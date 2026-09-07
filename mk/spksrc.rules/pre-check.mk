@@ -60,10 +60,23 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
-# Refuse an arch whose toolchain cannot meet MIN_GCC_VERSION / MIN_GLIBC_VERSION
-# (see spksrc.common/tc-capability.mk). Says why, not just where.
-ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
-  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
+# Every gate in the dependency tree, not only this package's own: a package is just as
+# blocked by a floor it never declared, and stopping at the first sends you round the loop
+# once per blocker. Same walk as `make check-<arch>-<vers>` (spksrc.rules/supported.mk),
+# stamped so a diamond is visited once, and it reports this package's verdict too.
+#
+# $(shell) folds newlines into spaces, so each line's own spaces travel as ~ and are put
+# back one $(info) at a time. No reason or package path contains one.
+ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
+_TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
+                   ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null | sed 's/ /~/g')
+endif
+
+# Refuse an arch whose toolchain cannot meet a declared floor (spksrc.common/tc-capability.mk),
+# naming every gate rather than the first, so one run tells the whole story.
+ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED))$(strip $(_TREE_GATES)),)
+  $(foreach _g,$(_TREE_GATES),$(info ===>  gate: $(subst ~, ,$(_g))))
+  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))$(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) gate(s) in the tree$())))
 endif
 
 # Check whether package supports ARCH.

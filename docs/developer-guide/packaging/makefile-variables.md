@@ -320,6 +320,21 @@ without a network query. So a rustc floor refuses only the archs pinned to an ol
 from-source Rust — see [Toolchain: custom from-source
 Rust](../../framework/toolchain.md#custom-from-source-rust-toolchains).
 
+**Ask what stands in the way.** `make check-<arch>-<tcvers>` lists every gate the
+package's whole dependency tree fails for that architecture, so a floor declared three
+levels down is visible without starting a build:
+
+```
+$ make check-x86-5.2
+===>  tvheadend: 17 gate(s) not met for x86-5.2
+         cross/chromaprint-fftw     gcc 4.7.3 < 4.8
+         cross/python314            gcc 4.7.3 < 4.8
+         cross/ffmpeg8              gcc 4.7.3 < 4.9
+```
+
+`make ARCH=x86 TCVERSION=5.2 check` is the same with the pair in variables. The
+pre-check runs the same walk, so a refused build names every blocker at once.
+
 **Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
 package belongs on its matching `cross/` package too, so a build is refused at its
 own level instead of failing deep in a dependency. If you add a floor to `spk/foo`,

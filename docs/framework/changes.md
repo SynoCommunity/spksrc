@@ -19,6 +19,21 @@ If you only read one thing, read this. The details are in the dated log below.
     cd cross/curl && make help
     ```
 
+- **Ask an architecture what stands in the way.** `make check-x86-5.2` (or
+  `make ARCH=x86 TCVERSION=5.2 check`) walks the whole dependency tree and lists every
+  capability gate that architecture fails, or says every gate is met:
+
+    ```
+    ===>  tvheadend: 17 gate(s) not met for x86-5.2
+             cross/chromaprint-fftw     gcc 4.7.3 < 4.8
+             cross/python314            gcc 4.7.3 < 4.8
+             cross/ffmpeg8              gcc 4.7.3 < 4.9
+    ```
+
+    The pre-check uses the same walk, so a refused build names every blocker at once
+    instead of stopping at the first. See
+    [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
+
 - **Declare what a package needs, not where it fails.** Instead of
   hand-maintaining an `UNSUPPORTED_ARCHS` list, state the capability floor:
   **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`MIN_RUSTC_VERSION`**,
@@ -83,7 +98,36 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 7th 2026 — An arch exclusion can say why (#7439)"
+??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
+    - **`make check-<arch>-<tcvers>`** reports every capability gate a package's whole
+      dependency tree fails for that architecture, or confirms it is clear.
+      `make ARCH=x86 TCVERSION=5.2 check` is the same thing with the pair in variables.
+      A pure diagnostic: it extracts no toolchain and builds nothing, it reads the floors
+      declared across the tree.
+    - **The pre-check names every gate, not the first.** A package is as blocked by a floor
+      it never declared as by one it did, and the pre-check only ever saw its own -- so
+      removing the blocker it named revealed the next, one build at a time. It now runs the
+      same walk and lists all of them before stopping:
+
+        ```
+        ===>  gate: cross/x264                 gcc 4.3.7 < 4.6
+        ===>  gate: cross/python314            gcc 4.3.7 < 4.8
+        ===>  gate: cross/ffmpeg8              gcc 4.3.7 < 4.9
+        ...
+        pre-check.mk:79: *** Arch 'ppc853x-5.2' is not supported by tvheadend:
+            gcc 4.3.7 < 4.9 (18 gate(s) in the tree).  Stop.
+        ```
+
+        It reuses `dependency-flat`'s walk, which already stamps each package so a diamond
+        is visited once, already forwards ARCH/TCVERSION so every package evaluates its own
+        conditional `DEPENDS`, and already sets `DEPENDENCY_WALK=1` so a refused package
+        reports instead of aborting. `DEP_FLAT_VERDICT` makes each package visited print its
+        own verdict, so one walk yields both the tree and every gate in it.
+
+        Cost is one walk per parse -- 2.8s warm on tvheadend's 141-package tree, against
+        builds measured in tens of minutes. Verdict-neutral on the archs measured: every
+        `spk/` package across x64-7.1, 88f6281-6.2.4 and ppc853x-5.2 gives the same
+        refused/allowed set as before. What changes is that the whole story is told at once.
     - **What was missing:** `UNSUPPORTED_ARCHS` states *where* a package fails and never
       *why*, and the archs are often added by an include rather than by the package -- so
       the message named a package with no such list in its own Makefile.
