@@ -376,6 +376,14 @@ tc_flags:
 # same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
 # active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
 # touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
+# TC_OVERLAY_<c>_PATH is the bin dir of an ACTIVE overlay, empty otherwise, so a package
+# can write its own fallback -- see the tc macro in spksrc.common/macros.mk, which is what
+# packages should call rather than assembling a path. Trailing slash, like TC_PATH.
+#
+# The GCC arm is inert today: no gcc overlay exists yet, so OVERLAY_GCC_ON is undefined and
+# the value comes out empty. It is emitted anyway so the contract is whole and a gcc
+# overlay needs no change here to switch it on.
+#
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
 tc_vars:
@@ -401,7 +409,9 @@ tc_vars:
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
-	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS))
+	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
+	echo TC_OVERLAY_BINUTILS_PATH := $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/) ; \
+	echo TC_OVERLAY_GCC_PATH := $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/)
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)

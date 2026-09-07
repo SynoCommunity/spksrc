@@ -33,6 +33,32 @@ version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; f
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
+# Macro: locate a toolchain tool
+#
+#   $(call tc,gcc)   $(call tc,ar)   $(call tc,g++)
+#
+# Absolute path of a cross tool, honouring whichever overlay provides it. A package must
+# not build that path itself: an overlay lives somewhere else entirely
+# (<consumer>/work/install/usr/local/bin against the toolchain's <work>/<target>/bin) and
+# the gcc family carries a version suffix there, so $(TC_PATH)$(TC_PREFIX)gcc silently
+# resolves to the vendor compiler whenever an overlay is active.
+#
+# Falls back to TC_PATH, so the call is correct with no overlay and stays correct when one
+# is grafted on -- nothing to revisit in the packages. TC_OVERLAY_<c>_PATH is empty unless
+# that overlay is ACTIVE (spksrc.toolchain/tc_vars.mk).
+#
+# Needed by any build system that ignores CC/AR from the environment: ffmpeg takes its
+# compilers from --cross-prefix, and a handful of packages pass CC=/AR= on a make line.
+_tc_gcc_tools      = gcc g++ c++ cpp gfortran
+_tc_binutils_tools = ld as ar nm ranlib strip objdump objcopy readelf
+
+tc = $(strip \
+  $(if $(filter $(1),$(_tc_gcc_tools)),\
+    $(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)$(1)$(TC_GCC_SUFFIX),\
+  $(if $(filter $(1),$(_tc_binutils_tools)),\
+    $(or $(TC_OVERLAY_BINUTILS_PATH),$(TC_PATH))$(TC_PREFIX)$(1),\
+    $(TC_PATH)$(TC_PREFIX)$(1))))
+
 # Remove duplicate words within string while preserving order
 define uniq
 $(strip \

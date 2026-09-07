@@ -115,7 +115,7 @@ endif
 endif
 	@echo "rust_args = [" ; \
 	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
-	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
+	echo -ne "\t'-Clinker=$(call tc,gcc)',\n"
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
