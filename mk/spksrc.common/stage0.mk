@@ -61,6 +61,17 @@
 #
 ###############################################################################
 
+# The shared tc_vars keeps the overlay state of whoever built first, so a directly invoked
+# package drops it here (MAKELEVEL: not deps) and the bootstrap below rewrites it.
+# Outside the ARCH guards: arch-<arch>-<vers> carries them in the goal, not in variables.
+ifeq ($(MAKELEVEL),0)
+ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
+  _s0_tc := $(or $(if $(strip $(ARCH)),$(if $(strip $(TCVERSION)),$(ARCH)-$(TCVERSION))),\
+                 $(patsubst arch-%,%,$(filter arch-%,$(MAKECMDGOALS))))
+  $(foreach t,$(_s0_tc),$(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(t) toolchainclean >/dev/null 2>&1))
+endif
+endif
+
 ifneq ($(strip $(filter-out noarch,$(ARCH))),)
 ifneq ($(strip $(TCVERSION)),)
 ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)

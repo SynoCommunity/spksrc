@@ -241,3 +241,14 @@ $(TOOLCHAIN_COOKIE): $(POST_TOOLCHAIN_TARGET)
 else
 toolchain: ;
 endif
+
+#####
+
+# Drop the generated tc_vars* and the cookies guarding them, so the next make rewrites them
+# for its own overlay state. Per-step cookies stay: nothing is re-downloaded or re-extracted.
+.PHONY: toolchainclean
+toolchainclean:
+	@$(MSG) "Removing generated tc_vars* and $(notdir $(TCVARS_COOKIE)) from $(TC_WORK_DIR)"
+	@rm -f $(TC_WORK_DIR)/tc_vars $(TC_WORK_DIR)/tc_vars.* \
+	       $(TC_WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done \
+	       $(TOOLCHAIN_COOKIE)
