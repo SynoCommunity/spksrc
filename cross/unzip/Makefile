@@ -13,7 +13,7 @@ LICENSE  = http://infozip.sourceforge.net/license.html
 
 CONFIGURE_TARGET = nop
 
-COMPILE_ARGS = -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
+COMPILE_ARGS = -f unix/Makefile generic CC="$(call tc,gcc)"
 INSTALL_ARGS = -f unix/Makefile install prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

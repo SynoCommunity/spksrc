@@ -59,13 +59,13 @@ CONFIGURE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
 
 # Export cross-compiler paths for cc-rs crate used by pcre2-sys
 # The cc-rs crate looks for CC_<target> (with underscores) to find the compiler
-ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)gcc
-ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)g++
-ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)ar
+ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,gcc)
+ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,g++)
+ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,ar)
 # pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
 ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=c99
 # Set cross-linker for Rust cargo builds
-ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr a-z- A-Z_)_LINKER=$(TC_PATH)$(TC_PREFIX)gcc
+ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr a-z- A-Z_)_LINKER=$(call tc,gcc)
 
 include ../../mk/spksrc.cross-cmake.mk
 

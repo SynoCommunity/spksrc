@@ -23,10 +23,10 @@ CONFIGURE_TARGET = nop
 INSTALL_TARGET = lua53_install
 
 COMPILE_ARGS += linux
-COMPILE_ARGS += CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
-COMPILE_ARGS += CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
-COMPILE_ARGS += AR="$(TC_PATH)$(TC_PREFIX)ar rcu \$$(ALLFLAGS)"
-COMPILE_ARGS += RANLIB="$(TC_PATH)$(TC_PREFIX)ranlib \$$(ALLFLAGS)"
+COMPILE_ARGS += CC="$(call tc,gcc) -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
+COMPILE_ARGS += CXX="$(call tc,g++) \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
+COMPILE_ARGS += AR="$(call tc,ar) rcu \$$(ALLFLAGS)"
+COMPILE_ARGS += RANLIB="$(call tc,ranlib) \$$(ALLFLAGS)"
 COMPILE_ARGS += CPPFLAGS="$(CPPFLAGS)"
 COMPILE_ARGS += LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib"
 COMPILE_ARGS += MYLIBS="-lncursesw"
