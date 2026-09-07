@@ -83,6 +83,40 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 7th 2026 — An overlay switch that did nothing on an installed toolchain (#7440)"
+    - **What was wrong:** the toolchain work dir holds ONE shared `tc_vars*`, and `tcvars`
+      regenerates it only while its cookie is absent. So the first package to build against
+      a toolchain fixed its overlay state, and every package after inherited it. Asking for
+      a different one changed nothing:
+
+        ```bash
+        make -C cross/<pkg> ARCH=qoriq TCVERSION=6.2.4 OVERLAY_RUSTC=1   # ... then
+        make -C cross/<pkg> ARCH=qoriq TCVERSION=6.2.4 OVERLAY_RUSTC=0
+        ```
+
+      `TC_OVERLAY_RUSTC`, `TC_EXTRA_RUSTFLAGS` and `TC_OVERLAY_BINUTILS` kept whatever the
+      first run wrote. The second build did not fail -- it quietly used the first one's
+      toolchain, which is the harder kind of wrong to notice.
+    - **`toolchainclean`** drops the generated `tc_vars*`, their cookie, and
+      `TOOLCHAIN_COOKIE`. The last is both consistent -- without its `tc_vars` a toolchain
+      is not fully installed -- and necessary: those cookies are read with `$(wildcard)` at
+      **parse** time, so one `make` cannot clean and regenerate in a single pass. The
+      rebuild has to come from the next invocation, and the missing cookie is what triggers
+      it. Per-step cookies stay, so nothing is re-downloaded or re-extracted.
+    - **Called from `stage0`,** outside its `ARCH`/`TCVERSION` guards so that one site
+      covers both entry points: `make -C cross/<pkg> ARCH=x TCVERSION=y`, which sets them,
+      and `make arch-<arch>-<vers>`, which does not -- it carries them in the goal, read
+      back from `MAKECMDGOALS`.
+    - **Only a directly invoked package cleans.** Dependencies already agree with whoever
+      pulled them in, and with `PARALLEL_MAKE=max` several parse at once -- one clearing the
+      file while another reads it is a race. `MAKELEVEL` is the discriminator: `0` from a
+      shell, non-zero for every sub-make.
+    - **Package-facing:** `make toolchainclean` in `toolchain/syno-<arch>-<vers>/` is now a
+      documented way to force a toolchain to re-answer. Nothing else changes: with a single
+      overlay state in play, which is the usual case, the regeneration is a few seconds and
+      the result identical.
+    - Pull request: [#7440](https://github.com/SynoCommunity/spksrc/pull/7440)
+
 ??? note "September 4th 2026 — Build logs keep what the console showed (#7396)"
     - **What was lost:** a package refused by a pre-check left a build log holding a
       single line. `$(error)` fires at **parse** time, so no recipe of the inner make
@@ -233,7 +267,9 @@ If you only read one thing, read this. The details are in the dated log below.
         with precedence `command line > environment > local.mk > defaults`. A request
         that cannot be honored degrades to the stock tools and says so in a banner
         rather than failing. `make help` in `cross/`, `spk/` and `diyspk/` prints the
-        switches, the value in effect, and what it resolves to for your arch.
+        switches, the value in effect, and what it resolves to for your arch. **That
+        precedence did not survive an already-installed toolchain until #7440** -- see the
+        September 7th entry: the shared tc_vars kept the first build's answer.
     - **Arch issues fixed along the way:** per-target rustflags, so the PowerPC SPE
       codegen options actually reach the compiler (`-Ctarget-cpu=e500
       -Ctarget-feature=+spe`, not `+efpu2`) — the qoriq `bat`/`lsd` SIGILL of #7304; the

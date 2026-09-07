@@ -53,6 +53,7 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
 endif
 ifeq ($(SPKSRC_TREE),toolchain)
 	@printf "  \033[36m%-24s\033[0m %s\n" "tc_vars" "show the toolchain variables (TC_GCC, ...)"
+	@printf "  \033[36m%-24s\033[0m %s\n" "toolchainclean" "drop tc_vars* so the next build regenerates them"
 endif
 ifeq ($(SPKSRC_TREE),toolkit)
 	@printf "  \033[36m%-24s\033[0m %s\n" "tk_vars" "show the toolkit variables"

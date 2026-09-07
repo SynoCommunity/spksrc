@@ -56,6 +56,7 @@ Run from `native/<package>/` directory (host tools built once, then reused via
 | `download` `checksum` `extract` `patch` `configure` `compile` `install` | Individual build lifecycle steps, in order |
 | `build-archive` / `print-archive-name` | Create the reusable archive on demand / print its filename (opt-in via `ARCHIVE_NAME`, see `spksrc.build/archive.mk`) |
 | `nativeclean` | Drop **this** package's build cookies so every step re-runs next `make`, keeping the work dir (source, install, archive). The native counterpart of `spkclean`; leaves dependencies' cookies alone |
+| `toolchainclean` | Drop a toolchain's generated `tc_vars*` and the cookies guarding them, so the next build regenerates them for its own overlay state. Run in `toolchain/syno-<arch>-<vers>/`. Keeps the extracted toolchain and its per-step cookies, so nothing is re-downloaded |
 | `clean` / `smart-clean` | Remove all work directories / this package's source and cookies |
 
 To re-run a single step, remove its one cookie, e.g.
