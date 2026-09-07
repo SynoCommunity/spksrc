@@ -66,6 +66,26 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 # Teed here rather than in build-arch-%: one level up also catches make's own
 # "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
 # _runlog's LOGGING_ENABLED guard makes this the only teeing level.
+# Every capability gate in the dependency tree that this arch fails, or nothing when it
+# builds. Pure diagnostic: reads the declared floors across the tree, extracts no toolchain.
+.PHONY: check
+check: SHELL:=/bin/bash
+check:  ## Report the capability gates ARCH/TCVERSION fails (see also check-<arch>-<vers>)
+	@out=$$(DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
+	          ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null) ; \
+	if [ -z "$$out" ] ; then \
+	   $(MSG) "$(NAME): every gate met for $(ARCH)-$(TCVERSION)" ; \
+	else \
+	   $(MSG) "$(NAME): $$(echo "$$out" | wc -l) gate(s) not met for $(ARCH)-$(TCVERSION)" ; \
+	   echo "$$out" | awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }' ; \
+	fi
+
+# The goal-shaped form, for symmetry with arch-<arch>-<vers>. Carries the pair in the goal
+# rather than in variables, so the parse it runs under has no ARCH to be refused for.
+check-%:
+	@$(MAKE) --no-print-directory check \
+	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
+
 arch-%: SHELL:=/bin/bash
 arch-%:
 	@set -o pipefail ; \

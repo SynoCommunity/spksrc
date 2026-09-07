@@ -59,6 +59,9 @@ ifeq ($(SPKSRC_TREE),toolkit)
 endif
 	@printf "  \033[36m%-24s\033[0m %s\n" "rustup <args>" "run rustup for the rust toolchain (e.g. make rustup show)"
 ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
+	@printf "  \033[36m%-24s\033[0m %s\n" "check-<arch>-<tcvers>" "list the capability gates an arch fails (also: ARCH=.. TCVERSION=.. check)"
+endif
+ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "\n\033[1mMulti-arch\033[0m  (needs 'make setup' once at the spksrc root first)\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-supported" "build for every supported arch"
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-latest" "build for the latest toolchains only"

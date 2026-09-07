@@ -14,8 +14,9 @@
 #
 ###############################################################################
 
-# disable checks for dependency targets
-ifneq ($(DEPENDENCY_WALK),1)
+# Disabled for dependency targets, and for the check goal -- whose whole job is to REPORT
+# the gates this arch fails, which a fatal pre-check would cut short at the first one.
+ifeq ($(strip $(filter 1,$(DEPENDENCY_WALK))$(filter check,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
@@ -120,4 +121,4 @@ endif
 
 endif # ifneq ($(TCVERSION),)
 
-endif # ifneq ($(DEPENDENCY_WALK),1)
+endif # ifeq (DEPENDENCY_WALK / check)
