@@ -46,7 +46,7 @@ endif
 COMPILE_ARGS = NO_PGXS=1 \
 	PG_CONFIG=$(PG_CONFIG) \
 	PG_CFLAGS="-I$(PG_SERVER_INCLUDE_DIR) -I$(STAGING_INSTALL_PREFIX)/include" \
-	CC="$(TC_PATH)$(TC_PREFIX)gcc" \
+	CC="$(call tc,gcc)" \
 	OPTFLAGS=""
 
 include ../../mk/spksrc.cross-cc.mk

@@ -13,9 +13,9 @@ LICENSE  = GPLv2
 
 # configure does not support GNU_CONFIGURE (--host, --build)
 # workaround inspired by: https://stackoverflow.com/questions/53885273/cross-compile-zlib-for-arm
-CONFIGURE_ARGS  = CXX=$(TC_PATH)$(TC_PREFIX)g++
-CONFIGURE_ARGS += AR=$(TC_PATH)$(TC_PREFIX)ar
-CONFIGURE_ARGS += RANTLIB=$(TC_PATH)$(TC_PREFIX)ranlib
+CONFIGURE_ARGS  = CXX=$(call tc,g++)
+CONFIGURE_ARGS += AR=$(call tc,ar)
+CONFIGURE_ARGS += RANTLIB=$(call tc,ranlib)
 
 CONFIGURE_ARGS += CPPFLAGS="-I $(STAGING_INSTALL_PREFIX)/include"
 CONFIGURE_ARGS += LDFLAGS="-L $(STAGING_INSTALL_PREFIX)/lib"
