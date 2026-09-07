@@ -279,6 +279,7 @@ dependency-flat-raw:
 	@PARALLEL_MAKE=max $(MAKE) -j $(nproc) --silent --no-print-directory \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
+		$(if $(DEP_FLAT_VERDICT),DEP_FLAT_VERDICT=1) \
 		dependency-flat-mk 2>/dev/null || true
 	@rm -rf $(DEP_FLAT_STAMP_DIR)
 
@@ -309,6 +310,10 @@ dependency-flat:
 # -------------------------------------------------------------------
 .PHONY: dependency-flat-mk
 dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
+	@# DEP_FLAT_VERDICT: each package visited also reports its own capability verdict, so
+	@# one walk yields both the tree and why any part of it refuses this arch. Emitted here
+	@# rather than by the parent -- TC_CAPABILITY_UNSUPPORTED is only correct in its own make.
+	$(if $(DEP_FLAT_VERDICT),@$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(TC_CAPABILITY_UNSUPPORTED)",:))
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
@@ -343,9 +348,27 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 	DEPENDENCY_WALK=1 \
 	$(MAKE) -s --output-sync=target \
 		-C ../../$$dep \
+		$(if $(DEP_FLAT_VERDICT),DEP_FLAT_VERDICT=1) \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 		dependency-flat-mk
+
+# -------------------------------------------------------------------
+# dependency-unsupported
+# Every package in the tree that refuses this arch, one per line, as
+#     <package> <reason>[, <reason>...]
+# Empty output means the whole tree accepts the arch. The same stamped walk as
+# dependency-flat, so a diamond is visited once, and OPTIONAL_DEPENDS drop out on
+# their own once ARCH and TCVERSION are both set.
+# -------------------------------------------------------------------
+.PHONY: dependency-unsupported
+dependency-unsupported:
+	@DEP_FLAT_VERDICT=1 $(MAKE) -s \
+		$(if $(ARCH),ARCH=$(ARCH)) \
+		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
+		dependency-flat-raw \
+		| sed -n 's/^UNSUPPORTED //p' \
+		| sort -u
 
 # -------------------------------------------------------------------
 # dependency-list
