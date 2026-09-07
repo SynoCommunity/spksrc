@@ -95,6 +95,12 @@ If you only read one thing, read this. The details are in the dated log below.
   package's build cookies to re-run it from scratch, the native counterpart of
   `spkclean`.
 
+- **One build tree, one set of `tc_vars`.** The toolchain directory no longer holds
+  generated variables at all; each build writes its own under its work directory, and
+  a dependency reads the tree that pulled it in. Two builds can run side by side
+  against the same toolchain. See
+  [tc_vars Files](../framework/toolchain.md#tc_vars-files).
+
 - **Rust builds on the legacy archs, and overlays are a first-class notion.** The archs
   `rustup` has no usable `rust-std` for — PowerPC e500 (`qoriq`, `ppc853x`), ARMv5
   `88f6281`, `x86-5.2` — now get a Rust toolchain built from source, published as an
@@ -106,6 +112,43 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 7th 2026 — The build tree owns its tc_vars, the toolchain owns none (#7442)"
+    - **What was shared:** `toolchain/syno-<arch>-<vers>/work` held one `tc_vars*` set.
+      `tcvars` short-circuits to an empty target once its cookie exists, so the *first*
+      build to reach a toolchain fixed that file and every build after inherited it --
+      in both directions. A build that wanted an overlay never got it provisioned; one
+      that did not was handed `TC_EXTRA_LDFLAGS` / `TC_OVERLAY_*` / `TC_GCC_SUFFIX` it
+      never asked for. A file shared by every build tree has no correct owner, so there
+      is no longer a file.
+    - **Each tree generates its own**, in its own work dir, and reads nothing else.
+      `WORK_DIR` already carried that scope: `depend.mk` passes the root's value down
+      through `$(ENV)`, `directories.mk` keeps what it is handed (`ifndef`), and the
+      `env -i` around an spk meta source is where one tree ends and the next begins:
+
+        ```
+        toolchain/syno-x64-7.1/work     0 tc_vars files
+        cross/libpng/work-x64-7.1       7 tc_vars files
+        cross/zlib/work-x64-7.1         0 tc_vars files   <- built inside libpng's tree
+        ```
+
+      Two builds may therefore run side by side against the same toolchain -- two SPKs,
+      or a cross package built directly to test it -- each with its own answer.
+    - **`stage0`** writes the tree's `tc_vars.mk` at parse time and includes that rather
+      than the toolchain's. Only the identity file: the other four embed
+      `INSTALL_PREFIX`-derived paths, and `INSTALL_PREFIX` is recipe environment that
+      `$(shell)` cannot see that early. It needs no extracted toolchain either, every
+      value in it being a constant of `toolchain/syno-*/Makefile`, so **`TC_GCC` now
+      resolves on a cold tree** and the heavy bootstrap keys on the extracted
+      `$(TC_TARGET)` instead of a generated file.
+    - **Ahead of the pre-check.** The generation is unconditional and runs before an arch
+      can be refused, so a refused package still leaves a work dir holding what the
+      refusal was judged against -- `spk/tvheadend/work-ppc853x-5.2/tc_vars.mk` with its
+      `TC_GCC := 4.3.7`.
+    - **Package-facing:** nothing to change. `make -C toolchain/<TC> toolchain` now only
+      downloads, extracts and patches; anything that read `toolchain/*/work/tc_vars*`
+      should read the build's own work dir instead.
+    - **Not closed by this:** work dirs are keyed on the arch alone, so two trees run in
+      sequence still share the *artifacts* under a dependency's work dir.
 ??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
     - **Seven restated floors gone.** `spk/tvheadend`, `chromaprint`, `comskip` and
       `spk/ffmpeg5-8` each declared `MIN_GCC_VERSION = 4.9`, restating what their own
