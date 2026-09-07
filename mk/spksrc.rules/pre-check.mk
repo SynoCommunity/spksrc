@@ -70,7 +70,8 @@ endif
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 # Required gates only: an optional dependency that refuses must not refuse the build.
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
-                   ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null | sed 's/ /~/g')
+                   ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
+                   | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
 endif
 
 # Refuse an arch whose toolchain cannot meet a declared floor (spksrc.common/tc-capability.mk),

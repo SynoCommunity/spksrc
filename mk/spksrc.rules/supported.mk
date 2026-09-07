@@ -69,8 +69,11 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 # Required gates come from the walk an arch context already defines; the optional ones are
 # what a second walk adds when OPTIONAL_DEPENDS are followed too. A set difference, not a
 # label carried down: a package under both a required and an optional parent is required.
+# The grep is not redundant with the sed inside dependency-unsupported: stage0's bootstrap
+# notice is an $(info) from the sub-make's PARSE, so it bypasses that recipe's own pipe.
 _gate_walk = DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
-                 ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null
+                 ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
+                 | grep -E '^(cross|spk|diyspk|native|kernel)/'
 _gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }'
 
 # Every capability gate in the dependency tree that this arch fails, or nothing when it

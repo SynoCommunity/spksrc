@@ -24,11 +24,19 @@ If you only read one thing, read this. The details are in the dated log below.
   capability gate that architecture fails, or says every gate is met:
 
     ```
-    ===>  tvheadend: 17 gate(s) not met for x86-5.2
-             cross/chromaprint-fftw     gcc 4.7.3 < 4.8
-             cross/python314            gcc 4.7.3 < 4.8
+    ===>  tvheadend: x86-5.2 check: 17 failed, 14 more behind an optional dependency
+           required
              cross/ffmpeg8              gcc 4.7.3 < 4.9
+             cross/python314            gcc 4.7.3 < 4.8
+             ...
+           optional
+             cross/frei0r               gcc 4.7.3 < 7.5
+             ...
     ```
+
+    **required** is what the build needs; **optional** is what an `OPTIONAL_DEPENDS`
+    branch would demand if turned on, and never a reason to refuse. A clear architecture
+    answers `x86-5.2 check: OK`.
 
     The pre-check uses the same walk, so a refused build names every blocker at once
     instead of stopping at the first. See
@@ -99,8 +107,13 @@ If you only read one thing, read this. The details are in the dated log below.
 ---
 
 ??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
+    - **Seven restated floors gone.** `spk/tvheadend`, `chromaprint`, `comskip` and
+      `spk/ffmpeg5-8` each declared `MIN_GCC_VERSION = 4.9`, restating what their own
+      `cross/` package declares -- and `cross/<same>` is a direct `DEPENDS`, so the walk
+      finds it. Declare a floor on the `cross/` package, where the requirement is a fact
+      about the code; the `spk/` inherits it by being walked. Verdicts unchanged.
     - **`make check-<arch>-<tcvers>`** reports every capability gate a package's whole
-      dependency tree fails for that architecture, or confirms it is clear.
+      dependency tree fails for that architecture, or answers `<arch>-<vers> check: OK`.
       `make ARCH=x86 TCVERSION=5.2 check` is the same thing with the pair in variables.
       A pure diagnostic: it extracts no toolchain and builds nothing, it reads the floors
       declared across the tree.
@@ -110,12 +123,12 @@ If you only read one thing, read this. The details are in the dated log below.
       same walk and lists all of them before stopping:
 
         ```
-        ===>  gate: cross/x264                 gcc 4.3.7 < 4.6
-        ===>  gate: cross/python314            gcc 4.3.7 < 4.8
-        ===>  gate: cross/ffmpeg8              gcc 4.3.7 < 4.9
+        ===>  check: cross/x264 gcc 4.3.7 < 4.6
+        ===>  check: cross/python314 gcc 4.3.7 < 4.8
+        ===>  check: cross/ffmpeg8 gcc 4.3.7 < 4.9
         ...
-        pre-check.mk:79: *** Arch 'ppc853x-5.2' is not supported by tvheadend:
-            gcc 4.3.7 < 4.9 (18 gate(s) in the tree).  Stop.
+        pre-check.mk:80: *** Arch 'ppc853x-5.2' is not supported by tvheadend
+            (18 failed check(s) in the tree).  Stop.
         ```
 
         It reuses `dependency-flat`'s walk, which already stamps each package so a diamond

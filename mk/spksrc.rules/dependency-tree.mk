@@ -308,6 +308,18 @@ dependency-flat:
 		| grep -P "^(cross|python|native|spk|diyspk)/" \
 		| sort -u
 
+# Everything this package would refuse the arch for, in the shape the pre-check reports:
+# a capability floor, and an explicit UNSUPPORTED_ARCHS with whatever reason came with it.
+_dep_flat_listed = $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS))$(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch$(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON)))))
+
+# The DSM/SRM window, tested the way pre-check.mk tests it further down.
+_dep_flat_dsm = $(strip \
+  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0)),$(if $(filter $(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM)))),,DSM $(TCVERSION) < $(REQUIRED_MIN_DSM))) \
+  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0)),$(if $(filter $(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM)))),,DSM $(TCVERSION) > $(REQUIRED_MAX_DSM))) \
+  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0)),$(if $(filter $(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM)))),,SRM $(TCVERSION) < $(REQUIRED_MIN_SRM))))
+
+_dep_flat_why = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_dep_flat_listed)),$(_dep_flat_dsm))
+
 # -------------------------------------------------------------------
 # dependency-flat-mk
 # Parallel orchestrator — invokes all annotated dep-flat-mk-% targets.
@@ -318,7 +330,7 @@ dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
 	@# DEP_FLAT_VERDICT: each package visited also reports its own capability verdict, so
 	@# one walk yields both the tree and why any part of it refuses this arch. Emitted here
 	@# rather than by the parent -- TC_CAPABILITY_UNSUPPORTED is only correct in its own make.
-	$(if $(DEP_FLAT_VERDICT),@$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(TC_CAPABILITY_UNSUPPORTED)",:))
+	$(if $(DEP_FLAT_VERDICT),@$(if $(strip $(_dep_flat_why)),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",:))
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
