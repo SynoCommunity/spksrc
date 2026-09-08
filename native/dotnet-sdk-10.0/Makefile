@@ -1,8 +1,8 @@
-# Version 9.0.12, SDK 9.0.309
-# https://dotnet.microsoft.com/download/dotnet/9.0
-PKG_VERS = 9.0.309
+# Version 10.0.11, SDK 10.0.400
+# https://dotnet.microsoft.com/download/dotnet/10.0
+PKG_VERS = 10.0.400
 PKG_EXT = tar.gz
-PKG_NAME = dotnet-sdk-9.0
+PKG_NAME = dotnet-sdk-10.0
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/Sdk/${PKG_VERS}
 

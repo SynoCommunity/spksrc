@@ -11,7 +11,7 @@ JELLYFIN_ARGS="--service \
 -c ${SYNOPKG_PKGVAR}/config \
 -l ${SYNOPKG_PKGVAR}/log \
 -w ${SYNOPKG_PKGDEST}/web \
---ffmpeg /var/packages/ffmpeg7/target/bin/ffmpeg"
+--ffmpeg /var/packages/ffmpeg8/target/bin/ffmpeg"
 
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
 
@@ -29,7 +29,7 @@ validate_preupgrade() {
     previous="${SYNOPKG_OLD_PKGVER%%-*}"
     current="${SYNOPKG_PKGVER%%-*}"
 
-    # Restrict upgrades to 10.11.x
+    # Restrict upgrades to 10.11.x and 12.x
     case "$current" in
         10.11.*)
             case "$previous" in
@@ -47,6 +47,27 @@ validate_preupgrade() {
                     echo "ERROR: Upgrades to Jellyfin 10.11.x are only supported from 10.10.7 or another 10.11.x version."
                     echo "Current version: $previous → Target version: $current"
                     echo "Please update to 10.10.7 first, then upgrade to 10.11.x."
+                    exit 1
+                    ;;
+            esac
+            ;;
+        12.*)
+            # Direct upgrades from 10.10.7 and 10.11.x to 12.0 are supported;
+            # database changes prevent rolling back, so back up those paths
+            case "$previous" in
+                10.10.7|10.11.*)
+                    SC_BACKUP_CONFIG=y
+                    export SC_BACKUP_CONFIG
+                    return 0
+                    ;;
+                12.*)
+                    # Allowed path, but no backup needed
+                    return 0
+                    ;;
+                *)
+                    echo "ERROR: Upgrades to Jellyfin 12.x are only supported from 10.10.7, 10.11.x or another 12.x version."
+                    echo "Current version: $previous → Target version: $current"
+                    echo "Please update to 10.10.7 first, then upgrade to 12.x."
                     exit 1
                     ;;
             esac
