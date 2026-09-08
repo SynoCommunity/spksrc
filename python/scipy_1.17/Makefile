@@ -1,11 +1,12 @@
-PKG_NAME = scipy
+PKG_NAME = scipy_$(PKG_VERS)
+PKG_REAL_NAME = scipy
 # Version >= 1.14.x requires gcc>=9.1 -> DSM-7.2+
 # Or using patch to enforce lower minimal gcc-8.5
-PKG_VERS = 1.18.1
+PKG_VERS = 1.17.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/s/scipy
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://scipy.org/
 COMMENT  = SciPy provides algorithms for optimization, integration, interpolation, eigenvalue problems, algebraic equations, differential equations, statistics and many other classes of problems.
@@ -46,5 +47,3 @@ scipy_post_configure:
 	@echo "build-python-version = '$(PYTHON_VERSION)'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "host-python-path = '$(CROSSENV_PATH)/bin/cross-python'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "host-python-version = '$(PYTHON_VERSION)'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
-	@echo "[binaries]" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
-	@echo "numpy-config = '$(CROSSENV_PATH)/build/bin/numpy-config'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
