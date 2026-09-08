@@ -22,8 +22,6 @@
       }, {
         "desc": "If you let the installer handle it, the shared folder goes to the package's volume. To use a different volume, create the shared folder in DSM Control Panel before installation and input its name during setup."
       }, {
-        "desc": ""
-      }, {
         "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> guide."
       }
     ]
