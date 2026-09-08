@@ -46,3 +46,5 @@ scipy_post_configure:
 	@echo "build-python-version = '$(PYTHON_VERSION)'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "host-python-path = '$(CROSSENV_PATH)/bin/cross-python'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "host-python-version = '$(PYTHON_VERSION)'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
+	@echo "[binaries]" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
+	@echo "numpy-config = '$(CROSSENV_PATH)/build/bin/numpy-config'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
