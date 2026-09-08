@@ -106,6 +106,12 @@ endif
 ##   2) access to maturin from crossenv/build/bin -> ${CROSSENV_PATH}/build/bin
 ##   3) access to crossenv/bin/cross* tools, mainly cross-pip -> ${CROSSENV_PATH}/bin
 ##
+##   4) per-wheel setup.py options from any [$(WHEEL_NAME)] section in
+##      $(WHEELS_BUILD_ARGS), forwarded as --config-settings=--global-option=*
+##      (pip silently ignores bare --global-option under PEP 517, so the
+##      --config-settings passthrough is required for setuptools-backed
+##      wheels; other backends ignore unknown settings)
+##
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
 	@$(MSG) Cross-compiling Python wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
@@ -120,6 +126,7 @@ cross-compile-wheel-%:
 	      cp -f "$${_cross_npymath}" "$${_build_npymath}"; \
 	   fi ; \
 	   extra_args=""; \
+	   pip_global_option=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | sed -e 's/[^ ][^ ]*/--config-settings=--global-option=&/g') ; \
 	$(MESON_PYTHON_CROSS_FILE_CMD) ; \
 	_pip_args="$(PIP_WHEEL_ARGS_CROSSENV)"; \
 	case "$(WHEEL_NAME)" in \
