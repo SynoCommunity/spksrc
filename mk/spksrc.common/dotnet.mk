@@ -17,8 +17,8 @@
 # 4. Certain combinations of ARMv7 and DSM are incompatible (issues #4790, #5089, #5302, #5315)
 # 5. Comprehensive ARMv7 testing conducted under issue #5574 resulted in the following exclusions
 #
-# The cross/ side is in spksrc.cross/env-dotnet.mk, which the dotnet build environment
-# pulls in; it carries its own list and its own reason.
+# Selected for a package built with the dotnet SDK by spksrc.cross-dotnet.mk itself:
+#   DOTNET_BUILD_ARCHS  = 1   the archs dotnet has no runtime port for
 ###############################################################################
 
 # dotnet is absent here for four different reasons, so the reason is picked by the arch at
@@ -34,6 +34,13 @@ _dotnet_why = $(strip $(or \
 # Servarr 2 refuses every ARMv7, capable silicon included, on a runtime bug rather than a
 # missing port -- so that ground is its own, and takes precedence over the map above.
 _dotnet_why_servarr2 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 servarr on ARMv7: dotnet/runtime#109739),$(_dotnet_why))
+
+# Anything built with the dotnet SDK; spksrc.cross-dotnet.mk sets this before it includes
+# spksrc.common.mk. Narrower than the app lists below: only the archs with no runtime port.
+ifeq ($(strip $(DOTNET_BUILD_ARCHS)),1)
+    UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
+    UNSUPPORTED_ARCHS_REASON := $(_dotnet_why)
+endif
 
 # Exclusions for dotnet core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)

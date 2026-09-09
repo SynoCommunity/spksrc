@@ -40,6 +40,10 @@ endif
 
 
 # Common makefiles
+# Every dotnet build refuses the archs dotnet has no runtime port for. Raised here, before
+# common.mk, because spksrc.common/dotnet.mk holds the list and the reason for all of them.
+DOTNET_BUILD_ARCHS = 1
+
 include ../../mk/spksrc.common.mk
 
 ##### dotnet specific configurations
