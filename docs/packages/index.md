@@ -86,6 +86,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Media Management"><td><a href="radarr-sonarr/">Radarr/Sonarr</a></td><td>Media Management</td><td>Movie &amp; TV series management</td></tr>
     <tr data-category="Backup"><td><a href="rclone/">Rclone</a></td><td>Backup</td><td>Cloud storage sync tool</td></tr>
     <tr data-category="Downloads"><td><a href="rutorrent/">ruTorrent</a></td><td>Downloads</td><td>Web-based BitTorrent client</td></tr>
+    <tr data-category="Development"><td><a href="rust/">Rust</a></td><td>Development</td><td>Rust compiler and cargo toolchain</td></tr>
     <tr data-category="Automation"><td><a href="salt/">Salt</a></td><td>Automation</td><td>Infrastructure automation</td></tr>
     <tr data-category="Media Management"><td><a href="sickbeard-custom/">SickBeard Custom</a></td><td>Media Management</td><td>SickBeard fork selector (archived)</td></tr>
     <tr data-category="Sync"><td><a href="syncthing/">Syncthing</a></td><td>Sync</td><td>Continuous file synchronization</td></tr>
