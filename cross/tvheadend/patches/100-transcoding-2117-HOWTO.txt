@@ -10,23 +10,24 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Current base: a97e57917, a single commit on top of master 45cbe4adb (Aug 22nd 2026).
-uknunknown rewrote the branch on 2026-09-01 to drop two merge commits and a
-duplicated commit; regenerating against the new head is what this revision does.
+Current base: f9c549a95, a single commit on top of master 45cbe4adb (Jul 31st 2026).
 
-What that head already carries, so it is no longer patched separately here:
-  102 apply-stream-params      (with his own V4L2 adjustment)
-  103 rename-matroska-to-mkv
-  104 restore-mpegts-profile
-  105 fix-webui-tv-profiles
-  106 hevc-software-preset
-  107 muxer report avcC/hvcC failure
-  108 muxer fix false reconfigure
-  109 muxer avio buffer size (MUX_BUF_SIZE 32768)
-  112 vainfo no vaTerminate() on failed init
-  113 config vainfo own group
+Nothing is carried on top any more. Everything this package used to patch
+separately has been taken upstream into PR #2117:
 
-Only 101 is still carried on top -- see 101-transcode-HOWTO.txt.
+  101 hwaccel decode fallback      102 audio ch_layout compare
+  103 audio drop dead legacy args  104 audio stale aresample comment
+  105 profile sharer double free   106 video recover first frame pts
+  107 globalheaders av start       108 globalheaders av passthru
+
+uknunknown also added a fix of his own in context.c, filling a missing pts from
+the packet fed to av_parser_parse2() -- which attacks the same first-frame
+timestamp loss 106 handled downstream, at its source.
+
+Verify a regenerated patch reproduces the branch exactly rather than trusting
+`patch --dry-run`: a patch whose change is already present can still apply with
+fuzz and duplicate the block. Extract the tarball, apply, and diff against
+`git archive <head>`; it should report no differences at all.
 
 # Regenerate the patch from the working tree. The base MUST equal the
 # cross/tvheadend Makefile PKG_GIT_HASH (the distrib tarball the patch applies to),
