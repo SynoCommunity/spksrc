@@ -61,6 +61,9 @@ include $(BASEDIR)/mk/spksrc.common/stage0.mk
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
 
+# Which archs a dotnet package refuses (needs the arch groups above)
+include $(BASEDIR)/mk/spksrc.common/dotnet.mk
+
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
 # Load local configuration
