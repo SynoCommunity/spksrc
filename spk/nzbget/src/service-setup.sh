@@ -6,17 +6,41 @@ TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/share/nzbget/nzbget.conf"
 WEBDIR="${SYNOPKG_PKGDEST}/bin/webui"
 NZBGET_INSTALLER="${SYNOPKG_PKGVAR}/nzbget.run"
 GROUP="sc-download"
+# Version of NZBGet to install for kernel < 3.2
+KERNEL_PINNED_VERSION="26.3"
 
 # Force-overwrite the PID-file and WebDir setting
 # These could change depending on previous package settings
 SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_FILE} -D"
 
+is_pre_3_2_kernel ()
+{
+    KERNEL_MAJOR=$(uname -r | cut -d. -f1)
+    KERNEL_MINOR=$(uname -r | cut -d. -f2)
+
+    [ "${KERNEL_MAJOR}" -lt 3 ] || { [ "${KERNEL_MAJOR}" -eq 3 ] && [ "${KERNEL_MINOR}" -lt 2 ]; }
+}
+
+validate_preinst ()
+{
+    # Latest (testing) installer is not compatible with kernels older than 3.2.
+    if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ] && is_pre_3_2_kernel; then
+        echo "Latest testing NZBGet is not supported on kernel $(uname -r) (< 3.2). Select stable instead."
+        exit 1
+    fi
+}
+
 service_postinst ()
 {
     # Download current NZBGet (stable or testing)
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
-        echo "Download nzbget installer: latest"
-        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-bin-linux.run"
+        if is_pre_3_2_kernel; then
+            echo "Download nzbget installer: ${KERNEL_PINNED_VERSION} (kernel $(uname -r) < 3.2)"
+            wget --quiet --output-document="${NZBGET_INSTALLER}" "https://github.com/nzbgetcom/nzbget/releases/download/v${KERNEL_PINNED_VERSION}/nzbget-${KERNEL_PINNED_VERSION}-bin-linux.run"
+        else
+            echo "Download nzbget installer: latest"
+            wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-bin-linux.run"
+        fi
     fi
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
         echo "Download nzbget installer: latest-testing"
@@ -44,6 +68,11 @@ service_postinst ()
         echo "The installer failed to install NZBGet. Please report the log below to SynoCommunity:"
         echo "${INST_LOG}"
         exit 1
+    fi
+
+    # Remove package-info.json from WebDir on pre-3.2 kernels to disable internal updater
+    if is_pre_3_2_kernel; then
+        rm -f "${WEBDIR}/package-info.json"
     fi
 
     # Make a copy of the config file created by the current installer
