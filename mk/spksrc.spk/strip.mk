@@ -46,13 +46,25 @@ TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
 # The toolchain's <target> root: a runtime library can sit in more than one place
 # under it (the sysroot lib, the compiler's own lib/lib64), so the search for a copy
 # to carry starts here rather than at the sysroot lib alone.
-TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..)
+#
+# An active gcc overlay adds a second root: it keeps its runtimes under
+# lib/gcc/<target>/<vers>/ (--enable-version-specific-runtime-libs), in its own
+# consumer directory, outside the base toolchain entirely.
+TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..) $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install)
 
 # Runtime libraries DSM does not ship, so any binary that needs one has to carry it
 # from the toolchain. libstdc++/libgcc_s are deliberately NOT here: DSM ships them,
 # and carrying a newer copy only matters once a gcc overlay can outpace the DSM one
 # -- that arrives with the overlay, as a separate TC_LIBS_OVERLAY list.
 TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
+
+# The overlay list the comment above anticipated. A gcc overlay outpaces the compiler
+# DSM ships, so a C++ binary built with it links against a libstdc++ newer than the NAS
+# has and will not start without a copy. Only when the overlay is ACTIVE: on a stock
+# build DSM's own copy is the right one, and shipping a second would be a regression.
+# _select_tclib_ then picks by the symbol versions the binary needs, so it takes the
+# overlay's libstdc++ rather than the sysroot's older one sitting under the same roots.
+TC_LIBS_OVERLAY = $(if $(OVERLAY_GCC_ON),libstdc++.so libgcc_s.so)
 
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
@@ -106,7 +118,7 @@ endef
 
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
-	for tclib in $(TC_LIBS_DEFAULT); do \
+	for tclib in $(TC_LIBS_DEFAULT) $(TC_LIBS_OVERLAY); do \
 	echo  "===> SEARCHING for $${tclib}" ; \
 	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
 	  case $${type} in \

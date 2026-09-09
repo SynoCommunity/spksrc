@@ -10,9 +10,25 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+#
+# Left OFF here on purpose: ffmpeg4 is the one package with no gcc floor, so it is the
+# only one that reaches a toolchain the overlay would otherwise have polluted. Keeping it
+# on the vendor compiler is what proves the stage0 tc_vars fix -- it is the build that
+# used to die on "ld: cannot find -latomic".
+#OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so under a gcc
+# overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
+# or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
+# and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
+CONFIGURE_ARGS += --cc=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic

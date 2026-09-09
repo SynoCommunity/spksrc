@@ -71,6 +71,24 @@ ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 # TC_WORK_DIR in particular is `?=` there, so it would keep our wrong value).
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
+# The toolchain work dir holds ONE shared tc_vars*, and tcvars regenerates it only
+# while its cookie is absent -- so the first package to build against a toolchain
+# fixes its overlay state and every package after inherits it, in both directions:
+# one that wants an overlay never gets it provisioned, one that does not is handed
+# TC_EXTRA_LDFLAGS / TC_OVERLAY_* / TC_GCC_SUFFIX it never asked for.
+#
+# A DIRECTLY invoked package owns that file, so drop it here and let the bootstrap
+# below rebuild it for this build's overlay state. Dependencies must not: they run
+# with the selectors forwarded (_OVERLAY_FORWARDED), they already agree with the
+# package that pulled them in, and with PARALLEL_MAKE=max several of them parse at
+# once -- one clearing the file while another reads it is a race.
+#
+# Before the -include below, and before the bootstrap's wildcard test, which is what
+# turns the removal into a regeneration.
+ifeq ($(strip $(_OVERLAY_FORWARDED)),)
+  $(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchainclean >/dev/null 2>&1)
+endif
+
 # Bootstrap (heavy, cookie-guarded) only when no explicit build goal and the
 # toolchain is not ready. On success, drop a status cookie in the PACKAGE work
 # dir tracing WHICH package triggered the early bootstrap. Purely informational:

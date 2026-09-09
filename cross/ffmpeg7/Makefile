@@ -13,9 +13,20 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so under a gcc
+# overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
+# or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
+# and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
+CONFIGURE_ARGS += --cc=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
 
 # The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
 # toolchains ship no such header. Was disabled for qoriq by name.

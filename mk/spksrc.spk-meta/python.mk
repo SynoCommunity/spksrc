@@ -10,9 +10,15 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
   PYTHON_PACKAGE = python312
 endif
 
-# Mark default unsupported archs
+# Mark default unsupported archs.
+#
+# The consumer inherits these without declaring them, so say which package excluded it and
+# why: read the floor from the python package rather than restate it, so the two cannot
+# drift apart.
 ifeq ($(call version_ge, $(PYTHON_PACKAGE), python312),1)
   UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+  _PYTHON_MIN_GCC := $(shell sed -n 's/^MIN_GCC_VERSION *= *//p' $(CURDIR)/../../cross/$(PYTHON_PACKAGE)/Makefile 2>/dev/null)
+  UNSUPPORTED_ARCHS_REASON += $(PYTHON_PACKAGE)$(if $(_PYTHON_MIN_GCC),: gcc $(TC_GCC) < $(_PYTHON_MIN_GCC))
 endif
 
 # set default spk/python* path to use

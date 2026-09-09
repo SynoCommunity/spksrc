@@ -53,6 +53,16 @@ ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
 DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
 endif
 
+# Same reason as overlay-gcc-install: an arch with no rust consumer has nothing else
+# pulling this in once the toolchain cookie exists.
+.PHONY: overlay-binutils-install
+ifeq ($(OVERLAY_BINUTILS_ON),1)
+overlay-binutils-install:
+	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_BINUTILS)
+else
+overlay-binutils-install: ;
+endif
+
 # Report a degraded or risky state. Conditions AND wording both come from
 # spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):
 # the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
@@ -63,7 +73,7 @@ overlay-binutils-warn:
 else ifeq ($(OVERLAY_BINUTILS_MISSING),1)
 overlay-binutils-warn:
 	@$(OVERLAY_WARN_BINUTILS_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_ON),1)
+else ifeq ($(OVERLAY_BINUTILS_ON)$(OVERLAY_GCC_ON),1)
 overlay-binutils-warn:
 	@$(OVERLAY_WARN_BINUTILS_UNMATCHED)
 else

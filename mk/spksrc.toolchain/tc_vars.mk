@@ -191,6 +191,8 @@ endif
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
 	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
+	  drv=$${source%% *} ; rest=$${source#$${drv}} ; \
+	  case " $(TC_GCC_TOOLS) " in *" $${drv} "*) tcbin="$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN),$${tcbin})" ; source="$${drv}$(OVERLAY_GCC_SUFFIX)$${rest}" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
@@ -279,10 +281,12 @@ tc_meson_cross_vars:
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
 	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
+	  drv=$${source%% *} ; rest=$${source#$${drv}} ; \
+	  case " $(TC_GCC_TOOLS) " in *" $${drv} "*) tcbin="$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN),$${tcbin})" ; source="$${drv}$(OVERLAY_GCC_SUFFIX)$${rest}" ;; esac ; \
 	  extra="" ; case "$${target}" in ldshared) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)g++'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)g++$(OVERLAY_GCC_SUFFIX)'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
@@ -333,8 +337,8 @@ tc_rust_vars:
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
 	echo TC_ENV += RUST_TARGET_PATH=\"$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)gcc$(OVERLAY_GCC_SUFFIX)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
@@ -349,6 +353,8 @@ tc_autotools_vars:
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
 	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
+	  drv=$${source%% *} ; rest=$${source#$${drv}} ; \
+	  case " $(TC_GCC_TOOLS) " in *" $${drv} "*) tcbin="$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN),$${tcbin})" ; source="$${drv}$(OVERLAY_GCC_SUFFIX)$${rest}" ;; esac ; \
 	  extra="" ; case "$${target}" in LDSHARED) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
 	  echo TC_ENV += $${target}=\"$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
 	done ; \
@@ -376,6 +382,17 @@ tc_flags:
 # same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
 # active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
 # touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
+# TC_OVERLAY_<c>_PATH is the bin dir of an ACTIVE overlay, empty otherwise -- so a package
+# writes the fallback itself and reads as the pair it is:
+#
+#   $(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+#
+# Published because a package cannot work it out: OVERLAY_<c>_ON and OVERLAY_<c>_BIN are
+# toolchain-side, and the layouts differ -- <work>/<target>/bin for the vendor toolchain,
+# <consumer>/work/install/usr/local/bin for an overlay. Needed by any build system that
+# ignores CC/AR from the environment; ffmpeg takes its compilers from --cross-prefix, and
+# a handful of packages pass CC=/AR= explicitly. Trailing slash, like TC_PATH.
+#
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
 tc_vars:
@@ -401,7 +418,11 @@ tc_vars:
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
-	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS))
+	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
+	echo TC_OVERLAY_GCC := $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)) ; \
+	echo TC_GCC_SUFFIX := $(OVERLAY_GCC_SUFFIX) ; \
+	echo TC_OVERLAY_GCC_PATH := $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/) ; \
+	echo TC_OVERLAY_BINUTILS_PATH := $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/)
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
@@ -413,7 +434,7 @@ endif
 #####
 
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
-tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
+tcvars: overlay-binutils-warn overlay-gcc-warn overlay-rustc-warn overlay-binutils-install overlay-gcc-install generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
 $(TCVARS_COOKIE): $(POST_TCVARS_TARGET)
 	$(create_target_dir)

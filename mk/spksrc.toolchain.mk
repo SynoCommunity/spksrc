@@ -193,10 +193,12 @@ ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
 endif
 
-# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
-# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
-# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
+# OVERLAY_<component> family together, base layer first: overlay-binutils sets the shim
+# path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-gcc, overlay-rustc and tc_vars all
+# read; overlay-gcc resolves the compiler suffix tc_vars appends; and overlay-rustc
+# resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
 include ../../mk/spksrc.toolchain/overlay-binutils.mk
+include ../../mk/spksrc.toolchain/overlay-gcc.mk
 include ../../mk/spksrc.toolchain/overlay-rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 
@@ -241,3 +243,31 @@ $(TOOLCHAIN_COOKIE): $(POST_TOOLCHAIN_TARGET)
 else
 toolchain: ;
 endif
+
+#####
+
+# toolchainclean -- drop the generated tc_vars* and the cookie that guards them, so the
+# next `tcvars` regenerates them.  Deliberately NOT a full clean: the extracted toolchain
+# and its step cookies stay, and so do the overlay consumers, which are additive (each
+# installs under its own directory and only symlinks INTO the base sysroot, never over it).
+#
+# TOOLCHAIN_COOKIE goes too, and consistently so: without its tc_vars the toolchain is not
+# fully installed. It also makes the removal effective -- both cookies are tested with
+# $(wildcard) at PARSE time, so a single make cannot clean and regenerate in one go; the
+# rebuild has to come from the next invocation, which the missing cookie is what triggers.
+# The per-step cookies stay, so nothing is re-downloaded or re-extracted: `toolchain` just
+# walks its DEPENDS again (provisioning any overlay this build asks for) and rewrites
+# tc_vars*.
+#
+# Needed because tcvars short-circuits to an empty target once TCVARS_COOKIE exists, which
+# also drops overlay-{binutils,gcc}-install from its prerequisites.  A toolchain first
+# built without an overlay therefore keeps a tc_vars.mk that names no overlay, and never
+# provisions one for the package that asks -- while a toolchain first built WITH one hands
+# its TC_EXTRA_LDFLAGS, TC_OVERLAY_* and TC_GCC_SUFFIX to every later package, whether it
+# wants the overlay or not.
+.PHONY: toolchainclean
+toolchainclean:
+	@$(MSG) "Removing generated tc_vars* and $(notdir $(TCVARS_COOKIE)) from $(TC_WORK_DIR)"
+	@rm -f $(TC_WORK_DIR)/tc_vars $(TC_WORK_DIR)/tc_vars.* \
+	       $(TC_WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done \
+	       $(TOOLCHAIN_COOKIE)

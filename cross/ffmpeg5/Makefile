@@ -13,9 +13,20 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so under a gcc
+# overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
+# or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
+# and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
+CONFIGURE_ARGS += --cc=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -246,7 +257,8 @@ CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
 # Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
-# and only qoriq was listed. Inert today: ffmpeg5 needs gcc 4.9, ppc853x has 4.3.7.
+# and only qoriq was listed. ppc853x is reachable too now that the gcc 8.5 overlay
+# provides the compiler its own 4.3.7 could not.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2

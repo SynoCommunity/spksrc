@@ -29,6 +29,10 @@ POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
 SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
