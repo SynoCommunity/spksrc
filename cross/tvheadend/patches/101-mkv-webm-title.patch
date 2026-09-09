@@ -1,0 +1,61 @@
+Write the Matroska Title element for WebM too.
+
+Connecting to a stream in VLC shows the channel name for the Matroska and MP4
+profiles, but for the WebM ones -- VP8 and VP9, software or VAAPI -- it shows
+the request URL instead: the channel UUID followed by the profile name.
+
+muxer_mkv.c builds Segment Information with two elements guarded the same way:
+
+    if(!mk->webm)
+      ebml_append_bin(q, 0x73a4, mk->uuid, sizeof(mk->uuid));   // SegmentUUID
+
+    if(!mk->webm)
+      ebml_append_string(q, 0x7ba9, mk->title);                 // Title
+
+The first guard is right: WebM has no use for SegmentUUID, which exists for
+segment linking that WebM does not support. The second is not -- Title is part
+of WebM's Segment Information, and libavformat writes it for both. From
+matroskaenc.c:
+
+    put_ebml_uint(pb, MATROSKA_ID_TIMECODESCALE, 1000000);
+    if ((tag = av_dict_get(s->metadata, "title", NULL, 0)))
+        put_ebml_string(pb, MATROSKA_ID_TITLE, tag->value);     <- unconditional
+    ...
+        if (!IS_WEBM(mkv))
+            put_ebml_binary(pb, MATROSKA_ID_SEGMENTUID, ...);   <- guarded
+
+So the title is simply dropped for WebM, the file carries no name, and the
+player falls back to whatever it asked for. Emit it in both cases.
+
+Only the two profiles that use the native Matroska muxer with MC_WEBM are
+affected. `pass` and HTSP are unrelated: they carry no Matroska container at
+all, so there is no Title element to write and their display name comes from
+elsewhere.
+
+Confirmed with VLC on the reporting hardware: the WebM profiles now show the
+channel name like the Matroska and MP4 ones, instead of the request URL.
+
+The libavformat precedent holds across every ffmpeg spksrc builds against --
+4.4.6, 5.1.7, 6.1.3, 7.1.2 and 8.1.2 all emit the title unconditionally and
+guard only SEGMENTUID. Not that it governs this patch: the native Matroska
+muxer writes its own EBML and never goes through libavformat, so no ffmpeg
+version enters into it.
+
+--- src/muxer/muxer_mkv.c.orig
++++ src/muxer/muxer_mkv.c
+@@ -232,8 +232,13 @@ mk_build_segment_info(mk_muxer_t *mk)
+   if(!mk->webm)
+     ebml_append_bin(q, 0x73a4, mk->uuid, sizeof(mk->uuid));   //0x73a4 = SegmentUUID
+ 
+-  if(!mk->webm)
+-    ebml_append_string(q, 0x7ba9, mk->title);                 //0x7ba9 = Title
++  /* Title is part of WebM's Segment Information, unlike SegmentUUID above --
++     libavformat writes it for both (matroskaenc.c: the title tag is emitted
++     unconditionally, only SEGMENTUID is guarded by IS_WEBM). Skipping it left
++     players with nothing to show for a webm stream, so VLC fell back to the
++     request URL and displayed the channel UUID and profile name instead of the
++     channel. */
++  ebml_append_string(q, 0x7ba9, mk->title);                   //0x7ba9 = Title
+ 
+   ebml_append_string(q, 0x4d80, "Tvheadend Matroska muxer");  //0x4d80 = MuxingApp
+   ebml_append_string(q, 0x5741, app);                         //0x5741 = WritingApp
