@@ -17,27 +17,41 @@
 # 4. Certain combinations of ARMv7 and DSM are incompatible (issues #4790, #5089, #5302, #5315)
 # 5. Comprehensive ARMv7 testing conducted under issue #5574 resulted in the following exclusions
 #
-# The cross/ side of the same story is in spksrc.cross/env-dotnet.mk, which the
-# dotnet build environment pulls in; it excludes on the same grounds.
+# The cross/ side is in spksrc.cross/env-dotnet.mk, which the dotnet build environment
+# pulls in; it carries its own list and its own reason.
 ###############################################################################
+
+# dotnet is absent here for four different reasons, so the reason is picked by the arch at
+# hand: one umbrella line would misdescribe most of a list that is not homogeneous.
+# First match wins, most specific first.
+_dotnet_why = $(strip $(or \
+  $(if $(filter $(ARCH)-$(TCVERSION),armv7-6.2.4 armv7-1.2 armv7-1.3),dotnet is incompatible with this arch/DSM pair (issues #4790 #5089 #5302 #5315)),\
+  $(if $(filter $(ARCH),armada370),dotnet needs full vfpv3 and this toolchain is vfpv3-d16),\
+  $(if $(filter $(ARCH),alpine),dotnet segfaults on this arch despite capable silicon (issue #5302)),\
+  $(if $(filter $(ARCH),comcerto2k),dotnet is incompatible with this arch (issue #5574)),\
+  $(if $(filter $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)),dotnet has no runtime port for this arch)))
+
+# Servarr 2 refuses every ARMv7, capable silicon included, on a runtime bug rather than a
+# missing port -- so that ground is its own, and takes precedence over the map above.
+_dotnet_why_servarr2 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 servarr on ARMv7: dotnet/runtime#109739),$(_dotnet_why))
 
 # Exclusions for dotnet core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine comcerto2k
     UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
-    UNSUPPORTED_ARCHS_REASON := dotnet core ships no runtime for this arch
+    UNSUPPORTED_ARCHS_REASON := $(_dotnet_why)
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
     UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
-    UNSUPPORTED_ARCHS_REASON := dotnet 6.0 servarr ships no runtime for this arch
+    UNSUPPORTED_ARCHS_REASON := $(_dotnet_why)
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 # ARMv7 incompatibility -- see: https://github.com/dotnet/runtime/issues/109739
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
-    UNSUPPORTED_ARCHS_REASON := dotnet 6.0 servarr on ARMv7: dotnet/runtime#109739
+    UNSUPPORTED_ARCHS_REASON := $(_dotnet_why_servarr2)
 endif

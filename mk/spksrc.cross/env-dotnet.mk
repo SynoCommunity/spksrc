@@ -8,9 +8,7 @@
 # NOTE: 32bit (x86) is not supported:
 # https://github.com/dotnet/core/issues/5403
 # https://github.com/dotnet/core/issues/4595
-# The spk/ side of the same story is in spksrc.common/dotnet.mk.
 UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
-UNSUPPORTED_ARCHS_REASON := dotnet ships no runtime for this arch
 
 DOTNET_OS = linux
 DOTNET_DEFAULT_VERSION = 3.1
