@@ -10,7 +10,10 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Current base: f9c549a95, a single commit on top of master 45cbe4adb (Jul 31st 2026).
+Current base: master fd698529f (merged Sep 8th 2026), with uknunknown's
+dev_transcoding_2026 head f9c549a95 rebased onto it -- his own branch still
+sits on 45cbe4adb, so that rebase is done here rather than pulled. If he
+rebases upstream himself the resulting hash will differ; regenerate then.
 
 Nothing is carried on top any more. Everything this package used to patch
 separately has been taken upstream into PR #2117:
