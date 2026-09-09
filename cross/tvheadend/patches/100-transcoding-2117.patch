@@ -1,6 +1,6 @@
 --- .github/workflows/build-ci.yml.orig
 +++ .github/workflows/build-ci.yml
-@@ -272,7 +272,7 @@ jobs:
+@@ -284,7 +284,7 @@ jobs:
              mkdir -p .staticlib
              export STATICLIB_CACHE=/workspace/.staticlib
              export VUE_FILE_CACHE=/workspace/.vuecache
@@ -9,7 +9,7 @@
          run: docker exec build-container bash -c "$SCRIPT"
        - name: copy-result
          env:
-@@ -334,7 +334,7 @@ jobs:
+@@ -346,7 +346,7 @@ jobs:
            export STATICLIB_CACHE="$PWD/.staticlib"
            export VUE_FILE_CACHE="$PWD/.vuecache"
            export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
@@ -20,7 +20,7 @@
        - uses: actions/upload-artifact@v4
 --- .github/workflows/build-cloudsmith.yml.orig
 +++ .github/workflows/build-cloudsmith.yml
-@@ -283,7 +283,7 @@ jobs:
+@@ -295,7 +295,7 @@ jobs:
              mkdir -p .staticlib
              export STATICLIB_CACHE=/workspace/.staticlib
              export VUE_FILE_CACHE=/workspace/.vuecache
@@ -29,7 +29,7 @@
          run: docker exec -e PCLOUD_TOKEN build-container bash -c "$SCRIPT"
        - name: copy-result
          env:
-@@ -350,7 +350,7 @@ jobs:
+@@ -362,7 +362,7 @@ jobs:
            export STATICLIB_CACHE="$PWD/.staticlib"
            export VUE_FILE_CACHE="$PWD/.vuecache"
            export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
@@ -609,7 +609,7 @@
    } else if (es->es_type == SCT_CA) {
 --- src/config.c.orig
 +++ src/config.c
-@@ -2247,6 +2247,10 @@ const idclass_t config_class = {
+@@ -2281,6 +2281,10 @@ const idclass_t config_class = {
           .name   = N_("Miscellaneous Settings"),
           .number = 8,
        },
@@ -620,7 +620,7 @@
        {}
    },
    .ic_properties = (const property_t[]){
-@@ -2873,7 +2877,7 @@ const idclass_t config_class = {
+@@ -2907,7 +2911,7 @@ const idclass_t config_class = {
                     "NOTE: After save, Tvheadend restart is required!"),
        .off    = offsetof(config_t, enable_vainfo),
        .opts   = PO_EXPERT,
