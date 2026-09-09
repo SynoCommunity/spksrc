@@ -310,7 +310,11 @@ dependency-flat:
 
 # Everything this package would refuse the arch for, in the shape the pre-check reports:
 # a capability floor, and an explicit UNSUPPORTED_ARCHS with whatever reason came with it.
-_dep_flat_listed = $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS))$(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch$(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON)))))
+# The two lists are reported apart, so the message points at the variable to look in.
+_dep_flat_reason = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
+_dep_flat_listed = $(call comma_append,\
+                     $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS)),unsupported arch$(_dep_flat_reason)),\
+                     $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_dep_flat_reason)))
 
 # The DSM/SRM window, tested the way pre-check.mk tests it further down.
 _dep_flat_dsm = $(strip \
