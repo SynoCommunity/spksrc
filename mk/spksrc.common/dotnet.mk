@@ -31,9 +31,9 @@ _dotnet_why = $(strip $(or \
   $(if $(filter $(ARCH),comcerto2k),dotnet is incompatible with this arch (issue #5574)),\
   $(if $(filter $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)),dotnet has no runtime port for this arch)))
 
-# Servarr 2 refuses every ARMv7, capable silicon included, on a runtime bug rather than a
-# missing port -- so that ground is its own, and takes precedence over the map above.
-_dotnet_why_servarr2 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 servarr on ARMv7: dotnet/runtime#109739),$(_dotnet_why))
+# Servarr 2 refuses every ARMv7, capable silicon included, on a .NET 6.0 runtime segfault
+# rather than a missing port -- its own ground, and it takes precedence over the map above.
+_dotnet_why_servarr2 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739)),$(_dotnet_why))
 
 # Anything built with the dotnet SDK; spksrc.cross-dotnet.mk sets this before it includes
 # spksrc.common.mk. Narrower than the app lists below: only the archs with no runtime port.
