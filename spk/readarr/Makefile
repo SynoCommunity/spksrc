@@ -6,11 +6,12 @@ SPK_ICON = src/readarr.png
 OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/readarr
 
-# dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739), and readarr is the only package
-# left on it: 0.4.18, its last release, still ships net6.0. Reasons: spksrc.common/dotnet.mk
-# -- lazy (=), this file assigns before it includes common.mk, where the reason is defined.
+# No dotnet flavour fits: every one of them excludes i686, and upstream does ship a
+# linux-core-x86 build that evansport uses. So the list is readarr's own, ARMv7 included --
+# dotnet 6.0 segfaults there (dotnet/runtime#109739) and 0.4.18, the last release, is still
+# net6.0. Lazy (=): this assigns before common.mk defines _dotnet_why, which names the rest.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
-UNSUPPORTED_ARCHS_REASON = $(_dotnet_why_armv7_net60)
+UNSUPPORTED_ARCHS_REASON = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739)),$(_dotnet_why))
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
