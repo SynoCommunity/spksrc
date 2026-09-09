@@ -8,7 +8,6 @@
 # Selected by the package:
 #   DOTNET_CORE_ARCHS   = 1   a dotnet core app
 #   DOTNET_SERVARR_ARCHS= 1   a dotnet 6.0 servarr app
-#   DOTNET_SERVARR_ARCHS= 2   ... one hitting the ARMv7 runtime bug
 #
 # Notes for .NET 6 compatibility:
 # 1. dotnet for x86 (32-bit) is unsupported on linux and must be built from source
@@ -31,9 +30,9 @@ _dotnet_why = $(strip $(or \
   $(if $(filter $(ARCH),comcerto2k),dotnet is incompatible with this arch (issue #5574)),\
   $(if $(filter $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)),dotnet has no runtime port for this arch)))
 
-# Servarr 2 refuses every ARMv7, capable silicon included, on a .NET 6.0 runtime segfault
-# rather than a missing port -- its own ground, and it takes precedence over the map above.
-_dotnet_why_servarr2 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739)),$(_dotnet_why))
+# The .NET 6.0 ARMv7 segfault: a ground of its own, not a missing port, and it takes
+# precedence over the map above. No flavour here -- one package hits it and says so itself.
+_dotnet_why_armv7_net60 = $(or $(if $(filter $(ARCH),$(ARMv7_ARCHS)),dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739)),$(_dotnet_why))
 
 # Anything built with the dotnet SDK; spksrc.cross-dotnet.mk sets this before it includes
 # spksrc.common.mk. Narrower than the app lists below: only the archs with no runtime port.
@@ -54,11 +53,4 @@ ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
     UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
     UNSUPPORTED_ARCHS_REASON := $(_dotnet_why)
-endif
-
-# Exclusions for dotnet 6.0 servarr apps (except x86)
-# ARMv7 incompatibility -- see: https://github.com/dotnet/runtime/issues/109739
-ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
-    UNSUPPORTED_ARCHS_REASON := $(_dotnet_why_servarr2)
 endif

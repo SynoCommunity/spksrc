@@ -6,8 +6,11 @@ SPK_ICON = src/readarr.png
 OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/readarr
 
-# Arch exclusions for dotnet 6.0
-DOTNET_SERVARR_ARCHS = 2
+# dotnet 6.0 segfaults on ARMv7 (dotnet/runtime#109739), and readarr is the only package
+# left on it: 0.4.18, its last release, still ships net6.0. Reasons: spksrc.common/dotnet.mk
+# -- lazy (=), this file assigns before it includes common.mk, where the reason is defined.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
+UNSUPPORTED_ARCHS_REASON = $(_dotnet_why_armv7_net60)
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
