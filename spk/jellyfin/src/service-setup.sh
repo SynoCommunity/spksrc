@@ -126,23 +126,27 @@ validate_preuninst() {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
         pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-        expected_prefix="${pkg}_backup_v10.10.7_"
 
         # If no backup folder, proceed normally
         [ -d "${sc_backup}" ] || return 0
 
-        # Look for a matching backup file (e.g., jellyfin_backup_v10.10.7_YYYYMMDD.tar.gz)
-        set -- "${sc_backup}/${expected_prefix}"*.tar.gz
+        # Look for a matching backup file (e.g., jellyfin_backup_v10.11.11_YYYYMMDD.tar.gz).
+        # Archives are named with the pre-upgrade version, so match any version
+        # (10.10.7, 10.11.x, 12.x, ...) rather than a single one.
+        set -- "${sc_backup}/${pkg}_backup_v"*.tar.gz
 
         # If no matching file found, just continue uninstall
         [ -e "$1" ] || return 0
 
-        # Optional: detect multiple matches
-        [ -e "${2-}" ] && { install_log "WARNING: Multiple backups found, using the first match."; }
+        # Optional: detect multiple matches (one per past upgrade)
+        [ -e "${2-}" ] && { install_log "WARNING: Multiple backups found, using the newest match."; }
+
+        # Prefer the newest match: lexical order is chronological here
+        # (v10.10.7 < v10.11.x < v12.x, then YYYYMMDD suffixes)
+        for SC_BACKUP_FILE in "$@"; do :; done
 
         # Valid backup found — mark for restore
         SC_RESTORE_CONFIG=y
-        SC_BACKUP_FILE="$1"
         export SC_RESTORE_CONFIG SC_BACKUP_FILE
 
         install_log "Backup found: ${SC_BACKUP_FILE}"

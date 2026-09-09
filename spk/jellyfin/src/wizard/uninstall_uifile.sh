@@ -22,13 +22,14 @@ check_backup_file() {
   [ -z "${SYNOPKG_PKGNAME}" ] && SYNOPKG_PKGNAME="jellyfin"
 
   sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
-  expected_prefix="${SYNOPKG_PKGNAME}_backup_v10.10.7_"
 
   # No backup directory → false
   [ -d "${sc_backup}" ] || return 1
 
-  # Look for a matching backup file (e.g. jellyfin_backup_v10.10.7_YYYYMMDD.tar.gz)
-  set -- "${sc_backup}/${expected_prefix}"*.tar.gz
+  # Look for a matching backup file (e.g. jellyfin_backup_v10.11.11_YYYYMMDD.tar.gz).
+  # Archives carry the pre-upgrade version, so match any version
+  # (10.10.7, 10.11.x, 12.x, ...) rather than a single one.
+  set -- "${sc_backup}/${SYNOPKG_PKGNAME}_backup_v"*.tar.gz
 
   # No matching file → false
   [ -e "$1" ] || return 1
