@@ -1904,7 +1904,7 @@
  
 --- src/plumbing/globalheaders.c.orig
 +++ src/plumbing/globalheaders.c
-@@ -23,20 +23,16 @@
+@@ -23,20 +23,18 @@
  
  typedef struct globalheaders {
    streaming_target_t gh_input;
@@ -1917,6 +1917,8 @@
 -
    int gh_passthru;
 -
++  // pts of the first picture sent downstream
++  int64_t gh_first_video_pts;
  } globalheaders_t;
  
 -/* note: there up to 2.5 sec diffs in some sources! */
@@ -1929,7 +1931,12 @@
  
  /**
   *
-@@ -78,44 +74,91 @@ gh_flush(globalheaders_t *gh)
+@@ -74,48 +72,96 @@ gh_flush(globalheaders_t *gh)
+   }
+ 
+   pktref_clear_queue(&gh->gh_holdq);
++  gh->gh_first_video_pts = PTS_UNSET;
+ }
  
  
  /**
@@ -2027,12 +2034,12 @@
        d[2] = 0x56;
        d[3] = 0xe5;
        d[4] = 0x80 | ((pkt->a.pkt_ext_sri - 1) << 3);
-@@ -125,7 +168,26 @@ apply_header(streaming_start_component_t *ssc, th_pkt_t *pkt)
+@@ -125,7 +171,26 @@ apply_header(streaming_start_component_t *ssc, th_pkt_t *pkt)
  
  
  /**
 + * @brief Validates if sufficient metadata has been collected to initialize the stream.
-  *
++ *
 + * This function checks the streaming start component (ssc) to ensure that all 
 + * critical parameters required by decoders or muxers have been populated. 
 + * It prevents the stream from starting prematurely with incomplete headers.
@@ -2041,7 +2048,7 @@
 + * @param not_so_picky  Flag to relax validation. If non-zero, the function will 
 + * ignore missing video dimensions (width/height) and aspect ratios, 
 + * which is useful for certain "raw" or passthrough scenarios.
-+ *
+  *
 + * @return int          Returns 1 if the metadata is complete and the stream can 
 + * proceed; returns 0 if more information is required.
 + *
@@ -2054,7 +2061,7 @@
   */
  static int
  header_complete(streaming_start_component_t *ssc, int not_so_picky)
-@@ -153,50 +215,109 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+@@ -153,50 +218,109 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
  
  
  /**
@@ -2173,7 +2180,7 @@
    return diff;
  }
  
-@@ -238,13 +359,13 @@ headers_complete(globalheaders_t *gh)
+@@ -238,13 +362,13 @@ headers_complete(globalheaders_t *gh)
         * - maximal timeout is reached without metadata
         */
        if(threshold || (qd[i] <= 0 && qd_max > (MAX_NOPKT_TIME * 90))) {
@@ -2189,6 +2196,106 @@
        }
      } else {
        ssc->ssc_disabled = 0;
+@@ -319,13 +443,54 @@ gh_hold(globalheaders_t *gh, streaming_message_t *sm)
+ 				   streaming_start_copy(gh->gh_ss));
+     streaming_target_deliver2(gh->gh_output, sm);
+ 
+-    // Send all pending packets
+-    while((pkt = pktref_get_first(&gh->gh_holdq)) != NULL) {
+-      if (pkt->pkt_payload) {
+-        sm = streaming_msg_create_pkt(pkt);
+-        streaming_target_deliver2(gh->gh_output, sm);
++    /* The hold queue usually starts with audio: on a transcoded stream the
++       audio encoder produces its first packet while the video side is still
++       waiting for the source to deliver a sequence header, so video only joins
++       0.5 to 1.5 s later. Releasing the queue as-is hands the client a stream
++       whose audio begins well before its first picture -- measured on one
++       source: audio at 0 ms against video at 534 ms (software), 1391 ms
++       (VAAPI), 1368 ms (QSV).
++
++       Drop the audio that precedes the first picture so both tracks start
++       together. Nothing is delayed and no video is touched; only leading audio
++       with nothing to show alongside it is discarded. If the queue holds no
++       video at all -- an audio-only subscription -- everything is released
++       unchanged. */
++    {
++      th_pktref_t *pr;
++      int64_t first_video_pts = PTS_UNSET;
++
++      TAILQ_FOREACH(pr, &gh->gh_holdq, pr_link) {
++        ssc = streaming_start_component_find_by_index(gh->gh_ss,
++                                        pr->pr_pkt->pkt_componentindex);
++        if (ssc && SCT_ISVIDEO(ssc->es_type)) {
++          first_video_pts = pr->pr_pkt->pkt_pts;
++          break;
++        }
++      }
++      // carried into passthru so the same test keeps applying
++      gh->gh_first_video_pts = first_video_pts;
++
++      // Send all pending packets
++      while((pkt = pktref_get_first(&gh->gh_holdq)) != NULL) {
++        if (pkt->pkt_payload) {
++          int skip = 0;
++          if (first_video_pts != PTS_UNSET) {
++            ssc = streaming_start_component_find_by_index(gh->gh_ss,
++                                            pkt->pkt_componentindex);
++            skip = ssc && !SCT_ISVIDEO(ssc->es_type) &&
++                   pkt->pkt_pts != PTS_UNSET &&
++                   pkt->pkt_pts < first_video_pts;
++          }
++          if (skip) {
++            pkt_trace(LS_GLOBALHEADERS, pkt, "drop, precedes first picture");
++          } else {
++            sm = streaming_msg_create_pkt(pkt);
++            streaming_target_deliver2(gh->gh_output, sm);
++          }
++        }
++        pkt_ref_dec(pkt);
+       }
+-      pkt_ref_dec(pkt);
+     }
+     gh->gh_passthru = 1;
+     break;
+@@ -393,6 +558,29 @@ gh_pass(globalheaders_t *gh, streaming_message_t *sm)
+     break;
+   case SMT_PACKET:
+     pkt = sm->sm_data;
++    /* Extends the hold-queue filter past the release, on the same test: a
++       packet is dropped when its pts precedes the first picture, whatever the
++       moment it arrives.
++
++       Arrival order is not presentation order here. The audio encoder lags the
++       video one on the delivery clock while still stamping its output with the
++       original stream times, so audio reaches this point *after* the first
++       picture yet carries a pts *before* it -- and would be presented ahead of
++       any image. Measured on one software run: the first picture was written
++       first at pts 572 ms, immediately followed by audio stamped 277 to 384 ms.
++       A "have we seen a picture yet" flag lets exactly that case through, which
++       is why the comparison has to stay on the timestamps. */
++    if (gh->gh_first_video_pts != PTS_UNSET && pkt->pkt_payload &&
++        pkt->pkt_pts != PTS_UNSET && pkt->pkt_pts < gh->gh_first_video_pts) {
++      streaming_start_component_t *vssc =
++        streaming_start_component_find_by_index(gh->gh_ss,
++                                                pkt->pkt_componentindex);
++      if (vssc && !SCT_ISVIDEO(vssc->es_type)) {
++        pkt_trace(LS_GLOBALHEADERS, pkt, "drop, precedes first picture");
++        streaming_msg_free(sm);
++        break;
++      }
++    }
+     if (pkt->pkt_payload || pkt->pkt_err)
+       streaming_target_deliver2(gh->gh_output, sm);
+     else
+@@ -441,6 +629,8 @@ globalheaders_create(streaming_target_t *output)
+ 
+   TAILQ_INIT(&gh->gh_holdq);
+ 
++  // calloc leaves this at 0, which is a valid timestamp
++  gh->gh_first_video_pts = PTS_UNSET;
+   gh->gh_output = output;
+   streaming_target_init(&gh->gh_input, &globalheaders_input_ops, gh, 0);
+   return &gh->gh_input;
 --- src/plumbing/tsfix.c.orig
 +++ src/plumbing/tsfix.c
 @@ -27,68 +27,112 @@
@@ -2938,7 +3045,20 @@
        sm->sm_data = n;
      } else {
        pkt_trace(LS_PROFILE, pkt, "packet drop (delta %"PRId64")", prch->prch_ts_delta);
-@@ -2312,6 +2317,10 @@ profile_class_mc_list ( void *o, const char *lang )
+@@ -993,6 +998,12 @@ profile_sharer_destroy(profile_chain_t *prch)
+ #endif
+     if (prsh->prsh_start_msg)
+       streaming_start_unref(prsh->prsh_start_msg);
++    /* prsh is about to be freed, so no chain may keep a pointer to it.  Only
++       the prsh_queue_run path above cleared these, which leaves prch_sharer
++       dangling for a chain torn down before the queue thread ever started --
++       and profile_chain_close() is called twice on exactly that path. */
++    prch->prch_sharer = NULL;
++    prch->prch_post_share = NULL;
+     free(prsh);
+   } else {
+     if (prsh->prsh_queue_run) {
+@@ -2312,6 +2323,10 @@ profile_class_mc_list ( void *o, const char *lang )
      { N_("Matroska (mkv)/av-lib"),        MC_AVMATROSKA },
      { N_("WEBM/av-lib"),                  MC_AVWEBM },
      { N_("MP4/av-lib"),                   MC_AVMP4 },
@@ -2949,7 +3069,7 @@
    };
    return strtab2htsmsg(tab, 1, lang);
  }
-@@ -2739,6 +2748,11 @@ profile_transcode_mc_valid(int mc)
+@@ -2739,6 +2754,11 @@ profile_transcode_mc_valid(int mc)
    case MC_VORBIS:
    case MC_AVMATROSKA:
    case MC_AVMP4:
@@ -7384,12 +7504,13 @@
 +static int
 +_audio_ch_layout_differs(TVHContext *self)
 +{
-+    if (self->iavctx->ch_layout.nb_channels != self->oavctx->ch_layout.nb_channels)
-+        return 1;
-+    if (self->iavctx->ch_layout.nb_channels &&
-+        self->iavctx->ch_layout.u.mask != self->oavctx->ch_layout.u.mask)
-+        return 1;
-+    return 0;
++    /* u.mask is only the channel bitmask for AV_CHANNEL_ORDER_NATIVE and
++       AV_CHANNEL_ORDER_AMBISONIC.  For AV_CHANNEL_ORDER_CUSTOM the same union
++       member is the AVChannelCustom *map pointer, so comparing u.mask there
++       compares two pointer values as if they were masks.  Let libavutil decide
++       instead: av_channel_layout_compare() dispatches on the order. */
++    return av_channel_layout_compare(&self->iavctx->ch_layout,
++                                     &self->oavctx->ch_layout) != 0;
 +}
 +
 +static int
@@ -7439,9 +7560,8 @@
 + *
 + * Pieces (in join order):
 + * - @c asetpts=N/SR/TB — normalizes PTS on the audio link (sample rate / time base).
-+ * - Optional @c aresample=@<output_sample_rate@> when input and output sample rates
-+ *   differ (in this source the condition is written as never taken; adjust if you
-+ *   re-enable rate mismatch handling here).
++ * - Optional @c aresample=@<output_sample_rate@> when input and output sample
++ *   rates differ.
 + * - Optional @c aformat=… when input and output differ in @c sample_fmt and/or
 + *   channel count: adds @c sample_fmts=… and/or @c channel_layouts=… as required
 + *   by the @c aformat filter.
@@ -7524,7 +7644,7 @@
  static void
  _audio_context_channel_layout(TVHContext *self, AVDictionary **opts, AVChannelLayout *dst)
  {
-@@ -254,6 +415,18 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
+@@ -254,6 +415,25 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
  static int
  tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
  {
@@ -7539,33 +7659,36 @@
 +    }
 +    
 +    tvhinfo(LS_TRANSCODE, "filters: audio: '%s'", filters2);
-+#endif
++
++    int ret = tvh_context_open_filters2(self,
++        "abuffer",                                             // source
++        (filters2 && filters2[0] != '\0') ? filters2 : "anull",// filters
++        "abuffersink"                                          // sink
++    );
++    str_clear(filters2);
++#else
      char source_args[128];
      char filters[16];
      char layout[32];
-@@ -273,6 +446,9 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
-             self->iavctx->sample_rate,
-             av_get_sample_fmt_name(self->iavctx->sample_fmt),
-             layout)) {
-+#if LIBAVCODEC_VERSION_MAJOR > 59
-+        str_clear(filters2);
-+#endif
+@@ -261,11 +441,7 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ 
+     // source args
+     memset(source_args, 0, sizeof(source_args));
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    av_channel_layout_describe(&self->iavctx->ch_layout, layout, sizeof(layout));
+-#else
+     av_get_channel_layout_string(layout, sizeof(layout), self->iavctx->channels, self->iavctx->channel_layout);
+-#endif
+     if (str_snprintf(source_args, sizeof(source_args),
+             "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
+             self->iavctx->time_base.num,
+@@ -287,25 +463,6 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
          return -1;
      }
  
-@@ -284,27 +460,21 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
-     memset(filters, 0, sizeof(filters));
-     if (str_snprintf(filters, sizeof(filters), "%s",
-                      (resample) ? "aresample" : "anull")) {
-+#if LIBAVCODEC_VERSION_MAJOR > 59
-+        str_clear(filters2);
-+#endif
-         return -1;
-     }
- 
- #if LIBAVCODEC_VERSION_MAJOR > 59
-     char ch_layout[64];
-     av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    char ch_layout[64];
+-    av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
 -    
 -    int ret = tvh_context_open_filters(self,
 -        "abuffer", source_args,                           // source
@@ -7581,16 +7704,11 @@
 -        sizeof(self->oavctx->sample_rate),
 -        &self->oavctx->sample_rate,
 -        NULL);                                            // _IMPORTANT!_
-+    int ret = tvh_context_open_filters2(self,
-+        "abuffer",                                             // source
-+        (filters2 && filters2[0] != '\0') ? filters2 : "anull",// filters
-+        "abuffersink"                                          // sink
-+    );
-+    str_clear(filters2);
- #else
+-#else
      int ret = tvh_context_open_filters(self,
          "abuffer", source_args,                           // source
-@@ -317,26 +487,50 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+         filters,                                          // filters
+@@ -317,26 +474,50 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
          "sample_rates", &self->oavctx->sample_rate,       // sink option: sample_rate
          sizeof(self->oavctx->sample_rate),
          NULL);                                            // _IMPORTANT!_
@@ -7650,7 +7768,7 @@
          default:
              break;
      }
-@@ -349,15 +543,35 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -349,15 +530,35 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
  {
      int64_t prev_pts = self->pts;
      int64_t new_pts = avpkt->pts - self->duration;
@@ -7692,7 +7810,7 @@
      self->duration += avpkt->duration;
      return 0;
  }
-@@ -366,10 +580,80 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -366,10 +567,80 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_encode(TVHContext *self, AVFrame *avframe)
  {
@@ -7777,7 +7895,7 @@
      return 0;
  }
  
-@@ -384,7 +668,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
+@@ -384,7 +655,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  {
@@ -7798,7 +7916,7 @@
  #if LIBAVCODEC_VERSION_MAJOR > 59
      pkt->a.pkt_channels = self->oavctx->ch_layout.nb_channels;
  #else
-@@ -394,7 +690,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -394,7 +677,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
      return 0;
  }
  
@@ -8735,7 +8853,7 @@
  
      if ((size = pktbuf_len(pkt->pkt_payload)) && pktbuf_ptr(pkt->pkt_payload)) {
          if (size >= TVH_INPUT_BUFFER_MAX_SIZE) {
-@@ -709,26 +1452,81 @@ tvh_context_handle(TVHContext *self, th_pkt_t *pkt)
+@@ -709,26 +1452,84 @@ tvh_context_handle(TVHContext *self, th_pkt_t *pkt)
              ret = AVERROR(ENOMEM);
          }
          else {
@@ -8761,6 +8879,9 @@
 +                /* PARSED PATH (H.264, HEVC, AAC, AC3, etc.) */
 +                uint8_t *in_data = data;
 +                int in_size = (int)size;
++                // save pts and dts for cases when av_parser_parse2() will not provide valid values
++                int64_t old_dts = pkt->pkt_dts;
++                int64_t old_pts = pkt->pkt_pts;
 +
 +                while (in_size > 0) {
 +                    int len = av_parser_parse2(
@@ -8786,8 +8907,8 @@
 +                            self->input_gh = pkt->pkt_meta;
 +                        }
 +
-+                        self->out_pkt->pts = self->parser->pts;
-+                        self->out_pkt->dts = self->parser->dts;
++                        self->out_pkt->pts = (self->parser->pts != PTS_UNSET) ? self->parser->pts : old_pts;
++                        self->out_pkt->dts = (self->parser->dts != PTS_UNSET) ? self->parser->dts : old_dts;
 +                        self->out_pkt->duration = self->parser->duration;
 +
 +                        pkt_trace(LS_CODEC, pkt,
@@ -8835,7 +8956,7 @@
              }
          }
      }
-@@ -778,22 +1576,33 @@ tvh_context_destroy(TVHContext *self)
+@@ -778,22 +1579,33 @@ tvh_context_destroy(TVHContext *self)
              pktbuf_ref_dec(self->input_gh);
              self->input_gh = NULL;
          }
@@ -9055,10 +9176,14 @@
      for (i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
          pix_fmt = pix_fmts[i];
          if ((desc = av_pix_fmt_desc_get(pix_fmt))) {
-@@ -113,134 +219,125 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
- }
- 
- 
+@@ -109,138 +215,147 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
+             }
+         }
+     }
+-    return pix_fmt;
+-}
+-
+-
 -void
 -hwaccels_decode_close_context(AVCodecContext *avctx)
 -{
@@ -9073,12 +9198,29 @@
 -#endif
 -            default:
 -                break;
--        }
++    /* No hardware pixel format could be set up -- either the device is
++       unusable at runtime, or it simply cannot decode this codec (VP9 on a
++       VAAPI device that lacks a VP9 decode entrypoint is the common case).
++       A software format was selected instead, so drop the hardware intent:
++       otherwise the filter graph is still built for hardware frames, graph
++       configuration fails, and the whole subscription dies -- taking the
++       audio stream down with it instead of degrading to audio only. */
++    {
++        TVHContext *tvhctx = avctx->opaque;
++        if (tvhctx && tvhctx->iavhwdevtype != AV_HWDEVICE_TYPE_NONE &&
++            (pix_fmt == AV_PIX_FMT_NONE ||
++             !((desc = av_pix_fmt_desc_get(pix_fmt)) &&
++               (desc->flags & AV_PIX_FMT_FLAG_HWACCEL)))) {
++            tvhwarn(LS_TRANSCODE, "hwaccels: [%s] hardware decoding unavailable, "
++                    "falling back to software decoding", avctx->codec->name);
++            tvhctx->iavhwdevtype = AV_HWDEVICE_TYPE_NONE;
+         }
 -        ctx->hw_accel_ictx = NULL;
--    }
--}
--
--
+     }
++    return pix_fmt;
+ }
+ 
+ 
  int
 -hwaccels_get_scale_filter(AVCodecContext *iavctx, AVCodecContext *oavctx,
 -                          char *filter, size_t filter_len)
@@ -9275,7 +9417,7 @@
  #endif
          default:
              break;
-@@ -250,17 +347,36 @@ hwaccels_encode_setup_context(AVCodecContext *avctx)
+@@ -250,17 +365,36 @@ hwaccels_encode_setup_context(AVCodecContext *avctx)
  
  
  void
@@ -9316,7 +9458,7 @@
  }
  
  
-@@ -275,7 +391,16 @@ hwaccels_init(void)
+@@ -275,7 +409,16 @@ hwaccels_init(void)
  void
  hwaccels_done(void)
  {
@@ -11904,7 +12046,27 @@
  #else
      // FFmpeg 4.x–5.x — older API, VAAPI filter time_base not API exposed
      int64_t *frame_duration = &avframe->pkt_duration;
-@@ -515,9 +686,12 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -426,6 +597,19 @@ tvh_video_context_encode(TVHContext *self, AVFrame *avframe)
+             self->oavctx->time_base.num, self->oavctx->time_base.den,
+             avframe->pts, avframe->pkt_dts, *frame_duration);
+     }
++    /* av_parser_parse2() emits the first frame of a stream with no timestamps
++       at all -- both pts and dts come back unset even though the packet fed to
++       it carried them -- so the decoder hands us a frame whose pts is
++       AV_NOPTS_VALUE while its dts still holds the right value. Since
++       AV_NOPTS_VALUE is INT64_MIN, the monotonicity test below reads such a
++       frame as older than everything and discards it. Take the dts instead:
++       measured on a 30000/1001 source the recovered value was 77718 and the
++       next frame arrived at 80721, exactly one frame later. */
++    if (avframe->pts == AV_NOPTS_VALUE && avframe->pkt_dts != AV_NOPTS_VALUE) {
++        tvh_context_log(self, LOG_DEBUG,
++                        "frame has no pts, using dts (%"PRId64")", avframe->pkt_dts);
++        avframe->pts = avframe->pkt_dts;
++    }
+ 
+     if (avframe->pts <= self->pts) {
+         tvh_context_log(self, LOG_WARNING,
+@@ -515,9 +699,12 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
                              pict_type);
              break;
      }
@@ -11918,7 +12080,7 @@
      pkt->v.pkt_aspect_num = self->src_pkt->v.pkt_aspect_num;
      pkt->v.pkt_aspect_den = self->src_pkt->v.pkt_aspect_den;
      return 0;
-@@ -527,10 +701,7 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -527,10 +714,7 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  static void
  tvh_video_context_close(TVHContext *self)
  {
