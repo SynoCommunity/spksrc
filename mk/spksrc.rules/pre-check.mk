@@ -16,7 +16,7 @@
 
 # Disabled for dependency targets, and for the check goal -- whose whole job is to REPORT
 # the gates this arch fails, which a fatal pre-check would cut short at the first one.
-ifeq ($(strip $(filter 1,$(DEPENDENCY_WALK))$(filter check,$(MAKECMDGOALS))),)
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
@@ -60,25 +60,26 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
-# Every gate in the dependency tree, not only this package's own: a package is just as
-# blocked by a floor it never declared, and stopping at the first sends you round the loop
-# once per blocker. Same walk as `make check-<arch>-<vers>` (spksrc.rules/supported.mk),
-# stamped so a diamond is visited once, and it reports this package's verdict too.
+# Every gate in the whole tree, not only this package's own: it is as blocked by a floor it
+# never declared, and stopping at the first sends you round the loop once per blocker. The
+# walk `make check-<arch>-<vers>` runs (spksrc.rules/supported.mk), required gates only --
+# an optional dependency that refuses must not refuse the build.
 #
-# $(shell) folds newlines into spaces, so each line's own spaces travel as ~ and are put
-# back one $(info) at a time. No reason or package path contains one.
+# $(shell) folds newlines into spaces, so each line's own spaces travel as ~ and come back
+# one $(info) at a time. No package path or reason contains one.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
-# Required gates only: an optional dependency that refuses must not refuse the build.
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
                    | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
 endif
 
-# Refuse an arch whose toolchain cannot meet a declared floor (spksrc.common/tc-capability.mk),
-# naming every gate rather than the first, so one run tells the whole story.
+# What this package refuses on its own, then how much the tree adds.
+_own_why  = $(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))
+_tree_why = $(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(s) in the tree))
+
 ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED))$(strip $(_TREE_GATES)),)
   $(foreach _g,$(_TREE_GATES),$(info ===>  check: $(subst ~, ,$(_g))))
-  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))$(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(s) in the tree$())))
+  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(_own_why)$(_tree_why))
 endif
 
 # Check whether package supports ARCH.
@@ -136,4 +137,4 @@ endif
 
 endif # ifneq ($(TCVERSION),)
 
-endif # ifeq (DEPENDENCY_WALK / check)
+endif # ifeq (DEPENDENCY_WALK / check goal)

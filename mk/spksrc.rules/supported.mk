@@ -63,9 +63,6 @@ pre-build-native:
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
 
-# Teed here rather than in build-arch-%: one level up also catches make's own
-# "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
-# _runlog's LOGGING_ENABLED guard makes this the only teeing level.
 # Required gates come from the walk an arch context already defines; the optional ones are
 # what a second walk adds when OPTIONAL_DEPENDS are followed too. A set difference, not a
 # label carried down: a package under both a required and an optional parent is required.
@@ -98,6 +95,9 @@ check-%:
 	@$(MAKE) --no-print-directory check \
 	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
 
+# Teed here rather than in build-arch-%: one level up also catches make's own
+# "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
+# _runlog's LOGGING_ENABLED guard makes this the only teeing level.
 arch-%: SHELL:=/bin/bash
 arch-%:
 	@set -o pipefail ; \
