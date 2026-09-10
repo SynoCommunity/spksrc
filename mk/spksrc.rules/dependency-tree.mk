@@ -61,7 +61,8 @@
 #
 #  dependency-flat-mk
 #      Parallel orchestrator — invokes all dep-flat-mk-% targets.
-#      Emits nothing itself; all output comes from dep-flat-mk-% targets.
+#      Emits nothing itself, except the package's own verdict under
+#      REPORT_UNSUPPORTED; the rest comes from dep-flat-mk-% targets.
 #
 #  dep-flat-mk-%
 #      Processes a single dependency during traversal.
@@ -352,14 +353,14 @@ _why_unsupported     = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_U
 # -------------------------------------------------------------------
 # dependency-flat-mk
 # Parallel orchestrator — invokes all annotated dep-flat-mk-% targets.
-# Emits nothing itself; all output comes from dep-flat-mk-% targets.
+# Emits nothing itself, save one line under REPORT_UNSUPPORTED: this package's own
+# verdict, so a single walk yields both the tree and every refusal in it. Emitted by
+# the package rather than by its parent, _why_unsupported being correct only in its
+# own make, and named <tree>/<pkg> because $(NAME) is the PKG_NAME that cross/foo
+# and spk/foo share.
 # -------------------------------------------------------------------
 .PHONY: dependency-flat-mk
 dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
-	@# Under REPORT_UNSUPPORTED each package visited also reports why it refuses this arch, so
-	@# one walk yields both the tree and every refusal in it. Said here rather than by the
-	@# parent: these variables are only correct in the package's own make. Named <tree>/<pkg>
-	@# as a dependency is everywhere else -- $(NAME) is the PKG_NAME, shared by cross and spk.
 	@$(if $(and $(strip $(REPORT_UNSUPPORTED)),$(strip $(_why_unsupported))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_why_unsupported)",true)
 
 # -------------------------------------------------------------------
