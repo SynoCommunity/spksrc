@@ -55,7 +55,7 @@
 +`--coverage`      | compact one-column-per-day cached% matrix (whole guide at a glance)
 +`--basic`         | just unique images, in cache, and still to download
 +`--by-channel`    | per-channel coverage, worst first (combine with `--day N`)
-+`--csv`           | one machine-readable row, for logging the trend over time
++`--csv`           | one machine-readable row, for logging the trend over time, with the per-day cached% and first-seen% of `--coverage`
 +`--day N`         | restrict to airing day N (1 = today)
 +`--details` / `--missing-only` / `--errors` / `--debug` | per-image detail / filters
 +`--help`          | full option list and more examples
@@ -72,7 +72,7 @@
 +  fetch problem.
 --- support/tv_imagecache_audit.py.orig
 +++ support/tv_imagecache_audit.py
-@@ -0,0 +1,974 @@
+@@ -0,0 +1,996 @@
 +#!/usr/bin/env python3
 +"""
 +tv_imagecache_audit.py -- cross-check the tvheadend imagecache against the rolling
@@ -213,7 +213,10 @@
 +
 +    Counts cache files written in the last 30 minutes (widening to 4 h when
 +    the cache is quiet) so the ETA reflects what tvheadend is actually doing
-+    right now instead of assuming a provider-capped rate."""
++    right now instead of assuming a provider-capped rate.  The count is
++    divided by the time actually covered -- back to the oldest of those
++    files -- not by the whole window, or a fill younger than the window
++    would read as that much slower."""
 +    if not cache_dir:
 +        return None
 +    ddir = os.path.join(cache_dir, 'data')
@@ -229,9 +232,10 @@
 +        except OSError:
 +            continue
 +    for window in (1800.0, 14400.0):
-+        recent = sum(1 for t in mtimes if now - t <= window)
-+        if recent >= 5:
-+            return recent * 3600.0 / window
++        recent = [t for t in mtimes if now - t <= window]
++        if len(recent) >= 5:
++            span = max(now - min(recent), 10.0)
++            return len(recent) * 3600.0 / span
 +    return None
 +
 +
@@ -618,7 +622,9 @@
 +                      help='minimal view: just unique images, in-cache, and to-download')
 +    view.add_argument('--csv', action='store_true',
 +                      help='one machine-readable row for trend logging (append over time): '
-+                           'iso_time,unique,cached,todo,errors,cached_pct')
++                           'iso_time,unique,cached,todo,errors,cached_pct,day1,ndays, '
++                           'then ndays cached%% (D1..DN), then ndays 1st-seen%% (D1..DN) '
++                           '-- the same per-day rows as --coverage')
 +    view.add_argument('--by-channel', action='store_true',
 +                      help='per-channel ("poste") cached/todo breakdown, worst first '
 +                           '(combine with --day N to inspect one day)')
@@ -732,6 +738,12 @@
 +    # Observed fetch rate (downloads/h), computed once for every view's ETA
 +    fetch_rate = observed_fetch_rate(cache_dir) if cache_known else None
 +
++    # snapshot time, stamped on every view: include a timezone offset so it is
++    # unambiguous across DST / when appended over a multi-day run (UTC with
++    # --utc, else local with offset)
++    ts = (datetime.now(timezone.utc) if args.utc
++          else datetime.now().astimezone()).isoformat(timespec='seconds')
++
 +    # header (suppressed in --csv mode so the row is clean for appending to a file)
 +    if not args.csv:
 +        tag = lambda auto: " (auto)" if auto else ""
@@ -742,6 +754,7 @@
 +
 +        def h(label, val):
 +            print("%-10s : %s" % (label, val))
++        h("Time", ts)
 +        h("Day 1", anchor.isoformat() + when)
 +        h("EPG events", str(len(events)))      # programmes scanned in the guide
 +        h("EPG source", esrc + tag(epg_auto))
@@ -791,12 +804,21 @@
 +    # ---- CSV snapshot: one row for trend logging over a 24h+ run ----
 +    if args.csv:
 +        cpct = (100.0 * dc[CACHED] / n) if n else 0.0
-+        # include a timezone offset so rows are unambiguous across DST / when
-+        # appended over a multi-day run (UTC with --utc, else local with offset)
-+        ts = (datetime.now(timezone.utc) if args.utc
-+              else datetime.now().astimezone()).isoformat(timespec='seconds')
-+        print("%s,%d,%d,%d,%d,%.1f" % (
-+            ts, n, dc[CACHED], pending, dc[ERROR], cpct))
++        # per-day columns, as in --coverage: day1 dates D1 so rows stay aligned
++        # across midnight, ndays says where the cached% group ends; an unknown
++        # value (no imagecache dir, no first-seen image that day) is left empty
++        pday, pfirst = [], []
++        for i in idxs:
++            c = day_counts(days[i])
++            pday.append("%.0f" % (100.0 * c[CACHED] / c['IDREF'])
++                        if cache_known and c['IDREF'] else "")
++            t = prim_total.get(i, 0)
++            pfirst.append("%.0f" % (100.0 * prim_cached.get(i, 0) / t)
++                          if cache_known and t else "")
++        d1 = days[idxs[0]]['date'] if idxs else None
++        print(",".join(["%s,%d,%d,%d,%d,%.1f" % (
++            ts, n, dc[CACHED], pending, dc[ERROR], cpct),
++            d1.isoformat() if d1 else "", str(len(idxs))] + pday + pfirst))
 +        return
 +
 +    # ---- BASIC view: just "in cache" vs "to download" on the unique set ----
