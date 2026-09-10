@@ -1,0 +1,69 @@
+# Caddyfile - Caddy's configuration file.
+# Docs: https://caddyserver.com/docs/caddyfile
+#
+# This file lives at /var/packages/caddy/var/Caddyfile on the NAS (a copy
+# of this template is installed there once, on first install, and is never
+# overwritten again - edit it freely).
+#
+# After editing, either restart the Caddy package from Package Center, or
+# apply changes without downtime by running:
+#   caddy reload --config /var/packages/caddy/var/Caddyfile
+#
+# The default site below listens on :8080 so it doesn't collide with
+# anything else on the NAS out of the box. The package grants the caddy
+# binary the cap_net_bind_service capability on install/upgrade, so binding
+# :80 / :443 directly also works once they're free - see below.
+#
+# ---------------------------------------------------------------------------
+# Freeing ports 80/443 on the NAS
+# ---------------------------------------------------------------------------
+# DSM itself often already holds these, even with Web Station stopped - its
+# Login Portal redirects plain http://<nas>/ to the DSM management UI on
+# :5000/:5001. To free them:
+#   Control Panel -> Login Portal -> Advanced -> Applications tab
+#     -> edit the "DSM" entry, change or disable its port 80/443 binding
+#   Control Panel -> Network -> DSM Settings
+#     -> uncheck "Automatically redirect HTTP connections to HTTPS" if set
+# (On older DSM 6.x, look for "Application Portal" instead of "Login
+# Portal" - the menu was renamed in DSM 7.)
+#
+# ---------------------------------------------------------------------------
+# Automatic HTTPS via Let's Encrypt
+# ---------------------------------------------------------------------------
+# Caddy gets you free, auto-renewing HTTPS just by naming a real domain
+# instead of a bare port. To serve your own domain:
+#   1. Point a DNS A record (and AAAA, if you have IPv6) for your domain or
+#      subdomain at your public IP.
+#   2. Forward ports 80 and 443 (TCP) from your router/firewall to this
+#      NAS's LAN IP. Port 80 is needed too, even though visitors end up on
+#      443 - Caddy uses it for the ACME HTTP challenge and to redirect
+#      plain HTTP to HTTPS.
+#   3. Make sure nothing else on the NAS is still holding 80/443 (see
+#      above), then replace the :8080 site block below with your real
+#      domain, e.g.:
+#
+#        example.your-domain.com {
+#            respond "Caddy is running"
+#        }
+#
+#   4. Restart the Caddy package (or `caddy reload`, see above). Caddy
+#      fetches and renews the certificate automatically from then on - no
+#      further action needed. Certificates are stored under
+#      /var/packages/caddy/var/data, so they survive package restarts and
+#      upgrades.
+#
+# Optional: set a contact address for Let's Encrypt's renewal notices with
+# a global options block at the very top of this file:
+#
+#   {
+#       email you@example.com
+#   }
+
+:8080 {
+	respond "Caddy is running"
+}
+
+# Example reverse proxy to another service on the NAS:
+# example.your-nas.synology.me {
+# 	reverse_proxy 127.0.0.1:5000
+# }
