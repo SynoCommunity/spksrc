@@ -10,16 +10,6 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
   PYTHON_PACKAGE = python312
 endif
 
-# Carry the selected python's own floor to the consumer, rather than listing the archs it
-# refuses -- read from that package, so the two cannot drift, and correct on archs no list
-# thought of. Raised, never lowered: a consumer keeps its own floor when it asks for more.
-_PYTHON_MIN_GCC := $(shell sed -n 's/^MIN_GCC_VERSION *= *//p' $(CURDIR)/../../cross/$(PYTHON_PACKAGE)/Makefile 2>/dev/null)
-ifneq ($(strip $(_PYTHON_MIN_GCC)),)
-  MIN_GCC_VERSION := $(strip $(if $(strip $(MIN_GCC_VERSION)),\
-                       $(if $(call version_ge,$(MIN_GCC_VERSION),$(_PYTHON_MIN_GCC)),$(MIN_GCC_VERSION),$(_PYTHON_MIN_GCC)),\
-                       $(_PYTHON_MIN_GCC)))
-endif
-
 # set default spk/python* path to use
 PYTHON_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
 PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
