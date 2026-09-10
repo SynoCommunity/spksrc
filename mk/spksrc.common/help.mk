@@ -40,7 +40,6 @@ ifeq ($(SPKSRC_TREE),python)
 	@printf "\n  \033[33m%s\033[0m\n" "built only as an spk dependency - it has no direct build here"
 else
 	@printf "\n\033[1mBuild\033[0m\n"
-	@printf "  \033[36m%-24s\033[0m %s\n" "all" "build this package (default target)"
 ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
 	@printf "  \033[36m%-24s\033[0m %s\n" "arch-<arch>-<tcvers>" "build for one arch/version (e.g. arch-x64-7.1)"
 endif
@@ -49,7 +48,7 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk native diyspk),)
 	@printf "  %-24s   %s\n" "" "$(HELP_STEPS)"
 endif
 ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
-	@printf "  \033[33m%s\033[0m\n" "  all and every <step> except download need ARCH=<arch> TCVERSION=<tcvers>"
+	@printf "  \033[33m%s\033[0m\n" "  every <step> except download needs ARCH=<arch> TCVERSION=<tcvers>"
 endif
 ifeq ($(SPKSRC_TREE),toolchain)
 	@printf "  \033[36m%-24s\033[0m %s\n" "tc_vars" "show the toolchain variables (TC_GCC, ...)"
