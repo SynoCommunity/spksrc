@@ -13,8 +13,16 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(i686_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = cjheath
-DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile; edit it, then restart the package (or run caddy reload) to apply changes. The default site listens on :8080; see the comments in the Caddyfile for switching to :80/:443.
+DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile. Edit it, then restart the package, or run caddy reload, to apply changes. The default site listens on port 8080. See the comments in the Caddyfile for switching to ports 80 and 443.
 DISPLAY_NAME = Caddy
+# Explicit, short, and free of shell metacharacters: SERVICE_PORT + SPK_ICON
+# would otherwise make spksrc.service.mk derive this from DESCRIPTION via an
+# UNQUOTED $(shell echo ${DESCRIPTION} ...) call - the parenthesis that used
+# to be in DESCRIPTION broke that (a bare "(" mid-command is a shell syntax
+# error), which is exactly the stray "/bin/sh: 1: Syntax error" seen in every
+# build log. Doesn't fail the build (a failed $(shell) call isn't fatal to
+# Make), but silently corrupted the app-shortcut tooltip text.
+SERVICE_DESC = Automatic-HTTPS web server
 CHANGELOG = "1. Initial package. Caddy 2.11.4."
 
 HOMEPAGE = https://caddyserver.com/
