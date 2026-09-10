@@ -316,13 +316,21 @@ _dep_flat_listed = $(call comma_append,\
                      $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS)),unsupported arch$(_dep_flat_reason)),\
                      $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_dep_flat_reason)))
 
-# The DSM/SRM window, tested the way pre-check.mk tests it further down.
+# Is $(1) below $(2)? The plain $(sort) pre-check.mk uses, not version_lt, so the two can
+# never disagree about a package -- one reports the refusal the other makes.
+_dep_flat_below = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
+
+# The DSM/SRM window: declared, in range, and outside it.
 _dep_flat_dsm = $(strip \
-  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0)),$(if $(filter $(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM)))),,DSM $(TCVERSION) < $(REQUIRED_MIN_DSM))) \
-  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0)),$(if $(filter $(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM)))),,DSM $(TCVERSION) > $(REQUIRED_MAX_DSM))) \
-  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0)),$(if $(filter $(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM)))),,SRM $(TCVERSION) < $(REQUIRED_MIN_SRM))))
+  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
+  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(REQUIRED_MAX_DSM),$(TCVERSION))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
+  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
 
 _dep_flat_why = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_dep_flat_listed)),$(_dep_flat_dsm))
+
+# "cross/foo", "spk/foo" -- the tree and the package, which is how a dependency is named
+# everywhere else. $(NAME) will not do: it is the PKG_NAME, and cross/ and spk/ share it.
+_dep_flat_pkg = $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR))
 
 # -------------------------------------------------------------------
 # dependency-flat-mk
@@ -331,10 +339,10 @@ _dep_flat_why = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPOR
 # -------------------------------------------------------------------
 .PHONY: dependency-flat-mk
 dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
-	@# DEP_FLAT_VERDICT: each package visited also reports its own capability verdict, so
-	@# one walk yields both the tree and why any part of it refuses this arch. Emitted here
-	@# rather than by the parent -- TC_CAPABILITY_UNSUPPORTED is only correct in its own make.
-	$(if $(DEP_FLAT_VERDICT),@$(if $(strip $(_dep_flat_why)),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",:))
+	@# Under DEP_FLAT_VERDICT each package visited also reports why it refuses this arch, so
+	@# one walk yields both the tree and every refusal in it. Said here rather than by the
+	@# parent: these variables are only correct in the package's own make.
+	@$(if $(and $(strip $(DEP_FLAT_VERDICT)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(_dep_flat_pkg) $(_dep_flat_why)",true)
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
@@ -377,13 +385,11 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 
 # -------------------------------------------------------------------
 # dependency-unsupported
-# Every package in the tree that refuses this arch, one per line, as
-#     required|optional <package> <reason>[, <reason>...]
-# Required gates only, OPTIONAL_DEPENDS being out of the walk once an arch is set. The sed
-# drops anything that is not a verdict -- stage0's bootstrap notice shares this stdout.
-# Empty output means the whole tree accepts the arch. The same stamped walk as
-# dependency-flat, so a diamond is visited once, and OPTIONAL_DEPENDS drop out on
-# their own once ARCH and TCVERSION are both set.
+# Every package in the tree that refuses this arch, one per line:
+#     <tree>/<package> <reason>[, <reason>...]
+# Empty output means the whole tree accepts it. The same stamped walk as dependency-flat, so
+# a diamond is visited once and OPTIONAL_DEPENDS stay out unless DEP_FLAT_WITH_OPTIONAL asks
+# for them. The sed keeps only verdicts: stage0's bootstrap notice shares this stdout.
 # -------------------------------------------------------------------
 .PHONY: dependency-unsupported
 dependency-unsupported:
