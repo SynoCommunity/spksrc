@@ -60,13 +60,8 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
-# Every gate in the whole tree, not only this package's own: it is as blocked by a floor it
-# never declared, and stopping at the first sends you round the loop once per blocker. The
-# walk `make check-<arch>-<vers>` runs (spksrc.rules/supported.mk), required gates only --
-# an optional dependency that refuses must not refuse the build.
-#
-# $(shell) folds newlines into spaces, so each line's own spaces travel as ~ and come back
-# one $(info) at a time. No package path or reason contains one.
+# Every gate in the tree, required ones only, as `make check-<arch>-<vers>` walks it: a
+# package is as blocked by a floor it never declared. ~ carries the spaces $(shell) eats.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
