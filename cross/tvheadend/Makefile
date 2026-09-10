@@ -30,7 +30,6 @@ POST_INSTALL_TARGET = tvheadend_post_install
 # Options that answer to no dependency of their own
 CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
-CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 
 # WARNING: pngquant fails when built after cross/zlib (i.e. cross/libpng), so it stays the
@@ -129,3 +128,9 @@ tvheadend_post_install:
 	# Enforce python3
 	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tmdb.py
 	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tvdb.py
+	# Imagecache audit tool (PR #2129): a developer tool that tvheadend's own
+	# build does not install.  Ship it with the package's config dir substituted
+	# as its last-resort fallback -- it normally finds the config dir from the
+	# running tvheadend process.
+	@$(RUN) sed 's|@TVHEADEND_LOCALSTATEDIR@|$(INSTALL_PREFIX_VAR)|' support/tv_imagecache_audit.py > $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_imagecache_audit.py
+	@$(RUN) chmod 0755 $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_imagecache_audit.py

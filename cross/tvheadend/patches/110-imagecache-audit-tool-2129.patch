@@ -1,13 +1,3 @@
---- configure.orig
-+++ configure
-@@ -79,6 +79,7 @@ OPTIONS=(
-   "cclang_threadsan:no"
-   "gperftools:no"
-   "execinfo:auto"
-+  "imagecache_audit:no"
- )
- 
- #
 --- docs/class/imagecache.md.orig
 +++ docs/class/imagecache.md
 @@ -15,3 +15,7 @@
@@ -20,7 +10,7 @@
 +The [Image cache audit tool](tv_imagecache_audit) (`support/tv_imagecache_audit.py` in the source tree) cross-checks the cache against the EPG, by airing day, to see how the artwork is filling in.
 --- docs/markdown/tv_imagecache_audit.md.orig
 +++ docs/markdown/tv_imagecache_audit.md
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,59 @@
 +# Image cache audit tool
 +
 +`tv_imagecache_audit.py` is a small command-line developer tool, shipped in the
@@ -28,11 +18,8 @@
 +[Image Cache](class/imagecache) has actually downloaded against the rolling EPG,
 +bucketed by airing day. It is a read-only diagnostic: it never changes the cache.
 +
-+It is not installed by default — run it straight from a source checkout
-+(`support/tv_imagecache_audit.py`). Packagers can opt in with
-+`./configure --enable-imagecache_audit`, which installs it into the binary
-+directory with the configured `--localstatedir` baked in as its config-dir
-+fallback.
++It is not installed with Tvheadend — run it straight from a source checkout
++(`support/tv_imagecache_audit.py`).
 +
 +It answers questions like *"is the guide artwork filling in?"*, *"are the
 +soonest-airing ("now") images fetched first?"* and *"how much is left to download?"*.
@@ -83,40 +70,6 @@
 +* A missing image that is a genuine `404`/dead link is reported separately from one
 +  that is merely still queued, so a few broken provider URLs are not mistaken for a
 +  fetch problem.
---- support/configure.inc.orig
-+++ support/configure.inc
-@@ -34,6 +34,7 @@ CONFIGURE_ARGS="$*"
- [ -z "$libdir"   ] && libdir=\${prefix}/lib
- [ -z "$datadir"  ] && datadir=\${prefix}/share
- [ -z "$mandir"   ] && mandir=\${datadir}/man
-+[ -z "$localstatedir" ] && localstatedir=\${prefix}/var
- 
- # Environment
- [ -z "$ROOTDIR"  ] && ROOTDIR=$(cd "$(dirname "$0")"; pwd)
-@@ -522,6 +523,7 @@ bindir    = ${bindir}
- mandir    = ${mandir}
- datadir   = ${datadir}
- libdir    = ${libdir}
-+localstatedir = ${localstatedir}
- EOF
- 
-   # no -Werror
---- support/posix.mk.orig
-+++ support/posix.mk
-@@ -10,6 +10,13 @@ install: ${PROG} ${MAN}
- 	install support/tvhmeta ${DESTDIR}${bindir}/tvhmeta
- 	install lib/py/tvh/tv_meta_tmdb.py ${DESTDIR}${bindir}/tv_meta_tmdb.py
- 	install lib/py/tvh/tv_meta_tvdb.py ${DESTDIR}${bindir}/tv_meta_tvdb.py
-+ifeq ($(CONFIG_IMAGECACHE_AUDIT),yes)
-+# Developer tool, not installed by default (run it from support/ instead).
-+# --enable-imagecache_audit installs it with the configured localstatedir baked
-+# in as its config-dir fallback (for packaged installs with non-standard paths).
-+	sed 's|@TVHEADEND_LOCALSTATEDIR@|${localstatedir}|' support/tv_imagecache_audit.py > ${DESTDIR}${bindir}/tv_imagecache_audit.py
-+	chmod 0755 ${DESTDIR}${bindir}/tv_imagecache_audit.py
-+endif
- 	install -d ${DESTDIR}${mandir}/man1
- 	install ${MAN} ${DESTDIR}${mandir}/man1/tvheadend.1
- 
 --- support/tv_imagecache_audit.py.orig
 +++ support/tv_imagecache_audit.py
 @@ -0,0 +1,974 @@
@@ -346,9 +299,9 @@
 +TVH_API_DEFAULT_PORT = 9981
 +TVH_DEFAULT_DIRS = ["/var/lib/tvheadend", "/etc/tvheadend",
 +                    os.path.expanduser("~/.hts/tvheadend")]
-+# Baked at install time from configure's --localstatedir (see support/posix.mk).
-+# Left as an '@'-prefixed placeholder in the source tree / when run standalone; the
-+# code below ignores it until it has been substituted by the build.
++# Tvheadend's own build does not install this tool.  The '@'-prefixed placeholder
++# is left for a packager that does, to substitute the installed config dir; the
++# code below ignores it for as long as it still starts with '@'.
 +TVH_INSTALL_CONFDIR = "@TVHEADEND_LOCALSTATEDIR@"
 +CONFIG_LOG_RE = re.compile(r"Using configuration from '([^']+)'")
 +
@@ -411,7 +364,7 @@
 +            if d:
 +                cands.append(d)
 +    if TVH_INSTALL_CONFDIR and not TVH_INSTALL_CONFDIR.startswith("@"):
-+        cands.append(TVH_INSTALL_CONFDIR)               # install-time --localstatedir
++        cands.append(TVH_INSTALL_CONFDIR)               # packager-substituted dir
 +        cands.append(os.path.join(TVH_INSTALL_CONFDIR, "tvheadend"))
 +    cands += TVH_DEFAULT_DIRS                            # upstream built-in defaults
 +    cands.append(".")                                    # offline: files copied to CWD
