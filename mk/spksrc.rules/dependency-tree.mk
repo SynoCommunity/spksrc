@@ -182,12 +182,12 @@ ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if 
 
 # An arch context drops OPTIONAL_DEPENDS, not being built; WALK_OPTIONAL_DEPENDS walks them
 # anyway, to REPORT what an optional branch would demand. Nothing about the build changes.
-_dep_flat_optional = $(if $(WALK_OPTIONAL_DEPENDS),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
+_walk_optional = $(if $(WALK_OPTIONAL_DEPENDS),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 
 DEP_FLAT_TARGETS_MK = $(strip \
   $(addprefix dep-flat-mk-DEPENDS__,          $(subst /,__,$(DEPENDS))) \
   $(addprefix dep-flat-mk-BUILD_DEPENDS__,    $(subst /,__,$(BUILD_DEPENDS))) \
-  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(_dep_flat_optional))) \
+  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(_walk_optional))) \
   $(addprefix dep-flat-mk-NATIVE_DEPENDS__,   $(subst /,__,$(NATIVE_DEPENDS))))
 
 # -------------------------------------------------------------------
@@ -327,30 +327,30 @@ dependency-flat:
 # -------------------------------------------------------------------
 # Why this package refuses this arch, in the shape pre-check.mk reports it. Five parts:
 #
-#   _dep_flat_below    is $(1) below $(2)? the comparison pre-check.mk itself uses
-#   _dep_flat_reason   the optional UNSUPPORTED_ARCHS_REASON, parenthesised
-#   _dep_flat_listed   refused by an arch list, the two lists named apart
-#   _dep_flat_dsm      refused by the DSM/SRM window
-#   _dep_flat_why      all of the above plus the capability floors, comma-joined
+#   _precheck_below    is $(1) below $(2)? the comparison pre-check.mk itself uses
+#   _why_reason        the optional UNSUPPORTED_ARCHS_REASON, parenthesised
+#   _why_arch_list     refused by an arch list, the two lists named apart
+#   _why_dsm_window    refused by the DSM/SRM window
+#   _why_unsupported   all of the above plus the capability floors, comma-joined
 #
-# Only _dep_flat_why is read outside this block, by dependency-flat-mk below. The plain
-# $(sort) rather than version_lt is deliberate: pre-check.mk compares that way, and the
-# two must never disagree about a package -- one reports the refusal the other makes.
+# Only _why_unsupported is read outside this block, by dependency-flat-mk below. The plain
+# $(sort) rather than version_lt is deliberate, hence the name: pre-check.mk compares that
+# way, and the two must never disagree -- one reports the refusal the other makes.
 # -------------------------------------------------------------------
-_dep_flat_below  = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
+_precheck_below  = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
 
-_dep_flat_reason = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
+_why_reason      = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
 
-_dep_flat_listed = $(call comma_append,\
-                     $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS)),unsupported arch$(_dep_flat_reason)),\
-                     $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_dep_flat_reason)))
+_why_arch_list   = $(call comma_append,\
+                     $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS)),unsupported arch$(_why_reason)),\
+                     $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_why_reason)))
 
-_dep_flat_dsm    = $(strip \
-  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
-  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(REQUIRED_MAX_DSM),$(TCVERSION))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
-  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
+_why_dsm_window  = $(strip \
+  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _precheck_below,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
+  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _precheck_below,$(REQUIRED_MAX_DSM),$(TCVERSION))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
+  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call _precheck_below,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
 
-_dep_flat_why    = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_dep_flat_listed)),$(_dep_flat_dsm))
+_why_unsupported = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_why_arch_list)),$(_why_dsm_window))
 
 # -------------------------------------------------------------------
 # dependency-flat-mk
@@ -363,7 +363,7 @@ dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
 	@# one walk yields both the tree and every refusal in it. Said here rather than by the
 	@# parent: these variables are only correct in the package's own make. Named <tree>/<pkg>
 	@# as a dependency is everywhere else -- $(NAME) is the PKG_NAME, shared by cross and spk.
-	@$(if $(and $(strip $(REPORT_UNSUPPORTED)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",true)
+	@$(if $(and $(strip $(REPORT_UNSUPPORTED)),$(strip $(_why_unsupported))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_why_unsupported)",true)
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
