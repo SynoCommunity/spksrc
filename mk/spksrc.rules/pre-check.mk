@@ -77,17 +77,17 @@ endif
 _own_why  = $(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))
 _tree_why = $(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(s) in the tree))
 
-ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED))$(strip $(_TREE_GATES)),)
+# Refuse the arch, naming every gate rather than the first, so one run tells the whole story.
+ifneq ($(or $(strip $(TC_CAPABILITY_UNSUPPORTED)),$(strip $(_TREE_GATES))),)
   $(foreach _g,$(_TREE_GATES),$(info ===>  check: $(subst ~, ,$(_g))))
   $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(_own_why)$(_tree_why))
 endif
 
-# Check whether package supports ARCH.
-#
 # UNSUPPORTED_ARCHS says WHERE a package fails, never why, and is often added by an include
 # rather than by the package -- so whoever adds the archs adds UNSUPPORTED_ARCHS_REASON too.
 _unsupported_why = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
 
+# Check whether package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
     $(call precheck_fatal,Arch '$(ARCH)' is not a supported architecture$(_unsupported_why))
