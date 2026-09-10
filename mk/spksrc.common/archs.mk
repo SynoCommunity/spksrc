@@ -91,31 +91,6 @@ OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 # outdated unsupported archs
 DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 
-# Notes for .NET 6 compatibility:
-# 1. dotnet for x86 (32-bit) is unsupported on linux and must be built from source
-# 2. ARMv7_ARCHS without full vfpv3 support (having only vfpv3-d16) are not supported
-# 3. SRM ARMv7 archs are not supported
-# 4. Certain combinations of ARMv7 and DSM are incompatible (issues #4790, #5089, #5302, #5315)
-# 5. Comprehensive ARMv7 testing conducted under issue #5574 resulted in the following exclusions
-
-# Exclusions for dotnet core apps
-ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine comcerto2k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
-endif
-
-# Exclusions for dotnet 6.0 servarr apps (except x86)
-ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
-endif
-
-# Exclusions for dotnet 6.0 servarr apps (except x86)
-# ARMv7 incompatibility — see: https://github.com/dotnet/runtime/issues/109739
-ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
-endif
-
 # Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
 TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
 
