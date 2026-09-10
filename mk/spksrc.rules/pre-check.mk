@@ -117,9 +117,6 @@ ifneq ($(REQUIRED_MAX_DSM),)
   endif
 endif
 
-# version_lt/gt rather than a plain $(sort): the latter compares lexically, so a future
-# DSM 10 would read as older than 7. spksrc.rules/dependency-tree.mk reports what is
-# refused here and calls the same macros, so the two cannot drift apart.
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_MIN_DSM),)
   ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
