@@ -45,6 +45,37 @@ For Intel-based Synology devices:
 3. Select "Video Acceleration API (VAAPI)" as the hardware acceleration method
 4. Set the VA-API device to `/dev/dri/renderD128`
 
+## Major Upgrades and Rollback
+
+Major Jellyfin versions migrate the database forward with no downgrade
+path: an older server cannot read a migrated database. When you upgrade
+across major versions, the package automatically takes a backup
+beforehand (`jellyfin_backup_v<previous-version>_YYYYMMDD.tar.gz`),
+which is what makes a rollback possible.
+
+### What the backup contains
+
+Everything needed to restore your server: configuration, the library
+database, users, metadata, artwork, playlists, and Jellyfin's own
+scheduled backups. Skipped on purpose is bulk the server transparently
+regenerates: prior rollback archives, transcode segments, and the
+extracted subtitle/attachment caches.
+
+### How to roll back
+
+1. In Package Center, uninstall Jellyfin and choose **Restore backup of
+   the package data files** when asked (offered only if a backup exists).
+2. Manually install the previous version's `.spk`
+   ([manual installation](../user-guide/installation.md#manual-installation)).
+3. Start the package, verify your libraries, then run a library scan.
+
+### Caveats
+
+- Rolling back without restoring the backup is unsupported: the old
+  server cannot read the migrated database.
+- Without a backup there is no restore option at uninstall — keep your
+  own data-directory copy before major upgrades as well.
+
 ## Troubleshooting
 
 ### Permission Issues
