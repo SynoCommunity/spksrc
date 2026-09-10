@@ -12,6 +12,15 @@
 #  - Optional filtering of output by dependency relation type (DEPENDS_TYPE)
 #  - Context-aware traversal: when ARCH and TCVERSION are both set, OPTIONAL_DEPENDS
 #    are excluded at every level so only toolchain-resolved DEPENDS are reported.
+#  - Reporting why a tree refuses an arch, not just what it contains
+#
+# Switches, set by the caller on the sub-make command line:
+#  REPORT_UNSUPPORTED
+#      Each package visited also prints why it refuses this arch, so one walk
+#      yields both the tree and every refusal in it. See dependency-unsupported.
+#  WALK_OPTIONAL_DEPENDS
+#      Walk OPTIONAL_DEPENDS even under an arch context, which normally drops
+#      them. For reporting only: what gets built is unchanged.
 #
 # Root-level Targets (available only when BASEDIR is empty):
 #  dependency-list-spk
@@ -31,6 +40,11 @@
 #      filtered by DEPENDS_TYPE.
 #      Default: all types when ARCH/TCVERSION are absent;
 #               OPTIONAL_DEPENDS excluded when both ARCH and TCVERSION are set.
+#
+#  dependency-unsupported
+#      Prints every package in the tree that refuses this arch, one per line, as
+#      "<tree>/<package> <reason>[, <reason>...]". Empty when the tree accepts it.
+#      Read by `make check-<arch>-<tcvers>` and by the pre-check.
 #
 #  dependency-list
 #      Prints a single-line, space-separated list of dependencies for the
@@ -166,9 +180,9 @@ DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 # -------------------------------------------------------------------
 ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 
-# An arch context drops OPTIONAL_DEPENDS, not being built; DEP_FLAT_WITH_OPTIONAL walks them
+# An arch context drops OPTIONAL_DEPENDS, not being built; WALK_OPTIONAL_DEPENDS walks them
 # anyway, to REPORT what an optional branch would demand. Nothing about the build changes.
-_dep_flat_optional = $(if $(DEP_FLAT_WITH_OPTIONAL),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
+_dep_flat_optional = $(if $(WALK_OPTIONAL_DEPENDS),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 
 DEP_FLAT_TARGETS_MK = $(strip \
   $(addprefix dep-flat-mk-DEPENDS__,          $(subst /,__,$(DEPENDS))) \
@@ -276,7 +290,9 @@ dependency-tree:
 # Used by dependency-flat and dependency-list to filter by DEPENDS_TYPE
 # without re-traversing the dependency graph.
 # ARCH and TCVERSION are forwarded to dependency-flat-mk so that the
-# correct set of dependencies is traversed for the given toolchain context.
+# correct set of dependencies is traversed for the given toolchain context,
+# and REPORT_UNSUPPORTED with them, so a caller asking for verdicts gets the
+# "UNSUPPORTED <pkg> <reason>" lines interleaved with the "TYPE dep/path" ones.
 # Cleans up the stamp directory on completion.
 # -------------------------------------------------------------------
 .PHONY: dependency-flat-raw
@@ -284,7 +300,7 @@ dependency-flat-raw:
 	@PARALLEL_MAKE=max $(MAKE) -j $(nproc) --silent --no-print-directory \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
-		$(if $(DEP_FLAT_VERDICT),DEP_FLAT_VERDICT=1) \
+		$(if $(REPORT_UNSUPPORTED),REPORT_UNSUPPORTED=1) \
 		dependency-flat-mk 2>/dev/null || true
 	@rm -rf $(DEP_FLAT_STAMP_DIR)
 
@@ -343,11 +359,11 @@ _dep_flat_why    = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUP
 # -------------------------------------------------------------------
 .PHONY: dependency-flat-mk
 dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
-	@# Under DEP_FLAT_VERDICT each package visited also reports why it refuses this arch, so
+	@# Under REPORT_UNSUPPORTED each package visited also reports why it refuses this arch, so
 	@# one walk yields both the tree and every refusal in it. Said here rather than by the
 	@# parent: these variables are only correct in the package's own make. Named <tree>/<pkg>
 	@# as a dependency is everywhere else -- $(NAME) is the PKG_NAME, shared by cross and spk.
-	@$(if $(and $(strip $(DEP_FLAT_VERDICT)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",true)
+	@$(if $(and $(strip $(REPORT_UNSUPPORTED)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",true)
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
@@ -382,8 +398,8 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 	DEPENDENCY_WALK=1 \
 	$(MAKE) -s --output-sync=target \
 		-C ../../$$dep \
-		$(if $(DEP_FLAT_VERDICT),DEP_FLAT_VERDICT=1) \
-		$(if $(DEP_FLAT_WITH_OPTIONAL),DEP_FLAT_WITH_OPTIONAL=1) \
+		$(if $(REPORT_UNSUPPORTED),REPORT_UNSUPPORTED=1) \
+		$(if $(WALK_OPTIONAL_DEPENDS),WALK_OPTIONAL_DEPENDS=1) \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 		dependency-flat-mk
@@ -393,12 +409,12 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 # Every package in the tree that refuses this arch, one per line:
 #     <tree>/<package> <reason>[, <reason>...]
 # Empty output means the whole tree accepts it. The same stamped walk as dependency-flat, so
-# a diamond is visited once and OPTIONAL_DEPENDS stay out unless DEP_FLAT_WITH_OPTIONAL asks
+# a diamond is visited once and OPTIONAL_DEPENDS stay out unless WALK_OPTIONAL_DEPENDS asks
 # for them. The sed keeps only verdicts: stage0's bootstrap notice shares this stdout.
 # -------------------------------------------------------------------
 .PHONY: dependency-unsupported
 dependency-unsupported:
-	@DEP_FLAT_VERDICT=1 $(MAKE) -s \
+	@REPORT_UNSUPPORTED=1 $(MAKE) -s \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 		dependency-flat-raw \

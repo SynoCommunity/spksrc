@@ -79,7 +79,7 @@ _gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr
 check: SHELL:=/bin/bash
 check:  ## Report the capability gates ARCH/TCVERSION fails (see also check-<arch>-<vers>)
 	@req=$$($(_gate_walk)) ; \
-	all=$$(DEP_FLAT_WITH_OPTIONAL=1 $(_gate_walk)) ; \
+	all=$$(WALK_OPTIONAL_DEPENDS=1 $(_gate_walk)) ; \
 	opt=$$(comm -13 <(echo "$$req") <(echo "$$all")) ; \
 	if [ -z "$$req$$opt" ] ; then \
 	   $(MSG) "$(NAME): $(ARCH)-$(TCVERSION) check: OK" ; \
