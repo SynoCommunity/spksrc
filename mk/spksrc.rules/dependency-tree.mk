@@ -165,10 +165,9 @@ DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 # are first evaluated (i.e. when dependency-flat-mk resolves its prerequisites).
 # -------------------------------------------------------------------
 ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
-# An arch context normally drops OPTIONAL_DEPENDS: they are not built, so they do not belong
-# in a dependency list. DEP_FLAT_WITH_OPTIONAL walks them anyway, to REPORT what an optional
-# branch would demand. What actually gets built is unchanged either way. This one is about
-# WHICH packages are walked; the _dep_flat_* below are about what each of them answers.
+
+# An arch context drops OPTIONAL_DEPENDS, not being built; DEP_FLAT_WITH_OPTIONAL walks them
+# anyway, to REPORT what an optional branch would demand. Nothing about the build changes.
 _dep_flat_optional = $(if $(DEP_FLAT_WITH_OPTIONAL),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 
 DEP_FLAT_TARGETS_MK = $(strip \
