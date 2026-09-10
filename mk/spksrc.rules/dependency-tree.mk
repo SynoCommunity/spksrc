@@ -325,20 +325,17 @@ dependency-flat:
 		| sort -u
 
 # -------------------------------------------------------------------
-# Why this package refuses this arch, in the shape pre-check.mk reports it. Five parts:
+# Why this package refuses this arch, in the shape pre-check.mk reports it. Four parts:
 #
-#   _precheck_version_lt  is $(1) < $(2)? by the same comparison pre-check.mk makes
 #   _why_reason           the optional UNSUPPORTED_ARCHS_REASON, parenthesised
 #   _why_arch_list        refused by an arch list, the two lists named apart
 #   _why_dsm_window       refused by the DSM/SRM window
 #   _why_unsupported      all of the above plus the capability floors, comma-joined
 #
-# Only _why_unsupported is read outside this block, by dependency-flat-mk below. The plain
-# $(sort) rather than version_lt is deliberate, hence the name: pre-check.mk compares that
-# way, and the two must never disagree -- one reports the refusal the other makes.
+# Only _why_unsupported is read outside this block, by dependency-flat-mk below. The version
+# comparisons are macros.mk's, the same ones pre-check.mk makes, so what is reported here and
+# what is refused there cannot drift apart.
 # -------------------------------------------------------------------
-_precheck_version_lt = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
-
 _why_reason          = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
 
 _why_arch_list       = $(call comma_append,\
@@ -346,9 +343,9 @@ _why_arch_list       = $(call comma_append,\
                      $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_why_reason)))
 
 _why_dsm_window      = $(strip \
-  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _precheck_version_lt,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
-  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _precheck_version_lt,$(REQUIRED_MAX_DSM),$(TCVERSION))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
-  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call _precheck_version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
+  $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call version_lt,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
+  $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call version_gt,$(TCVERSION),$(REQUIRED_MAX_DSM))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
+  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
 
 _why_unsupported     = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_why_arch_list)),$(_why_dsm_window))
 

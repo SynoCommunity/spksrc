@@ -111,16 +111,19 @@ endif
 # Check maximal DSM requirements of package
 ifneq ($(REQUIRED_MAX_DSM),)
   ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
-    ifneq ($(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM))))
+    ifeq ($(call version_gt,$(TCVERSION),$(REQUIRED_MAX_DSM)),1)
       $(call precheck_fatal,DSM Toolchain $(TCVERSION) is higher than $(REQUIRED_MAX_DSM))
     endif
   endif
 endif
 
+# version_lt/gt rather than a plain $(sort): the latter compares lexically, so a future
+# DSM 10 would read as older than 7. spksrc.rules/dependency-tree.mk reports what is
+# refused here and calls the same macros, so the two cannot drift apart.
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_MIN_DSM),)
   ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
-    ifneq ($(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM))))
+    ifeq ($(call version_lt,$(TCVERSION),$(REQUIRED_MIN_DSM)),1)
       $(call precheck_fatal,DSM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_DSM))
     endif
   endif
@@ -129,7 +132,7 @@ endif
 # Check minimum SRM requirements of package
 ifneq ($(REQUIRED_MIN_SRM),)
   ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
-    ifneq ($(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM))))
+    ifeq ($(call version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM)),1)
       $(call precheck_fatal,SRM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_SRM))
     endif
   endif
