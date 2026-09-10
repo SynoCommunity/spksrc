@@ -167,7 +167,8 @@ DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 # An arch context normally drops OPTIONAL_DEPENDS: they are not built, so they do not belong
 # in a dependency list. DEP_FLAT_WITH_OPTIONAL walks them anyway, to REPORT what an optional
-# branch would demand. What actually gets built is unchanged either way.
+# branch would demand. What actually gets built is unchanged either way. This one is about
+# WHICH packages are walked; the _dep_flat_* below are about what each of them answers.
 _dep_flat_optional = $(if $(DEP_FLAT_WITH_OPTIONAL),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
 
 DEP_FLAT_TARGETS_MK = $(strip \
@@ -308,29 +309,33 @@ dependency-flat:
 		| grep -P "^(cross|python|native|spk|diyspk)/" \
 		| sort -u
 
-# Everything this package would refuse the arch for, in the shape the pre-check reports:
-# a capability floor, and an explicit UNSUPPORTED_ARCHS with whatever reason came with it.
-# The two lists are reported apart, so the message points at the variable to look in.
+# -------------------------------------------------------------------
+# Why this package refuses this arch, in the shape pre-check.mk reports it. Five parts:
+#
+#   _dep_flat_below    is $(1) below $(2)? the comparison pre-check.mk itself uses
+#   _dep_flat_reason   the optional UNSUPPORTED_ARCHS_REASON, parenthesised
+#   _dep_flat_listed   refused by an arch list, the two lists named apart
+#   _dep_flat_dsm      refused by the DSM/SRM window
+#   _dep_flat_why      all of the above plus the capability floors, comma-joined
+#
+# Only _dep_flat_why is read outside this block, by dependency-flat-mk below. The plain
+# $(sort) rather than version_lt is deliberate: pre-check.mk compares that way, and the
+# two must never disagree about a package -- one reports the refusal the other makes.
+# -------------------------------------------------------------------
+_dep_flat_below  = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
+
 _dep_flat_reason = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
+
 _dep_flat_listed = $(call comma_append,\
                      $(if $(filter $(ARCH),$(UNSUPPORTED_ARCHS)),unsupported arch$(_dep_flat_reason)),\
                      $(if $(filter $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)),unsupported arch-tcversion$(_dep_flat_reason)))
 
-# Is $(1) below $(2)? The plain $(sort) pre-check.mk uses, not version_lt, so the two can
-# never disagree about a package -- one reports the refusal the other makes.
-_dep_flat_below = $(if $(filter $(2),$(firstword $(sort $(1) $(2)))),,1)
-
-# The DSM/SRM window: declared, in range, and outside it.
-_dep_flat_dsm = $(strip \
+_dep_flat_dsm    = $(strip \
   $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
   $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call _dep_flat_below,$(REQUIRED_MAX_DSM),$(TCVERSION))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
   $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call _dep_flat_below,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
 
-_dep_flat_why = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_dep_flat_listed)),$(_dep_flat_dsm))
-
-# "cross/foo", "spk/foo" -- the tree and the package, which is how a dependency is named
-# everywhere else. $(NAME) will not do: it is the PKG_NAME, and cross/ and spk/ share it.
-_dep_flat_pkg = $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR))
+_dep_flat_why    = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_dep_flat_listed)),$(_dep_flat_dsm))
 
 # -------------------------------------------------------------------
 # dependency-flat-mk
@@ -341,8 +346,9 @@ _dep_flat_pkg = $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR))
 dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
 	@# Under DEP_FLAT_VERDICT each package visited also reports why it refuses this arch, so
 	@# one walk yields both the tree and every refusal in it. Said here rather than by the
-	@# parent: these variables are only correct in the package's own make.
-	@$(if $(and $(strip $(DEP_FLAT_VERDICT)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(_dep_flat_pkg) $(_dep_flat_why)",true)
+	@# parent: these variables are only correct in the package's own make. Named <tree>/<pkg>
+	@# as a dependency is everywhere else -- $(NAME) is the PKG_NAME, shared by cross and spk.
+	@$(if $(and $(strip $(DEP_FLAT_VERDICT)),$(strip $(_dep_flat_why))),echo "UNSUPPORTED $(notdir $(patsubst %/,%,$(dir $(CURDIR))))/$(notdir $(CURDIR)) $(_dep_flat_why)",true)
 
 # -------------------------------------------------------------------
 # dep-flat-mk-%
