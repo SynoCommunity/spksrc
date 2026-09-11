@@ -1,5 +1,5 @@
 PKG_NAME = immich
-PKG_VERS = 3.1.0
+PKG_VERS = 3.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
@@ -45,7 +45,7 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile --ignore-scripts
 	# Ensure target-arch sharp prebuilt is available (frozen lockfile skips non-host platforms)
-	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.34.5 --filter immich --ignore-scripts 2>/dev/null || true
+	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.35.3 --filter immich --ignore-scripts 2>/dev/null || true
 
 	# ------------------------------------------------------------
 	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
