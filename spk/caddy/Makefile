@@ -1,6 +1,6 @@
 SPK_NAME = caddy
 SPK_VERS = 2.11.4
-SPK_REV = 4
+SPK_REV = 1
 SPK_ICON = src/caddy.png
 
 DEPENDS = cross/caddy
