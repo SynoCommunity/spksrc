@@ -92,8 +92,8 @@ install_ml_packages()
 {
     "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
         onnxruntime \
+        onnx \
         opencv-python-headless \
-        insightface \
         huggingface-hub \
         numpy \
         orjson \
@@ -108,7 +108,7 @@ install_ml_packages()
         rich \
         aiocache \
         rapidocr 2>&1
-    # insightface pulls in opencv-python (GUI); force back to headless
+    # ensure opencv stays headless (GUI variant has no place on DSM)
     "${ML_VENV}/bin/pip3" install \
         --force-reinstall \
         --no-deps \
@@ -288,6 +288,12 @@ service_postupgrade ()
     # Upgrade ML wheels if ML is installed
     if [ -x "${ML_VENV}/bin/python3" ]; then
         setup_proxy
+        # 3.2.0 dropped insightface (replaced by onnx); remove the
+        # leftover wheel on upgrade so it does not linger in the venv
+        if "${ML_VENV}/bin/pip3" show insightface >/dev/null 2>&1; then
+            echo "Removing obsolete insightface wheel."
+            "${ML_VENV}/bin/pip3" uninstall -y insightface 2>&1 || true
+        fi
         install_ml_packages
     fi
 }
