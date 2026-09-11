@@ -42,6 +42,25 @@ install_log ()
     fi
 }
 
+# Wrap a value as a shell single-quoted literal (safe to source)
+shell_quote()
+{
+    printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
+}
+
+# Escape a value for the replacement part of sed 's|...|...|'
+# (backslash, ampersand and the | delimiter)
+sed_escape()
+{
+    printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'
+}
+
+# Escape single quotes for use inside a SQL string literal
+sql_escape()
+{
+    printf '%s' "$1" | sed "s/'/''/g"
+}
+
 setup_proxy ()
 {
     [ -f /etc/proxy.conf ] || return 0
@@ -73,8 +92,8 @@ install_ml_packages()
 {
     "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
         onnxruntime \
+        onnx \
         opencv-python-headless \
-        insightface \
         huggingface-hub \
         numpy \
         orjson \
@@ -89,7 +108,7 @@ install_ml_packages()
         rich \
         aiocache \
         rapidocr 2>&1
-    # insightface pulls in opencv-python (GUI); force back to headless
+    # ensure opencv stays headless (GUI variant has no place on DSM)
     "${ML_VENV}/bin/pip3" install \
         --force-reinstall \
         --no-deps \
@@ -186,15 +205,15 @@ install_immich_config()
 {
     mkdir -p "$(dirname "${IMMICH_CONF}")"
     cp "${SYNOPKG_PKGDEST}/etc/immich.conf" "${IMMICH_CONF}"
-    sed -i -e "s|@immich_build_data@|${IMMICH_BUILD_DATA}|g" \
-           -e "s|@media_path@|${MEDIA_PATH}|g" \
-           -e "s|@ml_url@|${ML_URL}|g" \
-           -e "s|@ml_enabled@|${ML_ENABLED}|g" \
-           -e "s|@db_password@|${DB_PASSWORD}|g" \
-           -e "s|@db_hostname@|${PG_HOST}|g" \
-           -e "s|@db_port@|${PG_PORT}|g" \
-           -e "s|@db_username@|${PG_USER}|g" \
-           -e "s|@redis_hostname@|${REDIS_HOSTNAME}|g" \
+    sed -i -e "s|@immich_build_data@|$(sed_escape "$(shell_quote "${IMMICH_BUILD_DATA}")")|g" \
+           -e "s|@media_path@|$(sed_escape "$(shell_quote "${MEDIA_PATH}")")|g" \
+           -e "s|@ml_url@|$(sed_escape "$(shell_quote "${ML_URL}")")|g" \
+           -e "s|@ml_enabled@|$(sed_escape "$(shell_quote "${ML_ENABLED}")")|g" \
+           -e "s|@db_password@|$(sed_escape "$(shell_quote "${DB_PASSWORD}")")|g" \
+           -e "s|@db_hostname@|$(sed_escape "$(shell_quote "${PG_HOST}")")|g" \
+           -e "s|@db_port@|$(sed_escape "$(shell_quote "${PG_PORT}")")|g" \
+           -e "s|@db_username@|$(sed_escape "$(shell_quote "${PG_USER}")")|g" \
+           -e "s|@redis_hostname@|$(sed_escape "$(shell_quote "${REDIS_HOSTNAME}")")|g" \
            "${IMMICH_CONF}"
     chmod 600 "${IMMICH_CONF}"
 }
@@ -215,7 +234,8 @@ service_postinst ()
         DB_PASSWORD="${wizard_pg_password_immich}"
         install_immich_config
 
-        PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d postgres -c "CREATE USER ${PG_USER} WITH PASSWORD '${wizard_pg_password_immich}' SUPERUSER;" 2>/dev/null || true
+        DB_PASSWORD_SQL="$(sql_escape "${wizard_pg_password_immich}")"
+        PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d postgres -c "CREATE USER ${PG_USER} WITH PASSWORD '${DB_PASSWORD_SQL}' SUPERUSER;" 2>/dev/null || true
         PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d postgres -c "CREATE DATABASE ${PG_DATABASE} OWNER ${PG_USER};" 2>/dev/null || true
         for ext in vector unaccent cube earthdistance pg_trgm uuid-ossp; do
             PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d "${PG_DATABASE}" -c "CREATE EXTENSION IF NOT EXISTS \"${ext}\";" 2>/dev/null || true
@@ -268,6 +288,12 @@ service_postupgrade ()
     # Upgrade ML wheels if ML is installed
     if [ -x "${ML_VENV}/bin/python3" ]; then
         setup_proxy
+        # 3.2.0 dropped insightface (replaced by onnx); remove the
+        # leftover wheel on upgrade so it does not linger in the venv
+        if "${ML_VENV}/bin/pip3" show insightface >/dev/null 2>&1; then
+            echo "Removing obsolete insightface wheel."
+            "${ML_VENV}/bin/pip3" uninstall -y insightface 2>&1 || true
+        fi
         install_ml_packages
     fi
 }

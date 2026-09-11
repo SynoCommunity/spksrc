@@ -1,5 +1,5 @@
 PKG_NAME = libvips
-PKG_VERS = 8.17.3
+PKG_VERS = 8.18.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = vips-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libvips/libvips/releases/download/v$(PKG_VERS)
@@ -50,5 +50,5 @@ include ../../mk/spksrc.cross-meson.mk
 .PHONY: libvips_post_install
 libvips_post_install:
 	@cd $(STAGING_INSTALL_PREFIX)/lib && \
-	  patchelf --set-soname libvips-cpp.so.8.17.3 libvips-cpp.so.42.19.3 && \
-	  ln -sf libvips-cpp.so.42.19.3 libvips-cpp.so.8.17.3
+	  patchelf --set-soname libvips-cpp.so.8.18.3 libvips-cpp.so.42.20.3 && \
+	  ln -sf libvips-cpp.so.42.20.3 libvips-cpp.so.8.18.3

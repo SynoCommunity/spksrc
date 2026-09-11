@@ -1,5 +1,5 @@
 PKG_NAME = immich
-PKG_VERS = 3.1.0
+PKG_VERS = 3.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
@@ -45,7 +45,7 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile --ignore-scripts
 	# Ensure target-arch sharp prebuilt is available (frozen lockfile skips non-host platforms)
-	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.34.5 --filter immich --ignore-scripts 2>/dev/null || true
+	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.35.3 --filter immich --ignore-scripts 2>/dev/null || true
 
 	# ------------------------------------------------------------
 	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
@@ -147,16 +147,17 @@ immich_install:
 		> $(WORK_DIR)/$(PKG_NAME).plist
 
 .PHONY: immich_post_install
+# sharp >= 0.35 names the binary sharp-linux-<arch>-<version>.node
 immich_post_install:
 	@$(MSG) "Redirect sharp RPATH to target/lib for HEIC-enabled libvips"
-	SHARP_NODE=$$(find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules -name "sharp-linux-$(NODE_ARCH).node" 2>/dev/null | head -1); \
+	SHARP_NODE=$$(find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules -name "sharp-linux-$(NODE_ARCH)*.node" 2>/dev/null | head -1); \
 	if [ -n "$$SHARP_NODE" ]; then \
 	  patchelf --set-rpath /var/packages/immich/target/lib "$$SHARP_NODE"; \
 	else \
 	  $(MSG) "Warning: sharp-linux-$(NODE_ARCH).node not found, skipping RPATH fix" >&2; \
 	fi
 	@$(MSG) "Removing build-time and wrong-arch native binaries"
-	find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/.pnpm -name "*.node" ! -name "sharp-linux-$(NODE_ARCH).node" ! -path "*bcrypt*" -delete 2>/dev/null || true; \
+	find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/.pnpm -name "*.node" ! -name "sharp-linux-$(NODE_ARCH)*.node" ! -path "*bcrypt*" -delete 2>/dev/null || true; \
 	find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/.pnpm -path "*bcrypt*" -name "*.node" ! -path "*linux-$(NODE_ARCH)*" -delete 2>/dev/null || true
 	@$(MSG) "Removing dev-only packages from node_modules"
 	bash -c 'for pkg in typescript eslint @typescript-eslint @swc @esbuild @rolldown vitest jsdom; do \
