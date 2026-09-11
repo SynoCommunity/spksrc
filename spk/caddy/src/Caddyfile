@@ -9,7 +9,7 @@
 # apply changes without downtime by running:
 #   caddy reload --config /var/packages/caddy/var/Caddyfile
 #
-# The default site below listens on :8180 so it doesn't collide with
+# The default site below listens on :8880 so it doesn't collide with
 # anything else on the NAS out of the box.
 #
 # To run on a low port, the caddy binary needs the cap_net_bind_service
@@ -46,7 +46,7 @@
 #      443 - Caddy uses it for the ACME HTTP challenge and to redirect
 #      plain HTTP to HTTPS.
 #   3. Make sure nothing else on the NAS is still holding 80/443 (see
-#      above), then replace the :8180 site block below with your real
+#      above), then replace the :8880 site block below with your real
 #      domain, e.g.:
 #
 #        example.your-domain.com {
@@ -66,7 +66,7 @@
 #       email you@example.com
 #   }
 
-:8180 {
+:8880 {
 	respond "Caddy is running"
 }
 
