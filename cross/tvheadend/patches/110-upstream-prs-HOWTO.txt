@@ -4,8 +4,8 @@ can be dropped on its own once merged or abandoned.
   patch  PR                 th0ma7/tvheadend branch   commit
   110    tvheadend#2129     imagecache-audit-tool     62cd4b68e  (the whole PR)
   111    tvheadend#2160     imagecache-fetch-rework   fc8f89bbc  (the whole PR)
-  112    tvheadend#2249     record-from-buffer        db71b82b3  record from the channel buffer
-  113    tvheadend#2249     record-from-buffer        8c00c0cea  HTSP timeshift through it
+  112    tvheadend#2249     record-from-buffer        db71b82b3  record from the channel cache
+  113    tvheadend#2249     record-from-buffer        8c00c0cea  HTSP timeshift through the channel cache
   114    tvheadend#2249     record-from-buffer        6532fc343  packet timeshift double free
 
 The PR branches sit on a later master (2e64ec02c) than the distrib tarball
@@ -54,7 +54,7 @@ earlier patches produce: apply the chain up to it, apply the commit, diff.
 
 HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
 C=8c00c0cea
-F=$P/113-htsp-timeshift-channel-buffer.patch
+F=$P/113-htsp-timeshift-channel-cache.patch
 rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
 git archive $HASH | tar -x -C /tmp/pa
 (cd /tmp/pa && for p in $(ls $P/*.patch | sort); do

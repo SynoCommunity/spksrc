@@ -1,4 +1,4 @@
-HTSP clients (Kodi) timeshift through the channel buffer instead of each
+HTSP clients (Kodi) timeshift through the channel cache instead of each
 writing its own.  Needs 112; can be removed on its own.
 
 tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master 2e64ec02c).
