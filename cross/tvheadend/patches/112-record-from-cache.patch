@@ -2,7 +2,7 @@ Record from the cache of a tuned channel: a recording started after its
 programme began starts at the programme's start (less pre-padding), as far back
 as the channel cache reaches.  Timeshift option "Record from cache".
 
-tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master 2e64ec02c).
 
 --- Makefile.orig
 +++ Makefile
@@ -82,8 +82,8 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +static void
 +parser_update_service(parser_es_t *st)
 +{
-+  th_subscription_t *s = st->es_parser->prs_subscription;
-+  elementary_stream_t *es;
++  const th_subscription_t *s = st->es_parser->prs_subscription;
++  const elementary_stream_t *es;
 +
 +  if (s && s->ths_replaying) {
 +    es = elementary_stream_find(&st->es_service->s_components, st->es_pid);
@@ -308,7 +308,7 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
    const char *path = timeshift_conf.path;
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
-@@ -0,0 +1,706 @@
+@@ -0,0 +1,721 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
@@ -522,14 +522,19 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +static void
 +svcbuf_block_remove ( svcbuf_t *sb, svcbuf_block_t *b )
 +{
++  svcbuf_block_t *next = TAILQ_NEXT(b, link);
++
 +  TAILQ_REMOVE(&sb->blocks, b, link);
 +  sb->size -= b->size;
 +  if (sb->cur == b)
 +    sb->cur = NULL;
 +  if (sb->wr_next == b)
-+    sb->wr_next = TAILQ_FIRST(&sb->blocks);
-+  if (b->seg && --b->seg->nblocks == 0 && b->seg != sb->wr_seg)
-+    svcbuf_seg_close(sb, b->seg);
++    sb->wr_next = next;
++  if (b->seg) {
++    b->seg->nblocks--;
++    if (b->seg->nblocks == 0 && b->seg != sb->wr_seg)
++      svcbuf_seg_close(sb, b->seg);
++  }
 +  free(b->data);
 +  free(b);
 +}
@@ -551,17 +556,20 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +svcbuf_expire ( svcbuf_t *sb )
 +{
 +  svcbuf_block_t *b;
++  svcbuf_block_t *nb;
 +  const time_t limit = timeshift_conf.unlimited_period ? 0 :
 +                       gclk() - (time_t)timeshift_conf.max_period * 60;
-+  const uint64_t max_size = sb->ram_only ? timeshift_conf.ram_size :
-+                            timeshift_conf.unlimited_size ? 0 :
-+                            timeshift_conf.max_size;
 +  const uint64_t pin = svcbuf_pinned(sb);
++  uint64_t max_size = timeshift_conf.unlimited_size ? 0 : timeshift_conf.max_size;
 +
-+  while ((b = TAILQ_FIRST(&sb->blocks)) != NULL &&
-+         b->settled && b->seq < pin) {
++  if (sb->ram_only)
++    max_size = timeshift_conf.ram_size;
++
++  for (b = TAILQ_FIRST(&sb->blocks); b != NULL && b->settled && b->seq < pin;
++       b = nb) {
 +    if (!(limit && b->wall < limit) && !(max_size && sb->size > max_size))
 +      break;
++    nb = TAILQ_NEXT(b, link);
 +    svcbuf_block_remove(sb, b);
 +  }
 +}
@@ -572,14 +580,15 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +  svcbuf_t *sb = aux;
 +  svcbuf_block_t *b;
 +  svcbuf_seg_t *seg;
-+  uint8_t *data;
++  const uint8_t *data;
 +  size_t size;
 +  off_t off;
 +  int r;
 +
 +  tvh_mutex_lock(&sb->lock);
 +  while (sb->run) {
-+    while (sb->run && (b = sb->wr_next) != NULL && b->sealed) {
++    while (sb->run && sb->wr_next != NULL && sb->wr_next->sealed) {
++      b = sb->wr_next;
 +      if (!sb->ram_only && !sb->wr_error) {
 +        seg = sb->wr_seg;
 +        if (seg == NULL || seg->size + (off_t)b->size > SVCBUF_SEG_SIZE) {
@@ -689,7 +698,9 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +svcbuf_unref ( svcbuf_t *sb )
 +{
 +  svcbuf_block_t *b;
++  svcbuf_block_t *nb;
 +  svcbuf_seg_t *seg;
++  svcbuf_seg_t *nseg;
 +
 +  if (atomic_dec(&sb->refcount, 1) > 1)
 +    return;
@@ -701,10 +712,14 @@ tvheadend/tvheadend#2249, commit 5ed3ab5e3 (branch record-from-buffer, on master
 +  pthread_join(sb->writer, NULL);
 +
 +  sb->wr_seg = NULL;
-+  while ((b = TAILQ_FIRST(&sb->blocks)) != NULL)
++  for (b = TAILQ_FIRST(&sb->blocks); b != NULL; b = nb) {
++    nb = TAILQ_NEXT(b, link);
 +    svcbuf_block_remove(sb, b);
-+  while ((seg = TAILQ_FIRST(&sb->segs)) != NULL)
++  }
++  for (seg = TAILQ_FIRST(&sb->segs); seg != NULL; seg = nseg) {
++    nseg = TAILQ_NEXT(seg, link);
 +    svcbuf_seg_close(sb, seg);
++  }
 +  if (sb->dir) {
 +    rmdir(sb->dir);
 +    free(sb->dir);

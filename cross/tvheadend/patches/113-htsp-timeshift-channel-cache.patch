@@ -1,7 +1,7 @@
 HTSP clients (Kodi) timeshift through the channel cache instead of each
 writing its own.  Needs 112; can be removed on its own.
 
-tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master 2e64ec02c).
 
 --- Makefile.orig
 +++ Makefile
@@ -82,8 +82,8 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 --- src/parsers/parsers.c.orig
 +++ src/parsers/parsers.c
 @@ -120,7 +120,7 @@
-   th_subscription_t *s = st->es_parser->prs_subscription;
-   elementary_stream_t *es;
+   const th_subscription_t *s = st->es_parser->prs_subscription;
+   const elementary_stream_t *es;
  
 -  if (s && s->ths_replaying) {
 +  if (st->es_parser->prs_replay || (s && s->ths_replaying)) {
@@ -238,7 +238,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
  };
  
  static int svcbuf_index;
-@@ -207,10 +219,29 @@
+@@ -207,12 +219,30 @@
    return 0;
  }
  
@@ -256,28 +256,29 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
  static void
  svcbuf_block_remove ( svcbuf_t *sb, svcbuf_block_t *b )
  {
+   svcbuf_block_t *next = TAILQ_NEXT(b, link);
 +  svcbuf_reader_t *r;
-+
+ 
 +  /* readers do not hold data back: one still there moves on */
 +  LIST_FOREACH(r, &sb->readers, link)
 +    if (r->blk == b) {
-+      r->blk = TAILQ_NEXT(b, link);
++      r->blk = next;
 +      r->off = 0;
 +      r->skipped = r->lost = 1;
 +    }
    TAILQ_REMOVE(&sb->blocks, b, link);
    sb->size -= b->size;
    if (sb->cur == b)
-@@ -218,7 +249,7 @@
-   if (sb->wr_next == b)
-     sb->wr_next = TAILQ_FIRST(&sb->blocks);
-   if (b->seg && --b->seg->nblocks == 0 && b->seg != sb->wr_seg)
--    svcbuf_seg_close(sb, b->seg);
-+    svcbuf_seg_release(sb, b->seg);
+@@ -222,7 +252,7 @@
+   if (b->seg) {
+     b->seg->nblocks--;
+     if (b->seg->nblocks == 0 && b->seg != sb->wr_seg)
+-      svcbuf_seg_close(sb, b->seg);
++      svcbuf_seg_release(sb, b->seg);
+   }
    free(b->data);
    free(b);
- }
-@@ -273,7 +304,7 @@
+@@ -282,7 +312,7 @@
          seg = sb->wr_seg;
          if (seg == NULL || seg->size + (off_t)b->size > SVCBUF_SEG_SIZE) {
            if (seg && seg->nblocks == 0)
@@ -286,7 +287,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
            seg = sb->wr_seg = svcbuf_seg_open(sb);
          }
          if (seg) {
-@@ -427,6 +458,7 @@
+@@ -442,6 +472,7 @@
    TAILQ_INIT(&sb->blocks);
    TAILQ_INIT(&sb->segs);
    LIST_INIT(&sb->gates);
@@ -294,7 +295,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
    streaming_target_init(&sb->input, &svcbuf_input_ops, sb,
                          ~SMT_TO_MASK(SMT_MPEGTS));
    tvh_thread_create(&sb->writer, NULL, svcbuf_writer, sb, "svcbuf-wr");
-@@ -704,3 +736,160 @@
+@@ -719,3 +750,161 @@
    svcbuf_unref(sb);
    free(g);
  }
@@ -324,7 +325,8 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +int
 +svcbuf_span ( svcbuf_t *sb, int64_t *oldest, int64_t *newest )
 +{
-+  svcbuf_block_t *first, *last;
++  const svcbuf_block_t *first;
++  const svcbuf_block_t *last;
 +  int r = 0;
 +
 +  tvh_mutex_lock(&sb->lock);
@@ -483,7 +485,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
  #endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1058 @@
+@@ -0,0 +1,1086 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -616,13 +618,13 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 + * *************************************************************************/
 +
 +static inline int
-+svcts_is_keyframe ( th_pkt_t *pkt )
++svcts_is_keyframe ( const th_pkt_t *pkt )
 +{
 +  return SCT_ISVIDEO(pkt->pkt_type) && pkt->v.pkt_frametype == PKT_I_FRAME;
 +}
 +
 +static inline int64_t
-+svcts_pkt_time ( th_pkt_t *pkt )
++svcts_pkt_time ( const th_pkt_t *pkt )
 +{
 +  return ts_rescale(pkt->pkt_pts != PTS_UNSET ? pkt->pkt_pts : pkt->pkt_dts,
 +                    1000000);
@@ -663,7 +665,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +
 +/* A packet the client does not have yet: remember its DTS */
 +static int
-+svcts_out_new ( svcts_t *st, th_pkt_t *pkt )
++svcts_out_new ( svcts_t *st, const th_pkt_t *pkt )
 +{
 +  int64_t *last = &st->out_dts[pkt->pkt_componentindex];
 +  if (pkt->pkt_dts == PTS_UNSET)
@@ -678,7 +680,10 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +svcts_queue_clear ( svcts_t *st )
 +{
 +  svcts_pkt_t *p;
-+  while ((p = TAILQ_FIRST(&st->q)) != NULL) {
++  svcts_pkt_t *n;
++
++  for (p = TAILQ_FIRST(&st->q); p != NULL; p = n) {
++    n = TAILQ_NEXT(p, link);
 +    TAILQ_REMOVE(&st->q, p, link);
 +    pkt_ref_dec(p->pkt);
 +    free(p);
@@ -841,13 +846,14 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +static void
 +svcts_calibrate ( svcts_t *st, th_pkt_t *pkt )
 +{
-+  svcts_key_t k, *match = NULL;
++  svcts_key_t k;
++  const svcts_key_t *match = NULL;
 +  int i;
 +
 +  if (!svcts_key(pkt, &k))
 +    return;
 +  for (i = 0; i < SVCTS_RING; i++) {
-+    svcts_key_t *r = &st->ring[i];
++    const svcts_key_t *r = &st->ring[i];
 +    if (r->used && r->index == k.index && r->len == k.len && r->crc == k.crc) {
 +      if (match)
 +        return;
@@ -1009,7 +1015,9 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +static void
 +svcts_skip_back_select ( svcts_t *st )
 +{
-+  svcts_pkt_t *p, *kf = NULL;
++  svcts_pkt_t *p;
++  svcts_pkt_t *n;
++  svcts_pkt_t *kf = NULL;
 +
 +  st->skip_back = 0;
 +  for (;;) {
@@ -1024,12 +1032,36 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +      kf = p;
 +  if (kf == NULL)
 +    return;   /* none in the preroll: the first one after it */
-+  while ((p = TAILQ_FIRST(&st->q)) != kf) {
++  for (p = TAILQ_FIRST(&st->q); p != kf; p = n) {
++    n = TAILQ_NEXT(p, link);
 +    TAILQ_REMOVE(&st->q, p, link);
 +    pkt_ref_dec(p->pkt);
 +    free(p);
 +  }
 +  st->skip_to = kf->time;
++}
++
++/* Drop from the head of the queue what is not to be shown -- what comes
++ * before the keyframe a skip lands on, or all but keyframes in keyframe
++ * mode -- and return the first packet to show, if any (lock held) */
++static svcts_pkt_t *
++svcts_head ( svcts_t *st )
++{
++  svcts_pkt_t *p = TAILQ_FIRST(&st->q);
++  svcts_pkt_t *n;
++
++  while (p != NULL &&
++         ((st->skip_to && !(svcts_is_keyframe(p->pkt) && p->time >= st->skip_to)) ||
++          (st->keyframe_mode && !svcts_is_keyframe(p->pkt)))) {
++    n = TAILQ_NEXT(p, link);
++    TAILQ_REMOVE(&st->q, p, link);
++    pkt_ref_dec(p->pkt);
++    free(p);
++    p = n;
++  }
++  if (p != NULL)
++    st->skip_to = 0;
++  return p;
 +}
 +
 +/* Next packet to show, parsing as needed (lock held, released meanwhile);
@@ -1045,17 +1077,8 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +  for (;;) {
 +    if (st->reset)
 +      return NULL;
-+    if ((p = TAILQ_FIRST(&st->q)) != NULL) {
-+      if ((st->skip_to && !(svcts_is_keyframe(p->pkt) && p->time >= st->skip_to)) ||
-+          (st->keyframe_mode && !svcts_is_keyframe(p->pkt))) {
-+        TAILQ_REMOVE(&st->q, p, link);
-+        pkt_ref_dec(p->pkt);
-+        free(p);
-+        continue;
-+      }
-+      st->skip_to = 0;
++    if ((p = svcts_head(st)) != NULL)
 +      return p;
-+    }
 +    r = svcts_fill(st);
 +    if (r == 2) {
 +      /* a pause longer than the cache: the position expired.  Go on a
@@ -1094,7 +1117,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +
 +/* Answer a pending skip with the first packet found (lock held) */
 +static void
-+svcts_skip_answer ( svcts_t *st, svcts_pkt_t *p )
++svcts_skip_answer ( svcts_t *st, const svcts_pkt_t *p )
 +{
 +  streaming_skip_t *skip = st->skip_reply->sm_data;
 +
@@ -1137,7 +1160,9 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +static svcts_pkt_t *
 +svcts_rewind_find ( svcts_t *st )
 +{
-+  svcts_pkt_t *p, *kf;
++  svcts_pkt_t *p;
++  svcts_pkt_t *n;
++  svcts_pkt_t *kf;
 +  int64_t step = SVCTS_REWIND_STEP, from, oldest;
 +  int at_start;
 +
@@ -1150,16 +1175,20 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +    if (!svcts_replay_open(st, from + SVCTS_PREROLL))
 +      return NULL;
 +    kf = NULL;
++    p = TAILQ_FIRST(&st->q);
 +    for (;;) {
 +      if (st->reset)
 +        break;
-+      if ((p = TAILQ_FIRST(&st->q)) == NULL) {
++      if (p == NULL) {
++        /* all looked at: parse on */
 +        if (svcts_fill(st) != 1)
 +          break;
++        p = TAILQ_FIRST(&st->q);
 +        continue;
 +      }
 +      if (p->time >= st->last_time)
 +        break;
++      n = TAILQ_NEXT(p, link);
 +      TAILQ_REMOVE(&st->q, p, link);
 +      if (svcts_is_keyframe(p->pkt)) {
 +        if (kf) {
@@ -1171,6 +1200,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +        pkt_ref_dec(p->pkt);
 +        free(p);
 +      }
++      p = n;
 +    }
 +    if (kf || at_start || st->reset)
 +      return kf;
@@ -1381,10 +1411,8 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +  if (t < oldest)
 +    t = oldest;
 +
-+  if (!st->calibrated) {
-+    if (!svcts_enter(st))
-+      goto error;
-+  }
++  if (!st->calibrated && !svcts_enter(st))
++    goto error;
 +  cur = st->state == SVCTS_LIVE ? st->live_time : st->last_time;
 +  if (!svcts_replay_open(st, t))
 +    goto error;
@@ -1488,6 +1516,7 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +{
 +  svcts_t *st = (svcts_t *)pad;
 +  streaming_message_t *sm;
++  streaming_message_t *next;
 +
 +  tvh_mutex_lock(&st->lock);
 +  st->run = 0;
@@ -1495,7 +1524,8 @@ tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master
 +  tvh_mutex_unlock(&st->lock);
 +  pthread_join(st->thread, NULL);
 +
-+  while ((sm = TAILQ_FIRST(&st->ctrl)) != NULL) {
++  for (sm = TAILQ_FIRST(&st->ctrl); sm != NULL; sm = next) {
++    next = TAILQ_NEXT(sm, sm_link);
 +    TAILQ_REMOVE(&st->ctrl, sm, sm_link);
 +    streaming_msg_free(sm);
 +  }
