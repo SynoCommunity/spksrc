@@ -1,7 +1,7 @@
 HTSP clients (Kodi) timeshift through the channel cache instead of each
 writing its own.  Needs 112; can be removed on its own.
 
-tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit ef070a772 (branch record-from-buffer, on master 2e64ec02c).
 
 --- Makefile.orig
 +++ Makefile
@@ -19,7 +19,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +++ docs/class/timeshift.md
 @@ -21,9 +21,13 @@
  
- The buffer holds the channel's stream as received, in the *Storage path*
+ The cache holds the channel's stream as received, in the *Storage path*
  (or in RAM with *RAM only*, bounded by *Maximum RAM size*), and is removed
 -once nothing watches or records the channel any more. It is separate from
 -a client's own timeshift buffer, so a Kodi client pausing live TV keeps
@@ -27,9 +27,9 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +once nothing watches or records the channel any more.
 +
 +HTSP clients (Kodi) pausing, rewinding or skipping through live TV then use
-+that same buffer instead of writing one of their own: one buffer per
++that same cache instead of writing a buffer of their own: one cache per
 +channel, however many clients and recordings share it. A client paused
-+for longer than the buffer holds goes on, when it resumes, from a little
++for longer than the cache holds goes on, when it resumes, from a little
 +after the oldest data still there.
  
  ---
@@ -66,7 +66,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +}
  
 +/**
-+ * Parser for data replayed from the service buffer outside any
++ * Parser for data replayed from the channel cache outside any
 + * subscription (a client timeshifting through it): like replayed data
 + * reaching a subscription, it must not reconfigure the running service
 + */
@@ -108,7 +108,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
  
    service_t *prs_service;
  
-+  int prs_replay;   ///< Fed from the service buffer, outside any subscription
++  int prs_replay;   ///< Fed from the channel cache, outside any subscription
 +
    /* Elementary streams */
    elementary_set_t prs_components;
@@ -148,7 +148,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
  
  #if ENABLE_TIMESHIFT
 -  if (timeshift_period > 0)
-+  /* one buffer per channel: timeshift through it when there is one */
++  /* one cache per channel: timeshift through it when there is one */
 +  if (timeshift_period > 0 && svcts_enabled())
 +    dst = prch->prch_svcts = svcts_create(dst, timeshift_period);
 +  else if (timeshift_period > 0)
@@ -161,7 +161,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
    struct streaming_target  *prch_tsfix;
  #if ENABLE_TIMESHIFT
    struct streaming_target  *prch_timeshift;
-+  struct streaming_target  *prch_svcts;   ///< Timeshift through the channel buffer
++  struct streaming_target  *prch_svcts;   ///< Timeshift through the channel cache
  #endif
    struct streaming_target   prch_input;
    struct streaming_target  *prch_share;
@@ -179,7 +179,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
        s->ths_output = s->ths_gate = gate;
      s->ths_backfill_from = 0;
    }
-+  /* a client timeshifting through the channel buffer */
++  /* a client timeshifting through the channel cache */
 +  if (s->ths_prch && s->ths_prch->prch_svcts)
 +    svcts_attach(s->ths_prch->prch_svcts, t);
  #endif
@@ -200,13 +200,13 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
        .desc   = N_("Keep the last \"Maximum period\" of every tuned "
                     "channel, so a recording started after its programme "
                     "began also gets the part already broadcast, as far "
--                   "back as the buffer reaches. Each tuned channel uses "
--                   "its own buffer, within the storage path and the "
+-                   "back as the cache reaches. Each tuned channel uses "
+-                   "its own cache, within the storage path and the "
 -                   "maximum size above."),
-+                   "back as the buffer reaches. HTSP clients timeshift "
-+                   "through the same buffer instead of their own. Each "
-+                   "tuned channel uses one buffer, within the storage "
-+                   "path and the maximum size above."),
++                   "back as the cache reaches. HTSP clients timeshift "
++                   "through the same cache instead of a buffer of their "
++                   "own. Each tuned channel uses one cache, within the "
++                   "storage path and the maximum size above."),
        .off    = offsetof(timeshift_conf_t, record_cache),
      },
      {}
@@ -303,7 +303,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 + * Readers (timeshift clients)
 + * *************************************************************************/
 +
-+/* A reference to the service's buffer, NULL when it has none
++/* A reference to the channel cache, NULL when it has none
 + * (s_stream_mutex held) */
 +svcbuf_t *
 +svcbuf_acquire ( service_t *t )
@@ -363,7 +363,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +}
 +
 +/* Position at the block holding monotonic time 'mono', or the oldest one
-+ * when the buffer does not reach back that far; returns the block's time */
++ * when the cache does not reach back that far; returns the block's time */
 +int64_t
 +svcbuf_reader_seek ( svcbuf_reader_t *r, int64_t mono )
 +{
@@ -469,7 +469,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
  /* Free a stopped gate, s_stream_mutex not held */
  void svcbuf_gate_destroy ( streaming_target_t *pad );
  
-+/* Readers, for clients timeshifting through the buffer.  svcbuf_acquire()
++/* Readers, for clients timeshifting through the cache.  svcbuf_acquire()
 + * takes a reference (s_stream_mutex held), svcbuf_release() drops it. */
 +svcbuf_t *svcbuf_acquire ( struct service *t );
 +struct service *svcbuf_service ( svcbuf_t *sb );
@@ -485,7 +485,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +++ src/timeshift/timeshift_svcts.c
 @@ -0,0 +1,1058 @@
 +/*
-+ *  TV headend - Timeshift - clients timeshifting through the service buffer
++ *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
 + *
 + *  This program is free software: you can redistribute it and/or modify
@@ -505,13 +505,13 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +/*
 + * With "Record from cache" each tuned channel already keeps its last
 + * "Maximum period" of MPEG-TS (timeshift_svcbuf.c).  A client pausing or
-+ * rewinding live TV is served from that buffer here, instead of writing a
-+ * buffer of its own -- one buffer per channel, however many clients.
++ * rewinding live TV is served from that cache here, instead of writing a
++ * buffer of its own -- one cache per channel, however many clients.
 + *
 + * This target takes the place of timeshift_create() in the client's chain,
 + * after tsfix and the global headers, and answers the same speed / skip
 + * requests with the same messages.  Live, it passes packets through.  Out
-+ * of live, it reads the channel buffer through a private parser and hands
++ * of live, it reads the channel cache through a private parser and hands
 + * the client packets in the client's own time base: the offset between
 + * source and client timestamps is calibrated by matching replayed video
 + * frames against the recent live ones (the sharer and tsfix both move the
@@ -823,7 +823,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +{
 +  svcts_t *st = opaque;
 +  streaming_target_t *out = st->output;
-+  htsmsg_add_str(list, NULL, "service buffer timeshift input");
++  htsmsg_add_str(list, NULL, "channel cache timeshift input");
 +  return out->st_ops.st_info(out->st_opaque, list);
 +}
 +
@@ -897,7 +897,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +static htsmsg_t *
 +svcts_sink_info ( void *opaque, htsmsg_t *list )
 +{
-+  htsmsg_add_str(list, NULL, "service buffer timeshift replay");
++  htsmsg_add_str(list, NULL, "channel cache timeshift replay");
 +  return list;
 +}
 +
@@ -975,7 +975,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +  return 1;
 +}
 +
-+/* Parse one more chunk of the buffer (lock held, released meanwhile).
++/* Parse one more chunk of the cache (lock held, released meanwhile).
 + * 1 when data was parsed, 0 at the head, -1 on error, 2 when the position
 + * expired under the reader (nothing parsed: the data no longer follows) */
 +static int
@@ -1033,7 +1033,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +}
 +
 +/* Next packet to show, parsing as needed (lock held, released meanwhile);
-+ * NULL at the head of the buffer or on error */
++ * NULL at the head of the cache or on error */
 +static svcts_pkt_t *
 +svcts_next ( svcts_t *st )
 +{
@@ -1058,7 +1058,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +    }
 +    r = svcts_fill(st);
 +    if (r == 2) {
-+      /* a pause longer than the buffer: the position expired.  Go on a
++      /* a pause longer than the cache: the position expired.  Go on a
 +       * little ahead of the oldest data, as it keeps expiring at 1x. */
 +      int64_t t = MIN(svcts_oldest(st) + SVCTS_EXPIRED_GAP, st->live_time);
 +      tvhdebug(LS_TIMESHIFT, "svcts: position expired, going on from %"PRId64"s back",
@@ -1121,11 +1121,11 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +  svcts_speed_notify(st);
 +}
 +
-+/* Start of the buffer reached going back: pause there */
++/* Start of the cache reached going back: pause there */
 +static void
 +svcts_at_start ( svcts_t *st )
 +{
-+  tvhdebug(LS_TIMESHIFT, "svcts: start of buffer, pause");
++  tvhdebug(LS_TIMESHIFT, "svcts: start of the cache, pause");
 +  st->state = SVCTS_PAUSE;
 +  st->speed = 0;
 +  st->keyframe_mode = 0;
@@ -1271,7 +1271,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +      break;
 +  }
 +  if (!st->calibrated) {
-+    tvhwarn(LS_TIMESHIFT, "svcts: unable to line the buffer up with the stream");
++    tvhwarn(LS_TIMESHIFT, "svcts: unable to line the cache up with the stream");
 +    return 0;
 +  }
 +  /* what the client already has is dropped on the way out, by its DTS */
@@ -1546,7 +1546,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +++ src/timeshift/timeshift_svcts.h
 @@ -0,0 +1,38 @@
 +/*
-+ *  TV headend - Timeshift - clients timeshifting through the service buffer
++ *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
 + *
 + *  This program is free software: you can redistribute it and/or modify
@@ -1570,7 +1570,7 @@ tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master
 +
 +struct service;
 +
-+/* Clients timeshift through the channel's buffer rather than their own */
++/* Clients timeshift through the channel's cache rather than their own */
 +int svcts_enabled ( void );
 +
 +/* In a client chain, where timeshift_create() would go */
