@@ -1,18 +1,18 @@
-Patches 110-114 carry open tvheadend PRs, one patch per PR commit, so each
+Patches 111-114 carry open tvheadend PRs, one patch per PR commit, so each
 can be dropped on its own once merged or abandoned.
 
   patch  PR                 th0ma7/tvheadend branch   commit
-  110    tvheadend#2129     imagecache-audit-tool     62cd4b68e  (the whole PR)
   111    tvheadend#2160     imagecache-fetch-rework   fc8f89bbc  (the whole PR)
-  112    tvheadend#2249     record-from-buffer        607b09f6a  record from the channel cache
-  113    tvheadend#2249     record-from-buffer        c4f117942  HTSP timeshift through the channel cache
-  114    tvheadend#2249     record-from-buffer        ddce93e73  packet timeshift double free
+  112    tvheadend#2249     record-from-buffer        efb98e2f1  record from the channel cache
+  113    tvheadend#2249     record-from-buffer        7da8972b7  HTSP timeshift through the channel cache
+  114    tvheadend#2249     record-from-buffer        3abf9d918  packet timeshift double free
 
-The PR branches sit on a later master (2e64ec02c) than the distrib tarball
+The PR branches sit on a later master than the distrib tarball
 (PKG_GIT_HASH in ../Makefile).  Take only each commit's own change,
 `git diff <commit>~1 <commit>` -- never `git diff ${PKG_GIT_HASH} <commit>`,
-which would drag in every master commit in between.  They apply after 000-004,
-100 and 101, in that order.
+which would drag in every master commit in between.  They apply after
+000-004, 100 and 101, in that order.  Once PKG_GIT_HASH moves past a merged
+PR, drop its patch, as 110 (tvheadend#2129) was once merged as 5ce3ff63c.
 
 The text before the first "--- " line of a patch is its header (what it does,
 which PR and commit): keep it when regenerating.
@@ -30,13 +30,13 @@ tvh_patch() {
 }
 
 
-# Regenerate one patch from its commit (110, 111, 112, 114)
+# Regenerate one patch from its commit (111, 112, 114)
 
 P=<spksrc>/cross/tvheadend/patches
 cd <tvheadend clone>
 git fetch https://github.com/th0ma7/tvheadend.git \
-    imagecache-audit-tool imagecache-fetch-rework record-from-buffer
-C=ddce93e73                                  # the commit, from the table
+    imagecache-fetch-rework record-from-buffer
+C=3abf9d918                                  # the commit, from the table
 F=$P/114-timeshift-skip-live-double-free.patch
 { awk '/^--- /{exit} {print}' $F             # keep the header
   git diff --no-prefix $C~1 $C | tvh_patch; } > $F.new && mv $F.new $F
@@ -53,7 +53,7 @@ misplace or duplicate a hunk, so regenerate such a patch against the tree the
 earlier patches produce: apply the chain up to it, apply the commit, diff.
 
 HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
-C=c4f117942
+C=7da8972b7
 F=$P/113-htsp-timeshift-channel-cache.patch
 rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
 git archive $HASH | tar -x -C /tmp/pa
