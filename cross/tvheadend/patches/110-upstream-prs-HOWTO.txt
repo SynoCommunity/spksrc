@@ -1,0 +1,85 @@
+Patches 110-114 carry open tvheadend PRs, one patch per PR commit, so each
+can be dropped on its own once merged or abandoned.
+
+  patch  PR                 th0ma7/tvheadend branch   commit
+  110    tvheadend#2129     imagecache-audit-tool     62cd4b68e  (the whole PR)
+  111    tvheadend#2160     imagecache-fetch-rework   fc8f89bbc  (the whole PR)
+  112    tvheadend#2249     record-from-buffer        d829c155e  record from the channel buffer
+  113    tvheadend#2249     record-from-buffer        7407ca2b3  HTSP timeshift through it
+  114    tvheadend#2249     record-from-buffer        377f86591  packet timeshift double free
+
+The PR branches sit on a later master (2e64ec02c) than the distrib tarball
+(PKG_GIT_HASH in ../Makefile).  Take only each commit's own change,
+`git diff <commit>~1 <commit>` -- never `git diff ${PKG_GIT_HASH} <commit>`,
+which would drag in every master commit in between.  They apply after 000-004,
+100 and 101, in that order.
+
+The text before the first "--- " line of a patch is its header (what it does,
+which PR and commit): keep it when regenerating.
+
+
+# Converter: `git diff --no-prefix` -> the `patch -p0` ".orig" style used here
+
+tvh_patch() {
+  awk '/^(diff --git|index |new file mode|deleted file mode|old mode|new mode|similarity index|rename from|rename to)/ { next }
+       /^--- / { l = $0
+                 if ((getline n) > 0 && n ~ /^\+\+\+ /) { f = substr(n, 5); print "--- " f ".orig"; print "+++ " f }
+                 else { print l; print n }
+                 next }
+       { print }'
+}
+
+
+# Regenerate one patch from its commit (110, 111, 112, 114)
+
+P=<spksrc>/cross/tvheadend/patches
+cd <tvheadend clone>
+git fetch https://github.com/th0ma7/tvheadend.git \
+    imagecache-audit-tool imagecache-fetch-rework record-from-buffer
+C=377f86591                                  # the commit, from the table
+F=$P/114-timeshift-skip-live-double-free.patch
+{ awk '/^--- /{exit} {print}' $F             # keep the header
+  git diff --no-prefix $C~1 $C | tvh_patch; } > $F.new && mv $F.new $F
+
+When the PR is updated, its head commit changes: take the new hash from the
+PR (or `git log` on the branch) and update the table above.
+
+
+# Regenerate against the patched tree (113)
+
+A commit whose context was changed by an earlier patch of the chain applies
+with fuzz -- 113 in src/parsers/parsers.c, next to lines 100 adds.  Fuzz can
+misplace or duplicate a hunk, so regenerate such a patch against the tree the
+earlier patches produce: apply the chain up to it, apply the commit, diff.
+
+HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
+C=7407ca2b3
+F=$P/113-htsp-timeshift-channel-buffer.patch
+rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
+git archive $HASH | tar -x -C /tmp/pa
+(cd /tmp/pa && for p in $(ls $P/*.patch | sort); do
+   [ "$p" = "$F" ] && break; patch -p0 -s < $p; done)
+cp -a /tmp/pa /tmp/pb
+git diff --no-prefix $C~1 $C | tvh_patch | (cd /tmp/pb && patch -p0 -s)
+# check by hand that the fuzzed hunk landed where it should, then:
+{ awk '/^--- /{exit} {print}' $F
+  for f in $(git diff --name-only $C~1 $C); do
+    if [ -f /tmp/pa/$f ]; then diff -u --label $f.orig --label $f /tmp/pa/$f /tmp/pb/$f
+    else diff -u --label $f.orig --label $f /dev/null /tmp/pb/$f; fi
+  done; } > $F.new && mv $F.new $F
+
+
+# Verify the whole chain
+
+Do not trust `patch --dry-run` alone: a patch whose change is already there can
+still apply with fuzz and duplicate the block.  Apply the chain to a pristine
+tree and require no fuzz and no reject:
+
+rm -rf /tmp/chk && mkdir /tmp/chk && git archive $HASH | tar -x -C /tmp/chk
+cd /tmp/chk && for p in $(ls $P/*.patch | sort); do
+  patch -p0 < $p | grep -iE 'fuzz|FAILED|reject' | sed "s|^|$(basename $p): |"
+done
+
+Then compare the files a PR touches with its head, `git show <head>:<file>`:
+they should be identical, except files 100 also patches (htsp_server.c,
+parsers.c, service.c, ...).
