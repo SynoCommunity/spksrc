@@ -1,6 +1,6 @@
 SPK_NAME = caddy
 SPK_VERS = 2.11.4
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/caddy.png
 
 DEPENDS = cross/caddy
@@ -13,7 +13,7 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(i686_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = cjheath
-DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile. Edit it, then restart the package, or run caddy reload, to apply changes. The default site listens on port 8180. See the comments in the Caddyfile for switching to ports 80 and 443.
+DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile. Edit it, then restart the package, or run caddy reload, to apply changes. The default site listens on port 8880. See the comments in the Caddyfile for switching to ports 80 and 443.
 DISPLAY_NAME = Caddy
 CHANGELOG = "1. Initial package. Caddy 2.11.4."
 
@@ -24,7 +24,7 @@ LICENSE = Apache-2.0
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 8180
+SERVICE_PORT = 8880
 FWPORTS = src/caddy.sc
 # No DSM app-menu shortcut: Caddy has no web UI of its own to open - the
 # default site is just a health-check placeholder, and once a real site is

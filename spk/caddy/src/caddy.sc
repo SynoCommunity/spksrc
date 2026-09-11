@@ -2,4 +2,4 @@
 title="HTTP"
 desc="Caddy default site"
 port_forward="yes"
-dst.ports="8180/tcp"
+dst.ports="8880/tcp"
