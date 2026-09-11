@@ -281,9 +281,7 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          # TEMP (revert before merge): DSM 5.2 carries the toolchains this PR's floors
-          # actually bite on -- gcc 4.3.7 (ppc853x), 4.6.4 (88f6281), 4.7.3 (x86, x64).
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
