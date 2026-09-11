@@ -9,10 +9,17 @@
 # apply changes without downtime by running:
 #   caddy reload --config /var/packages/caddy/var/Caddyfile
 #
-# The default site below listens on :8080 so it doesn't collide with
-# anything else on the NAS out of the box. The package grants the caddy
-# binary the cap_net_bind_service capability on install/upgrade, so binding
-# :80 / :443 directly also works once they're free - see below.
+# The default site below listens on :8180 so it doesn't collide with
+# anything else on the NAS out of the box.
+#
+# To run on a low port, the caddy binary needs the cap_net_bind_service
+# capability. The package grants this itself, automatically, right before
+# every service start (DSM's installer runs postinst/postupgrade without
+# the privilege needed to set it there, so it's done in service_prestart
+# instead - the same point spksrc's own dnscrypt-proxy package relies on
+# to bind port 53). If it ever doesn't take - check the service log for a
+# "setcap failed" warning - grant it yourself:
+# 	setcap 'cap_net_bind_service=+ep' /var/packages/caddy/target/bin/caddy
 #
 # ---------------------------------------------------------------------------
 # Freeing ports 80/443 on the NAS
@@ -39,7 +46,7 @@
 #      443 - Caddy uses it for the ACME HTTP challenge and to redirect
 #      plain HTTP to HTTPS.
 #   3. Make sure nothing else on the NAS is still holding 80/443 (see
-#      above), then replace the :8080 site block below with your real
+#      above), then replace the :8180 site block below with your real
 #      domain, e.g.:
 #
 #        example.your-domain.com {
@@ -59,7 +66,7 @@
 #       email you@example.com
 #   }
 
-:8080 {
+:8180 {
 	respond "Caddy is running"
 }
 
