@@ -91,7 +91,16 @@ service_save() {
         [ -w "${SYNOPKG_TEMP_UPGRADE_FOLDER}" ] || { echo "ERROR: Not writable: ${SYNOPKG_TEMP_UPGRADE_FOLDER}"; return 1; }
 
         echo "Backing up ${SYNOPKG_PKGNAME} data → ${archive}"
-        tar -C "${SYNOPKG_PKGVAR}" -czf "${archive}" . || { echo "ERROR: tar failed"; return 1; }
+        # Skip bulk that Jellyfin transparently regenerates on access:
+        # previous rollback archives (sc_backup), transient transcode
+        # segments, plus the extracted subtitle and attachment caches.
+        # Excludes precede the member list so they apply on GNU and BSD
+        # tar alike. Everything with user value — including Jellyfin's
+        # own scheduled backups — is kept, so a restore loses nothing
+        # the user cannot get back untouched.
+        BACKUP_EXCLUDES="--exclude=./sc_backup --exclude=./data/transcodes --exclude=./data/data/subtitles --exclude=./data/data/attachments"
+        # shellcheck disable=SC2086
+        tar -C "${SYNOPKG_PKGVAR}" ${BACKUP_EXCLUDES} -czf "${archive}" . || { echo "ERROR: tar failed"; return 1; }
 
         SC_BACKUP_FILE="${archive}"
         printf '%s\n' "${SC_BACKUP_FILE}" > "${marker}" || { echo "ERROR: Could not write marker ${marker}"; return 1; }
@@ -158,7 +167,7 @@ service_preuninst() {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
         if [ "$SC_RESTORE_CONFIG" = "y" ] && [ -f "$SC_BACKUP_FILE" ]; then
             pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-            SC_TEMP_FOLDER="/volume1/@tmp"
+            SC_TEMP_FOLDER="${SYNOPKG_PKGTMP:-/volume1/@tmp}"
             SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
             marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
 
@@ -186,7 +195,7 @@ service_preuninst() {
 service_postuninst() {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
         pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-        SC_TEMP_FOLDER="/volume1/@tmp"
+        SC_TEMP_FOLDER="${SYNOPKG_PKGTMP:-/volume1/@tmp}"
         SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
         marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
 
