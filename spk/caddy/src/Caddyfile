@@ -12,13 +12,11 @@
 # The default site below listens on :8880 so it doesn't collide with
 # anything else on the NAS out of the box.
 #
-# To run on a low port, the caddy binary needs the cap_net_bind_service
-# capability. The package grants this itself, automatically, right before
-# every service start (DSM's installer runs postinst/postupgrade without
-# the privilege needed to set it there, so it's done in service_prestart
-# instead - the same point spksrc's own dnscrypt-proxy package relies on
-# to bind port 53). If it ever doesn't take - check the service log for a
-# "setcap failed" warning - grant it yourself:
+# To run on a low port (e.g. 80/443), the caddy binary needs the
+# cap_net_bind_service capability - Caddy can't grant this to itself, and
+# this package can't grant it automatically either, so run this yourself
+# after every install and upgrade (an upgrade replaces the binary, which
+# drops the capability again):
 # 	setcap 'cap_net_bind_service=+ep' /var/packages/caddy/target/bin/caddy
 #
 # ---------------------------------------------------------------------------

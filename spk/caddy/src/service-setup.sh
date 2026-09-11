@@ -15,29 +15,6 @@ SERVICE_COMMAND="${CADDY_BIN} run --environ --config ${CADDY_CONFIG} --adapter c
 SVC_BACKGROUND=yes
 SVC_WRITE_PID=yes
 
-# Let the (non-root) service user bind ports <1024, so the default
-# Caddyfile can be switched to :80/:443 without running Caddy as root.
-#
-# This can't be granted from service_postinst/service_postupgrade: DSM's
-# package installer runs those without the CAP_SETFCAP privilege setcap
-# itself needs (confirmed on real hardware - it fails there even though
-# the installer otherwise acts with elevated rights). service_prestart
-# runs earlier in the startup pipeline, before DSM drops to the
-# unprivileged service user to actually exec the service command, so it
-# still has the privilege setcap needs - the same point spksrc's own
-# dnscrypt-proxy package relies on to bind port 53. Granting it on every
-# start rather than only postinst/postupgrade also makes it self-healing,
-# since an upgrade replaces the binary and drops any previously granted
-# capability. Non-fatal: a filesystem without xattr support just means
-# the Caddyfile has to stick to ports >1024.
-grant_low_port_capability ()
-{
-    if command -v setcap >/dev/null 2>&1; then
-        setcap 'cap_net_bind_service=+ep' "${CADDY_BIN}" || \
-            echo "WARNING: setcap failed on ${CADDY_BIN}; binding ports <1024 (80/443) will require editing ${CADDY_CONFIG} to use a port >1024 instead."
-    fi
-}
-
 service_postinst ()
 {
     mkdir -p "${CADDY_DATA_DIR}" "${CADDY_CONFIG_DIR}"
@@ -53,5 +30,4 @@ service_prestart ()
         echo "Configuration file ${CADDY_CONFIG} missing" >&2
         return 1
     fi
-    grant_low_port_capability
 }
