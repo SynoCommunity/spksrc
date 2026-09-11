@@ -2,7 +2,7 @@ Record from the cache of a tuned channel: a recording started after its
 programme began starts at the programme's start (less pre-padding), as far back
 as the channel cache reaches.  Timeshift option "Record from cache".
 
-tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit efb98e2f1 (branch record-from-buffer, on master 5ce3ff63c).
 
 --- Makefile.orig
 +++ Makefile
@@ -58,6 +58,36 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
    de->de_chain = prch;
  
    atomic_set(&de->de_thread_shutdown, 0);
+@@ -1370,6 +1377,7 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
+   htsmsg_field_t *f;
+   muxer_t *muxer;
+   struct stat st;
++  time_t start;
+   int i;
+ 
+   if (!cfg) {
+@@ -1526,11 +1534,19 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
+ 
+   streaming_start_unref(ss_copy);
+ 
+-  /* update the info field for a filename */
++  /* update the info field for a filename; backfilled from the channel
++   * cache, the file starts with what the cache held (once: a later file
++   * of the same recording starts when it does) */
+   if ((f = htsmsg_field_last(de->de_files)) != NULL &&
+       (e = htsmsg_field_get_map(f)) != NULL) {
+     htsmsg_set_msg(e, "info", info);
+-    htsmsg_set_s64(e, "start", gclk());
++    start = gclk();
++    if (de->de_s && de->de_s->ths_backfill_start &&
++        de->de_s->ths_backfill_start < start)
++      start = de->de_s->ths_backfill_start;
++    if (de->de_s)
++      de->de_s->ths_backfill_start = 0;
++    htsmsg_set_s64(e, "start", start);
+   } else {
+     htsmsg_destroy(info);
+   }
 --- src/parsers/parsers.c.orig
 +++ src/parsers/parsers.c
 @@ -27,6 +27,7 @@
@@ -206,7 +236,7 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +  if (s->ths_backfill_from) {
 +    streaming_target_t *gate =
 +      svcbuf_gate_create(t, s->ths_backfill_from, s->ths_output,
-+                         &s->ths_replaying,
++                         &s->ths_replaying, &s->ths_backfill_start,
 +                         s->ths_prch && s->ths_prch->prch_sq_used ?
 +                           &s->ths_prch->prch_sq : NULL);
 +    if (gate)
@@ -244,13 +274,14 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
      s->ths_parser = NULL;
 --- src/subscriptions.h.orig
 +++ src/subscriptions.h
-@@ -110,6 +110,9 @@ typedef struct th_subscription {
+@@ -110,6 +110,10 @@ typedef struct th_subscription {
  
    streaming_target_t *ths_output;
    streaming_target_t *ths_parser;
 +  streaming_target_t *ths_gate;      ///< Replays the channel cache first
 +  time_t ths_backfill_from;          ///< Join from this time if cached
 +  int ths_replaying;                 ///< Fed from the channel cache, not live
++  time_t ths_backfill_start;         ///< Where the replayed data begins
  
    int ths_flags;
    int ths_timeout;
@@ -308,7 +339,7 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
    const char *path = timeshift_conf.path;
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
-@@ -0,0 +1,721 @@
+@@ -0,0 +1,728 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
@@ -404,6 +435,7 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +  time_t               from;
 +  int                  state;   ///< Changed under s_stream_mutex
 +  int                 *replaying; ///< Mirrors state == GATE_REPLAY
++  time_t              *replay_start; ///< Set to where the replay begins
 +  streaming_queue_t   *sq;      ///< Consumer queue to pace on, or NULL
 +  svcbuf_block_t      *blk;     ///< Replay position, pins it (sb->lock)
 +  size_t               off;
@@ -924,6 +956,7 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +  }
 +  tvhinfo(LS_TIMESHIFT, "svcbuf: %s: recording from %"PRItime_t"s ago",
 +          sb->service->s_nicename, gclk() - pos->wall);
++  *g->replay_start = pos->wall;
 +  g->blk = pos;
 +  g->off = 0;
 +  svcbuf_gate_set_state(g, GATE_REPLAY);
@@ -947,12 +980,14 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +      return;
 +    }
 +    if (sm->sm_type == SMT_START) {
-+      /* the first one starts the replay; a later one (the service
-+       * restarting its streams) resets the output, which then goes on
-+       * with the replayed data like it would with live data */
-+      streaming_target_deliver2(g->output, sm);
++      /* the first one starts the replay -- before passing it on, so the
++       * consumer knows where the data begins; the replay thread waits
++       * for s_stream_mutex, so the start message still goes first.  A
++       * later one (the service restarting its streams) resets the output,
++       * which then goes on with the replayed data like with live data. */
 +      if (g->state == GATE_WAIT)
 +        svcbuf_gate_start(g);
++      streaming_target_deliver2(g->output, sm);
 +      return;
 +    }
 +    break;
@@ -978,13 +1013,15 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +
 +/*
 + * Create a gate replaying the channel cache from 'from' before passing
-+ * the live data to 'output'; *replaying is set while it replays, which
-+ * waits whenever 'sq' (the consumer's queue, if any) is backed up.  NULL
-+ * when the service has no cache.  s_stream_mutex held.
++ * the live data to 'output'; *replaying is set while it replays and
++ * *replay_start to where the replayed data begins; the replay waits
++ * whenever 'sq' (the consumer's queue, if any) is backed up.  NULL when
++ * the service has no cache.  s_stream_mutex held.
 + */
 +streaming_target_t *
 +svcbuf_gate_create ( service_t *t, time_t from, streaming_target_t *output,
-+                     int *replaying, streaming_queue_t *sq )
++                     int *replaying, time_t *replay_start,
++                     streaming_queue_t *sq )
 +{
 +  svcbuf_t *sb = t->s_svcbuf;
 +  svcbuf_gate_t *g;
@@ -996,6 +1033,7 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +  g->from   = from;
 +  g->state  = GATE_WAIT;
 +  g->replaying = replaying;
++  g->replay_start = replay_start;
 +  g->sq     = sq;
 +  g->sb     = sb;
 +  atomic_add(&sb->refcount, 1);
@@ -1068,12 +1106,12 @@ tvheadend/tvheadend#2249, commit 607b09f6a (branch record-from-buffer, on master
 +void svcbuf_release ( svcbuf_t *sb );
 +
 +/* Replay the channel cache from 'from', then pass live data on to
-+ * 'output'; *replaying is set while replaying, paced on the consumer's
-+ * queue 'sq' when given.  NULL when the service is not cached.
-+ * s_stream_mutex held. */
++ * 'output'; *replaying is set while replaying and *replay_start to where
++ * the replayed data begins, paced on the consumer's queue 'sq' when given.
++ * NULL when the service is not cached.  s_stream_mutex held. */
 +streaming_target_t *svcbuf_gate_create
 +  ( struct service *t, time_t from, streaming_target_t *output,
-+    int *replaying, streaming_queue_t *sq );
++    int *replaying, time_t *replay_start, streaming_queue_t *sq );
 +/* Stop replaying, returns the gate's output.  s_stream_mutex held. */
 +streaming_target_t *svcbuf_gate_stop ( streaming_target_t *pad );
 +/* Free a stopped gate, s_stream_mutex not held */
