@@ -1,7 +1,7 @@
 HTSP clients (Kodi) timeshift through the channel cache instead of each
 writing its own.  Needs 112; can be removed on its own.
 
-tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit 7da8972b7 (branch record-from-buffer, on master 5ce3ff63c).
 
 --- Makefile.orig
 +++ Makefile
@@ -221,7 +221,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
    char     *path;
  } svcbuf_seg_t;
  
-@@ -122,6 +124,16 @@
+@@ -123,6 +125,16 @@
    int                       run;
    pthread_t                 writer;
    LIST_HEAD(, svcbuf_gate)  gates;
@@ -238,7 +238,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
  };
  
  static int svcbuf_index;
-@@ -207,12 +219,30 @@
+@@ -208,12 +220,30 @@
    return 0;
  }
  
@@ -269,7 +269,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
    TAILQ_REMOVE(&sb->blocks, b, link);
    sb->size -= b->size;
    if (sb->cur == b)
-@@ -222,7 +252,7 @@
+@@ -223,7 +253,7 @@
    if (b->seg) {
      b->seg->nblocks--;
      if (b->seg->nblocks == 0 && b->seg != sb->wr_seg)
@@ -278,7 +278,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
    }
    free(b->data);
    free(b);
-@@ -282,7 +312,7 @@
+@@ -283,7 +313,7 @@
          seg = sb->wr_seg;
          if (seg == NULL || seg->size + (off_t)b->size > SVCBUF_SEG_SIZE) {
            if (seg && seg->nblocks == 0)
@@ -287,7 +287,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
            seg = sb->wr_seg = svcbuf_seg_open(sb);
          }
          if (seg) {
-@@ -442,6 +472,7 @@
+@@ -443,6 +473,7 @@
    TAILQ_INIT(&sb->blocks);
    TAILQ_INIT(&sb->segs);
    LIST_INIT(&sb->gates);
@@ -295,7 +295,7 @@ tvheadend/tvheadend#2249, commit c4f117942 (branch record-from-buffer, on master
    streaming_target_init(&sb->input, &svcbuf_input_ops, sb,
                          ~SMT_TO_MASK(SMT_MPEGTS));
    tvh_thread_create(&sb->writer, NULL, svcbuf_writer, sb, "svcbuf-wr");
-@@ -719,3 +750,161 @@
+@@ -726,3 +757,161 @@
    svcbuf_unref(sb);
    free(g);
  }

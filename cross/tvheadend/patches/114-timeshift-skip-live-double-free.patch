@@ -2,7 +2,7 @@ Packet timeshift: do not deliver a packet already freed on skip to live.
 Rewinding, then going back to live, aborted tvheadend (double free of the
 pending packet on SMT_SKIP_LIVE).  Independent of 112/113.
 
-tvheadend/tvheadend#2249, commit ddce93e73 (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit 3abf9d918 (branch record-from-buffer, on master 5ce3ff63c).
 
 --- src/timeshift/timeshift_reader.c.orig
 +++ src/timeshift/timeshift_reader.c
