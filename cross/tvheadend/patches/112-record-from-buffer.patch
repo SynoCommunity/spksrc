@@ -1,8 +1,8 @@
-Record from the buffer of a tuned channel: a recording started after its
+Record from cache of a tuned channel: a recording started after its
 programme began starts at the programme's start (less pre-padding), as far back
-as the channel buffer reaches.  Timeshift option "Record from the buffer".
+as the channel buffer reaches.  Timeshift option "Record from cache".
 
-tvheadend/tvheadend#2249, commit d829c155e (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit db71b82b3 (branch record-from-buffer, on master 2e64ec02c).
 
 --- Makefile.orig
 +++ Makefile
@@ -24,7 +24,7 @@ tvheadend/tvheadend#2249, commit d829c155e (branch record-from-buffer, on master
  
 +## Recording from the buffer
 +
-+With *Record from the buffer* enabled, every tuned channel keeps its own
++With *Record from cache* enabled, every tuned channel keeps its own
 +buffer of the last *Maximum period*, from the moment it was tuned. A
 +recording started after its programme began -- pressing record on what is
 +playing, typically -- then begins at the programme's start (less the
@@ -262,15 +262,15 @@ tvheadend/tvheadend#2249, commit d829c155e (branch record-from-buffer, on master
      },
 +    {
 +      .type   = PT_BOOL,
-+      .id     = "record_buffer",
-+      .name   = N_("Record from the buffer"),
++      .id     = "record_cache",
++      .name   = N_("Record from cache"),
 +      .desc   = N_("Keep the last \"Maximum period\" of every tuned "
 +                   "channel, so a recording started after its programme "
 +                   "began also gets the part already broadcast, as far "
 +                   "back as the buffer reaches. Each tuned channel uses "
 +                   "its own buffer, within the storage path and the "
 +                   "maximum size above."),
-+      .off    = offsetof(timeshift_conf_t, record_buffer),
++      .off    = offsetof(timeshift_conf_t, record_cache),
 +    },
      {}
    }
@@ -281,7 +281,7 @@ tvheadend/tvheadend#2249, commit d829c155e (branch record-from-buffer, on master
    int       ram_only;
    int       ram_fit;
    int       teletext;
-+  int       record_buffer;
++  int       record_cache;
  } timeshift_conf_t;
  
  extern struct timeshift_conf timeshift_conf;
@@ -722,7 +722,7 @@ tvheadend/tvheadend#2249, commit d829c155e (branch record-from-buffer, on master
 +
 +  /* channels only: not the raw mux services used for scanning and EPG;
 +   * and "RAM only" needs a RAM size to stay bounded */
-+  if (!timeshift_conf.enabled || !timeshift_conf.record_buffer ||
++  if (!timeshift_conf.enabled || !timeshift_conf.record_cache ||
 +      t->s_type != STYPE_STD || t->s_svcbuf != NULL ||
 +      (timeshift_conf.ram_only && timeshift_conf.ram_size == 0))
 +    return;

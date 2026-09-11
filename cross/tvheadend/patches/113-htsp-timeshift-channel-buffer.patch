@@ -1,7 +1,7 @@
 HTSP clients (Kodi) timeshift through the channel buffer instead of each
 writing its own.  Needs 112; can be removed on its own.
 
-tvheadend/tvheadend#2249, commit 7407ca2b3 (branch record-from-buffer, on master 2e64ec02c).
+tvheadend/tvheadend#2249, commit 8c00c0cea (branch record-from-buffer, on master 2e64ec02c).
 
 --- Makefile.orig
 +++ Makefile
@@ -207,7 +207,7 @@ tvheadend/tvheadend#2249, commit 7407ca2b3 (branch record-from-buffer, on master
 +                   "through the same buffer instead of their own. Each "
 +                   "tuned channel uses one buffer, within the storage "
 +                   "path and the maximum size above."),
-       .off    = offsetof(timeshift_conf_t, record_buffer),
+       .off    = offsetof(timeshift_conf_t, record_cache),
      },
      {}
 --- src/timeshift/timeshift_svcbuf.c.orig
@@ -503,7 +503,7 @@ tvheadend/tvheadend#2249, commit 7407ca2b3 (branch record-from-buffer, on master
 + */
 +
 +/*
-+ * With "Record from the buffer" each tuned channel already keeps its last
++ * With "Record from cache" each tuned channel already keeps its last
 + * "Maximum period" of MPEG-TS (timeshift_svcbuf.c).  A client pausing or
 + * rewinding live TV is served from that buffer here, instead of writing a
 + * buffer of its own -- one buffer per channel, however many clients.
@@ -607,7 +607,7 @@ tvheadend/tvheadend#2249, commit 7407ca2b3 (branch record-from-buffer, on master
 +int
 +svcts_enabled ( void )
 +{
-+  return timeshift_conf.enabled && timeshift_conf.record_buffer &&
++  return timeshift_conf.enabled && timeshift_conf.record_cache &&
 +         !(timeshift_conf.ram_only && timeshift_conf.ram_size == 0);
 +}
 +
