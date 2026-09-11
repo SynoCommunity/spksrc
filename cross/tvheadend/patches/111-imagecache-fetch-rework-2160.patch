@@ -1,6 +1,42 @@
+--- src/api/api_epg.c.orig
++++ src/api/api_epg.c
+@@ -183,7 +183,7 @@ api_epg_entry ( epg_broadcast_t *eb, const char *lang, const access_t *perm, con
+   /* Image */
+   s = eb->image;
+   if (!strempty(s)) {
+-    s = imagecache_get_propstr(s, buf, sizeof(buf));
++    s = imagecache_get_propstr_prio(s, buf, sizeof(buf), (int64_t)eb->start);
+     if (s)
+       htsmsg_add_str(m, "image", s);
+   }
+--- src/api/api_imagecache.c.orig
++++ src/api/api_imagecache.c
+@@ -22,6 +22,7 @@
+ #include "access.h"
+ #include "api.h"
+ #include "imagecache.h"
++#include "epg.h"
+ 
+ static int
+ api_imagecache_clean
+@@ -30,8 +31,13 @@ api_imagecache_clean
+   int b;
+   if (htsmsg_get_bool(args, "clean", &b))
+     return EINVAL;
+-  if (b)
++  if (b) {
+     imagecache_clean();
++    /* refill from the guide, soonest-airing first, as at start-up */
++    tvh_mutex_lock(&global_lock);
++    epg_broadcast_images_register();
++    tvh_mutex_unlock(&global_lock);
++  }
+   return 0;
+ }
+ 
 --- src/epg.c.orig
 +++ src/epg.c
-@@ -1417,7 +1417,7 @@ int epg_broadcast_set_image
+@@ -1417,10 +1417,27 @@ int epg_broadcast_set_image
    save = _epg_object_set_str(b, &b->image, image,
                               changed, EPG_CHANGED_IMAGE);
    if (save)
@@ -9,6 +45,95 @@
    return save;
  }
  
++/*
++ * Register every broadcast's image at its airing time, as loading the EPG at
++ * start-up does.  Used after an image cache clean, so the refill starts with
++ * the soonest-airing artwork instead of waiting for a client to walk the guide.
++ */
++void epg_broadcast_images_register ( void )
++{
++  channel_t *ch;
++  epg_broadcast_t *b;
++
++  lock_assert(&global_lock);
++  CHANNEL_FOREACH(ch)
++    RB_FOREACH(b, &ch->ch_epg_schedule, sched_link)
++      if (!strempty(b->image))
++        imagecache_get_id_prio(b->image, (int64_t)b->start);
++}
++
+ int epg_broadcast_set_epnumber
+   ( epg_broadcast_t *b, uint16_t number, epg_changes_t *changed )
+ {
+--- src/epg.h.orig
++++ src/epg.h
+@@ -473,6 +473,9 @@ htsmsg_t        *epg_broadcast_serialize   ( epg_broadcast_t *b );
+ epg_broadcast_t *epg_broadcast_deserialize
+   ( htsmsg_t *m, int create, int *save );
+ 
++/* Register every broadcast's image with the image cache (global_lock held) */
++void epg_broadcast_images_register ( void );
++
+ /* ************************************************************************
+  * Channel - provides mapping from EPG channels to real channels
+  * ***********************************************************************/
+--- src/htsp_server.c.orig
++++ src/htsp_server.c
+@@ -342,10 +342,10 @@ htsp_flush_queue(htsp_connection_t *htsp, htsp_msg_q_t *hmq, int dead)
+  */
+ static const char *
+ htsp_image(htsp_connection_t *htsp, const char *image,
+-           char *buf, size_t buflen, int version)
++           char *buf, size_t buflen, int version, int64_t airtime)
+ {
+   const char *ret = image;
+-  const int id = imagecache_get_id(image);
++  const int id = imagecache_get_id_prio(image, airtime);
+ 
+   /* Handle older clients */
+   if (id) {
+@@ -879,7 +879,7 @@ htsp_build_channel(channel_t *ch, const char *method, htsp_connection_t *htsp)
+ 
+   htsmsg_add_str(out, "channelName", channel_get_name(ch, channel_blank_name));
+   if ((icon = channel_get_icon(ch)))
+-    htsmsg_add_str(out, "channelIcon", htsp_image(htsp, icon, buf, sizeof(buf), 8));
++    htsmsg_add_str(out, "channelIcon", htsp_image(htsp, icon, buf, sizeof(buf), 8, 0));
+ 
+   now  = ch->ch_epg_now;
+   next = ch->ch_epg_next;
+@@ -945,7 +945,7 @@ htsp_build_tag(htsp_connection_t *htsp, channel_tag_t *ct, const char *method, i
+   htsmsg_add_str(out, "tagName", ct->ct_name);
+   icon = channel_tag_get_icon(ct);
+   if (!strempty(icon))
+-    htsmsg_add_str(out, "tagIcon", htsp_image(htsp, icon, buf, sizeof(buf), 34));
++    htsmsg_add_str(out, "tagIcon", htsp_image(htsp, icon, buf, sizeof(buf), 34, 0));
+   htsmsg_add_u32(out, "tagTitledIcon", ct->ct_titled_icon);
+ 
+   if(members != NULL) {
+@@ -1112,11 +1112,11 @@ htsp_build_dvrentry(htsp_connection_t *htsp, dvr_entry_t *de, const char *method
+      */
+     const char *image = dvr_entry_get_image(de);
+     if(!strempty(image))
+-      htsmsg_add_str(out, "image", htsp_image(htsp, image, buf, sizeof(buf), 34));
++      htsmsg_add_str(out, "image", htsp_image(htsp, image, buf, sizeof(buf), 34, 0));
+     /* htsmsg camelcase to be compatible with other names */
+     image = de->de_fanart_image;
+     if(!strempty(image))
+-      htsmsg_add_str(out, "fanartImage", htsp_image(htsp, image, buf, sizeof(buf), 34));
++      htsmsg_add_str(out, "fanartImage", htsp_image(htsp, image, buf, sizeof(buf), 34, 0));
+     if (de->de_copyright_year)
+       htsmsg_add_u32(out, "copyrightYear", de->de_copyright_year);
+ 
+@@ -1438,7 +1438,8 @@ htsp_build_event
+   epg_broadcast_get_epnum(e, &epnum);
+   htsp_serialize_epnum(out, &epnum, NULL);
+   if (!strempty(e->image))
+-    htsmsg_add_str(out, "image", htsp_image(htsp, e->image, buf, sizeof(buf), 34));
++    htsmsg_add_str(out, "image", htsp_image(htsp, e->image, buf, sizeof(buf), 34,
++                                              (int64_t)e->start));
+ 
+   if (e->channel) {
+     LIST_FOREACH(de, &e->channel->ch_dvrs, de_channel_link) {
 --- src/imagecache.c.orig
 +++ src/imagecache.c
 @@ -39,15 +39,21 @@ typedef struct imagecache_image
@@ -542,7 +667,28 @@
    }
  
    /* Do file:// to imagecache ID mapping even if imagecache is not enabled */
-@@ -730,6 +1017,52 @@ imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
+@@ -721,7 +1008,19 @@ imagecache_get_id ( const char *url )
+ const char *
+ imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
+ {
+-  int id = imagecache_get_id(image);
++  return imagecache_get_propstr_prio(image, buf, buflen, 0);
++}
++
++/*
++ * As above, for the image of an EPG event: rendering the event registers its
++ * artwork at the event's airing time rather than as asap, so the order in
++ * which clients walk the guide cannot reorder the fetch queue.
++ */
++const char *
++imagecache_get_propstr_prio ( const char *image, char *buf, size_t buflen,
++                              int64_t airtime )
++{
++  int id = imagecache_get_id_prio(image, airtime);
+   if (id == 0) return image;
+   snprintf(buf, buflen, "imagecache/%d", id);
+   return buf;
+@@ -730,6 +1029,52 @@ imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
  /*
   * Get data
   */
@@ -595,7 +741,7 @@
  int
  imagecache_filename ( int id, char *name, size_t len )
  {
-@@ -754,29 +1087,8 @@ imagecache_filename ( int id, char *name, size_t len )
+@@ -754,29 +1099,8 @@ imagecache_filename ( int id, char *name, size_t len )
  
    /* Remote file */
    else if (imagecache_conf.enabled) {
@@ -637,7 +783,7 @@
    uint32_t  expire;
    uint32_t  ok_period;
    uint32_t  fail_period;
-@@ -45,6 +46,10 @@ void imagecache_trigger  ( void );
+@@ -45,8 +46,16 @@ void imagecache_trigger  ( void );
  // Note: will return 0 if invalid (must serve original URL)
  int imagecache_get_id  ( const char *url );
  
@@ -647,4 +793,10 @@
 +
  const char *imagecache_get_propstr ( const char *image, char *buf, size_t buflen );
  
++// As above, for the image of an EPG event airing at airtime
++const char *imagecache_get_propstr_prio ( const char *image, char *buf,
++                                          size_t buflen, int64_t airtime );
++
  int imagecache_filename ( int id, char *name, size_t len );
+ 
+ #endif /* __IMAGE_CACHE_H__ */
