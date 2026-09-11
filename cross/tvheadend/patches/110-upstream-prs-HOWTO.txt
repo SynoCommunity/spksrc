@@ -4,9 +4,9 @@ can be dropped on its own once merged or abandoned.
   patch  PR                 th0ma7/tvheadend branch   commit
   110    tvheadend#2129     imagecache-audit-tool     62cd4b68e  (the whole PR)
   111    tvheadend#2160     imagecache-fetch-rework   fc8f89bbc  (the whole PR)
-  112    tvheadend#2249     record-from-buffer        db71b82b3  record from the channel cache
-  113    tvheadend#2249     record-from-buffer        8c00c0cea  HTSP timeshift through the channel cache
-  114    tvheadend#2249     record-from-buffer        6532fc343  packet timeshift double free
+  112    tvheadend#2249     record-from-buffer        5ed3ab5e3  record from the channel cache
+  113    tvheadend#2249     record-from-buffer        ef070a772  HTSP timeshift through the channel cache
+  114    tvheadend#2249     record-from-buffer        ed27e68ff  packet timeshift double free
 
 The PR branches sit on a later master (2e64ec02c) than the distrib tarball
 (PKG_GIT_HASH in ../Makefile).  Take only each commit's own change,
@@ -36,7 +36,7 @@ P=<spksrc>/cross/tvheadend/patches
 cd <tvheadend clone>
 git fetch https://github.com/th0ma7/tvheadend.git \
     imagecache-audit-tool imagecache-fetch-rework record-from-buffer
-C=6532fc343                                  # the commit, from the table
+C=ed27e68ff                                  # the commit, from the table
 F=$P/114-timeshift-skip-live-double-free.patch
 { awk '/^--- /{exit} {print}' $F             # keep the header
   git diff --no-prefix $C~1 $C | tvh_patch; } > $F.new && mv $F.new $F
@@ -53,7 +53,7 @@ misplace or duplicate a hunk, so regenerate such a patch against the tree the
 earlier patches produce: apply the chain up to it, apply the commit, diff.
 
 HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
-C=8c00c0cea
+C=ef070a772
 F=$P/113-htsp-timeshift-channel-cache.patch
 rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
 git archive $HASH | tar -x -C /tmp/pa
