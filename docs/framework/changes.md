@@ -19,6 +19,29 @@ If you only read one thing, read this. The details are in the dated log below.
     cd cross/curl && make help
     ```
 
+- **Ask an architecture what stands in the way.** `make check-x86-5.2` (or
+  `make ARCH=x86 TCVERSION=5.2 check`) walks the whole dependency tree and lists every
+  capability gate that architecture fails, or says every gate is met:
+
+    ```
+    ===>  tvheadend: x86-5.2 check: 17 failed, 14 more behind an optional dependency
+           required
+             cross/ffmpeg8              gcc 4.7.3 < 4.9
+             cross/python314            gcc 4.7.3 < 4.8
+             ...
+           optional
+             cross/frei0r               gcc 4.7.3 < 7.5
+             ...
+    ```
+
+    **required** is what the build needs; **optional** is what an `OPTIONAL_DEPENDS`
+    branch would demand if turned on, and never a reason to refuse. A clear architecture
+    answers `x86-5.2 check: OK`.
+
+    The pre-check uses the same walk, so a refused build names every blocker at once
+    instead of stopping at the first. See
+    [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
+
 - **Declare what a package needs, not where it fails.** Instead of
   hand-maintaining an `UNSUPPORTED_ARCHS` list, state the capability floor:
   **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`MIN_RUSTC_VERSION`**,
@@ -82,6 +105,68 @@ If you only read one thing, read this. The details are in the dated log below.
   shows which are active for your arch.
 
 ---
+
+??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
+    - **Seven restated floors gone.** `spk/tvheadend`, `chromaprint`, `comskip` and
+      `spk/ffmpeg5-8` each declared `MIN_GCC_VERSION = 4.9`, restating what their own
+      `cross/` package declares -- and `cross/<same>` is a direct `DEPENDS`, so the walk
+      finds it. Declare a floor on the `cross/` package, where the requirement is a fact
+      about the code; the `spk/` inherits it by being walked. Verdicts unchanged.
+    - **`make check-<arch>-<tcvers>`** reports every capability gate a package's whole
+      dependency tree fails for that architecture, or answers `<arch>-<vers> check: OK`.
+      `make ARCH=x86 TCVERSION=5.2 check` is the same thing with the pair in variables.
+      A pure diagnostic: it extracts no toolchain and builds nothing, it reads the floors
+      declared across the tree.
+    - **The pre-check names every gate, not the first.** A package is as blocked by a floor
+      it never declared as by one it did, and the pre-check only ever saw its own -- so
+      removing the blocker it named revealed the next, one build at a time. It now runs the
+      same walk and lists all of them before stopping:
+
+        ```
+        ===>  check: cross/x264 gcc 4.3.7 < 4.6
+        ===>  check: cross/python314 gcc 4.3.7 < 4.8
+        ===>  check: cross/ffmpeg8 gcc 4.3.7 < 4.9
+        ...
+        pre-check.mk:80: *** Arch 'ppc853x-5.2' is not supported by tvheadend
+            (18 failed check(s) in the tree).  Stop.
+        ```
+
+        It reuses `dependency-flat`'s walk, which already stamps each package so a diamond
+        is visited once, already forwards ARCH/TCVERSION so every package evaluates its own
+        conditional `DEPENDS`, and already sets `DEPENDENCY_WALK=1` so a refused package
+        reports instead of aborting. `DEP_FLAT_VERDICT` makes each package visited print its
+        own verdict, so one walk yields both the tree and every gate in it.
+
+        Cost is one walk per parse -- 2.8s warm on tvheadend's 141-package tree, against
+        builds measured in tens of minutes. Verdict-neutral on the archs measured: every
+        `spk/` package across x64-7.1, 88f6281-6.2.4 and ppc853x-5.2 gives the same
+        refused/allowed set as before. What changes is that the whole story is told at once.
+    - **What was missing:** `UNSUPPORTED_ARCHS` states *where* a package fails and never
+      *why*, and the archs are often added by an include rather than by the package -- so
+      the message named a package with no such list in its own Makefile.
+      **`UNSUPPORTED_ARCHS_REASON`** is now carried into the refusal in parentheses:
+
+        ```
+        Arch 'ppc853x' is not a supported architecture (go has no 32-bit PowerPC target)
+        ```
+
+        `spksrc.cross/env-go.mk` and `env-dotnet.mk` say theirs. A capability floor is
+        still the better answer where one fits; this is for exclusions that are not
+        capability checks.
+    - **One accumulator instead of two.** `_tc_cap_join` accumulated
+      `TC_CAPABILITY_UNSUPPORTED` and `unsupported_reason_join` accumulated
+      `UNSUPPORTED_ARCHS_REASON` -- the same operation under two names, and the second was
+      not a macro at all (no argument, just a lazy read of a global). Both are now
+      **`$(call comma_append,<list>,<item>)`**.
+    - **A `$(,)` that expanded to nothing.** `spksrc.common.mk` defined `empty` / `space` /
+      `$(,)` *below* every `spksrc.common/` include, so an included file expanding `$(,)`
+      in a `:=` assignment got the empty string -- which is why `tc-capability.mk` carried
+      a private comma variable. The utility block moved above the includes.
+    - **`spksrc.cross/env-dotnet.mk`** lost 26 tab-indented lines sitting outside any
+      recipe, and its `$(error)` became a `$(warning)`: an unsupported arch should be
+      reported by the pre-check, not by a parse abort in an env file.
+    - **Package-facing:** nothing to change. Add `UNSUPPORTED_ARCHS_REASON` alongside an
+      `UNSUPPORTED_ARCHS` you introduce, and the refusal will carry it.
 
 ??? note "September 4th 2026 — Build logs keep what the console showed (#7396)"
     - **What was lost:** a package refused by a pre-check left a build log holding a

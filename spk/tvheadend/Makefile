@@ -45,7 +45,6 @@ ADMIN_PORT = ${SERVICE_PORT}
 # PPC archs except qoriq are not supported
 #    https://tvheadend.org/issues/5060
 # ffmpeg8 needs C11 -- gcc 4.9 or newer
-MIN_GCC_VERSION = 4.9
 
 DEPENDS  = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables

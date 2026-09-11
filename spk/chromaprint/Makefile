@@ -7,7 +7,6 @@ FFMPEG_PACKAGE = ffmpeg8
 DEPENDS = cross/chromaprint
 
 # ffmpeg8 needs C11 -- gcc 4.9 or newer
-MIN_GCC_VERSION = 4.9
 
 STARTABLE = no
 

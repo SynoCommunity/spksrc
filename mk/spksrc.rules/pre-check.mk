@@ -14,8 +14,9 @@
 #
 ###############################################################################
 
-# disable checks for dependency targets
-ifneq ($(DEPENDENCY_WALK),1)
+# Disabled for dependency targets, and for the check goal -- whose whole job is to REPORT
+# the gates this arch fails, which a fatal pre-check would cut short at the first one.
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
@@ -59,16 +60,32 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
-# Refuse an arch whose toolchain cannot meet MIN_GCC_VERSION / MIN_GLIBC_VERSION
-# (see spksrc.common/tc-capability.mk). Says why, not just where.
-ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
-  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
+# Every gate in the tree, required ones only, as `make check-<arch>-<vers>` walks it: a
+# package is as blocked by a floor it never declared. ~ carries the spaces $(shell) eats.
+ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
+_TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
+                   ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
+                   | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
 endif
+
+# What this package refuses on its own, then how much the tree adds.
+_own_why  = $(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))
+_tree_why = $(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(s) in the tree))
+
+# Refuse the arch, naming every gate rather than the first, so one run tells the whole story.
+ifneq ($(or $(strip $(TC_CAPABILITY_UNSUPPORTED)),$(strip $(_TREE_GATES))),)
+  $(foreach _g,$(_TREE_GATES),$(info ===>  check: $(subst ~, ,$(_g))))
+  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(_own_why)$(_tree_why))
+endif
+
+# UNSUPPORTED_ARCHS says WHERE a package fails, never why, and is often added by an include
+# rather than by the package -- so whoever adds the archs adds UNSUPPORTED_ARCHS_REASON too.
+_unsupported_why = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
 
 # Check whether package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
-    $(call precheck_fatal,Arch '$(ARCH)' is not a supported architecture)
+    $(call precheck_fatal,Arch '$(ARCH)' is not a supported architecture$(_unsupported_why))
   endif
 endif
 
@@ -76,7 +93,7 @@ ifneq ($(TCVERSION),)
 
 ifneq ($(UNSUPPORTED_ARCHS_TCVERSION),)
   ifneq (,$(findstring $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)))
-    $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture)
+    $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture$(_unsupported_why))
   endif
 endif
 
@@ -89,7 +106,7 @@ endif
 # Check maximal DSM requirements of package
 ifneq ($(REQUIRED_MAX_DSM),)
   ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
-    ifneq ($(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM))))
+    ifeq ($(call version_gt,$(TCVERSION),$(REQUIRED_MAX_DSM)),1)
       $(call precheck_fatal,DSM Toolchain $(TCVERSION) is higher than $(REQUIRED_MAX_DSM))
     endif
   endif
@@ -98,7 +115,7 @@ endif
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_MIN_DSM),)
   ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
-    ifneq ($(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM))))
+    ifeq ($(call version_lt,$(TCVERSION),$(REQUIRED_MIN_DSM)),1)
       $(call precheck_fatal,DSM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_DSM))
     endif
   endif
@@ -107,7 +124,7 @@ endif
 # Check minimum SRM requirements of package
 ifneq ($(REQUIRED_MIN_SRM),)
   ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
-    ifneq ($(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM))))
+    ifeq ($(call version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM)),1)
       $(call precheck_fatal,SRM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_SRM))
     endif
   endif
@@ -115,4 +132,4 @@ endif
 
 endif # ifneq ($(TCVERSION),)
 
-endif # ifneq ($(DEPENDENCY_WALK),1)
+endif # ifeq (DEPENDENCY_WALK / check goal)

@@ -49,6 +49,14 @@ ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 endif
 
+# Utility variables
+empty :=
+space := $(empty) $(empty)
+# For literal ',' in $(eval ...) contexts interpreted as individual arguments -> $(eval -Wl$(,)--rpath-link$(,)/some/path)
+, := ,
+
+# Ahead of every include below, not further down the file: an included makefile that uses
+# these in a `:=` assignment expands them at its own parse, and would otherwise get empty.
 # Load macros early
 include $(BASEDIR)/mk/spksrc.common/macros.mk
 
@@ -100,12 +108,6 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Display message in a consistent way
 MSG = echo "===> "
-
-# Utility variables
-empty :=
-space := $(empty) $(empty)
-# For literal ',' in $(eval ...) contexts interpreted as individual arguments -> $(eval -Wl$(,)--rpath-link$(,)/some/path)
-, := ,
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk

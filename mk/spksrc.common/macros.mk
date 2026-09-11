@@ -33,6 +33,10 @@ version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; f
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
+# Append $(2) to the comma-separated list $(1), or return $(1) when there is nothing to add.
+# Reasons accumulate rather than overwrite: an arch can miss several capabilities at once.
+comma_append = $(if $(strip $(2)),$(1)$(if $(strip $(1)),$(,) )$(2),$(1))
+
 # Remove duplicate words within string while preserving order
 define uniq
 $(strip \

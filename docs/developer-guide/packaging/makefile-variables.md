@@ -320,6 +320,32 @@ without a network query. So a rustc floor refuses only the archs pinned to an ol
 from-source Rust — see [Toolchain: custom from-source
 Rust](../../framework/toolchain.md#custom-from-source-rust-toolchains).
 
+**Ask what stands in the way.** `make check-<arch>-<tcvers>` lists every check the
+package's whole dependency tree fails for that architecture, so a floor declared three
+levels down is visible without starting a build:
+
+```
+$ make check-x86-5.2
+===>  tvheadend: x86-5.2 check: 17 failed, 14 more behind an optional dependency
+       required
+         cross/ffmpeg8              gcc 4.7.3 < 4.9
+         cross/python314            gcc 4.7.3 < 4.8
+         ...
+       optional
+         cross/frei0r               gcc 4.7.3 < 7.5
+         cross/openexr              gcc 4.7.3 < 4.8
+         ...
+```
+
+`make ARCH=x86 TCVERSION=5.2 check` is the same with the pair in variables, and a clear
+architecture answers `x86-5.2 check: OK`. **required** is what the build actually needs;
+**optional** is what an `OPTIONAL_DEPENDS` branch would demand if that option were turned
+on -- worth knowing before turning it on, and never a reason to refuse the build. A
+package under both a required and an optional parent counts as required.
+
+The pre-check runs the same walk on the required set, so a refused build names every
+blocker at once instead of stopping at the first.
+
 **Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
 package belongs on its matching `cross/` package too, so a build is refused at its
 own level instead of failing deep in a dependency. If you add a floor to `spk/foo`,
