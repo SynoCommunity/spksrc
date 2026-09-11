@@ -1,6 +1,6 @@
-Record from cache of a tuned channel: a recording started after its
+Record from the cache of a tuned channel: a recording started after its
 programme began starts at the programme's start (less pre-padding), as far back
-as the channel buffer reaches.  Timeshift option "Record from cache".
+as the channel cache reaches.  Timeshift option "Record from cache".
 
 tvheadend/tvheadend#2249, commit db71b82b3 (branch record-from-buffer, on master 2e64ec02c).
 
