@@ -10,6 +10,29 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
+Current base: master 5ce3ff63c (merged Sep 11th 2026), with uknunknown's
+dev_transcoding_2026 head f9c549a95 rebased onto it (400658886; earlier
+914870f28 on fd698529f) -- his own branch still sits on 45cbe4adb, so that
+rebase is done here rather than pulled. If he rebases upstream himself the
+resulting hash will differ; regenerate then.
+
+Nothing is carried on top any more. Everything this package used to patch
+separately has been taken upstream into PR #2117:
+
+  101 hwaccel decode fallback      102 audio ch_layout compare
+  103 audio drop dead legacy args  104 audio stale aresample comment
+  105 profile sharer double free   106 video recover first frame pts
+  107 globalheaders av start       108 globalheaders av passthru
+
+uknunknown also added a fix of his own in context.c, filling a missing pts from
+the packet fed to av_parser_parse2() -- which attacks the same first-frame
+timestamp loss 106 handled downstream, at its source.
+
+Verify a regenerated patch reproduces the branch exactly rather than trusting
+`patch --dry-run`: a patch whose change is already present can still apply with
+fuzz and duplicate the block. Extract the tarball, apply, and diff against
+`git archive <head>`; it should report no differences at all.
+
 # Regenerate the patch from the working tree. The base MUST equal the
 # cross/tvheadend Makefile PKG_GIT_HASH (the distrib tarball the patch applies to),
 # otherwise upstream commits between the old base and the new base leak into the
