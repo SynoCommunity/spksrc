@@ -1,6 +1,6 @@
 PKG_NAME = numpy_$(PKG_VERS)
 PKG_REAL_NAME = numpy
-PKG_VERS = 2.5.2
+PKG_VERS = 2.4.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/numpy

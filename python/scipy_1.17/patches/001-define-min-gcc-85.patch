@@ -1,0 +1,13 @@
+--- meson.build-orig	2025-02-16 22:01:46.000000000 +0000
++++ meson.build	2025-03-09 21:26:16.438247658 +0000
+@@ -37,8 +37,8 @@ cython = find_program(cy.cmd_array()[0])
+ 
+ # Check compiler is recent enough (see "Toolchain Roadmap" for details)
+ if cc.get_id() == 'gcc'
+-  if not cc.version().version_compare('>=9.1')
+-    error('SciPy requires GCC >= 9.1')
++  if not cc.version().version_compare('>=8.5')
++    error('SciPy requires GCC >= 8.5')
+   endif
+ elif cc.get_id() == 'clang' or cc.get_id() == 'clang-cl'
+   if not cc.version().version_compare('>=12.0')

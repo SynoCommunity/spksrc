@@ -32,11 +32,11 @@ POST_SERVICE_TARGET = $(SPK_NAME)_extra_install
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
-OPTIONAL_DEPENDS += python/numpy-latest
+OPTIONAL_DEPENDS += python/numpy_2.4
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/pendulum
 OPTIONAL_DEPENDS += python/pygobject
-OPTIONAL_DEPENDS += python/scipy
+OPTIONAL_DEPENDS += python/scipy_1.17
 
 include ../../mk/spksrc.common.mk
 
@@ -125,6 +125,7 @@ endif
 # version == 1.25.2                  BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 # version >= 1.26 (DSM-7.1)          Mandatory requires gcc >= 8.4
 # version >= 2.3  (DSM-7.2)          Requires gcc >= 9.4 (using patch for DSM-7.1 compatibility)
+# version == 2.4.3 (python311)         Last version supporting python 3.11 (numpy >= 2.5 requires python >= 3.12)
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += numpy==1.22.4
@@ -138,7 +139,7 @@ endif
 else
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
-DEPENDS += python/numpy-latest
+DEPENDS += python/numpy_2.4
 endif
 endif
 
@@ -223,8 +224,9 @@ WHEELS += rpds_py==0.24.0
 endif
 
 # [scipy] - depends on numpy >= 2.x
+# version == 1.17.1 (python311)         Last version supporting python 3.11 (scipy >= 1.18 requires python >= 3.12)
 ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
-DEPENDS += python/scipy
+DEPENDS += python/scipy_1.17
 endif
 
 include ../../mk/spksrc.spk-meta.mk
