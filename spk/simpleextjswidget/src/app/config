@@ -1,0 +1,13 @@
+{
+    "simpleextjswidget.js": {
+        "SYNOCOMMUNITY.SimpleExtJSApp.WidgetCustom": {
+            "type": "widget",
+            "title": "Customized",
+            "icon": "images\/{1}\/wdgt_icn_title_system_info.png",
+            "appInstance": "SYNO.SDS.AdminCenter.Application",
+            "launchParam": "{\"fn\":\"SYNO.SDS.AdminCenter.InfoCenter.Main\"}",
+            "depend": ["SYNO.SDS._Widget.GridPanel"],
+            "texts": "texts"            
+        }
+    }
+}
