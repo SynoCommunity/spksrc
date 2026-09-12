@@ -1,0 +1,31 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "element",
+        "display_name": "Element",
+        "type": "static",
+        "root": "element",
+        "backend": 2,
+        "icon": "app/images/element-{0}.png"
+      }
+    ],
+    "portals": [
+      {
+        "service": "element",
+        "type": "alias",
+        "name": "Element",
+        "alias": "element",
+        "app": "com.synocommunity.packages.element"
+      }
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/element/target/web",
+        "target": "element",
+        "mode": "0755",
+        "group": "http"
+      }
+    ]
+  }
+}
