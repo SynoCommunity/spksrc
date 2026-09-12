@@ -1,0 +1,28 @@
+[
+   {
+      "step_title": "Subversion repository configuration",
+      "items": [
+         {
+            "type": "textfield",
+            "desc": "Repository shared folder (either existing share, or new share that will be created)",
+            "subitems": [
+               {
+                  "key": "wizard_repo_directory",
+                  "desc": "Repository folder",
+                  "defaultValue": "svn",
+                  "validator": {
+                     "allowBlank": false,
+                     "regex": {
+                        "expr": "/^[\\w _-]+$/",
+                        "errorText": "Subdirectories are not supported."
+                     }
+                  }
+               }
+            ]
+         },
+         {
+            "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-subversion</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+         }
+      ]
+   }
+]
