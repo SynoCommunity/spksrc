@@ -1,0 +1,16 @@
+#!/bin/sh
+PKG_NAME="adguardhome"
+PKG_DIR="/var/packages/${PKG_NAME}"
+PRIVILEGE="${PKG_DIR}/conf/privilege"
+
+echo "Applying privilege fix for AdGuard Home..."
+echo ""
+
+if ! sudo -n true 2>/dev/null; then
+    echo "This operation requires administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+sudo sed 's/package/root/g' -i "${PRIVILEGE}"
+sudo synopkg start "${PKG_NAME}" >/dev/null
+echo "AdGuard Home is now running."
