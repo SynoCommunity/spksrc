@@ -1,0 +1,71 @@
+# avoid compile error with newer toolchains (glibc >= 2.34)
+# "error: size of array 'altStackMem' is not an integral constant-expression"
+# 
+# add code changes similar to catch.hpp v2.13.9
+# mustache uses chatch.hpp v1.12.1 and v2.x are not compatible...
+# 
+--- catch.hpp.orig	2020-04-18 16:49:08.000000000 +0000
++++ catch.hpp	2026-07-28 09:11:33.996829524 +0000
+@@ -6401,6 +6401,10 @@
+         resultCapture->handleFatalErrorCondition( message );
+     }
+ 
++    //! Minimal size Catch2 needs for its own fatal error handling.
++    //! Picked anecdotally, so it might not be sufficient on all
++    //! platforms, and for all configurations.
++    constexpr std::size_t minStackSizeForErrors = 32 * 1024;
+ } // namespace Catch
+ 
+ #if defined ( CATCH_PLATFORM_WINDOWS ) /////////////////////////////////////////
+@@ -6534,13 +6538,14 @@
+             { SIGTERM, "SIGTERM - Termination request signal" },
+             { SIGABRT, "SIGABRT - Abort (abnormal termination) signal" }
+     };
++    static char* altStackMem = nullptr;
++    static std::size_t altStackSize = 0;
+ 
+     struct FatalConditionHandler {
+ 
+         static bool isSet;
+         static struct sigaction oldSigActions [sizeof(signalDefs)/sizeof(SignalDefs)];
+         static stack_t oldSigStack;
+-        static char altStackMem[SIGSTKSZ];
+ 
+         static void handleSignal( int sig ) {
+             std::string name = "<unknown signal>";
+@@ -6557,10 +6562,15 @@
+         }
+ 
+         FatalConditionHandler() {
++            assert(!altStackMem && "Cannot initialize POSIX signal handler when one already exists");
++            if (altStackSize == 0) {
++                altStackSize = std::max(static_cast<size_t>(SIGSTKSZ), minStackSizeForErrors);
++            }
++            altStackMem = new char[altStackSize]();
+             isSet = true;
+             stack_t sigStack;
+             sigStack.ss_sp = altStackMem;
+-            sigStack.ss_size = SIGSTKSZ;
++            sigStack.ss_size = altStackSize;
+             sigStack.ss_flags = 0;
+             sigaltstack(&sigStack, &oldSigStack);
+             struct sigaction sa = { 0 };
+@@ -6573,6 +6583,10 @@
+         }
+ 
+         ~FatalConditionHandler() {
++            delete[] altStackMem;
++            // We signal that another instance can be constructed by zeroing
++            // out the pointer.
++            altStackMem = nullptr;
+             reset();
+         }
+         static void reset() {
+@@ -6591,7 +6605,6 @@
+     bool FatalConditionHandler::isSet = false;
+     struct sigaction FatalConditionHandler::oldSigActions[sizeof(signalDefs)/sizeof(SignalDefs)] = {};
+     stack_t FatalConditionHandler::oldSigStack = {};
+-    char FatalConditionHandler::altStackMem[SIGSTKSZ] = {};
+ 
+ } // namespace Catch
+ 
