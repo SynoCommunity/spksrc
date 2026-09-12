@@ -1,0 +1,5 @@
+bin:bin/heif-convert
+bin:bin/heif-dec
+bin:bin/heif-enc
+bin:bin/heif-info
+bin:bin/heif-thumbnailer
