@@ -128,7 +128,6 @@ If you only read one thing, read this. The details are in the dated log below.
         ```
         toolchain/syno-x64-7.1/work    (nothing)
         cross/libpng/work-x64-7.1      libpng-1.6.50  zlib-1.3.2  install  tc_vars.*
-        cross/zlib/work-x64-7.1        (nothing -- zlib is unpacked and built in libpng's)
         ```
 
       Two builds may therefore run side by side against the same toolchain -- two SPKs,
