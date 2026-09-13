@@ -126,9 +126,9 @@ If you only read one thing, read this. The details are in the dated log below.
       `env -i` around an spk meta source is where one tree ends and the next begins:
 
         ```
-        toolchain/syno-x64-7.1/work     0 tc_vars files
-        cross/libpng/work-x64-7.1       7 tc_vars files
-        cross/zlib/work-x64-7.1         0 tc_vars files   <- built inside libpng's tree
+        toolchain/syno-x64-7.1/work    (nothing)
+        cross/libpng/work-x64-7.1      libpng-1.6.50  zlib-1.3.2  install  tc_vars.*
+        cross/zlib/work-x64-7.1        (nothing -- zlib is unpacked and built in libpng's)
         ```
 
       Two builds may therefore run side by side against the same toolchain -- two SPKs,
@@ -147,8 +147,10 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Package-facing:** nothing to change. `make -C toolchain/<TC> toolchain` now only
       downloads, extracts and patches; anything that read `toolchain/*/work/tc_vars*`
       should read the build's own work dir instead.
-    - **Not closed by this:** work dirs are keyed on the arch alone, so two trees run in
-      sequence still share the *artifacts* under a dependency's work dir.
+    - **The dependency walk goes with it.** `dep-flat-mk-%` recursed without forwarding
+      `WORK_DIR`, so every package it visited wrote a `tc_vars.mk` of its own: a single
+      `make check` left 141 work directories behind for a command that builds nothing. It
+      now forwards it as `depend.mk` does through `$(ENV)`, and the walk reads the root's.
 ??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
     - **Seven restated floors gone.** `spk/tvheadend`, `chromaprint`, `comskip` and
       `spk/ffmpeg5-8` each declared `MIN_GCC_VERSION = 4.9`, restating what their own
