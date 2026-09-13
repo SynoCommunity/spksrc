@@ -135,7 +135,10 @@ If you only read one thing, read this. The details are in the dated log below.
       a change under `cross/libva`, `cross/mesa` or any other videodriver dependency
       does name it through the dependency list, and that run builds the meta in full.
       A manual `workflow_dispatch` never sets it, so published packages always carry
-      hardware acceleration.
+      hardware acceleration. It also crosses the `env -i` that isolates an spk meta
+      source (`depend.mk`): a meta that disagreed with its consumer linked a libdrm the
+      consumer then could not resolve -- `libavutil.so: undefined reference to
+      'drmGetVersion'`.
     - **The CI list stopped injecting metas** while it was at it. `prepare.sh` resolved
       `PYTHON_PACKAGE` / `FFMPEG_PACKAGE` / `VIDEODRV_PACKAGE` recursively and added each
       meta to the list of packages to build -- redundant, since `python.mk`, `ffmpeg.mk`
