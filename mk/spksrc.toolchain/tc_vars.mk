@@ -96,14 +96,14 @@ TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
-# stage0 writes tc_vars.mk at parse time, before the package's overlay switches are known,
-# so every generation rewrites rather than accepting the file already there.
-.PHONY: tcvars_force
-tcvars_force: ;
+# A .PHONY prerequisite is never up to date, so the file rules below always re-run: stage0
+# wrote tc_vars.mk at parse, without the overlay switches, and it must not survive here.
+.PHONY: tcvars_regenerate
+tcvars_regenerate: ;
 
 # Template to generate toolchain rule
 define make_tc_var_rule
-$(WORK_DIR)/$(2): tcvars_force
+$(WORK_DIR)/$(2): tcvars_regenerate
 	@$(MSG) "Generating $(WORK_DIR)/$(2)"
 	@mkdir -p $(WORK_DIR)
 	@$(MAKE) --no-print-directory \

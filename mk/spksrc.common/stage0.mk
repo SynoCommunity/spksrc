@@ -49,7 +49,7 @@
 # │   make WORK_DIR=<pkg work dir> \                                     │
 # │        -C toolchain/<TC> tcvars    -> the FULL tc_vars* set, and it  │
 # │                                       REWRITES stage0's tc_vars.mk   │
-# │                                       (tcvars_force): the overlay    │
+# │                                       (tcvars_regenerate): overlay   │
 # │                                       switches are unknown at parse, │
 # │                                       and the rest needs recipe ENV  │
 # │                                       (INSTALL_PREFIX)               │
