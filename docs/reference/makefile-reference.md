@@ -307,7 +307,7 @@ make all-supported
 | `PARALLEL_MAKE` | Parallel build mode (nop, max, N) |
 | `NCPUS` | Number of CPUs for parallel builds |
 | `V` | Verbose output when set to 1 |
-| `VIDEODRV_SKIP` | Set to 1 to build without the `synocli-videodriver` meta and the hardware acceleration it provides (default `0`; `make setup` writes it commented into `local.mk`, and automatic CI runs set it) |
+| `VIDEODRV` | Set to 0 to build without the `synocli-videodriver` meta and the hardware acceleration it provides (default `1`; only an explicit `0`/`off` leaves it out. `make setup` writes it commented into `local.mk`, and automatic CI runs set it) |
 
 ### Proxy Configuration
 
@@ -332,7 +332,7 @@ PARALLEL_MAKE = max
 PSTAT = 1
 
 # Build without the synocli-videodriver meta and the hardware acceleration it feeds
-VIDEODRV_SKIP ?= 1
+VIDEODRV ?= 0
 
 # Skip GitHub maintainer API lookups (e.g. offline builds)
 DISABLE_GITHUB_MAINTAINER = 1

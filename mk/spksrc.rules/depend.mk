@@ -60,8 +60,8 @@ native-depend: native-depend_msg_target
 # its install staging already exists (re-running arch- on a built package is
 # not idempotent at the packaging step). No-op when BUILD_DEPENDS has no spk/*.
 #
-# VIDEODRV_SKIP crosses that isolation on purpose: it is a decision about the whole
-# run, and a meta that disagrees links a libdrm the consumer then cannot resolve.
+# VIDEODRV crosses that isolation on purpose: it is a decision about the whole run,
+# and a meta that disagrees links a libdrm the consumer then cannot resolve.
 .PHONY: spk-meta-source
 spk-meta-source:
 	@set -e; \
@@ -70,7 +70,7 @@ spk-meta-source:
 	      $(MSG) "Stage1: meta source $$metasrc already built for $(ARCH)-$(TCVERSION)" ; \
 	   else \
 	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
-	      env -i PATH="$(PATH)" HOME="$(HOME)" VIDEODRV_SKIP="$(VIDEODRV_SKIP)" \
+	      env -i PATH="$(PATH)" HOME="$(HOME)" VIDEODRV="$(VIDEODRV)" \
 	         $(MAKE) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
 	   fi ; \
 	done

@@ -217,7 +217,7 @@ local.mk:
 	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 	@echo "# Build without the synocli-videodriver meta and the hardware acceleration it feeds" >> $@
-	@echo "#VIDEODRV_SKIP ?= 1" >> $@
+	@echo "#VIDEODRV ?= 0" >> $@
 	@$(MAKE) --no-print-directory overlay-defaults
 
 # The OVERLAY_<component> switches, written out at their current defaults so local.mk is the

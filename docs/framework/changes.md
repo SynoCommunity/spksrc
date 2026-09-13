@@ -122,14 +122,16 @@ If you only read one thing, read this. The details are in the dated log below.
       Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes
       almost never. Every automatic run that touched an ffmpeg consumer paid for it
       again, because `spk/ffmpeg*` declares `VIDEODRV_PACKAGE` and the meta follows.
-    - **`VIDEODRV_SKIP = 1`** drops the meta and every option that depends on it:
+    - **`VIDEODRV = 0`** drops the meta and every option that depends on it:
       `META_DEPENDS` is empty, `spk/synocli-videodriver` leaves `BUILD_DEPENDS`,
       `synocli-videodriver-tools` leaves `SPK_DEPENDS`, and `cross/ffmpeg4-8` configure
       without `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan
       set and `--enable-libplacebo`. Anything else (`--enable-v4l2-m2m`) is untouched.
-      Undeclared or `0` builds as before, which is what a local tree does; `make setup`
-      writes it commented into `local.mk`, below the overlay switches and reading the
-      same way -- command line > environment > `local.mk` > the default.
+      Undeclared builds as before, which is what a local tree does; `make setup` writes it
+      commented into `local.mk`, below the overlay switches and reading the same way --
+      command line > environment > `local.mk` > the default. Unlike them, only an explicit
+      `0`/`off` leaves the meta out: an unexpected value builds, rather than quietly
+      publishing an ffmpeg with no acceleration and no error to show for it.
     - **Who sets it.** Only the automatic CI runs (`push`, `pull_request`), and only when
       change detection did not already name `synocli-videodriver` or its tools package --
       a change under `cross/libva`, `cross/mesa` or any other videodriver dependency

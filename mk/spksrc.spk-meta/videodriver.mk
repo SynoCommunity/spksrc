@@ -11,9 +11,9 @@
 # building it can only stop at "DSM Toolchain 5.2 is lower than 6".
 IS_VIDEODRV_SUPPORTED := $(if $(call version_ge,$(TCVERSION),6),$(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)))
 
-# Same answer as an unsupported arch when the meta is skipped altogether: no META_DEPENDS,
-# no spk/synocli-videodriver in BUILD_DEPENDS, no tools package in SPK_DEPENDS.
-ifeq ($(VIDEODRV_SKIP),1)
+# Same answer as an unsupported arch when the meta is left out: no META_DEPENDS, no
+# spk/synocli-videodriver in BUILD_DEPENDS, no tools package in SPK_DEPENDS.
+ifeq ($(VIDEODRV_ON),)
 IS_VIDEODRV_SUPPORTED :=
 endif
 

@@ -20,7 +20,7 @@
 # - has_arch_min_dsm<V>_packages   : true/false
 # - has_noarch_min_dsm<V>_packages : true/false
 # - download_packages              : space-separated list of cross/native packages to pre-download
-# - videodriver_skip               : 1 when the videodriver meta must be left out of the builds
+# - videodriver                    : 0 when the videodriver meta must be left out of the builds
 
 set -o pipefail
 
@@ -36,7 +36,7 @@ min_dsm_versions=(7.2 7.3)
 # The videodriver meta and its tools: heavy builds that almost never change. Automatic runs
 # build them only when change detection named one; manual runs always do (see section 1).
 videodriver_packages="synocli-videodriver synocli-videodriver-tools"
-videodriver_skip=0
+videodriver=1
 
 # ===========================================================================
 
@@ -112,14 +112,14 @@ packages=$(echo "${filtered_packages}" | xargs)
 # Every package builds its own metas through BUILD_DEPENDS, so the only question left is
 # the videodriver one: a manual dispatch, or a change that named it above, pays for it.
 if [ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]; then
-    videodriver_skip=1
+    videodriver=0
     for package in ${packages}; do
         case " ${videodriver_packages} " in
-            *" ${package} "*) videodriver_skip=0 ;;
+            *" ${package} "*) videodriver=1 ;;
         esac
     done
-    if [ "${videodriver_skip}" = "1" ]; then
-        echo "===> Skipping the videodriver meta: automatic run, no change of its own"
+    if [ "${videodriver}" = "0" ]; then
+        echo "===> Leaving out the videodriver meta: automatic run, no change of its own"
     fi
 fi
 
@@ -214,7 +214,7 @@ output_vars=(
     noarch_packages
     has_arch_packages
     has_noarch_packages
-    videodriver_skip
+    videodriver
 )
 
 # Dynamic outputs — arch and noarch per DSM version
