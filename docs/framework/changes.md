@@ -117,7 +117,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 13th 2026 — Hardware acceleration is opt-out with `VIDEODRV_SKIP` (#7455)"
+??? note "September 13th 2026 — An automatic build does what the change asks for, no more (#7455)"
     - **The cost.** `synocli-videodriver` is the heaviest build in the tree -- mesa, the
       Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes
       almost never. Every automatic run that touched an ffmpeg consumer paid for it
@@ -181,6 +181,10 @@ If you only read one thing, read this. The details are in the dated log below.
         - One switch per `CONFIGURE_ARGS` line throughout the tool block, so a diff shows
           which tool changed.
         - Pull request: [#7454](https://github.com/SynoCommunity/spksrc/pull/7454)
+    - **And a clean that no longer happens.** `build.sh` assembled `packages_to_keep` from
+      its `ffmpeg_versions` / `python_versions` arrays and never read it: the per-package
+      clean it shielded those artifacts from is gone, the runners having grown enough disk
+      this year to hold every work dir for a whole run. All three are removed.
 
 ---
 
