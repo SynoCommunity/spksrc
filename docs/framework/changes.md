@@ -134,6 +134,13 @@ If you only read one thing, read this. The details are in the dated log below.
       does name it through the dependency list, and that run builds the meta in full.
       A manual `workflow_dispatch` never sets it, so published packages always carry
       hardware acceleration.
+    - **The CI list stopped injecting metas** while it was at it. `prepare.sh` resolved
+      `PYTHON_PACKAGE` / `FFMPEG_PACKAGE` / `VIDEODRV_PACKAGE` recursively and added each
+      meta to the list of packages to build -- redundant, since `python.mk`, `ffmpeg.mk`
+      and `videodriver.mk` each put `spk/<meta>` in `BUILD_DEPENDS` and the dependent
+      builds it anyway. It also built metas for architectures the dependent refuses:
+      `spk/homeassistant` declares `UNSUPPORTED_ARCHS = $(ARMv7_ARCHS)`, yet armv7 spent
+      a full run on the injected `python314`. Such a run now builds nothing.
 ??? note "September 13th 2026 — Ask the toolchain for a tool, never spell its path (2 PRs)"
     A package that needs a compiler or a binutils tool by *path* used to write
     `$(TC_PATH)$(TC_PREFIX)gcc`. That is right only while the toolchain is the vendor one:
