@@ -22,6 +22,7 @@
 # - has_arch_min_dsm<V>_packages   : true/false
 # - has_noarch_min_dsm<V>_packages : true/false
 # - download_packages              : space-separated list of cross/native packages to pre-download
+# - videodriver_skip               : 1 when the videodriver meta must be left out of the builds
 
 set -o pipefail
 
@@ -43,6 +44,11 @@ min_dsm_versions=(7.2 7.3)
 # Makefile variables that declare a dependency on a meta SPK to be built first.
 # Add new variable names here to extend meta-package detection.
 meta_package_vars=(PYTHON_PACKAGE FFMPEG_PACKAGE VIDEODRV_PACKAGE)
+
+# The videodriver meta and its tools: heavy builds that almost never change. Automatic runs
+# build them only when change detection named one; manual runs always do (see section 1).
+videodriver_packages="synocli-videodriver synocli-videodriver-tools"
+videodriver_skip=0
 
 # ===========================================================================
 
@@ -103,6 +109,8 @@ _inject_one() {
 
     if [ -f "./spk/${package}/Makefile" ]; then
         for meta_var in "${meta_package_vars[@]}"; do
+            # Automatic runs resolve every meta but the videodriver one
+            [ "${meta_var}" = "VIDEODRV_PACKAGE" ] && [ "${videodriver_skip}" = "1" ] && continue
             while IFS= read -r meta; do
                 [ -z "${meta}" ] && continue
                 _inject_one "$meta" "$2"
@@ -183,6 +191,20 @@ for package in ${packages}; do
     fi
 done
 packages=$(echo "${filtered_packages}" | xargs)
+
+# Decide the videodriver meta before any injection: only an explicit request -- a manual
+# dispatch, or a change that put one of its packages in the list above -- pays for it.
+if [ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]; then
+    videodriver_skip=1
+    for package in ${packages}; do
+        case " ${videodriver_packages} " in
+            *" ${package} "*) videodriver_skip=0 ;;
+        esac
+    done
+    if [ "${videodriver_skip}" = "1" ]; then
+        echo "===> Skipping the videodriver meta: automatic run, no change of its own"
+    fi
+fi
 
 # Inject missing meta-packages into the global package list
 packages=$(inject_meta_packages "${packages}")
@@ -293,6 +315,7 @@ output_vars=(
     noarch_packages
     has_arch_packages
     has_noarch_packages
+    videodriver_skip
 )
 
 # Dynamic outputs — arch and noarch per DSM version

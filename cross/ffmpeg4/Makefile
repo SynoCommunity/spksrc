@@ -317,7 +317,10 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 CONFIGURE_ARGS += --enable-neon
+# libdrm comes from the videodriver meta
+ifneq ($(VIDEODRV_SKIP),1)
 CONFIGURE_ARGS += --enable-libdrm
+endif
 CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
@@ -343,11 +346,15 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 ifeq ($(call version_ge, $(TCVERSION), 6),1)
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
+# meta; asking for them where it does not exist stops configure at "libmfx not found".
+ifneq ($(VIDEODRV_SKIP),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
@@ -362,6 +369,7 @@ CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
 
+endif # ifneq VIDEODRV_SKIP
 endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 

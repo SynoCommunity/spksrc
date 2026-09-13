@@ -173,6 +173,7 @@ jobs:
       has_noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm72_packages }}
       has_arch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm73_packages }}
       has_noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm73_packages }}
+      videodriver_skip: ${{ steps.dependencies.outputs.videodriver_skip }}
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
@@ -203,6 +204,7 @@ jobs:
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
           GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
           USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
@@ -551,6 +553,7 @@ jobs:
           NOARCH_MIN_DSM72_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm72_packages }}
           ARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.arch_min_dsm73_packages }}
           NOARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm73_packages }}
+          VIDEODRV_SKIP: ${{ needs.prepare.outputs.videodriver_skip }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}

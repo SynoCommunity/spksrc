@@ -117,6 +117,23 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 13th 2026 — Hardware acceleration is opt-out with `VIDEODRV_SKIP` (#PRNUM)"
+    - **The cost.** `synocli-videodriver` is the heaviest build in the tree -- mesa, the
+      Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes
+      almost never. Every automatic run that touched an ffmpeg consumer paid for it
+      again, because `spk/ffmpeg*` declares `VIDEODRV_PACKAGE` and the meta follows.
+    - **`VIDEODRV_SKIP = 1`** drops the meta and every option that depends on it:
+      `META_DEPENDS` is empty, `spk/synocli-videodriver` leaves `BUILD_DEPENDS`,
+      `synocli-videodriver-tools` leaves `SPK_DEPENDS`, and `cross/ffmpeg4-8` configure
+      without `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan
+      set and `--enable-libplacebo`. Anything else (`--enable-v4l2-m2m`) is untouched.
+      Undeclared or `0` builds as before, which is what a local tree does.
+    - **Who sets it.** Only the automatic CI runs (`push`, `pull_request`), and only when
+      change detection did not already name `synocli-videodriver` or its tools package --
+      a change under `cross/libva`, `cross/mesa` or any other videodriver dependency
+      does name it through the dependency list, and that run builds the meta in full.
+      A manual `workflow_dispatch` never sets it, so published packages always carry
+      hardware acceleration.
 ??? note "September 13th 2026 — Ask the toolchain for a tool, never spell its path (2 PRs)"
     A package that needs a compiler or a binutils tool by *path* used to write
     `$(TC_PATH)$(TC_PREFIX)gcc`. That is right only while the toolchain is the vendor one:

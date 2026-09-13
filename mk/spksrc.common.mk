@@ -49,6 +49,10 @@ ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 endif
 
+# Hardware video acceleration comes from the synocli-videodriver meta; 1 drops the meta
+# and every option it feeds. Automatic CI runs set it, local and manual builds do not.
+VIDEODRV_SKIP ?= 0
+
 # Utility variables
 empty :=
 space := $(empty) $(empty)

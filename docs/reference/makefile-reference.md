@@ -307,6 +307,7 @@ make all-supported
 | `PARALLEL_MAKE` | Parallel build mode (nop, max, N) |
 | `NCPUS` | Number of CPUs for parallel builds |
 | `V` | Verbose output when set to 1 |
+| `VIDEODRV_SKIP` | Set to 1 to build without the `synocli-videodriver` meta and the hardware acceleration it provides (default `0`; automatic CI runs set it) |
 
 ### Proxy Configuration
 
