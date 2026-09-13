@@ -379,7 +379,9 @@ dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
 #  - Recursively invokes dependency-flat-mk in the dependency directory.
 #    ARCH and TCVERSION are forwarded so each sub-package evaluates its own
 #    conditional DEPENDS in the correct toolchain context, and excludes its
-#    own OPTIONAL_DEPENDS when the context is set.
+#    own OPTIONAL_DEPENDS when the context is set. WORK_DIR goes with them,
+#    as depend.mk sends it through $(ENV) for a real build: the walk then
+#    reads the root's tc_vars.mk instead of writing one per package visited.
 # -------------------------------------------------------------------
 .PHONY: dep-flat-mk-%
 dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
@@ -396,6 +398,7 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 	DEPENDENCY_WALK=1 \
 	$(MAKE) -s --output-sync=target \
 		-C ../../$$dep \
+		WORK_DIR=$(WORK_DIR) \
 		$(if $(REPORT_UNSUPPORTED),REPORT_UNSUPPORTED=1) \
 		$(if $(WALK_OPTIONAL_DEPENDS),WALK_OPTIONAL_DEPENDS=1) \
 		$(if $(ARCH),ARCH=$(ARCH)) \

@@ -10,19 +10,24 @@
 # ┌──────────────────────────────────────────────────────────────────────┐
 # │ stage0  (PARSE time, this file)                                      │
 # │                                                                      │
-# │   no explicit goal AND <TC work dir>/tc_vars.mk missing?             │
+# │   <pkg work dir>/tc_vars.mk missing?                                 │
 # │        │                                                             │
 # │        ▼                                                             │
-# │   make WORK_DIR=<TC work dir> -C toolchain/<TC> toolchain            │
-# │        ├─ download / extract / patch / rust  (cookie-guarded)        │
-# │        └─ generates <TC work dir>/tc_vars*   (toolchain identity)    │
-# │   touch $(WORK_DIR)/.stage0-bootstrap_done   (trace: who triggered)  │
+# │   make WORK_DIR=<pkg work dir> -C toolchain/<TC> tcvars-identity     │
+# │        └─ writes <pkg work dir>/tc_vars.mk  (identity only; needs    │
+# │           no extracted toolchain -- all constants of its Makefile)   │
 # │        │                                                             │
 # │        ▼                                                             │
-# │   -include <TC work dir>/tc_vars.mk   ->   TC_GCC, TC_VERS, ...      │
+# │   -include <pkg work dir>/tc_vars.mk  ->  TC_GCC, TC_VERS, ...       │
 # │        │                                                             │
 # │        ▼                                                             │
 # │   DEPENDS parse evaluates version_ge($(TC_GCC),...) correctly        │
+# │        │                                                             │
+# │        ▼                                                             │
+# │   no explicit goal AND <TC work dir>/<TC_TARGET> missing?            │
+# │   make WORK_DIR=<TC work dir> -C toolchain/<TC> toolchain            │
+# │        └─ download / extract / patch / rust  (cookie-guarded)        │
+# │   touch $(WORK_DIR)/.stage0-bootstrap_done   (trace: who triggered)  │
 # └──────────────────────────────────────────────────────────────────────┘
 #                                  │
 #                                  ▼  (recipes run after parse)
@@ -33,18 +38,25 @@
 # │                                       REAL bootstrap on explicit     │
 # │                                       goals (stage0 skips those)     │
 # │   make WORK_DIR=<pkg work dir> \                                     │
-# │        -C toolchain/<TC> tcvars    -> SOLE generator of the package  │
-# │                                       $(WORK_DIR)/tc_vars* (needs    │
-# │                                       recipe ENV: INSTALL_PREFIX)    │
+# │        -C toolchain/<TC> tcvars    -> the FULL tc_vars* set, and it  │
+# │                                       rewrites stage0's tc_vars.mk   │
+# │                                       (needs recipe ENV:             │
+# │                                        INSTALL_PREFIX)               │
 # └──────────────────────────────────────────────────────────────────────┘
 #
-# Why stage0 must NOT generate the package $(WORK_DIR)/tc_vars*: those files
-# embed INSTALL_PREFIX-derived paths (CMAKE_FIND_ROOT_PATH, -I/-L staging
-# flags), and INSTALL_PREFIX is recipe ENVIRONMENT (depend.mk/spk.mk) that
-# $(shell) does not see at parse time. Generating them here bakes in the
-# /usr/local default and drops .stage1-tcvars_done, so stage1 never fixes
-# them -> every cmake/autotools dependant breaks (libpng "Could NOT find
-# ZLIB", IGC "Could NOT find SPIRVLLVMTranslator", ...).
+# WORK_DIR is the ROOT of the build tree, not the package's own: depend.mk passes it down
+# through $(ENV) and directories.mk keeps what it is handed (ifndef), so libpng and the
+# zlib it pulls in read one tc_vars.mk, in cross/libpng/work-<arch>-<vers>. The `env -i`
+# around an spk meta source is where one tree ends and the next begins. The toolchain
+# work dir holds NO tc_vars: it is shared by every tree and could hold only one answer.
+#
+# Why stage0 generates tc_vars.mk and nothing else: the other files embed
+# INSTALL_PREFIX-derived paths (CMAKE_FIND_ROOT_PATH, -I/-L staging flags),
+# and INSTALL_PREFIX is recipe ENVIRONMENT (depend.mk/spk.mk) that $(shell)
+# does not see at parse time. Generating them here would bake in the
+# /usr/local default -> every cmake/autotools dependant breaks (libpng
+# "Could NOT find ZLIB", IGC "Could NOT find SPIRVLLVMTranslator", ...).
+# tc_vars.mk carries no such path, which is what makes it safe here.
 #
 # Guards: ARCH non-noarch AND TCVERSION both required (a sub-make carrying
 # TCVERSION alone would derive a bogus toolchain/syno--<vers> work path and
@@ -71,21 +83,28 @@ ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 # TC_WORK_DIR in particular is `?=` there, so it would keep our wrong value).
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
-# Bootstrap (heavy, cookie-guarded) only when no explicit build goal and the
-# toolchain is not ready. On success, drop a status cookie in the PACKAGE work
-# dir tracing WHICH package triggered the early bootstrap. Purely informational:
-# the bootstrap condition is the existence of $(TC_WORK_DIR)/tc_vars.mk, not
-# this cookie. Cleaned by spkclean (spk.mk) / clean (rm -fr work-*).
-ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
-ifeq ($(wildcard $(TC_WORK_DIR)/tc_vars.mk),)
-  $(info ===> Bootstrapping toolchain for $(ARCH)-$(TCVERSION) (stage0))
+# The build tree's own tc_vars.mk, in the ROOT's work dir: depend.mk hands WORK_DIR down
+# through $(ENV) and directories.mk keeps it (ifndef), so a dependency reads the tree that
+# pulled it in. Unconditional and ahead of pre-check, so a refused arch still leaves one.
+# Needs no extracted toolchain: the identity values are toolchain/syno-*/Makefile constants.
+# MAKEFLAGS cleared -- a $(shell) sub-make inherits -n/-p and would print, not generate.
+ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
-  $(shell $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchain >&2 && touch $(WORK_DIR)/.stage0-bootstrap_done)
-endif
+  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
 endif
 
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
--include $(TC_WORK_DIR)/tc_vars.mk
+-include $(WORK_DIR)/tc_vars.mk
+
+# Bootstrap (heavy, cookie-guarded) only when no explicit build goal and the toolchain is
+# not extracted. The condition is now the extracted $(TC_TARGET) rather than a generated
+# file, the toolchain having stopped generating any. The cookie only traces who triggered.
+ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
+ifeq ($(wildcard $(TC_WORK_DIR)/$(TC_TARGET)),)
+  $(info ===> Bootstrapping toolchain for $(ARCH)-$(TCVERSION) (stage0))
+  $(shell $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchain >&2 && touch $(WORK_DIR)/.stage0-bootstrap_done)
+endif
+endif
 
 endif
 endif

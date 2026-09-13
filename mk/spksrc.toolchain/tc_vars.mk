@@ -96,9 +96,14 @@ TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
+# stage0 writes tc_vars.mk at parse time, before the package's overlay switches are known,
+# so every generation rewrites rather than accepting the file already there.
+.PHONY: tcvars_force
+tcvars_force: ;
+
 # Template to generate toolchain rule
 define make_tc_var_rule
-$(WORK_DIR)/$(2):
+$(WORK_DIR)/$(2): tcvars_force
 	@$(MSG) "Generating $(WORK_DIR)/$(2)"
 	@mkdir -p $(WORK_DIR)
 	@$(MAKE) --no-print-directory \
@@ -121,6 +126,11 @@ generate_tc_vars_mk: $(foreach m,$(TC_VAR_MAPPING_MK),$(WORK_DIR)/$(word 2,$(sub
 
 .PHONY: generate_tc_vars_other
 generate_tc_vars_other: $(foreach m,$(TC_VAR_MAPPING_OTHER),$(WORK_DIR)/$(word 2,$(subst :, ,$(m))))
+
+# Toolchain identity alone (TC_GCC, TC_TARGET, ...), the one file free of INSTALL_PREFIX and
+# thus generatable from stage0's parse; the rest needs the recipe environment.
+.PHONY: tcvars-identity
+tcvars-identity: $(TC_VARS_MK)
 
 #####
 
