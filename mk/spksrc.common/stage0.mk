@@ -37,16 +37,22 @@
 #                                  │
 #                                  ▼  (recipes run after parse)
 # ┌──────────────────────────────────────────────────────────────────────┐
-# │ stage1  (RECIPE time, cross-cc.mk / spk.mk) -- NOT made obsolete     │
+# │ stage1  (RECIPE time, cross-cc.mk / spk.mk) -- ALWAYS runs           │
 # │                                                                      │
-# │   make -C toolchain/<TC> toolchain -> no-op when stage0 ran; the     │
-# │                                       REAL bootstrap on explicit     │
-# │                                       goals (stage0 skips those)     │
+# │   Guarded by <pkg work dir>/.stage1-tcvars_done, which stage0 never  │
+# │   writes: a toolchain already extracted does not skip it, the local  │
+# │   tc_vars* still have to be made for THIS package.                   │
+# │                                                                      │
+# │   make -C toolchain/<TC> toolchain -> no-op when step 2 already ran; │
+# │                                       the REAL bootstrap when a goal │
+# │                                       on the command line skipped it │
 # │   make WORK_DIR=<pkg work dir> \                                     │
 # │        -C toolchain/<TC> tcvars    -> the FULL tc_vars* set, and it  │
-# │                                       rewrites stage0's tc_vars.mk   │
-# │                                       (needs recipe ENV:             │
-# │                                        INSTALL_PREFIX)               │
+# │                                       REWRITES stage0's tc_vars.mk   │
+# │                                       (tcvars_force): the overlay    │
+# │                                       switches are unknown at parse, │
+# │                                       and the rest needs recipe ENV  │
+# │                                       (INSTALL_PREFIX)               │
 # └──────────────────────────────────────────────────────────────────────┘
 #
 # WORK_DIR is the ROOT of the build tree, not the package's own: depend.mk passes it down
