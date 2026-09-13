@@ -55,32 +55,21 @@
 # │                                       (INSTALL_PREFIX)               │
 # └──────────────────────────────────────────────────────────────────────┘
 #
-# WORK_DIR is the ROOT of the build tree, not the package's own: depend.mk passes it down
-# through $(ENV) and directories.mk keeps what it is handed (ifndef), so libpng and the
-# zlib it pulls in read one tc_vars.mk, in cross/libpng/work-<arch>-<vers>. The `env -i`
-# around an spk meta source is where one tree ends and the next begins. The toolchain
-# work dir holds NO tc_vars: it is shared by every tree and could hold only one answer.
+# WORK_DIR is the ROOT's, not the package's: depend.mk passes it through
+# $(ENV), directories.mk keeps what it is handed (ifndef). One tc_vars.mk per
+# tree, and the `env -i` at an spk meta source is where the next one starts.
 #
-# Why stage0 generates tc_vars.mk and nothing else: the other files embed
-# INSTALL_PREFIX-derived paths (CMAKE_FIND_ROOT_PATH, -I/-L staging flags),
-# and INSTALL_PREFIX is recipe ENVIRONMENT (depend.mk/spk.mk) that $(shell)
-# does not see at parse time. Generating them here would bake in the
-# /usr/local default -> every cmake/autotools dependant breaks (libpng
-# "Could NOT find ZLIB", IGC "Could NOT find SPIRVLLVMTranslator", ...).
-# tc_vars.mk carries no such path, which is what makes it safe here.
+# tc_vars.mk and nothing else: the other files embed INSTALL_PREFIX-derived
+# paths, and INSTALL_PREFIX is recipe environment $(shell) cannot see at parse.
+# Writing them here bakes in /usr/local and breaks every cmake dependant.
 #
-# Guards: ARCH non-noarch AND TCVERSION both required (a sub-make carrying
-# TCVERSION alone would derive a bogus toolchain/syno--<vers> work path and
-# attempt to bootstrap it); skipped inside toolchain/ (recursion; do NOT
-# guard on $(TC): spk.mk sets it before common.mk); bootstrap only fires on
-# empty MAKECMDGOALS (or dependency-%), which is how the real build parses
-# packages (supported.mk build-arch-%). Native builds run under `env -i`
-# (depend.mk) -> ARCH empty -> excluded.
+# Guards: ARCH non-noarch AND TCVERSION both required, or a sub-make carrying
+# one alone derives a bogus syno--<vers> path; skipped inside toolchain/ for
+# recursion -- do NOT guard on $(TC), spk.mk sets it before common.mk.
 #
-# Gotchas: never pass MSG= to the sub-make (a blank MSG turns recipe message
-# lines into shell commands -> Error 127 before anything is extracted). The
-# sub-make stdout goes to `>&2`: $(shell) only captures fd 1, so the build
-# output stays out of the parse yet remains visible on console and in logs.
+# Gotchas: never pass MSG= to the sub-make, a blank one turns recipe message
+# lines into shell commands. Its stdout goes to `>&2` so $(shell), which reads
+# fd 1 only, keeps the build output out of the parse yet on console and in logs.
 #
 ###############################################################################
 
@@ -88,17 +77,12 @@ ifneq ($(strip $(filter-out noarch,$(ARCH))),)
 ifneq ($(strip $(TCVERSION)),)
 ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 
-# Toolchain-namespace vars -- defined INSIDE the "not in toolchain dir" guard so
-# they can never clobber spksrc.toolchain.mk's own definitions during a toolchain
-# build (there ARCH/TCVERSION are empty -> a bogus syno--/work path; and
-# TC_WORK_DIR in particular is `?=` there, so it would keep our wrong value).
+# Inside the "not in toolchain dir" guard so a toolchain build keeps its own
+# definitions: TC_WORK_DIR is `?=` there and would hold our bogus syno--/work.
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
-# The build tree's own tc_vars.mk, in the ROOT's work dir: depend.mk hands WORK_DIR down
-# through $(ENV) and directories.mk keeps it (ifndef), so a dependency reads the tree that
-# pulled it in. Unconditional and ahead of pre-check, so a refused arch still leaves one.
-# Needs no extracted toolchain: the identity values are toolchain/syno-*/Makefile constants.
-# MAKEFLAGS cleared -- a $(shell) sub-make inherits -n/-p and would print, not generate.
+# Unconditional and ahead of pre-check, so a refused arch still leaves one behind.
+# MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
   $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
@@ -107,9 +91,8 @@ endif
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(WORK_DIR)/tc_vars.mk
 
-# Bootstrap (heavy, cookie-guarded) only when no explicit build goal and the toolchain is
-# not extracted. The condition is now the extracted $(TC_TARGET) rather than a generated
-# file, the toolchain having stopped generating any. The cookie only traces who triggered.
+# Keyed on the extracted $(TC_TARGET), the toolchain no longer generating a file to
+# look for. The cookie traces who paid for it; it guards nothing.
 ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
 ifeq ($(wildcard $(TC_WORK_DIR)/$(TC_TARGET)),)
   $(info ===> Bootstrapping toolchain for $(ARCH)-$(TCVERSION) (stage0))
