@@ -28,10 +28,9 @@ set -o pipefail
 # Configuration — update these lists when versions are added or removed
 # ===========================================================================
 
-# ffmpeg versions to manage build order for
+# Meta package versions, recognised so a DSM-restricted meta is not held out of
+# the standard builds (see section 2).
 ffmpeg_versions=(5 6 7 8)
-
-# python minor versions to manage build order for
 python_versions=(311 312 314)
 
 # DSM versions above the default builds (6.2.4, 7.1) that require special handling.
