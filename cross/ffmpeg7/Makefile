@@ -15,7 +15,13 @@ MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
-CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
+
+# Every tool named, rather than derived from --cross-prefix, so each follows whichever
+# overlay provides it. as, ld and dep_cc come from cc; --pkg-config is set below.
+CONFIGURE_ARGS += --cc=$(call tc,gcc) --cxx=$(call tc,g++)
+CONFIGURE_ARGS += --ar=$(call tc,ar) --nm=$(call tc,nm)
+CONFIGURE_ARGS += --ranlib=$(call tc,ranlib) --strip=$(call tc,strip)
 
 # The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
 # toolchains ship no such header. Was disabled for qoriq by name.
@@ -23,7 +29,6 @@ ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
 CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
-CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3

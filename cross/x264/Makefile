@@ -22,7 +22,10 @@ CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --disable-opencl
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --cross-prefix=$(TC_PATH)$(TC_PREFIX)
+# x264 reads every tool from the environment -- CC="${CC-${cross_prefix}gcc}" -- so each
+# follows whichever overlay provides it, and no --cross-prefix is needed.
+ENV += CC=$(call tc,gcc) AR=$(call tc,ar) NM=$(call tc,nm)
+ENV += RANLIB=$(call tc,ranlib) STRIP=$(call tc,strip)
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -38,7 +41,7 @@ CONFIGURE_ARGS += --host=aarch64-linux
 # .s is raw assembly passed to as
 # .S is assembly which expects to be preprocessed by a cpp then fed to assembler
 # More info: https://code.videolan.org/videolan/x264/-/issues/61
-ENV += AS=$(abspath $(PWD)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+ENV += AS=$(call tc,gcc)
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))

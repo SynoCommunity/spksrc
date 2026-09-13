@@ -13,7 +13,13 @@ LICENSE  = GPLv2
 # that only need AAC decoding. It avoids the heavy video codec and hardware
 # acceleration dependencies of the full ffmpeg6 package.
 
-CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
+
+# Every tool named, rather than derived from --cross-prefix, so each follows whichever
+# overlay provides it. as, ld and dep_cc come from cc; --pkg-config is set below.
+CONFIGURE_ARGS += --cc=$(call tc,gcc) --cxx=$(call tc,g++)
+CONFIGURE_ARGS += --ar=$(call tc,ar) --nm=$(call tc,nm)
+CONFIGURE_ARGS += --ranlib=$(call tc,ranlib) --strip=$(call tc,strip)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
