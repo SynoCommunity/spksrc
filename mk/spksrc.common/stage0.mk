@@ -47,12 +47,11 @@
 # │                                       the REAL bootstrap when a goal │
 # │                                       on the command line skipped it │
 # │   make WORK_DIR=<pkg work dir> \                                     │
-# │        -C toolchain/<TC> tcvars    -> the FULL tc_vars* set, and it  │
-# │                                       REWRITES stage0's tc_vars.mk   │
-# │                                       (tcvars_regenerate): overlay   │
-# │                                       switches are unknown at parse, │
-# │                                       and the rest needs recipe ENV  │
-# │                                       (INSTALL_PREFIX)               │
+# │        -C toolchain/<TC> tcvars    -> the six OTHER tc_vars* files;  │
+# │                                       they embed INSTALL_PREFIX,     │
+# │                                       recipe ENV stage0 cannot see.  │
+# │                                       tc_vars.mk is already correct  │
+# │                                       and left as stage0 wrote it.   │
 # └──────────────────────────────────────────────────────────────────────┘
 #
 # WORK_DIR is the ROOT's, not the package's: depend.mk passes it through
@@ -81,11 +80,12 @@ ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 # definitions: TC_WORK_DIR is `?=` there and would hold our bogus syno--/work.
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
-# Unconditional and ahead of pre-check, so a refused arch still leaves one behind.
+# Unconditional and ahead of pre-check, so a refused arch still leaves one behind. The
+# overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
-  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) OVERLAY_BINUTILS=$(OVERLAY_BINUTILS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
 endif
 
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
