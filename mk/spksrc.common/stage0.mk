@@ -22,8 +22,10 @@
 # │        ▼                                                             │
 # │   DEPENDS parse evaluates version_ge($(TC_GCC),...) correctly        │
 # │                                                                      │
-# │ 2. TOOLCHAIN, almost never: only a cold tree with no goal named.     │
-# │    Step 1 does not lead here -- the two are independent.             │
+# │ 2. TOOLCHAIN, once per arch: the first build for it in a fresh tree, │
+# │    then never again. Step 1 does not lead here, the two are          │
+# │    independent -- and a goal named on the command line skips this,   │
+# │    stage1 doing the real bootstrap in that case.                     │
 # │                                                                      │
 # │   no explicit goal AND <TC work dir>/<TC_TARGET> missing?            │
 # │        ▼                                                             │
