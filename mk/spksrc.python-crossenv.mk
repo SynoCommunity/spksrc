@@ -168,17 +168,17 @@ build_crossenv_target: pre_crossenv_target
 	mkdir -p $(PYTHON_LIB_CROSS) ; \
 	cp -RL $(HOSTPYTHON_LIB_NATIVE) $(abspath $(PYTHON_LIB_CROSS)/../) ; \
 	echo $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
-	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
-	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
-	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
+	                        --cc $(call tc,gcc) \
+	                        --cxx $(call tc,c++) \
+	                        --ar $(call tc,ar) \
 	                        --sysroot $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \
 	                        "$(CROSSENV_PATH)" ; \
 	$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
-	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
-	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
-	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
+	                        --cc $(call tc,gcc) \
+	                        --cxx $(call tc,c++) \
+	                        --ar $(call tc,ar) \
 	                        --sysroot $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \

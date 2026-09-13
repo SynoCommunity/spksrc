@@ -60,7 +60,7 @@ CONFIGURE_ARGS += --disable-static
 
 # Disable parallel build (SQL file generation race conditions)
 # Override CC since PGXS hardcodes gcc
-COMPILE_ARGS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
+COMPILE_ARGS = -j1 CC="$(call tc,gcc)"
 POST_INSTALL_TARGET = postgis_post_install
 
 include ../../mk/spksrc.cross-cc.mk
@@ -82,7 +82,7 @@ $(PG_CONFIG):
 	@printf '  --docdir|--htmldir) echo "$(INSTALL_PREFIX)/share/doc" ;;\n' >> $@
 	@printf '  --mandir) echo "$(INSTALL_PREFIX)/share/man" ;;\n' >> $@
 	@printf '  --locale) echo "$(INSTALL_PREFIX)/share/locale" ;;\n' >> $@
-	@printf '  --cc) echo "$(TC_PATH)$(TC_PREFIX)gcc" ;;\n' >> $@
+	@printf '  --cc) echo "$(call tc,gcc)" ;;\n' >> $@
 	@printf '  --cflags) echo "$(CFLAGS)" ;;\n' >> $@
 	@printf '  *) echo "pg_config-not-implemented$$1" ;;\n' >> $@
 	@printf 'esac\n' >> $@

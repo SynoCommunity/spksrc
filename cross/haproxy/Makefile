@@ -28,7 +28,7 @@ BUILD_OPTIONS += SSL_INC=$(SSL_INC) SSL_LIB=$(SSL_LIB)
 # Use linux-glibc-legacy target for older glibc compatibility (DSM 7.1 has glibc 2.26)
 # Pass explicit CC and LD for cross-compilation
 COMPILE_ARGS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
-COMPILE_ARGS += CC=$(TC_PATH)$(TC_PREFIX)gcc LD=$(TC_PATH)$(TC_PREFIX)gcc
+COMPILE_ARGS += CC=$(call tc,gcc) LD=$(call tc,gcc)
 COMPILE_ARGS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk

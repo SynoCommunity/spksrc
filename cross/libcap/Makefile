@@ -28,7 +28,7 @@ libcap_compile:
 	@$(MSG) Build _makenames for host
 	@$(RUN) make -C libcap empty _makenames
 	@$(MSG) Build libcap for $(ARCH)
-	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)gcc -C libcap
+	@$(RUN) make CC=$(call tc,gcc) -C libcap
 
 # install libs only
 # and force install in /lib rather than /lib64 for x86_64
