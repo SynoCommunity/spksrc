@@ -127,7 +127,9 @@ If you only read one thing, read this. The details are in the dated log below.
       `synocli-videodriver-tools` leaves `SPK_DEPENDS`, and `cross/ffmpeg4-8` configure
       without `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan
       set and `--enable-libplacebo`. Anything else (`--enable-v4l2-m2m`) is untouched.
-      Undeclared or `0` builds as before, which is what a local tree does.
+      Undeclared or `0` builds as before, which is what a local tree does; `make setup`
+      writes it commented into `local.mk`, below the overlay switches and reading the
+      same way -- command line > environment > `local.mk` > the default.
     - **Who sets it.** Only the automatic CI runs (`push`, `pull_request`), and only when
       change detection did not already name `synocli-videodriver` or its tools package --
       a change under `cross/libva`, `cross/mesa` or any other videodriver dependency
@@ -185,6 +187,9 @@ If you only read one thing, read this. The details are in the dated log below.
       its `ffmpeg_versions` / `python_versions` arrays and never read it: the per-package
       clean it shielded those artifacts from is gone, the runners having grown enough disk
       this year to hold every work dir for a whole run. All three are removed.
+      a full run on the injected `python314`. Such a run now builds nothing. The exemption
+      that kept an injected meta in the standard builds goes with it: every list now holds
+      only what declares that `REQUIRED_MIN_DSM` itself, and none of them may be exempt.
 
 ---
 

@@ -28,11 +28,6 @@ set -o pipefail
 # Configuration — update these lists when versions are added or removed
 # ===========================================================================
 
-# Meta package versions, recognised so a DSM-restricted meta is not held out of
-# the standard builds (see section 2).
-ffmpeg_versions=(5 6 7 8)
-python_versions=(311 312 314)
-
 # DSM versions above the default builds (6.2.4, 7.1) that require special handling.
 # Packages declaring REQUIRED_MIN_DSM equal to one of these will only be built
 # for the corresponding toolchain, not for the standard ones.
@@ -172,31 +167,17 @@ for version in "${min_dsm_versions[@]}"; do
     declare "${has_noarch_var}=$([ -n "${noarch_list}" ] && echo 'true' || echo 'false')"
 done
 
-# Build the combined list of all DSM-restricted non-meta packages for exclusion
-# from standard builds. Meta-packages are intentionally kept in standard builds
-# since other standard packages may depend on them.
+# Build the combined list of all DSM-restricted packages for exclusion from the
+# standard builds. Each list holds what declares that REQUIRED_MIN_DSM itself, and
+# nothing may be exempt: a package that refuses DSM 7.1 cannot build there.
 all_min_dsm_packages=
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    arch_var="arch_min_dsm${v}_packages"
-    noarch_var="noarch_min_dsm${v}_packages"
-    eval "arch_pkgs=\$${arch_var}"
-    eval "noarch_pkgs=\$${noarch_var}"
+    eval "arch_pkgs=\$arch_min_dsm${v}_packages"
+    eval "noarch_pkgs=\$noarch_min_dsm${v}_packages"
     for pkg in ${arch_pkgs} ${noarch_pkgs}; do
-        # Keep meta-packages in standard builds — only exclude applicative packages.
-        # A package is a meta if its name matches python*, ffmpeg* or synocli-videodriver.
-        is_meta=false
-        [ "${pkg}" = "synocli-videodriver" ] && is_meta=true
-        for i in "${ffmpeg_versions[@]}"; do
-            [ "${pkg}" = "ffmpeg${i}" ] && is_meta=true && break
-        done
-        for py_ver in "${python_versions[@]}"; do
-            [ "${pkg}" = "python${py_ver}" ] && is_meta=true && break
-        done
-        if [ "${is_meta}" = "false" ]; then
-            if ! echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${pkg}"; then
-                all_min_dsm_packages+="${pkg} "
-            fi
+        if ! echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${pkg}"; then
+            all_min_dsm_packages+="${pkg} "
         fi
     done
 done
