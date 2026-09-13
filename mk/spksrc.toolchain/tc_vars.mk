@@ -122,6 +122,11 @@ generate_tc_vars_mk: $(foreach m,$(TC_VAR_MAPPING_MK),$(WORK_DIR)/$(word 2,$(sub
 .PHONY: generate_tc_vars_other
 generate_tc_vars_other: $(foreach m,$(TC_VAR_MAPPING_OTHER),$(WORK_DIR)/$(word 2,$(subst :, ,$(m))))
 
+# Toolchain identity alone (TC_GCC, TC_TARGET, ...), the one file free of INSTALL_PREFIX and
+# thus generatable from stage0's parse; the rest needs the recipe environment.
+.PHONY: tcvars-identity
+tcvars-identity: $(TC_VARS_MK)
+
 #####
 
 .PHONY: $(PRE_TCVARS_TARGET) $(TCVARS_TARGET) $(POST_TCVARS_TARGET)

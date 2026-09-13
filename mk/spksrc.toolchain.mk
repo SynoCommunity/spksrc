@@ -220,7 +220,9 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status rustup-rustc depend tcvars
+# No tcvars: the generated files belong to the build tree that asked for them, in its own
+# work dir, never to the toolchain shared by every tree (spksrc.common/stage0.mk).
+_all: status rustup-rustc depend
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

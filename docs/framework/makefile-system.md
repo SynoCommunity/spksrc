@@ -54,7 +54,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.toolchain.mk` | Toolchain build and tc_vars generation |
+| `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
 | `spksrc.toolkit.mk` | Toolkit management |
 
 ### Build System Adapters

@@ -14,12 +14,7 @@ toolchain/
 │   ├── Makefile
 │   ├── digests
 │   └── work/
-│       ├── x86_64-pc-linux-gnu/    # Extracted toolchain
-│       ├── tc_vars.mk              # Generated variables
-│       ├── tc_vars.autotools.mk
-│       ├── tc_vars.flags.mk
-│       ├── tc_vars.cmake
-│       └── tc_vars.meson-*
+│       └── x86_64-pc-linux-gnu/    # Extracted toolchain (nothing else)
 ├── syno-aarch64-7.2/
 ├── syno-armv7-7.2/
 └── ...
@@ -113,7 +108,20 @@ toolchain's own runtime and are present on every target that has them.
 
 ## tc_vars Files
 
-The toolchain build generates several `tc_vars*.mk` files that configure cross-compilation:
+Several `tc_vars*.mk` files configure cross-compilation. They are generated into the **work
+directory of the build tree that asked for them** — never into the toolchain, which is shared by
+every tree and could only ever hold one tree's answer:
+
+```
+cross/libpng/work-x64-7.1/tc_vars.mk    # libpng AND the zlib it pulls in read this one
+```
+
+`WORK_DIR` carries that: `depend.mk` hands the root's value down through `$(ENV)`, and
+`directories.mk` keeps what it is given (`ifndef`), so a dependency builds inside the root's work
+directory. The `env -i` around an spk meta source is where one tree ends and the next begins.
+
+Two builds may therefore run side by side against the same toolchain — two SPKs, or a cross
+package built directly to test it — each with its own answer and no file to contend for.
 
 ### tc_vars.mk
 
@@ -244,7 +252,8 @@ The toolchain build follows this process:
 3. **Extract** - Unpacks to `work/` directory
 4. **Normalize** - Applies patches for compatibility
 5. **Rust** - Installs Rust toolchain components if needed
-6. **tcvars** - Generates tc_vars*.mk files
+
+The toolchain does not generate `tc_vars*`; the build tree does, into its own work directory.
 
 ## Caching
 
@@ -344,11 +353,12 @@ grep TC_DIST_NAME toolchain/syno-x64-7.2/Makefile
 
 ### tc_vars Not Generated
 
-Remove the tcvars cookie and rebuild:
+They belong to the build tree, so remove them there and rebuild the package:
 ```bash
-rm toolchain/syno-x64-7.2/work/.tcvars_done
-make -C toolchain/syno-x64-7.2 tcvars
+rm -f cross/<package>/work-x64-7.2/tc_vars* cross/<package>/work-x64-7.2/.stage1-tcvars_done
+make -C cross/<package> arch-x64-7.2
 ```
+`stage0` rewrites `tc_vars.mk` alone at parse time; `stage1` rewrites the whole set.
 
 ### Cross-Compiler Not Found
 
