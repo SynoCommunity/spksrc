@@ -42,6 +42,11 @@ If you only read one thing, read this. The details are in the dated log below.
     instead of stopping at the first. See
     [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
 
+- **Ask the toolchain for a tool.** `$(call tc,gcc)`, `$(call tc,ar)` — the absolute
+  path of a cross tool, following whichever overlay provides it. Never write
+  `$(TC_PATH)$(TC_PREFIX)gcc`: it silently resolves to the vendor compiler as soon as an
+  overlay is active. See [Macros](../reference/macros.md#toolchain-tools).
+
 - **Declare what a package needs, not where it fails.** Instead of
   hand-maintaining an `UNSUPPORTED_ARCHS` list, state the capability floor:
   **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`MIN_RUSTC_VERSION`**,
@@ -109,6 +114,49 @@ If you only read one thing, read this. The details are in the dated log below.
   generalises: a component shipped **beside** a base toolchain is an *overlay*, switched
   with **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`** from `local.mk`, and `make help`
   shows which are active for your arch.
+
+---
+
+??? note "September 13th 2026 — Ask the toolchain for a tool, never spell its path (2 PRs)"
+    A package that needs a compiler or a binutils tool by *path* used to write
+    `$(TC_PATH)$(TC_PREFIX)gcc`. That is right only while the toolchain is the vendor one:
+    an overlay lives somewhere else entirely (`<consumer>/work/install/usr/local/bin`
+    against `<work>/<target>/bin`) and its gcc family carries a version suffix, so the
+    hand-built path silently keeps resolving to the vendor tool with an overlay active --
+    no error, just the wrong compiler. `$(call tc,<tool>)` answers the question instead.
+
+    ??? note "`$(call tc,<tool>)`, and the packages that spelled paths (#7441)"
+        - **The macro** takes a tool name and returns its absolute path, through
+          `TC_OVERLAY_GCC_PATH` for the gcc family (`gcc` `g++` `c++` `cpp` `gfortran`,
+          plus `TC_GCC_SUFFIX`), through `TC_OVERLAY_BINUTILS_PATH` for binutils
+          (`ld` `as` `ar` `nm` `ranlib` `strip` `objdump` `objcopy` `readelf`), and
+          through `TC_PATH` for anything else. `TC_OVERLAY_<c>_PATH` is empty unless that
+          overlay is *active*, so a call is already correct with no overlay and stays
+          correct when one is grafted on -- nothing to revisit in the package.
+        - **`TC_OVERLAY_GCC_PATH` is emitted too**, empty today since no gcc overlay
+          exists yet. The contract is whole, so switching one on needs no change here.
+        - **Converted**: `cross/fish`, `haproxy`, `libcap`, `libcap_2.51`, `lua`,
+          `lua-5.3`, `lzip`, `lzlib`, `pgvector`, `plzip`, `postgis`, `unzip`, and the
+          `meson` crossfile and python-crossenv generators.
+        - Documented under [Macros](../reference/macros.md#toolchain-tools).
+        - Pull request: [#7441](https://github.com/SynoCommunity/spksrc/pull/7441)
+
+    ??? note "ffmpeg and x264: name every tool instead of deriving it (#7454)"
+        `--cross-prefix` was ffmpeg's single answer for nine tools, and it derives them by
+        string concatenation -- precisely the hand-built path the macro exists to replace.
+        - **Every tool is named**: `--cc`, `--cxx`, `--ar`, `--nm`, `--ranlib`, `--strip`,
+          each `$(call tc,...)`, so each follows whichever overlay provides it. `as`, `ld`
+          and `dep_cc` still default from `cc` inside configure, which is what we want;
+          `--enable-cross-compile`, which `--cross-prefix` used to imply, is now stated
+          and leads the block; `--ranlib` no longer goes through `$(RANLIB)`.
+        - **The x86 assembler is not `as`.** `--x86asmexe=nasm` on the i686/x64 families
+          is unchanged and stays a plain name: that nasm is a *native* tool, not a cross
+          one, so it is deliberately not a `$(call tc,...)`.
+        - **x264** takes `CC` from the environment (`CC="${CC-${cross_prefix}gcc}"`), so
+          naming it there is enough.
+        - One switch per `CONFIGURE_ARGS` line throughout the tool block, so a diff shows
+          which tool changed.
+        - Pull request: [#7454](https://github.com/SynoCommunity/spksrc/pull/7454)
 
 ---
 

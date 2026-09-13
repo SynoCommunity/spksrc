@@ -25,6 +25,11 @@ CC           # Cross-compiler (gcc)
 CXX          # Cross-compiler (g++)
 ```
 
+Where a build system ignores `CC`/`CXX`/`AR` from the environment and wants a tool path of
+its own, ask for it with [`$(call tc,<tool>)`](../../reference/macros.md#toolchain-tools)
+rather than writing `$(TC_PATH)$(TC_PREFIX)gcc`: the macro follows whichever overlay
+provides that tool.
+
 ## Configure Scripts
 
 ```makefile
