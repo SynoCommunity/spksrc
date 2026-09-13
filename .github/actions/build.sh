@@ -20,8 +20,8 @@
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
 # - Packages in PACKAGES_TO_KEEP are not fully cleaned so dependents can reuse
 #   their artifacts (shared libs, python wheels, etc.).
-# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7.
-# - Therefore ffmpeg and python are built before their dependents (see prepare.sh).
+# - Meta packages (ffmpeg, python, synocli-videodriver) are not listed on their own:
+#   each dependent builds the one it declares through BUILD_DEPENDS.
 
 set -o pipefail
 
