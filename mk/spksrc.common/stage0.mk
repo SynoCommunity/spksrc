@@ -8,26 +8,29 @@
 # spk/ packages.
 #
 # ┌──────────────────────────────────────────────────────────────────────┐
-# │ stage0  (PARSE time, this file)                                      │
+# │ stage0  (PARSE time, this file) -- two steps, guarded separately     │
+# │                                                                      │
+# │ 1. IDENTITY, every parse. Witness: the file itself.                  │
 # │                                                                      │
 # │   <pkg work dir>/tc_vars.mk missing?                                 │
-# │        │                                                             │
 # │        ▼                                                             │
 # │   make WORK_DIR=<pkg work dir> -C toolchain/<TC> tcvars-identity     │
-# │        └─ writes <pkg work dir>/tc_vars.mk  (identity only; needs    │
-# │           no extracted toolchain -- all constants of its Makefile)   │
-# │        │                                                             │
+# │        └─ writes <pkg work dir>/tc_vars.mk. Needs NO extracted       │
+# │           toolchain: every value is a constant of its Makefile       │
 # │        ▼                                                             │
 # │   -include <pkg work dir>/tc_vars.mk  ->  TC_GCC, TC_VERS, ...       │
-# │        │                                                             │
 # │        ▼                                                             │
 # │   DEPENDS parse evaluates version_ge($(TC_GCC),...) correctly        │
-# │        │                                                             │
-# │        ▼                                                             │
+# │                                                                      │
+# │ 2. TOOLCHAIN, almost never: only a cold tree with no goal named.     │
+# │    Step 1 does not lead here -- the two are independent.             │
+# │                                                                      │
 # │   no explicit goal AND <TC work dir>/<TC_TARGET> missing?            │
+# │        ▼                                                             │
 # │   make WORK_DIR=<TC work dir> -C toolchain/<TC> toolchain            │
 # │        └─ download / extract / patch / rust  (cookie-guarded)        │
-# │   touch $(WORK_DIR)/.stage0-bootstrap_done   (trace: who triggered)  │
+# │        └─ on success only: touch <pkg work dir>/.stage0-bootstrap_   │
+# │           done, tracing WHICH package paid for the extraction        │
 # └──────────────────────────────────────────────────────────────────────┘
 #                                  │
 #                                  ▼  (recipes run after parse)
