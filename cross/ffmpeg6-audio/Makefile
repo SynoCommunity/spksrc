@@ -17,6 +17,7 @@ CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
 
 # Every tool named, rather than derived from --cross-prefix, so each follows whichever
 # overlay provides it. as, ld and dep_cc come from cc; --pkg-config is set below.
+CONFIGURE_ARGS += --enable-cross-compile
 CONFIGURE_ARGS += --cc=$(call tc,gcc)
 CONFIGURE_ARGS += --cxx=$(call tc,g++)
 CONFIGURE_ARGS += --ar=$(call tc,ar)
@@ -24,9 +25,11 @@ CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
-CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
+CONFIGURE_ARGS += --enable-rpath
+CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --enable-shared
-CONFIGURE_ARGS += --enable-gpl --enable-version3
+CONFIGURE_ARGS += --enable-gpl
+CONFIGURE_ARGS += --enable-version3
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 CONFIGURE_ARGS += --disable-debug
@@ -92,7 +95,8 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 # Enable NEON on ARMv8 - required to compile the assembly that the init code references
-CONFIGURE_ARGS += --enable-neon --enable-thumb
+CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
@@ -109,12 +113,14 @@ ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
 else
-CONFIGURE_ARGS += --cpu=e500 --disable-altivec
+CONFIGURE_ARGS += --cpu=e500
+CONFIGURE_ARGS += --disable-altivec
 endif
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-CONFIGURE_ARGS += --arch=x86 --cpu=atom
+CONFIGURE_ARGS += --arch=x86
+CONFIGURE_ARGS += --cpu=atom
 endif
 
 include ../../mk/spksrc.cross-cc.mk

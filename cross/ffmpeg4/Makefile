@@ -16,6 +16,7 @@ CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
 
 # Every tool named, rather than derived from --cross-prefix, so each follows whichever
 # overlay provides it. as, ld and dep_cc come from cc; --pkg-config is set below.
+CONFIGURE_ARGS += --enable-cross-compile
 CONFIGURE_ARGS += --cc=$(call tc,gcc)
 CONFIGURE_ARGS += --cxx=$(call tc,g++)
 CONFIGURE_ARGS += --ar=$(call tc,ar)
@@ -23,14 +24,20 @@ CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
-CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
+CONFIGURE_ARGS += --enable-rpath
+CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --enable-shared
-CONFIGURE_ARGS += --enable-gpl --enable-version3
+CONFIGURE_ARGS += --enable-gpl
+CONFIGURE_ARGS += --enable-version3
 CONFIGURE_ARGS += --enable-avresample
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
+  CONFIGURE_ARGS += --enable-debug=3
+  CONFIGURE_ARGS += --disable-stripping
+  CONFIGURE_ARGS += --assert-level=2
+  CONFIGURE_ARGS += --enable-ftrapv
+  CONFIGURE_ARGS += --disable-optimizations
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
@@ -50,7 +57,8 @@ CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WO
 # Dropping the two fifo muxers costs those archs nothing else.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 ifeq ($(call version_lt,$(TC_GCC),4.9),1)
-CONFIGURE_ARGS += --disable-muxer=fifo --disable-muxer=fifo_test
+CONFIGURE_ARGS += --disable-muxer=fifo
+CONFIGURE_ARGS += --disable-muxer=fifo_test
 endif
 endif
 
@@ -147,7 +155,8 @@ DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
 DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+CONFIGURE_ARGS += --enable-libopencore-amrnb
+CONFIGURE_ARGS += --enable-libopencore-amrwb
 
 DEPENDS += cross/openjpeg
 CONFIGURE_ARGS += --enable-libopenjpeg
@@ -226,7 +235,8 @@ CONFIGURE_ARGS += --enable-libx265
 endif
 
 DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-libxml2 --enable-demuxer=dash
+CONFIGURE_ARGS += --enable-libxml2
+CONFIGURE_ARGS += --enable-demuxer=dash
 
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS += cross/libzimg
@@ -248,7 +258,8 @@ CONFIGURE_ARGS += --enable-libzvbi
 # See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
 #
 DEPENDS += cross/fdk-aac
-CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
+CONFIGURE_ARGS += --enable-libfdk-aac
+CONFIGURE_ARGS += --enable-nonfree
 
 ##
 ## ARCH SPECIFIC
@@ -315,7 +326,8 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 # Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548,
 # and neither core has AltiVec. The e500 branch stood for "not qoriq", an era not a core.
-CONFIGURE_ARGS += --cpu=e500v2 --disable-altivec
+CONFIGURE_ARGS += --cpu=e500v2
+CONFIGURE_ARGS += --disable-altivec
 # libatomic arrived with gcc 4.8; ppc853x's 4.3.7 ships none, and asking for it there
 # fails the link outright.
 ifeq ($(call version_ge,$(TC_GCC),4.8),1)
