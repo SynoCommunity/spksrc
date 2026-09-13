@@ -117,7 +117,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 13th 2026 — Hardware acceleration is opt-out with `VIDEODRV_SKIP` (#PRNUM)"
+??? note "September 13th 2026 — Hardware acceleration is opt-out with `VIDEODRV_SKIP` (#7455)"
     - **The cost.** `synocli-videodriver` is the heaviest build in the tree -- mesa, the
       Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes
       almost never. Every automatic run that touched an ffmpeg consumer paid for it
