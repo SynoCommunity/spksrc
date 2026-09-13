@@ -34,4 +34,7 @@ filestash_pre_compile:
 	# Upstream CI builds with CGO_ENABLED=0 (env-go.mk default); use the
 	# pure-Go image plugin like they do (see Jenkinsfile)
 	@cd $(WORK_DIR)/$(PKG_DIR) && sed -i 's|plg_image_c|plg_image_golang|' server/plugin/index.go
-	@cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) go generate ./server/...
+	# go generate builds AND runs a host tool: clear the cross GOOS/GOARCH
+	# (empty falls back to the build host), or the arm64 binary fails with
+	# "exec format error" on non-arm64 hosts
+	@cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) GOOS= GOARCH= GOARM= go generate ./server/...
