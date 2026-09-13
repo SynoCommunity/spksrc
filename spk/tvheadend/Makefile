@@ -21,6 +21,7 @@ STARTABLE = yes
 CHANGELOG  = "1. Update to latest git version 5ce3ff63 of September 11th 2026<br/>"
 CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding \(TVH-\#2117\)<br/>"
 CHANGELOG += "3. Experimental Record from Cache using Timeshift \(TVH-\#2249\)<br/>"
+CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/
@@ -60,8 +61,16 @@ WHEELS += src/requirements-pure.txt
 export TVH_VERS
 
 POST_SERVICE_TARGET = tvh_post_service
+POST_STRIP_TARGET = tvh_extra_install
 
 include ../../mk/spksrc.spk-meta.mk
+
+# Post-remove command deleting the comskip and scene marker files left next
+# to a removed recording
+.PHONY: tvh_extra_install
+tvh_extra_install:
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 src/tv_postremove_cleanup.sh $(STAGING_DIR)/bin/tv_postremove_cleanup.sh
 
 .PHONY: tvh_post_service
 tvh_post_service:
