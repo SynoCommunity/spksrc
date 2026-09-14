@@ -33,6 +33,39 @@ ADDITIONAL_CFLAGS += -std=gnu99
 endif
 ```
 
+## Toolchain tools
+
+`$(call tc,<tool>)` is the absolute path of a cross tool. Use it instead of assembling
+`$(TC_PATH)$(TC_PREFIX)<tool>` by hand: an overlay toolchain lives somewhere else entirely
+(`<consumer>/work/install/usr/local/bin`, against the base toolchain's
+`<work>/<target>/bin`) and its gcc family carries a version suffix there, so a
+hand-built path silently resolves to the **vendor** tool the moment an overlay is active.
+
+| Tool family | Resolved through | Tools |
+|-------------|------------------|-------|
+| gcc | `TC_OVERLAY_GCC_PATH`, else `TC_PATH` (plus `TC_GCC_SUFFIX`) | `gcc` `g++` `c++` `cpp` `gfortran` |
+| binutils | `TC_OVERLAY_BINUTILS_PATH`, else `TC_PATH` | `ld` `as` `ar` `nm` `ranlib` `strip` `objdump` `objcopy` `readelf` |
+| anything else | `TC_PATH` | — |
+
+`TC_OVERLAY_<c>_PATH` is empty unless that overlay is *active* for the build (see
+[Overlay switches](../framework/toolchain.md#overlay-switches)), so the call is already
+correct with no overlay and stays correct when one is grafted on — nothing to revisit in
+the package.
+
+```makefile
+# ffmpeg takes its tools from the command line, not from CC/AR in the environment
+CONFIGURE_ARGS += --cc=$(call tc,gcc)
+CONFIGURE_ARGS += --ar=$(call tc,ar)
+
+# a plain make line that would otherwise ignore the environment
+COMPILE_ARGS = CC=$(call tc,gcc) AR=$(call tc,ar)
+```
+
+!!! tip "Most packages need nothing"
+    Autotools, CMake and Meson builds already receive `CC`, `CXX`, `AR`… through the
+    environment, overlay-aware. Reach for `$(call tc,...)` only where a build system
+    ignores that and takes a tool path of its own.
+
 ## List helpers
 
 | Macro | Purpose |

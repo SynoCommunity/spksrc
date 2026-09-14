@@ -15,16 +15,31 @@ MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
-CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
+
+# Every tool named, rather than derived from --cross-prefix, so each follows whichever
+# overlay provides it. as, ld and dep_cc come from cc; --pkg-config is set below.
+CONFIGURE_ARGS += --enable-cross-compile
+CONFIGURE_ARGS += --cc=$(call tc,gcc)
+CONFIGURE_ARGS += --cxx=$(call tc,g++)
+CONFIGURE_ARGS += --ar=$(call tc,ar)
+CONFIGURE_ARGS += --nm=$(call tc,nm)
+CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
+CONFIGURE_ARGS += --strip=$(call tc,strip)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
-CONFIGURE_ARGS += --ranlib=$(RANLIB)
-CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
+CONFIGURE_ARGS += --enable-rpath
+CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --enable-shared
-CONFIGURE_ARGS += --enable-gpl --enable-version3
+CONFIGURE_ARGS += --enable-gpl
+CONFIGURE_ARGS += --enable-version3
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
+  CONFIGURE_ARGS += --enable-debug=3
+  CONFIGURE_ARGS += --disable-stripping
+  CONFIGURE_ARGS += --assert-level=2
+  CONFIGURE_ARGS += --enable-ftrapv
+  CONFIGURE_ARGS += --disable-optimizations
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
@@ -111,7 +126,8 @@ DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
 DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+CONFIGURE_ARGS += --enable-libopencore-amrnb
+CONFIGURE_ARGS += --enable-libopencore-amrwb
 
 DEPENDS += cross/openjpeg
 CONFIGURE_ARGS += --enable-libopenjpeg
@@ -173,7 +189,8 @@ DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 
 DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-libxml2 --enable-demuxer=dash
+CONFIGURE_ARGS += --enable-libxml2
+CONFIGURE_ARGS += --enable-demuxer=dash
 
 DEPENDS += cross/libzimg
 CONFIGURE_ARGS += --enable-libzimg
@@ -193,7 +210,8 @@ CONFIGURE_ARGS += --enable-libzvbi
 # See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
 #
 DEPENDS += cross/fdk-aac
-CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
+CONFIGURE_ARGS += --enable-libfdk-aac
+CONFIGURE_ARGS += --enable-nonfree
 
 ##
 ## ARCH SPECIFIC
