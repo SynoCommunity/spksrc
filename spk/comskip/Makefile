@@ -8,8 +8,9 @@ FFMPEG_PACKAGE = ffmpeg8
 # ffmpeg8 needs C11 -- gcc 4.9 or newer
 
 # The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
-# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
-OVERLAY_GCC = 1
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
 
 DEPENDS = cross/comskip
 
