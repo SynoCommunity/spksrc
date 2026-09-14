@@ -20,6 +20,15 @@ LICENSE  = GPLv3
 
 include ../../mk/spksrc.common.mk
 
+OPTIONAL_DEPENDS  = cross/ffmpeg4
+OPTIONAL_DEPENDS += cross/ffmpeg8
+OPTIONAL_DEPENDS += cross/intel-libvpl
+OPTIONAL_DEPENDS += cross/intel-mediasdk
+OPTIONAL_DEPENDS += cross/libva
+OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/x264
+OPTIONAL_DEPENDS += cross/x265
+
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
@@ -79,18 +88,19 @@ CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
 
-# The videodriver meta's libraries, beside the options they answer for: vaapi wants
-# libva >= 0.38, qsv wants libmfx >= 1.28 from intel-mediasdk (or oneVPL >= 2.0).
-# Asking for either where the meta was not built stops configure dead.
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 
+# qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0
 DEPENDS += cross/intel-mediasdk
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+DEPENDS += cross/intel-libvpl
 CONFIGURE_ARGS += --enable-qsv
-endif
-endif
+endif  # TC_GCC > 5
+endif  # x64
+endif  # VIDEODRV_ON
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
