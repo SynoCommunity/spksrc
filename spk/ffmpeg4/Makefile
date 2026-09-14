@@ -29,13 +29,14 @@ SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
 SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 # The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
-# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
 #
 # Left OFF here on purpose: ffmpeg4 is the one package with no gcc floor, so it is the
 # only one that reaches a toolchain the overlay would otherwise have polluted. Keeping it
 # on the vendor compiler is what proves the stage0 tc_vars fix -- it is the build that
 # used to die on "ld: cannot find -latomic".
-#OVERLAY_GCC = 1
+#OVERLAY_GCC ?= 1
 
 include ../../mk/spksrc.common.mk
 
