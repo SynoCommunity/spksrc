@@ -61,7 +61,7 @@ ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
 
-# ffmpeg8 needs gcc >= 4.9 (its MIN_GCC_VERSION), ffmpeg4 declares no floor at all.
+# ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
 # Keep in step with spk/tvheadend, which picks its FFMPEG_PACKAGE the same way.
 ifeq ($(call version_lt,$(TC_GCC),4.9),1)
 DEPENDS += cross/ffmpeg4
@@ -92,17 +92,26 @@ endif
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
 
+# libvpx needs gcc >= 4.6
+ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+endif
 
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 
+# x264 needs gcc >= 4.6
+ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
+endif
 
+# x265 needs gcc >= 4.8
+ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
+endif
 
 # Enable building of new experimental UI
 BUILD_DEPENDS = native/nodejs_22
