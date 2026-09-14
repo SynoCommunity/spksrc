@@ -18,31 +18,6 @@ LICENSE  = GPLv3
 # ffmpeg needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
-OPTIONAL_DEPENDS += cross/ffmpeg8
-OPTIONAL_DEPENDS += cross/fdk-aac
-OPTIONAL_DEPENDS += cross/fontconfig
-OPTIONAL_DEPENDS += cross/opus
-OPTIONAL_DEPENDS += cross/pcre2
-OPTIONAL_DEPENDS += cross/libtheora
-OPTIONAL_DEPENDS += cross/libvorbis
-OPTIONAL_DEPENDS += cross/libvpx
-OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
-
-# WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
-# with prebuilt ffmpeg this is not a problem
-# without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
-DEPENDS  = cross/pngquant
-
-DEPENDS += cross/openssl3 cross/gnutls
-DEPENDS += cross/uriparser cross/libiconv
-DEPENDS += cross/libdvbcsa cross/dvb-apps
-DEPENDS += cross/libhdhomerun
-
-# curl build needs additional configuration for gnutls and libssh2
-DEPENDS += cross/curl
-export BUILD_CURL_WITH="gnutls libssh2 zstd"
-
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
@@ -51,18 +26,48 @@ CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
-CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
+
+# WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng),
+# so it stays the first dependency named.
+DEPENDS  = cross/pngquant
+CONFIGURE_ARGS += --enable-pngquant
+
+DEPENDS += cross/openssl3 cross/gnutls
+DEPENDS += cross/uriparser cross/libiconv
+
+DEPENDS += cross/libdvbcsa cross/dvb-apps
+CONFIGURE_ARGS += --enable-dvbcsa
+
+DEPENDS += cross/libhdhomerun
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 
-# Enable media libraries incoming from FFMPEG
-CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
-CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
-CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
-CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
-CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
-CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
-CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
+# curl build needs additional configuration for gnutls and libssh2
+DEPENDS += cross/curl
+export BUILD_CURL_WITH="gnutls libssh2 zstd"
+
+# The media libraries and the option that turns each one on, together. Declared outright
+# rather than behind "no FFMPEG_PACKAGE work dir": a meta has already built them and
+# symlinks its status cookies into this work dir, so each is a no-op, not a second build.
+DEPENDS += cross/ffmpeg8
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
+DEPENDS += cross/fdk-aac
+CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
+DEPENDS += cross/opus
+CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
+DEPENDS += cross/libtheora
+CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
+DEPENDS += cross/libvorbis
+CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
+DEPENDS += cross/libvpx
+CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+DEPENDS += cross/x264
+CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
+DEPENDS += cross/x265
+CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
+
+# No option of their own: ffmpeg's libass wants fontconfig, tvheadend probes pcre2 itself.
+DEPENDS += cross/fontconfig
+DEPENDS += cross/pcre2
 
 # Enable building of new experimental UI
 CONFIGURE_ARGS += --enable-vue_build
@@ -80,29 +85,13 @@ ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL
 
 include ../../mk/spksrc.common.mk
 
-# vaapi and qsv are the videodriver meta's libva and MediaSDK; asking for them where it
-# was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
+# libva, and the two options it answers for, are the videodriver meta's: asking for them
+# where it was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-qsv
-endif
-endif
-
-# If libraries through FFMPEG_PACKAGE shared libraries unavailable
-ifeq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
-DEPENDS += cross/ffmpeg8
-DEPENDS += cross/fdk-aac
-DEPENDS += cross/fontconfig
-DEPENDS += cross/opus
-DEPENDS += cross/pcre2
-DEPENDS += cross/libtheora
-DEPENDS += cross/libvorbis
-DEPENDS += cross/libvpx
-DEPENDS += cross/x264
-DEPENDS += cross/x265
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva
 endif
 endif
 
