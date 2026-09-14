@@ -22,66 +22,66 @@ GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
 
+# Options that answer to no dependency of their own
 CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 
-# WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng),
-# so it stays the first dependency named.
+# WARNING: pngquant fails when built after cross/zlib (i.e. cross/libpng), so it stays the
+# first dependency named -- ahead of the alphabetical order everything below follows.
 DEPENDS  = cross/pngquant
 CONFIGURE_ARGS += --enable-pngquant
 
-DEPENDS += cross/openssl3 cross/gnutls
-DEPENDS += cross/uriparser cross/libiconv
-
-DEPENDS += cross/libdvbcsa cross/dvb-apps
-CONFIGURE_ARGS += --enable-dvbcsa
-
-DEPENDS += cross/libhdhomerun
-CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
+# Dependencies with no option of their own: found by probe, or pulled in by another
+DEPENDS += cross/curl
+DEPENDS += cross/fontconfig
+DEPENDS += cross/gnutls
+DEPENDS += cross/libiconv
+DEPENDS += cross/openssl3
+DEPENDS += cross/pcre2
+DEPENDS += cross/uriparser
 
 # curl build needs additional configuration for gnutls and libssh2
-DEPENDS += cross/curl
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
-# The media libraries and the option that turns each one on, together. Declared outright
-# rather than behind "no FFMPEG_PACKAGE work dir": a meta has already built them and
-# symlinks its status cookies into this work dir, so each is a no-op, not a second build.
-DEPENDS += cross/ffmpeg8
-CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
+# Each remaining dependency beside the option it answers for. Declared outright rather
+# than behind "no FFMPEG_PACKAGE work dir": a meta has already built the media libraries
+# and symlinks its status cookies here, so each is a no-op, not a second build.
+DEPENDS += cross/dbus
+CONFIGURE_ARGS += --enable-dbus_1
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
-DEPENDS += cross/opus
-CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
+DEPENDS += cross/ffmpeg8
+CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
+DEPENDS += cross/libdvbcsa cross/dvb-apps
+CONFIGURE_ARGS += --enable-dvbcsa
+DEPENDS += cross/libhdhomerun
+CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+DEPENDS += cross/opus
+CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 
-# No option of their own: ffmpeg's libass wants fontconfig, tvheadend probes pcre2 itself.
-DEPENDS += cross/fontconfig
-DEPENDS += cross/pcre2
-
-# Enable building of new experimental UI
-CONFIGURE_ARGS += --enable-vue_build
-BUILD_DEPENDS = native/nodejs_22
-# Build environment - use native Node.js from spksrc
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
-
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
 #    - include/dbus-1.0/ (public) must precede
 #    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
-DEPENDS += cross/dbus
-CONFIGURE_ARGS += --enable-dbus_1
 ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
 ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
+
+# Enable building of new experimental UI
+BUILD_DEPENDS = native/nodejs_22
+CONFIGURE_ARGS += --enable-vue_build
+# Build environment - use native Node.js from spksrc
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 
 include ../../mk/spksrc.common.mk
 
