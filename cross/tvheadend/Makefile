@@ -113,7 +113,7 @@ DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 endif
 
-# Enable building of new experimental UI
+# Enable building of new UI
 BUILD_DEPENDS = native/nodejs_22
 CONFIGURE_ARGS += --enable-vue_build
 # Build environment - use native Node.js from spksrc
