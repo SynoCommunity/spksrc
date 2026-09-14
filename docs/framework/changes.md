@@ -124,9 +124,10 @@ If you only read one thing, read this. The details are in the dated log below.
       again, because `spk/ffmpeg*` declares `VIDEODRV_PACKAGE` and the meta follows.
     - **`VIDEODRV = 0`** drops the meta and every option that depends on it:
       `META_DEPENDS` is empty, `spk/synocli-videodriver` leaves `BUILD_DEPENDS`,
-      `synocli-videodriver-tools` leaves `SPK_DEPENDS`, and `cross/ffmpeg4-8` configure
-      without `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan
-      set and `--enable-libplacebo`. Anything else (`--enable-v4l2-m2m`) is untouched.
+      `synocli-videodriver-tools` leaves `SPK_DEPENDS`, `cross/ffmpeg4-8` configure without
+      `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan set and
+      `--enable-libplacebo`, and `cross/tvheadend` without `--enable-vaapi`/`--enable-qsv`.
+      Anything else (`--enable-v4l2-m2m`) is untouched.
       Undeclared builds as before, which is what a local tree does; `make setup` writes it
       commented into `local.mk`, below the overlay switches and reading the same way --
       command line > environment > `local.mk` > the default. Unlike them, only an explicit

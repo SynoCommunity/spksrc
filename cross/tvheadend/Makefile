@@ -80,9 +80,13 @@ ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL
 
 include ../../mk/spksrc.common.mk
 
+# vaapi and qsv are the videodriver meta's libva and MediaSDK; asking for them where it
+# was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
+ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-qsv
+endif
 endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable
