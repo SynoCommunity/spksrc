@@ -2,7 +2,10 @@ PKG_NAME = zlib
 PKG_VERS = 1.3.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://zlib.net/fossils
+# Primary: GitHub release CDN (most reliable, byte-identical to upstream).
+# Fallback: canonical fossils archive (permanent for pinned versions).
+PKG_DIST_SITE = https://github.com/madler/zlib/releases/download/v$(PKG_VERS)
+PKG_DIST_MIRRORS = https://zlib.net/fossils
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
