@@ -18,6 +18,8 @@ LICENSE  = GPLv3
 # ffmpeg needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+include ../../mk/spksrc.common.mk
+
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
@@ -34,7 +36,6 @@ DEPENDS  = cross/pngquant
 CONFIGURE_ARGS += --enable-pngquant
 
 # Dependencies with no option of their own: found by probe, or pulled in by another
-DEPENDS += cross/curl
 DEPENDS += cross/fontconfig
 DEPENDS += cross/gnutls
 DEPENDS += cross/libiconv
@@ -42,19 +43,31 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/pcre2
 DEPENDS += cross/uriparser
 
+# Each remaining dependency beside what it answers for. Declared outright rather than
+# behind "no FFMPEG_PACKAGE work dir": a meta has already built the media libraries and
+# symlinks its status cookies here, so each is a no-op, not a second build.
+DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
-# Each remaining dependency beside the option it answers for. Declared outright rather
-# than behind "no FFMPEG_PACKAGE work dir": a meta has already built the media libraries
-# and symlinks its status cookies here, so each is a no-op, not a second build.
 DEPENDS += cross/dbus
 CONFIGURE_ARGS += --enable-dbus_1
+# dbus splits its headers between include/ and lib/dbus-1.0/include/
+#    - include/dbus-1.0/ (public) must precede
+#    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
 
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
 
+# ffmpeg8 needs gcc >= 4.9 (its MIN_GCC_VERSION), ffmpeg4 declares no floor at all.
+# Keep in step with spk/tvheadend, which picks its FFMPEG_PACKAGE the same way.
+ifeq ($(call version_lt,$(TC_GCC),4.9),1)
+DEPENDS += cross/ffmpeg4
+else
 DEPENDS += cross/ffmpeg8
+endif
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
 DEPENDS += cross/libdvbcsa cross/dvb-apps
@@ -65,6 +78,16 @@ CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
+
+# libva, and the two options it answers for, are the videodriver meta's: asking for them
+# where it was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
+ifneq ($(VIDEODRV_ON),)
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+DEPENDS += cross/libva
+CONFIGURE_ARGS += --enable-vaapi
+CONFIGURE_ARGS += --enable-qsv
+endif
+endif
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
@@ -81,29 +104,11 @@ CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 
-# dbus splits its headers between include/ and lib/dbus-1.0/include/
-#    - include/dbus-1.0/ (public) must precede
-#    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
-ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
-ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
-
 # Enable building of new experimental UI
 BUILD_DEPENDS = native/nodejs_22
 CONFIGURE_ARGS += --enable-vue_build
 # Build environment - use native Node.js from spksrc
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
-
-include ../../mk/spksrc.common.mk
-
-# libva, and the two options it answers for, are the videodriver meta's: asking for them
-# where it was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
-ifneq ($(VIDEODRV_ON),)
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva
-CONFIGURE_ARGS += --enable-vaapi
-CONFIGURE_ARGS += --enable-qsv
-endif
-endif
 
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
 CONFIGURE_ARGS += --nowerror

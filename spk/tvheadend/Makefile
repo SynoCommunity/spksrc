@@ -8,13 +8,19 @@ SPK_REV = 50
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
-FFMPEG_PACKAGE = ffmpeg8
-
 # Include common.mk first to get ARCH definitions
 include ../../mk/spksrc.common.mk
 
-# python314 needs gcc >= 4.8 (its MIN_GCC_VERSION); older toolchains use 3.11.
-# Must be set before spksrc.spk-meta.mk, which would otherwise gate the arch out.
+# Both metas follow the toolchain, and must be set before spksrc.spk-meta.mk, which
+# would otherwise gate the arch out. Floors read off the packages themselves:
+#   ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
+#   python314 needs gcc >= 4.8, python311 declares none
+ifeq ($(call version_lt,$(TC_GCC),4.9),1)
+FFMPEG_PACKAGE = ffmpeg4
+else
+FFMPEG_PACKAGE = ffmpeg8
+endif
+
 ifeq ($(call version_lt,$(TC_GCC),4.8),1)
 PYTHON_PACKAGE = python311
 else
