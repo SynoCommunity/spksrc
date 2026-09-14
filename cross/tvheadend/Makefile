@@ -50,24 +50,34 @@ export BUILD_CURL_WITH="gnutls libssh2 zstd"
 # and symlinks its status cookies here, so each is a no-op, not a second build.
 DEPENDS += cross/dbus
 CONFIGURE_ARGS += --enable-dbus_1
+
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
+
 DEPENDS += cross/ffmpeg8
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
+
 DEPENDS += cross/libdvbcsa cross/dvb-apps
 CONFIGURE_ARGS += --enable-dvbcsa
+
 DEPENDS += cross/libhdhomerun
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
+
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
+
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
+
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
+
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
+
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 
