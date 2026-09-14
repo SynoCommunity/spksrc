@@ -21,18 +21,14 @@ OVERLAY_GCC_BIN = $(TC_OVERLAY_GCC)/work/install/usr/local/bin
 # Which gcc a build uses. The suffix tc_vars appends to the gcc-family drivers only
 # (cc/cxx/cpp/fc); binutils tools keep their plain names.
 #
-# Discovered by wildcard rather than declared, so a future gcc-12 overlay needs no change
-# here -- OVERLAY_GCC_VERS already picked the directory, this just reads what is in it.
+# Read off OVERLAY_GCC_VERS, which already named the consumer directory, rather than
+# probed inside it: stage0 records this into the build's tc_vars.mk at parse time, before
+# anything is extracted, and that file is never rewritten -- a probe would find nothing
+# and leave every $(call tc,gcc) naming a driver the overlay does not ship.
 #
-# Pairing gcc-<v> with a matching g++-<v> is what does the work: an archive ships both
-# gcc-8.5 and gcc-8.5.0 while g++ exists only as g++-8.5, and a stock toolchain ships a
-# versioned gcc alias but never a versioned g++. Pairing leaves exactly one answer.
-#
-# Lazy (=): the bin dir only exists once the consumer has been extracted.
-_OVERLAY_GCC_PREFIX = $(OVERLAY_GCC_BIN)/$(TC_PREFIX)
-_OVERLAY_GCC_FOUND  = $(patsubst $(_OVERLAY_GCC_PREFIX)gcc-%,%,$(wildcard $(_OVERLAY_GCC_PREFIX)gcc-[0-9]*))
-_OVERLAY_GCC_PAIRED = $(foreach v,$(_OVERLAY_GCC_FOUND),$(if $(wildcard $(_OVERLAY_GCC_PREFIX)g++-$(v)),$(v)))
-OVERLAY_GCC_SUFFIX  = $(if $(OVERLAY_GCC_ON),$(if $(_OVERLAY_GCC_PAIRED),-$(firstword $(_OVERLAY_GCC_PAIRED))))
+# The archive names its drivers for that same version (gcc-8.5, g++-8.5). It also ships a
+# gcc-8.5.0 alias with no g++ beside it, which is why PKG_VERS is not the answer here.
+OVERLAY_GCC_SUFFIX = $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
 
 # The gcc-family drivers, the ones the suffix applies to. Everything else tc_vars emits
 # (ar, nm, strip, ...) is a binutils tool and belongs to the other overlay.
