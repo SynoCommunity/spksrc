@@ -81,7 +81,8 @@ ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
 # Unconditional and ahead of pre-check, so a refused arch still leaves one behind. The
-# overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
+# overlay switches reach the sub-make through overlay.mk's export, which is included
+# before this file; the two named below are belt and braces, not the mechanism.
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
