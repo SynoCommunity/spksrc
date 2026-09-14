@@ -11,16 +11,14 @@ DSM_UI_DIR = app
 # Include common.mk first to get ARCH definitions
 include ../../mk/spksrc.common.mk
 
-# Both metas follow the toolchain, and must be set before spksrc.spk-meta.mk, which
-# would otherwise gate the arch out. Floors read off the packages themselves:
-#   ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
-#   python314 needs gcc >= 4.8, python311 declares none
+# ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
 ifeq ($(call version_lt,$(TC_GCC),4.9),1)
 FFMPEG_PACKAGE = ffmpeg4
 else
 FFMPEG_PACKAGE = ffmpeg8
 endif
 
+# python314 needs gcc >= 4.8, python311 declares none
 ifeq ($(call version_lt,$(TC_GCC),4.8),1)
 PYTHON_PACKAGE = python311
 else

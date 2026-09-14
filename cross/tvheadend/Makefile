@@ -13,10 +13,10 @@ HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 LICENSE  = GPLv3
 
-# PPC archs except qoriq are not supported
-# https://tvheadend.org/issues/5060
-# ffmpeg needs C11 -- gcc 4.9 or newer
-MIN_GCC_VERSION = 4.9
+# No floor of its own: what tvheadend needs is whatever its ffmpeg needs, and the meta
+# below picks the version an arch can build. The old PPC family is the open question --
+# it was never tried, the 4.9 floor that used to stand here having refused it outright
+# (https://tvheadend.org/issues/5060 says only qoriq works).
 
 include ../../mk/spksrc.common.mk
 
