@@ -1,0 +1,27 @@
+[
+  {
+    "step_title": "Basic Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Please specify a shared folder for files managed through Filestash. This share is created at installation when it does not already exist.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "filestash",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": "After installation, open Filestash and create the admin account on the setup page, then configure storage backends (local disk, SFTP, S3, WebDAV and others) from the admin console."
+      }
+    ]
+  }
+]
