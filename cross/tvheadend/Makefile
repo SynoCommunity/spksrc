@@ -79,12 +79,15 @@ CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
 
-# libva, and the two options it answers for, are the videodriver meta's: asking for them
-# where it was not built stops configure at "vaapi (Video Acceleration (VA) API) not found".
+# The videodriver meta's libraries, beside the options they answer for: vaapi wants
+# libva >= 0.38, qsv wants libmfx >= 1.28 from intel-mediasdk (or oneVPL >= 2.0).
+# Asking for either where the meta was not built stops configure dead.
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
+
+DEPENDS += cross/intel-mediasdk
 CONFIGURE_ARGS += --enable-qsv
 endif
 endif
