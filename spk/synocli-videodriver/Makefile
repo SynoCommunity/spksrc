@@ -29,8 +29,9 @@ CHANGELOG += "9. Re-publish for DSM 7.2+.<br/>"
 CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu_top) moved to synocli-videodriver-tools: this package now ships libraries only.<br/>"
 
 # The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
-# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
-OVERLAY_GCC = 1
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
 
 include ../../mk/spksrc.common.mk
 
