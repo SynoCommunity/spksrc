@@ -71,6 +71,10 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk
 
+# How a switch declared above reaches a sub-make -- AFTER every declaration, BEFORE the
+# first crossing, which is stage0's.
+include $(BASEDIR)/mk/spksrc.common/forward.mk
+
 # Setup minimal toolchain environment variables -- AFTER overlay.mk, so the tc_vars.mk it
 # writes already carries the switches, and stage1 regenerates the same file rather than a
 # different one. overlay.mk needs only ARCH_SUFFIX, so nothing here waits on stage0.

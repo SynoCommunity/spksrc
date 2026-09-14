@@ -85,7 +85,7 @@ TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
-  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) OVERLAY_BINUTILS=$(OVERLAY_BINUTILS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
 endif
 
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
