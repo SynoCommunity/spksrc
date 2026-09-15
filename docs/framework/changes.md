@@ -161,6 +161,13 @@ If you only read one thing, read this. The details are in the dated log below.
       `GCC_DEBUG_INFO` win by if/else while `cmake`, `ninja` and `install` tested
       `GCC_NO_DEBUG_INFO` on its own and stripped anyway -- a build that compiled symbols
       and then threw them away. Setting both is now an error.
+    - **`TC_GCC` stops being re-derived.** `env-default.mk` put it into every build's
+      environment by running the cross compiler -- `TC_GCC=$$(eval $$(echo …gcc
+      -dumpversion))`, 61 times in one tvheadend build -- for a value `tc_vars.mk` had
+      already written beside it. It now reads `$(TC_GCC)`, like the `TC_GLIBC` and
+      `TC_KERNEL` lines under it. Same answer on every arch measured; and one answer
+      rather than two, which matters once an overlay makes the vendor compiler the
+      wrong one to ask.
     - **Package-facing:** nothing to change. A new build-wide switch is one line,
       `FWRD_VARS += <NAME>`, next to where it is declared.
 
