@@ -71,15 +71,9 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk
 
-# How a switch declared above reaches a sub-make. Here and not lower down: the first
-# crossing is stage0's $(shell) below, and FWRD_ARGS expands empty until this point.
-# sort, and not merely to order: a package that includes spksrc.common.mk itself reaches
-# it again through spksrc.spk-meta.mk, and a bare += would list each name twice.
-FWRD_VARS := $(sort $(FWRD_VARS))
-
-# As command-line variables: the only shape that outranks a makefile assignment in the
-# child. Lazy (=): a switch may still be assigned after this line.
-FWRD_ARGS = $(foreach v,$(FWRD_VARS),$(v)='$($(v))')
+# The switches named above, as command-line variables. Here and not lower down: stage0's
+# $(shell) below is the first crossing to read them.
+FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
 
 # Setup minimal toolchain environment variables -- AFTER overlay.mk, so the tc_vars.mk it
 # writes already carries the switches, and stage1 regenerates the same file rather than a
