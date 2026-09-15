@@ -75,9 +75,8 @@ include $(BASEDIR)/mk/spksrc.common/overlay.mk
 # $(shell) below is the first crossing to read them.
 FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
 
-# Setup minimal toolchain environment variables -- AFTER overlay.mk, so the tc_vars.mk it
-# writes already carries the switches, and stage1 regenerates the same file rather than a
-# different one. overlay.mk needs only ARCH_SUFFIX, so nothing here waits on stage0.
+# Setup minimal toolchain environment variables -- AFTER overlay.mk and FWRD_ARGS above,
+# so the tc_vars.mk stage0 writes already carries this build's switches.
 include $(BASEDIR)/mk/spksrc.common/stage0.mk
 
 # Load common definitions
