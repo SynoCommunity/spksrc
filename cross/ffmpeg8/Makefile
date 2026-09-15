@@ -13,6 +13,11 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
@@ -26,6 +31,14 @@ CONFIGURE_ARGS += --ar=$(call tc,ar)
 CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
+
+# ffmpeg 8 wants C11 static assertions. static_assert is not a runtime feature, just a
+# macro glibc added to assert.h in 2.16; the keyword comes from the compiler, so define it
+# ourselves on an older libc rather than lose the arch. Via --extra-cflags, not CFLAGS:
+# ffmpeg takes its environment from the generated tc_vars.
+ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
 
 # The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
 # toolchains ship no such header. Was disabled for qoriq by name.
@@ -260,6 +273,23 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# ARMv7L (hi3535): Cortex-A9 but SOFT float, which is why it has its own arch group
+# instead of sitting with the hard-float ARMv7 ones. Never buildable, never configured.
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=cortex-a9
+CONFIGURE_ARGS += --disable-neon
+CONFIGURE_ARGS += --disable-vfp
+endif
+
+# ARMv5 (88f6281, Marvell Feroceon): armv5te, soft float. Never listed here because its
+# gcc 4.6.4 kept ffmpeg8 out entirely; the overlay makes it reachable. --cpu=armv5te is
+# what turns off the armv6/v6t2/neon/vfp paths this core does not have.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=armv5te
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
@@ -306,8 +336,12 @@ CONFIGURE_ARGS += --enable-vaapi
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
 #   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
+endif
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)

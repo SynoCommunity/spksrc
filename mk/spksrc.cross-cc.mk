@@ -141,7 +141,7 @@ $(TCVARS_DONE):
 	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
 	@# a per-package selector, since the toolchain build itself is cookie-locked. All
 	@# rust toolchains (stock std + overlays) are already installed, so this only picks.
-	@$(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) OVERLAY_BINUTILS=$(OVERLAY_BINUTILS) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@$(MAKE) WORK_DIR=$(WORK_DIR) $(OVERLAY_SELECTORS) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif
