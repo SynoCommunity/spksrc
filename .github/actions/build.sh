@@ -16,24 +16,14 @@
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
 # - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}.
 # - The build output is structured into log groups by package.
-# - As the disk space in the workflow environment is limited, we clean the
-#   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - Packages in PACKAGES_TO_KEEP are not fully cleaned so dependents can reuse
-#   their artifacts (shared libs, python wheels, etc.).
-# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7.
-# - Therefore ffmpeg and python are built before their dependents (see prepare.sh).
+# - Meta packages (ffmpeg, python, synocli-videodriver) are not listed on their own:
+#   each dependent builds the one it declares through BUILD_DEPENDS.
 
 set -o pipefail
 
 # ===========================================================================
 # Configuration — keep in sync with prepare.sh
 # ===========================================================================
-
-# ffmpeg versions whose build artifacts must be preserved for dependents
-ffmpeg_versions=(5 6 7 8)
-
-# python minor versions whose build artifacts must be preserved for dependents
-python_versions=(311 312 314)
 
 # DSM versions above the default builds that require filtered package lists.
 # Must match the min_dsm_versions array in prepare.sh.
@@ -111,17 +101,6 @@ echo "===> PACKAGES to Build: ${build_packages}"
 # ===========================================================================
 # 3. Build each package
 # ===========================================================================
-
-# Packages whose build artifacts must be preserved for dependents.
-# synocli-videodriver and ffmpeg are kept for their shared libs;
-# python is kept for its wheels. All others are fully cleaned after build.
-packages_to_keep="synocli-videodriver"
-for i in "${ffmpeg_versions[@]}"; do
-    packages_to_keep+=" ffmpeg${i}"
-done
-for py_ver in "${python_versions[@]}"; do
-    packages_to_keep+=" python${py_ver}"
-done
 
 # Publish to synocommunity.com when the API key is set
 MAKE_ARGS=

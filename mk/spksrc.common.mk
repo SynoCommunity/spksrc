@@ -67,6 +67,13 @@ include $(BASEDIR)/mk/spksrc.common/directories.mk
 LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 -include $(LOCAL_CONFIG_MK)
 
+# Hardware video acceleration comes from the synocli-videodriver meta. AFTER local.mk for
+# the same reason as the overlay switches, and read like them -- except that only an
+# explicit 0/off leaves the meta out, so an unexpected value builds rather than silently
+# publishing an ffmpeg with no acceleration and no error to show for it.
+VIDEODRV    ?= 1
+VIDEODRV_ON  = $(if $(filter 0 off OFF,$(strip $(VIDEODRV))),,1)
+
 ### Overlay decisions -- AFTER local.mk: both use ?=, so the first read wins and that has
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk

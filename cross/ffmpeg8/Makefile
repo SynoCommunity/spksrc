@@ -273,7 +273,10 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 CONFIGURE_ARGS += --enable-neon
+# libdrm comes from the videodriver meta
+ifneq ($(VIDEODRV_ON),)
 CONFIGURE_ARGS += --enable-libdrm
+endif
 CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
@@ -297,9 +300,11 @@ ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
+ifeq ($(call version_ge, $(TCVERSION), 6),1)
+
 # libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
 # meta; asking for them where it does not exist stops configure at "libmfx not found".
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
+ifneq ($(VIDEODRV_ON),)
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
 
@@ -323,6 +328,7 @@ DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 
+endif # ifneq VIDEODRV_ON
 endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 

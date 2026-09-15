@@ -8,8 +8,22 @@ SPK_REV = 50
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
+# Include common.mk first to get ARCH definitions
+include ../../mk/spksrc.common.mk
+
+# ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
+ifeq ($(call version_lt,$(TC_GCC),4.9),1)
+FFMPEG_PACKAGE = ffmpeg4
+else
 FFMPEG_PACKAGE = ffmpeg8
+endif
+
+# python314 needs gcc >= 4.8, python311 declares none
+ifeq ($(call version_lt,$(TC_GCC),4.8),1)
+PYTHON_PACKAGE = python311
+else
 PYTHON_PACKAGE = python314
+endif
 
 #GCC_DEBUG_INFO := 1
 

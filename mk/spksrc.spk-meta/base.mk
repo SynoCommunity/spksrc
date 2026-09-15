@@ -39,12 +39,21 @@ META_DEP_OP ?= \>\=
 # -------------------------------------------------------------------
 define SPK_BASE_TEMPLATE
 
-# Set installation prefix variables for this namespace
-$(eval $(1)_INSTALL_PREFIX         := /var/packages/$($(1)_PACKAGE)/target)
-$(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
-# Version of the meta package itself, read from its own spk Makefile
-# ($(SPK_VERS)/$(SPK_REV) at this point belong to the consumer package)
+# The meta's own spk Makefile, which is what names the package and versions it --
+# $(SPK_VERS)/$(SPK_REV)/$(SPK_NAME) at this point all belong to the consumer.
 $(eval $(1)_SPK_MAKEFILE           := $(realpath $($(1)_PACKAGE_WORK_DIR)/..)/Makefile)
+
+# Set installation prefix variables for this namespace. From the meta's SPK_NAME, not
+# from its directory: spk/ffmpeg4 installs as "ffmpeg", and a prefix that names no
+# existing directory makes $(realpath) empty -- which every path below is guarded on,
+# so the meta would share its status cookies while its libraries stayed unreachable.
+$(eval $(1)_SPK_NAME               := $(shell sed -n 's/^SPK_NAME[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
+$(eval $(1)_INSTALL_PREFIX         := /var/packages/$(or $($(1)_SPK_NAME),$($(1)_PACKAGE))/target)
+$(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
+
+# Nothing staged is always a bug, never a state to carry on from: the caller only reaches
+# here once the meta has been built. Say so, rather than silently drop every -I and -L.
+$(if $($(1)_STAGING_INSTALL_PREFIX),,$(error meta $($(1)_PACKAGE) staged nothing at $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
 $(eval $(1)_VERSION                := $(shell sed -n 's/^SPK_VERS[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE))-$(shell sed -n 's/^SPK_REV[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
