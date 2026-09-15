@@ -136,11 +136,8 @@ cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@# Forward the OVERLAY_<component> selectors (defaulted in spksrc.common/overlay.mk) so the
-	@# tc_vars generated into THIS package's WORK_DIR reflect
-	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
-	@# a per-package selector, since the toolchain build itself is cookie-locked. All
-	@# rust toolchains (stock std + overlays) are already installed, so this only picks.
+	@# The selectors decide something here and not above: the toolchain build is shared and
+	@# cookie-locked, so tcvars is where a package's own overlay choice can still show.
 	@$(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
