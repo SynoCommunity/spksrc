@@ -65,6 +65,7 @@ extracted subtitle/attachment caches.
 
 1. In Package Center, uninstall Jellyfin and choose **Restore backup of
    the package data files** when asked (offered only if a backup exists).
+   If several backups accumulated across upgrades, the newest is used.
 2. Manually install the previous version's `.spk`
    ([manual installation](../user-guide/installation.md#manual-installation)).
 3. Start the package, verify your libraries, then run a library scan.

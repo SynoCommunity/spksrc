@@ -171,15 +171,11 @@ validate_preuninst() {
     fi
 }
 
-service_preuninst() {
-    # No staging needed: postuninst restores directly from sc_backup/,
-    # which persists through uninstall when data is kept. (A previous
-    # revision staged via @apptemp, which DSM itself deletes mid-uninstall,
-    # so restores silently never ran.)
-    return 0
-}
-
 service_postuninst() {
+    # NOTE: restore reads straight from sc_backup/ — never stage via temp
+    # dirs here. DSM wipes locations such as @apptemp mid-uninstall, so any
+    # staging there is destroyed before this function runs and restores
+    # would silently never happen.
     sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
     marker="${sc_backup}/.restore-marker"
 
