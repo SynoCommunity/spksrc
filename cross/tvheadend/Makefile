@@ -105,10 +105,14 @@ endif  # VIDEODRV_ON
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
 
-# libvpx needs gcc >= 4.6
+# libvpx needs gcc >= 4.6. Disabled explicitly below that: every one of these defaults
+# to enabled AND static upstream, so omitting the pair keeps the codec and asks for a
+# bundled build whose headers nothing stages.
 ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+else
+CONFIGURE_ARGS += --disable-libvpx
 endif
 
 DEPENDS += cross/opus
@@ -118,12 +122,16 @@ CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
+else
+CONFIGURE_ARGS += --disable-libx264
 endif
 
 # x265 needs gcc >= 4.8
 ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
+else
+CONFIGURE_ARGS += --disable-libx265
 endif
 
 # Enable building of new UI
