@@ -13,10 +13,10 @@ HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 LICENSE  = GPLv3
 
-# No floor of its own: what tvheadend needs is whatever its ffmpeg needs, and the meta
-# below picks the version an arch can build. The old PPC family is the open question --
-# it was never tried, the 4.9 floor that used to stand here having refused it outright
-# (https://tvheadend.org/issues/5060 says only qoriq works).
+# Its own sources redefine typedefs, which only C11 allows -- gcc from 4.6, where 4.3.7
+# stops at "redefinition of typedef 'streaming_start_t'". Nothing above that: the ffmpeg
+# floor is ffmpeg's, and the meta below picks the version an arch can build.
+MIN_GCC_VERSION = 4.6
 
 include ../../mk/spksrc.common.mk
 
@@ -105,28 +105,17 @@ endif  # VIDEODRV_ON
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
 
-# libvpx needs gcc >= 4.6. Disabled explicitly below that: every one of these defaults
-# to enabled AND static upstream, so omitting the pair keeps the codec and asks for a
-# bundled build whose headers nothing stages.
-ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
-else
-CONFIGURE_ARGS += --disable-libvpx
-endif
 
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 
-# x264 needs gcc >= 4.6
-ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
-else
-CONFIGURE_ARGS += --disable-libx264
-endif
 
-# x265 needs gcc >= 4.8
+# x265 needs gcc >= 4.8. Disabled explicitly below that: it defaults to enabled AND
+# static upstream, so omitting the pair keeps it and asks for a bundled build.
 ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
