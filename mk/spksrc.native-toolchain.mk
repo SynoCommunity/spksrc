@@ -72,9 +72,8 @@ INSTALL_PREFIX = /usr/local
 .PHONY: tc-install
 tc-install:
 	@$(MSG) "native-toolchain: ensuring $(TC) is installed ($(TC_ARCH)-$(TC_VERS))"
-	@# No WORK_DIR, alone in its family: a producer is addressed by TC, not by
-	@# ARCH/TCVERSION, so the framework's TC_WORK_DIR is empty here and the extraction
-	@# belongs in the toolchain's own work dir -- which is what the sub-make defaults to.
+	@# No WORK_DIR, alone in its family: a producer is addressed by TC, so the framework's
+	@# TC_WORK_DIR is empty here and the extraction belongs in the sub-make's own default.
 	@$(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
 
 # Component-specific logic (config, build/install targets, archive vars), when the
