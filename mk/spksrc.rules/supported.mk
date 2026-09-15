@@ -60,8 +60,14 @@ pre-build-native:
 	   $(MSG) Pre-build native dependencies for parallel build [END] ; \
 	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
+# The debug switches ride along here but stay out of FWRD_VARS: they are per-package, and
+# that list crosses into OTHER packages, where one package's choice must not be imposed.
+# Passed only when set, since an empty argument would override the child's own assignment.
+# At most one is ever there: common.mk refuses both at parse, before this is expanded.
+DBG_ARGS = $(strip $(foreach v,GCC_DEBUG_INFO GCC_NO_DEBUG_INFO,$(if $(strip $($(v))),$(v)='$($(v))')))
+
 $(TARGET_TYPE)-arch-% &: pre-build-native
-	-@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" arch-$*
+	-@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) $(DBG_ARGS) arch-$*
 
 # One walk of the tree. The grep is not redundant with the sed inside dependency-unsupported:
 # stage0's bootstrap notice is an $(info) from the sub-make's PARSE, outside that pipe.
@@ -113,8 +119,6 @@ arch-noarch-%:
 
 ####
 
-# GCC_DEBUG_INFO rides along but stays out of FWRD_VARS: it is a per-package property, and
-# that list crosses into OTHER packages, where one package's choice must not be imposed.
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain 
@@ -124,7 +128,7 @@ build-arch-%:
 	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
 	@# failed build would be reported as a success.
 	@set -o pipefail ; \
-	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
+	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) $(DBG_ARGS) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
 	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
@@ -138,7 +142,7 @@ build-noarch-%:
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	       | tee --append $(STATUS_LOG)
 	@set -o pipefail ; \
-	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) TCVERSION=$* ARCH=noarch,build-noarch-$*.log) ; \
+	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) $(DBG_ARGS) TCVERSION=$* ARCH=noarch,build-noarch-$*.log) ; \
 	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
