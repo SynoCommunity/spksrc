@@ -60,10 +60,8 @@ pre-build-native:
 	   $(MSG) Pre-build native dependencies for parallel build [END] ; \
 	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
-# The debug switches ride along here but stay out of FWRD_VARS: they are per-package, and
-# that list crosses into OTHER packages, where one package's choice must not be imposed.
-# Passed only when set, since an empty argument would override the child's own assignment.
-# At most one is ever there: common.mk refuses both at parse, before this is expanded.
+# Per-package, so out of FWRD_VARS, which crosses into other packages. Passed only when
+# set: an empty argument would override the child's own assignment.
 DBG_ARGS = $(strip $(foreach v,GCC_DEBUG_INFO GCC_NO_DEBUG_INFO,$(if $(strip $($(v))),$(v)='$($(v))')))
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
