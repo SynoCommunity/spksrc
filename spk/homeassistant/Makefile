@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2026.7.4
-SPK_REV = 27
+SPK_REV = 26
 SPK_ICON = src/homeassistant.png
 
 PYTHON_PACKAGE = python314
