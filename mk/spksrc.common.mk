@@ -71,6 +71,9 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk
 
+# Read by every build step, so it crosses with the rest (spksrc.spk/strip.mk and friends).
+FWRD_VARS += GCC_DEBUG_INFO
+
 # The switches named above, as command-line variables. Here and not lower down: stage0's
 # $(shell) below is the first crossing to read them.
 FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
