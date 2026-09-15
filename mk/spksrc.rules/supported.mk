@@ -61,7 +61,7 @@ pre-build-native:
 	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
-	-@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) arch-$*
+	-@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" arch-$*
 
 # One walk of the tree. The grep is not redundant with the sed inside dependency-unsupported:
 # stage0's bootstrap notice is an $(info) from the sub-make's PARSE, outside that pipe.
@@ -113,6 +113,8 @@ arch-noarch-%:
 
 ####
 
+# GCC_DEBUG_INFO rides along but stays out of FWRD_VARS: it is a per-package property, and
+# that list crosses into OTHER packages, where one package's choice must not be imposed.
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain 
@@ -122,7 +124,7 @@ build-arch-%:
 	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
 	@# failed build would be reported as a success.
 	@set -o pipefail ; \
-	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
+	$(call _runlog,MAKEFLAGS= $(MAKE) $(FWRD_ARGS) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
 	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
