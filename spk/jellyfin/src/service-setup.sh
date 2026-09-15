@@ -91,7 +91,16 @@ service_save() {
         [ -w "${SYNOPKG_TEMP_UPGRADE_FOLDER}" ] || { echo "ERROR: Not writable: ${SYNOPKG_TEMP_UPGRADE_FOLDER}"; return 1; }
 
         echo "Backing up ${SYNOPKG_PKGNAME} data → ${archive}"
-        tar -C "${SYNOPKG_PKGVAR}" -czf "${archive}" . || { echo "ERROR: tar failed"; return 1; }
+        # Skip bulk that Jellyfin transparently regenerates on access:
+        # previous rollback archives (sc_backup), transient transcode
+        # segments, plus the extracted subtitle and attachment caches.
+        # Excludes precede the member list so they apply on GNU and BSD
+        # tar alike. Everything with user value — including Jellyfin's
+        # own scheduled backups — is kept, so a restore loses nothing
+        # the user cannot get back untouched.
+        BACKUP_EXCLUDES="--exclude=./sc_backup --exclude=./data/transcodes --exclude=./data/data/subtitles --exclude=./data/data/attachments"
+        # shellcheck disable=SC2086
+        tar -C "${SYNOPKG_PKGVAR}" ${BACKUP_EXCLUDES} -czf "${archive}" . || { echo "ERROR: tar failed"; return 1; }
 
         SC_BACKUP_FILE="${archive}"
         printf '%s\n' "${SC_BACKUP_FILE}" > "${marker}" || { echo "ERROR: Could not write marker ${marker}"; return 1; }
@@ -149,73 +158,67 @@ validate_preuninst() {
         SC_RESTORE_CONFIG=y
         export SC_RESTORE_CONFIG SC_BACKUP_FILE
 
+        # Persist the selection where postuninst can find it. NOTE: this
+        # must live inside sc_backup/ (which survives uninstall when data
+        # is kept) — DSM wipes temp locations such as @apptemp mid-uninstall.
+        printf '%s\n' "${SC_BACKUP_FILE}" > "${sc_backup}/.restore-marker" || {
+            echo "ERROR: Could not write marker ${sc_backup}/.restore-marker"
+            return 1
+        }
+
         install_log "Backup found: ${SC_BACKUP_FILE}"
         return 0
     fi
 }
 
-service_preuninst() {
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
-        if [ "$SC_RESTORE_CONFIG" = "y" ] && [ -f "$SC_BACKUP_FILE" ]; then
-            pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-            SC_TEMP_FOLDER="/volume1/@tmp"
-            SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
-            marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
-
-            # Ensure temp dir is writable
-            [ -w "${SC_TEMP_FOLDER}" ] || { echo "ERROR: Not writable: ${SC_TEMP_FOLDER}"; return 1; }
-
-            mkdir -p "${SC_TEMP_UNINSTALL_FOLDER}" || {
-                echo "ERROR: Failed to create ${SC_TEMP_UNINSTALL_FOLDER}"; return 1; }
-
-            base="$(basename "$SC_BACKUP_FILE")"
-            new_path="${SC_TEMP_UNINSTALL_FOLDER}/${base}"
-
-            echo "Staging backup → ${new_path}"
-            mv -f -- "$SC_BACKUP_FILE" "$new_path" || {
-                echo "ERROR: Failed to move backup to temp location"; return 1; }
-
-            # Persist the staged path for post-uninstall/restore steps
-            printf '%s\n' "$new_path" > "${marker}" || {
-                echo "ERROR: Could not write marker ${marker}"; return 1; }
-        fi
-        return 0
-    fi
-}
-
 service_postuninst() {
+    # NOTE: restore reads straight from sc_backup/ — never stage via temp
+    # dirs here. DSM wipes locations such as @apptemp mid-uninstall, so any
+    # staging there is destroyed before this function runs and restores
+    # would silently never happen.
+    sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
+    marker="${sc_backup}/.restore-marker"
+
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
-        pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-        SC_TEMP_FOLDER="/volume1/@tmp"
-        SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
-        marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
-
-        if [ -f "${marker}" ]; then
-            # Read path from marker
-            IFS= read -r SC_BACKUP_FILE < "${marker}"
-
-            if [ -f "${SC_BACKUP_FILE}" ]; then
-                echo "Restoring backup from ${SC_BACKUP_FILE} → ${SYNOPKG_PKGVAR}"
-
-                # Clear old data safely
-                if [ -d "${SYNOPKG_PKGVAR}" ]; then
-                    rm -rf "${SYNOPKG_PKGVAR:?}/"* || {
-                        echo "ERROR: Failed to clear ${SYNOPKG_PKGVAR}"
-                        return 1
-                    }
-                fi
-
-                # Extract backup
-                tar -xzf "${SC_BACKUP_FILE}" -C "${SYNOPKG_PKGVAR}" || {
-                    echo "ERROR: Failed to extract backup archive"
-                    return 1
-                }
-
-                # Clean up temp uninstall folder
-                rm -rf -- "${SC_TEMP_UNINSTALL_FOLDER}"
-                echo "Backup restored successfully."
-            fi
+        if [ ! -f "${marker}" ]; then
+            echo "WARNING: Restore requested but no backup marker found; keeping current data."
+            return 0
         fi
+        # Read path from marker (written by validate_preuninst)
+        IFS= read -r SC_BACKUP_FILE < "${marker}"
+        rm -f -- "${marker}"
+
+        if [ ! -f "${SC_BACKUP_FILE}" ]; then
+            echo "WARNING: Restore requested but backup archive missing (${SC_BACKUP_FILE}); keeping current data."
+            return 0
+        fi
+        # Integrity-check before touching live data (never destroy the
+        # only rollback copy on a corrupt archive)
+        if ! tar -tzf "${SC_BACKUP_FILE}" >/dev/null 2>&1; then
+            echo "WARNING: Backup archive failed integrity check (${SC_BACKUP_FILE}); keeping current data."
+            return 0
+        fi
+
+        echo "Restoring backup from ${SC_BACKUP_FILE} → ${SYNOPKG_PKGVAR}"
+
+        # Clear old data but keep sc_backup/ itself (holds this and older
+        # rollback archives). find (not glob) also catches dotfiles.
+        if [ -d "${SYNOPKG_PKGVAR}" ]; then
+            find "${SYNOPKG_PKGVAR}" -mindepth 1 -maxdepth 1 ! -name sc_backup -exec rm -rf {} + || {
+                echo "ERROR: Failed to clear ${SYNOPKG_PKGVAR}"
+                return 1
+            }
+        fi
+
+        # Extract backup (copy semantics: the archive stays in sc_backup/)
+        tar -xzf "${SC_BACKUP_FILE}" -C "${SYNOPKG_PKGVAR}" || {
+            echo "ERROR: Failed to extract backup archive"
+            return 1
+        }
+        echo "Backup restored successfully."
         return 0
     fi
+    # No restore requested: drop any stale marker so it cannot misfire later
+    rm -f -- "${marker}" 2>/dev/null || true
+    return 0
 }
