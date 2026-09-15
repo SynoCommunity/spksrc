@@ -154,8 +154,9 @@ If you only read one thing, read this. The details are in the dated log below.
       `GCC_DEBUG_INFO` and `GCC_NO_DEBUG_INFO` do not -- they are per-package, set by
       `spk/tvheadend` and by `cross/llvm-140` and the intel stack respectively, and the
       list crosses into *other* packages, where one package's choice must not be imposed.
-      `supported.mk` still carries `GCC_DEBUG_INFO` by hand, now as an argument rather
-      than an environment prefix, which is what lets a command line outrank a package.
+      `supported.mk` carries both by hand instead, as arguments rather than the
+      environment prefix it used -- the prefix loses to a package's own assignment, an
+      argument does not -- and only when set, an empty one being an override of its own.
     - **The two debug switches now refuse each other.** `env-default.mk` let
       `GCC_DEBUG_INFO` win by if/else while `cmake`, `ninja` and `install` tested
       `GCC_NO_DEBUG_INFO` on its own and stripped anyway -- a build that compiled symbols
