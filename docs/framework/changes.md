@@ -149,6 +149,17 @@ If you only read one thing, read this. The details are in the dated log below.
       conversion is idempotent: `spksrc.common.mk` is read three times for a cross package
       and twice for a native one, and a single variable would re-convert its own output
       into `OVERLAY_BINUTILS='0'=''`.
+    - **What belongs in the list**, and what does not: a decision that must hold
+      identically for every package of the run. The overlays qualify (a shared ABI);
+      `GCC_DEBUG_INFO` and `GCC_NO_DEBUG_INFO` do not -- they are per-package, set by
+      `spk/tvheadend` and by `cross/llvm-140` and the intel stack respectively, and the
+      list crosses into *other* packages, where one package's choice must not be imposed.
+      `supported.mk` still carries `GCC_DEBUG_INFO` by hand, now as an argument rather
+      than an environment prefix, which is what lets a command line outrank a package.
+    - **The two debug switches now refuse each other.** `env-default.mk` let
+      `GCC_DEBUG_INFO` win by if/else while `cmake`, `ninja` and `install` tested
+      `GCC_NO_DEBUG_INFO` on its own and stripped anyway -- a build that compiled symbols
+      and then threw them away. Setting both is now an error.
     - **Package-facing:** nothing to change. A new build-wide switch is one line,
       `FWRD_VARS += <NAME>`, next to where it is declared.
 
