@@ -135,7 +135,7 @@ cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
-	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
 	@# Forward the OVERLAY_<component> selectors (defaulted in spksrc.common/overlay.mk) so the
 	@# tc_vars generated into THIS package's WORK_DIR reflect
 	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
@@ -149,8 +149,8 @@ endif
 # $(TK) is only being set if REQUIRE_TOOLKIT=1
 ifneq ($(strip $(TK)),)
 $(TKVARS_DONE):
-	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolkit/$(TK) tkvars
 else
 $(TKVARS_DONE): ;
 endif
