@@ -514,8 +514,8 @@ spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
-	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif
@@ -523,8 +523,8 @@ endif
 # $(TK) is only being set if REQUIRE_TOOLKIT=1
 ifneq ($(strip $(TK)),)
 $(TKVARS_DONE):
-	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../toolkit/$(TK) tkvars
 else
 $(TKVARS_DONE): ;
 endif
