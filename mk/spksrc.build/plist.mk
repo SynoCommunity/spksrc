@@ -24,7 +24,7 @@ endif
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
 	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) $(OVERLAY_SELECTORS) --no-print-directory -C ../../$$depend cat_PLIST ; \
+	  $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../$$depend cat_PLIST ; \
 	done
 	@if [ -f PLIST ] && [ -f $(WORK_DIR)/$(PKG_NAME).plist ] ; \
 	then \

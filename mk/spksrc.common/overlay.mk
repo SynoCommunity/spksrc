@@ -100,7 +100,7 @@ export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
 
 # Exported as a BACKSTOP, not as the mechanism. An exported value arrives with environment
 # origin, which any `OVERLAY_x = ...` in a package Makefile overrides -- so it cannot
-# enforce one compiler across a tree on its own. OVERLAY_SELECTORS above can, because a
+# enforce one compiler across a tree on its own. FWRD_ARGS can, because a
 # command-line variable outranks everything. The export only covers a sub-make nobody
 # forwarded to, where inheriting the switch beats inheriting nothing.
 export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
