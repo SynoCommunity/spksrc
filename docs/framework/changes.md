@@ -117,6 +117,65 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 15th 2026 — One list carries the build-wide switches (#7458)"
+    - **Written out at every crossing.** A switch only means something downstream if it
+      survives the process boundary, and `OVERLAY_RUSTC` / `OVERLAY_BINUTILS` were spelled
+      out by hand at each one. Eleven call sites provision a toolchain or a toolkit, and
+      they had already drifted: `cross-cc.mk` forwarded the selectors to `tcvars`,
+      `spk.mk` and `kernel.mk` called the same target without them.
+    - **Silent when it goes wrong**, which is what makes it worth fixing: the child falls
+      back to its own `?=` default and resolves a different toolchain. Nothing errors, the
+      build just uses another compiler, or provisions an overlay nobody asked for.
+    - **Declared once, beside the switch:**
+
+        ```makefile
+        # mk/spksrc.common/overlay.mk
+        FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS
+
+        # mk/spksrc.common.mk
+        FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
+        ```
+
+      and every crossing reads `$(FWRD_ARGS)`, in one shape:
+      `@$(MAKE) WORK_DIR=<dir> $(FWRD_ARGS) --no-print-directory -C <dir> <target>`.
+      The toolkit calls carry it too, where the switches mean nothing today: carving out
+      exceptions is what let the `tcvars` calls drift apart in the first place.
+    - **Placement is load-bearing.** `FWRD_ARGS` sits between the include that declares the
+      names and `stage0.mk`, whose `$(shell)` is the first crossing to read them; put it
+      lower and a switch assigned in a package Makefile is lost. Only a makefile assignment
+      shows this -- a value from the command line arrives regardless, make exporting those
+      to its children.
+    - **Two variables, not one.** `FWRD_VARS` holds names and `FWRD_ARGS` the pairs, so the
+      conversion is idempotent: `spksrc.common.mk` is read three times for a cross package
+      and twice for a native one, and a single variable would re-convert its own output
+      into `OVERLAY_BINUTILS='0'=''`.
+    - **What belongs in the list**, and what does not: a decision that must hold
+      identically for every package of the run. The overlays qualify (a shared ABI);
+      `GCC_DEBUG_INFO` and `GCC_NO_DEBUG_INFO` do not -- they are per-package, set by
+      `spk/tvheadend` and by `cross/llvm-140` and the intel stack respectively, and the
+      list crosses into *other* packages, where one package's choice must not be imposed.
+      `supported.mk` carries both by hand instead, as arguments rather than the
+      environment prefix it used -- the prefix loses to a package's own assignment, an
+      argument does not -- and only when set, an empty one being an override of its own.
+    - **The two debug switches now refuse each other.** `env-default.mk` let
+      `GCC_DEBUG_INFO` win by if/else while `cmake`, `ninja` and `install` tested
+      `GCC_NO_DEBUG_INFO` on its own and stripped anyway -- a build that compiled symbols
+      and then threw them away. Setting both is now an error.
+    - **`TC_GCC` stops being re-derived.** `env-default.mk` put it into every build's
+      environment by running the cross compiler -- `TC_GCC=$$(eval $$(echo …gcc
+      -dumpversion))`, 61 times in one tvheadend build -- for a value `tc_vars.mk` had
+      already written beside it. It now reads `$(TC_GCC)`, like the `TC_GLIBC` and
+      `TC_KERNEL` lines under it. Same answer on every arch measured; and one answer
+      rather than two, which matters once an overlay makes the vendor compiler the
+      wrong one to ask.
+    - **`VIDEODRV` is the first to use it.** #7455 landed it with the name spelled out in
+      `depend.mk`'s `env -i`; it is now `FWRD_VARS += VIDEODRV` and `$(FWRD_ARGS)`, which
+      also promotes it from an environment prefix to a command-line variable there.
+    - **Package-facing:** nothing to change. A new build-wide switch is one line,
+      `FWRD_VARS += <NAME>`, next to where it is declared.
+
+---
+
 ??? note "September 13th 2026 — An automatic build does what the change asks for, no more (#7455)"
     - **The cost.** `synocli-videodriver` is the heaviest build in the tree -- mesa, the
       Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes

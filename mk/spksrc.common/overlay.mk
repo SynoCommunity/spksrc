@@ -62,6 +62,10 @@ OVERLAY_RUSTC          ?= 1
 OVERLAY_BINUTILS       ?= 0
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
+# Carried to every sub-make that resolves a toolchain (FWRD_ARGS, spksrc.common.mk). Not
+# RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the child reads itself.
+FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS
+
 # ---- ACTIVE ------------------------------------------------------------------------
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
 # environment or the command line. The wildcards above stay immediate.
