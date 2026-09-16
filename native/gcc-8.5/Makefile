@@ -35,7 +35,7 @@ PRE_CONFIGURE_TARGET = gcc-prepare
 # what is inside without changing a version already encoded in the name, so the
 # rebuild lands under a new name instead of replacing a file consumers cached.
 ##############################################################################
-PKG_REV ?= v1
+PKG_REV ?= v4
 ARCHIVE_NAME = gcc-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
