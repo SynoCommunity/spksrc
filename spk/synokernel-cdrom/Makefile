@@ -18,6 +18,9 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
 REQUIRED_MIN_SRM = 1.3
 
+# epyc7003-7.3 toolchain exists but kernel sources are not provided yet.
+UNSUPPORTED_ARCHS += epyc7003
+
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
 
