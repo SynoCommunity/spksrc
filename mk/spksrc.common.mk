@@ -74,6 +74,10 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 VIDEODRV    ?= 1
 VIDEODRV_ON  = $(if $(filter 0 off OFF,$(strip $(VIDEODRV))),,1)
 
+# Carried to every crossing: a meta that disagrees links a libdrm its consumer cannot
+# resolve, which is the same class of hazard as an overlay's ABI.
+FWRD_VARS += VIDEODRV
+
 ### Overlay decisions -- AFTER local.mk: both use ?=, so the first read wins and that has
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk

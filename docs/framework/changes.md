@@ -168,6 +168,9 @@ If you only read one thing, read this. The details are in the dated log below.
       `TC_KERNEL` lines under it. Same answer on every arch measured; and one answer
       rather than two, which matters once an overlay makes the vendor compiler the
       wrong one to ask.
+    - **`VIDEODRV` is the first to use it.** #7455 landed it with the name spelled out in
+      `depend.mk`'s `env -i`; it is now `FWRD_VARS += VIDEODRV` and `$(FWRD_ARGS)`, which
+      also promotes it from an environment prefix to a command-line variable there.
     - **Package-facing:** nothing to change. A new build-wide switch is one line,
       `FWRD_VARS += <NAME>`, next to where it is declared.
 
