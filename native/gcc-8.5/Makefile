@@ -91,6 +91,11 @@ HOST_OPTFLAGS += $(if $(call _host_cc_ok,-flto=auto),-flto=auto -ffat-lto-object
 
 ENV += CFLAGS="$(HOST_OPTFLAGS)" CXXFLAGS="$(HOST_OPTFLAGS)" LDFLAGS="$(HOST_OPTFLAGS)"
 
+# Where host==target (the x86-64 archs), configure copies CFLAGS into CFLAGS_FOR_TARGET --
+# which would ship a v3 libstdc++ to Goldmont NAS CPUs that have no AVX2. Pin what a cross
+# already gets.
+ENV += CFLAGS_FOR_TARGET="-g -O2" CXXFLAGS_FOR_TARGET="-g -O2"
+
 # GNU_CONFIGURE already adds --prefix=$(INSTALL_PREFIX).
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
 
