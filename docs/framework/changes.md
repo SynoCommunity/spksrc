@@ -117,6 +117,45 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 13th 2026 — An automatic build does what the change asks for, no more (#7455)"
+    - **The cost.** `synocli-videodriver` is the heaviest build in the tree -- mesa, the
+      Intel compute runtime, the graphics compiler, Vulkan, shaderc -- and it changes
+      almost never. Every automatic run that touched an ffmpeg consumer paid for it
+      again, because `spk/ffmpeg*` declares `VIDEODRV_PACKAGE` and the meta follows.
+    - **`VIDEODRV = 0`** drops the meta and every option that depends on it:
+      `META_DEPENDS` is empty, `spk/synocli-videodriver` leaves `BUILD_DEPENDS`,
+      `synocli-videodriver-tools` leaves `SPK_DEPENDS`, `cross/ffmpeg4-8` configure without
+      `--enable-libdrm`, `--enable-vaapi`, `--enable-libmfx`, the OpenCL/Vulkan set and
+      `--enable-libplacebo`, and `cross/tvheadend` without `--enable-vaapi`/`--enable-qsv`.
+      Anything else (`--enable-v4l2-m2m`) is untouched.
+      Undeclared builds as before, which is what a local tree does; `make setup` writes it
+      commented into `local.mk`, below the overlay switches and reading the same way --
+      command line > environment > `local.mk` > the default. Unlike them, only an explicit
+      `0`/`off` leaves the meta out: an unexpected value builds, rather than quietly
+      publishing an ffmpeg with no acceleration and no error to show for it.
+    - **Who sets it.** Only the automatic CI runs (`push`, `pull_request`), and only when
+      change detection did not already name `synocli-videodriver` or its tools package --
+      a change under `cross/libva`, `cross/mesa` or any other videodriver dependency
+      does name it through the dependency list, and that run builds the meta in full.
+      A manual `workflow_dispatch` never sets it, so published packages always carry
+      hardware acceleration. It also crosses the `env -i` that isolates an spk meta
+      source (`depend.mk`): a meta that disagreed with its consumer linked a libdrm the
+      consumer then could not resolve -- `libavutil.so: undefined reference to
+      'drmGetVersion'`.
+    - **The CI list stopped injecting metas** while it was at it. `prepare.sh` resolved
+      `PYTHON_PACKAGE` / `FFMPEG_PACKAGE` / `VIDEODRV_PACKAGE` recursively and added each
+      meta to the list of packages to build -- redundant, since `python.mk`, `ffmpeg.mk`
+      and `videodriver.mk` each put `spk/<meta>` in `BUILD_DEPENDS` and the dependent
+      builds it anyway. It also built metas for architectures the dependent refuses:
+      `spk/homeassistant` declares `UNSUPPORTED_ARCHS = $(ARMv7_ARCHS)`, yet armv7 spent
+      a full run on the injected `python314`. Such a run now builds nothing.
+    - **And a clean that no longer happens.** `build.sh` assembled `packages_to_keep` from
+      its `ffmpeg_versions` / `python_versions` arrays and never read it: the per-package
+      clean it shielded those artifacts from is gone, the runners having grown enough disk
+      this year to hold every work dir for a whole run. All three are removed.
+
+---
+
 ??? note "September 13th 2026 — Ask the toolchain for a tool, never spell its path (2 PRs)"
     A package that needs a compiler or a binutils tool by *path* used to write
     `$(TC_PATH)$(TC_PREFIX)gcc`. That is right only while the toolchain is the vendor one:
@@ -157,6 +196,9 @@ If you only read one thing, read this. The details are in the dated log below.
         - One switch per `CONFIGURE_ARGS` line throughout the tool block, so a diff shows
           which tool changed.
         - Pull request: [#7454](https://github.com/SynoCommunity/spksrc/pull/7454)
+      a full run on the injected `python314`. Such a run now builds nothing. The exemption
+      that kept an injected meta in the standard builds goes with it: every list now holds
+      only what declares that `REQUIRED_MIN_DSM` itself, and none of them may be exempt.
 
 ---
 
