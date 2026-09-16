@@ -36,7 +36,13 @@ PRE_CONFIGURE_TARGET = gcc-prepare
 # rebuild lands under a new name instead of replacing a file consumers cached.
 ##############################################################################
 PKG_REV ?= v4
-ARCHIVE_NAME = gcc-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV)
+# The consumer fetches by PKG_DIST_ARCH, which is not always TC_ARCH: aarch64-6.2.4 takes
+# rtd1296, armv7-6.2.4 armada38x, x64-6.2.4 x86. Read back rather than tabulated here, so
+# the name this produces cannot drift from the name that is fetched.
+TC_DIST_ARCH = $(or $(strip $(shell sed -n 's/^PKG_DIST_ARCH[[:space:]]*=[[:space:]]*//p' \
+                 ../../toolchain/syno-$(TC_ARCH)-$(TC_VERS)_gcc-$(basename $(PKG_VERS))/Makefile \
+                 2>/dev/null | sed 's|$$(TC_ARCH)|$(TC_ARCH)|')),$(TC_ARCH))
+ARCHIVE_NAME = gcc-$(PKG_VERS)-$(TC_TARGET)-$(TC_DIST_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
 ARCHIVE_KEEP = usr/local
