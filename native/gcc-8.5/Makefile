@@ -80,8 +80,16 @@ ENV += PATH=$(GCC_BINUTILS_BIN):$$PATH
 
 # GCC's build defaults CFLAGS to -g -O2, but only when CFLAGS is unset; spksrc.native
 # exports it empty, which leaves cc1 and cc1plus at -O0 and the compiler ~3x slower.
-# -O2 and nothing more: this archive is published, so it must run on any host.
-ENV += CFLAGS="-O2" CXXFLAGS="-O2"
+#
+# HOST_OPTFLAGS is what builds the compiler itself, not what it emits. Probed rather than
+# assumed: -march=x86-64-v3 is a GCC 11 spelling, and LTO here is a single-stage -flto,
+# --with-build-config=bootstrap-lto needing a bootstrap a cross compiler cannot do.
+_host_cc_ok = $(shell echo 'int main(){return 0;}' | $(or $(CC),cc) $(1) -x c - -o /dev/null 2>/dev/null && echo 1)
+HOST_OPTFLAGS  = -O2
+HOST_OPTFLAGS += $(if $(call _host_cc_ok,-march=x86-64-v3),-march=x86-64-v3)
+HOST_OPTFLAGS += $(if $(call _host_cc_ok,-flto=auto),-flto=auto -ffat-lto-objects)
+
+ENV += CFLAGS="$(HOST_OPTFLAGS)" CXXFLAGS="$(HOST_OPTFLAGS)" LDFLAGS="$(HOST_OPTFLAGS)"
 
 # GNU_CONFIGURE already adds --prefix=$(INSTALL_PREFIX).
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
