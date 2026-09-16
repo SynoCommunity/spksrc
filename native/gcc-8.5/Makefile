@@ -78,6 +78,11 @@ GCC_BINUTILS_DIR = $(BASEDIR)/native/binutils-2.30
 GCC_BINUTILS_BIN = $(GCC_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
 ENV += PATH=$(GCC_BINUTILS_BIN):$$PATH
 
+# GCC's build defaults CFLAGS to -g -O2, but only when CFLAGS is unset; spksrc.native
+# exports it empty, which leaves cc1 and cc1plus at -O0 and the compiler ~3x slower.
+# -O2 and nothing more: this archive is published, so it must run on any host.
+ENV += CFLAGS="-O2" CXXFLAGS="-O2"
+
 # GNU_CONFIGURE already adds --prefix=$(INSTALL_PREFIX).
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
 
