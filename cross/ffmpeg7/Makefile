@@ -32,6 +32,14 @@ CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
 
+# ffmpeg 7 wants C11 static assertions. static_assert is not a runtime feature, just a
+# macro glibc added to assert.h in 2.16; the keyword comes from the compiler, so define it
+# ourselves on an older libc rather than lose the arch. Via --extra-cflags, not CFLAGS:
+# ffmpeg takes its environment from the generated tc_vars.
+ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
+
 # The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
 # toolchains ship no such header. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
