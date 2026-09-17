@@ -56,7 +56,13 @@ NATIVE_LDFLAGS  = $(HOST_OPTFLAGS)
 # v3: same binutils, rebuilt with the flags above actually reaching the compiler. Every
 # consumer pins the same rev.
 PKG_REV ?= v3
-ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV)
+# The consumer fetches by PKG_DIST_ARCH, which is not always TC_ARCH: aarch64 takes
+# rtd1296, armv7 armada38x, x64 x86 or apollolake. Read back from the consumer rather
+# than tabulated here, so the name this produces cannot drift from the name fetched.
+TC_DIST_ARCH = $(or $(strip $(shell sed -n 's/^PKG_DIST_ARCH[[:space:]]*=[[:space:]]*//p' \
+                 ../../toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-$(PKG_VERS)/Makefile \
+                 2>/dev/null | sed 's|$$(TC_ARCH)|$(TC_ARCH)|')),$(TC_ARCH))
+ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_DIST_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
 ARCHIVE_KEEP = usr/local
