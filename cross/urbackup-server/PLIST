@@ -1,0 +1,5 @@
+bin:bin/urbackup_mount_helper
+bin:bin/urbackup_snapshot_helper
+bin:bin/urbackupsrv
+rsc:share/urbackup
+rsc:var/urbackup/dataplan_db.txt
