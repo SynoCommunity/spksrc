@@ -265,6 +265,13 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# gcc 4.6.4 kept ffmpeg7 out entirely; the overlay makes it reachable. --cpu=armv5te is
+# what turns off the armv6/v6t2/neon/vfp paths this core does not have.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=armv5te
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
