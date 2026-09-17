@@ -48,7 +48,9 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
-  ifeq ($(findstring $(ARCH), $(i686_ARCHS)),)
+  # PowerPC joins i686 out of LTO: gcc 8.5 segfaults in the postreload RTL pass on
+  # 6.1's jpeg2000dec.c, and lto1 is the only path that reaches it.
+  ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(PPC_ARCHS)),)
     CONFIGURE_ARGS += --enable-lto
   endif
 endif
