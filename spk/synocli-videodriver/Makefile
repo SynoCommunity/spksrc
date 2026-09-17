@@ -33,6 +33,10 @@ CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu
 # `?=` here in turn stands down for a command line or an environment saying otherwise.
 OVERLAY_GCC ?= 1
 
+# The Intel media stack drives i915 ioctls the running kernel either has or has not;
+# DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
+MIN_KERNEL_VERSION = 3.10
+
 include ../../mk/spksrc.common.mk
 
 # Library dependency list shared with the consumer-side meta integration
