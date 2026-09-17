@@ -120,9 +120,6 @@ endif
 ### Include common definitions
 include ../../mk/spksrc.common.mk
 
-### Include common rules
-include ../../mk/spksrc.rules.mk
-
 #####
 
 # Mark toolchain installation as completed using status cookie
@@ -178,6 +175,9 @@ include ../../mk/spksrc.toolchain/tc-normalize.mk
 
 patch: normalize
 include ../../mk/spksrc.build/patch.mk
+
+### Include common rules
+include ../../mk/spksrc.rules.mk
 
 rustup-rustc: patch
 # The rust version this toolchain runs: the overlay's own PKG_VERS when the overlay is ACTIVE

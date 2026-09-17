@@ -149,9 +149,6 @@ endif
 ### Include common definitions
 include ../../mk/spksrc.common.mk
 
-### Include common rules
-include ../../mk/spksrc.rules.mk
-
 # Common kernel variables
 include ../../mk/spksrc.kernel/base.mk
 
@@ -194,6 +191,9 @@ include ../../mk/spksrc.build/extract.mk
 
 patch: extract
 include ../../mk/spksrc.build/patch.mk
+
+### Include common rules
+include ../../mk/spksrc.rules.mk
 
 kernel_configure: patch
 include ../../mk/spksrc.kernel/configure.mk
