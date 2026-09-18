@@ -62,8 +62,10 @@ TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
 # DSM ships, so a C++ binary built with it links against a libstdc++ newer than the NAS
 # has and will not start without a copy. Only when the overlay is ACTIVE: on a stock
 # build DSM's own copy is the right one, and shipping a second would be a regression.
-# The union of what every shipped binary needs then decides which copy is carried, so it
-# takes the overlay's libstdc++ rather than the sysroot's older one under the same roots.
+# The copy is picked by the UNION of the symbol versions every shipped binary needs, so
+# it takes the overlay's libstdc++ rather than the sysroot's older one sitting under the
+# same roots. Matching the first binary alone shipped whichever copy satisfied it, and
+# the C++ libraries built with the overlay then failed to start on the NAS.
 TC_LIBS_OVERLAY = $(if $(OVERLAY_GCC_ON),libstdc++.so libgcc_s.so)
 
 .PHONY: strip strip_msg
