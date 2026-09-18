@@ -186,7 +186,7 @@ RUSTC_STAGE2_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage2_done
 # RUST_LINK_VIA_BINUTILS, also co-build the modern binutils and its build wrapper first.
 PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
-rustc_prepare: tc-install $(if $(OVERLAY_GCC_ON),rustc_gcc_overlay) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
+rustc_prepare: tc-install rustc_gcc_overlay $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
 	@cd $(TC_EXTRACT_DIR)/bin ; \
 	for gnutool in $$(ls -1) ; do \
@@ -209,11 +209,16 @@ endef
 # is extracted, and RUST_CC names them. Extracted here per-arch rather than declared as a
 # DEPENDS, for the same reason binutils is co-built below.
 .PHONY: rustc_gcc_overlay
+# Unconditional prerequisite, tested in the recipe: prerequisites expand when the rule is
+# READ, and OVERLAY_GCC_ON comes from overlay.mk, which native-cc.mk includes after this
+# file. Testing it above would read empty and silently skip the extraction.
 rustc_gcc_overlay:
-	@$(call rustc_status,gcc-overlay)
-	@$(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERS) for $(TC_ARCH)-$(TC_VERS)"
-	@$(MSG) "*** PATH: $(TC_OVERLAY_GCC)"
-	$(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC)
+	@if [ -n "$(OVERLAY_GCC_ON)" ]; then \
+	  $(call rustc_status,gcc-overlay) ; \
+	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERS) for $(TC_ARCH)-$(TC_VERS)" ; \
+	  $(MSG) "*** PATH: $(TC_OVERLAY_GCC)" ; \
+	  $(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC) ; \
+	fi
 
 .PHONY: rustc_binutils_cobuild
 rustc_binutils_cobuild:
