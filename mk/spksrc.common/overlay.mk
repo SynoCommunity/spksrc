@@ -52,7 +52,13 @@ OVERLAY_GCC_VERS       ?= 8.5
 _OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
 _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
 _OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
-TC_OVERLAY_RUSTC      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
+# A rust toolchain is built against a specific gcc, and its directory says which. With
+# the gcc overlay on, take the one built against it; with it off, the vendor one. Both
+# coexist, so OVERLAY_GCC=0 keeps working -- and the _gcc-* glob alone would match two.
+_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
+TC_OVERLAY_RUSTC      := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
+                           $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL)),\
+                           $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL)))
 TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
 TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
