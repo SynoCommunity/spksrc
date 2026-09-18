@@ -32,6 +32,10 @@
 # Architecture-specific digest generation.
 # This target appends checksum entries for the currently selected architecture
 # into the shared DIGESTS_FILE.
+# checksum.mk defines this too, but the toolchain, kernel and toolkit front-ends include
+# it after the rules, and a target name must be known when its rule is parsed.
+DIGESTS_FILE ?= digests
+
 .PHONY: digests-%
 digests-%:
 	@$(MSG) "Generate digests for $(NAME) [$*]"

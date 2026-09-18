@@ -78,6 +78,9 @@ endif
 ### Include common definitions
 include ../../mk/spksrc.common.mk
 
+### Include common rules
+include ../../mk/spksrc.rules.mk
+
 #####
 
 # Mark toolkit installation as completed using status cookie
@@ -137,9 +140,6 @@ include ../../mk/spksrc.toolkit/tk-normalize.mk
 
 patch: normalize
 include ../../mk/spksrc.build/patch.mk
-
-### Include common rules
-include ../../mk/spksrc.rules.mk
 
 include ../../mk/spksrc.toolkit/tk_vars.mk
 
