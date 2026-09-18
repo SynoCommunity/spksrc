@@ -1,6 +1,8 @@
 TC_ARCH = qoriq
 TC_VERS = 6.2.4
-TC_GCC = 8.5
+# override: a package passes TC_GCC= on the make line (env-default.mk), which would
+# otherwise win over this and compose an archive name that exists nowhere.
+override TC_GCC = 8.5
 
 PKG_NAME = rust
 PKG_VERS = 1.82.0
