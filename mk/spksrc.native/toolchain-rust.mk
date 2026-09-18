@@ -96,12 +96,17 @@ RUST_STAGE_DIR  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)
 # stage<N>/bin/. cargo is copied over at the end of the stage2 step.
 RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 
-# The target gcc this rustc is built with. TC_GCC_SUFFIX is empty for the stock gcc;
-# a future gcc-overlay variant would set it so both coexist under distinct ids/archives.
-TC_GCC_SUFFIX ?=
+# The target gcc this rustc is built with: the stock one, or the gcc overlay when it is
+# active. TC_GCC_SUFFIX and TC_OVERLAY_GCC_PATH both come from overlay.mk, which now
+# resolves here because native-toolchain.mk declares TC_ARCH_SUFFIX.
+#
+# gcc and g++ only: the overlay archive ships no binutils, so ar and ranlib keep coming
+# from the toolchain that has them.
+TC_GCC_SUFFIX ?= $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
+_RUST_GCC_BIN  = $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
 RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
-RUST_CC       ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
-RUST_CXX      ?= $(RUST_TOOL_BIN)g++$(TC_GCC_SUFFIX)
+RUST_CC       ?= $(_RUST_GCC_BIN)$(TC_TARGET)-gcc$(TC_GCC_SUFFIX)
+RUST_CXX      ?= $(_RUST_GCC_BIN)$(TC_TARGET)-g++$(TC_GCC_SUFFIX)
 RUST_AR       ?= $(RUST_TOOL_BIN)ar
 RUST_RANLIB   ?= $(RUST_TOOL_BIN)ranlib
 # The link driver: the co-built binutils wrapper when the Rust link is routed through the
@@ -113,7 +118,7 @@ _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # overlay-rustc.mk's _RUST_TC_ID on the package-build side.
-_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
+_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
 # are trackable in status-build.log: NAME: native-rust-<step>.
@@ -181,7 +186,7 @@ RUSTC_STAGE2_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage2_done
 # RUST_LINK_VIA_BINUTILS, also co-build the modern binutils and its build wrapper first.
 PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
-rustc_prepare: tc-install $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
+rustc_prepare: tc-install $(if $(OVERLAY_GCC_ON),rustc_gcc_overlay) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
 	@cd $(TC_EXTRACT_DIR)/bin ; \
 	for gnutool in $$(ls -1) ; do \
@@ -199,6 +204,16 @@ define RUST_BINUTILS_CC_SCRIPT
 # via -B. Used as the [target.*] linker for the from-source build.
 exec "$(RUST_CC)" -B"$(RUST_BINUTILS_SHIM)" "$$@"
 endef
+
+# The gcc overlay is a consumer toolchain like any other: its drivers only exist once it
+# is extracted, and RUST_CC names them. Extracted here per-arch rather than declared as a
+# DEPENDS, for the same reason binutils is co-built below.
+.PHONY: rustc_gcc_overlay
+rustc_gcc_overlay:
+	@$(call rustc_status,gcc-overlay)
+	@$(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERS) for $(TC_ARCH)-$(TC_VERS)"
+	@$(MSG) "*** PATH: $(TC_OVERLAY_GCC)"
+	$(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC)
 
 .PHONY: rustc_binutils_cobuild
 rustc_binutils_cobuild:
