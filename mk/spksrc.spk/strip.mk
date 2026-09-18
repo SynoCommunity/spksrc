@@ -62,8 +62,10 @@ TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
 # DSM ships, so a C++ binary built with it links against a libstdc++ newer than the NAS
 # has and will not start without a copy. Only when the overlay is ACTIVE: on a stock
 # build DSM's own copy is the right one, and shipping a second would be a regression.
-# _select_tclib_ then picks by the symbol versions the binary needs, so it takes the
-# overlay's libstdc++ rather than the sysroot's older one sitting under the same roots.
+# The copy is picked by the UNION of the symbol versions every shipped binary needs, so
+# it takes the overlay's libstdc++ rather than the sysroot's older one sitting under the
+# same roots. Matching the first binary alone shipped whichever copy satisfied it, and
+# the C++ libraries built with the overlay then failed to start on the NAS.
 TC_LIBS_OVERLAY = $(if $(OVERLAY_GCC_ON),libstdc++.so libgcc_s.so)
 
 .PHONY: strip strip_msg
@@ -119,33 +121,40 @@ endef
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
 	for tclib in $(TC_LIBS_DEFAULT) $(TC_LIBS_OVERLAY); do \
-	echo  "===> SEARCHING for $${tclib}" ; \
-	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
-	  case $${type} in \
-	    lib|bin) \
-	         _src_=$$(_select_tclib_ "$${tclib}" "$(STAGING_DIR)/$${file}" || true) ; \
-	         if [ -n "$${_src_}" ]; then \
-	            echo  "===>  Found in $${file} for library dependency from toolchain ($${tclib})" ; \
-	            _install_tclib_ "$${tclib}" "$${_src_}" ; \
-	            break 2 ; \
-	         fi ;; \
-	  esac ; \
-	done ; \
-	for wheel in $(WORK_DIR)/wheelhouse/*.whl ; do \
-	   [ -e "$${wheel}" ] || continue ; \
-	   for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
-	      _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
-	      unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
-	      _src_=$$(_select_tclib_ "$${tclib}" "$${_tmp_}/$${shlib}" || true) ; \
-	      if [ -n "$${_src_}" ]; then \
-	         echo  "===>  Found in $$(basename $${wheel}) for library dependency from toolchain ($${tclib})" ; \
-	         _install_tclib_ "$${tclib}" "$${_src_}" ; \
-	         rm -fr $${_tmp_} ; \
-	         break 2 ; \
-	      fi ; \
-	      rm -fr $${_tmp_} ; \
-	   done ; \
-	done ; \
+	  echo  "===> SEARCHING for $${tclib}" ; \
+	  _need_all_="" ; _seen_="" ; \
+	  for _f_ in $$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; do \
+	     _b_="$(STAGING_DIR)/$${_f_}" ; \
+	     _sn_=$$(objdump -p "$$_b_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
+	     [ -n "$$_sn_" ] || continue ; \
+	     _seen_=1 ; \
+	     _need_all_="$$_need_all_ $$(_versions_needed_ "$$_b_" "$$_sn_")" ; \
+	  done ; \
+	  for wheel in $(WORK_DIR)/wheelhouse/*.whl ; do \
+	     [ -e "$${wheel}" ] || continue ; \
+	     for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
+	        _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
+	        unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
+	        _sn_=$$(objdump -p "$${_tmp_}/$${shlib}" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
+	        if [ -n "$$_sn_" ]; then \
+	           _seen_=1 ; \
+	           _need_all_="$$_need_all_ $$(_versions_needed_ "$${_tmp_}/$${shlib}" "$$_sn_")" ; \
+	        fi ; \
+	        rm -fr $${_tmp_} ; \
+	     done ; \
+	  done ; \
+	  [ -n "$$_seen_" ] || continue ; \
+	  _need_all_=$$(echo $$_need_all_ | tr ' ' '\n' | grep -v '^$$' | sort -u) ; \
+	  _src_="" ; \
+	  for _cand_ in $$(find $(TC_TOOLCHAIN_ROOT) -name "$${tclib}" 2>/dev/null | xargs -r realpath 2>/dev/null | sort -u) ; do \
+	     if _provides_ "$$_cand_" $$_need_all_ ; then _src_="$$_cand_" ; break ; fi ; \
+	  done ; \
+	  if [ -n "$$_src_" ]; then \
+	     echo  "===>  Providing [$$(echo $$_need_all_ | tr '\n' ' ')] for $${tclib}" ; \
+	     _install_tclib_ "$${tclib}" "$$_src_" ; \
+	  else \
+	     echo  "===>      WARNING: no $${tclib} in the toolchain provides [$$(echo $$_need_all_ | tr '\n' ' ')]" >&2 ; \
+	  fi ; \
 	done
 
 pre_strip_target: strip_msg
