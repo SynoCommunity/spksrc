@@ -84,4 +84,13 @@ ifneq ($(wildcard $(_TC_COMPONENT_MK)),)
 include $(_TC_COMPONENT_MK)
 endif
 
+# overlay.mk keys its lookups off _OVERLAY_TC = syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX)),
+# and a native package leaves ARCH_SUFFIX at -native. Declare the real (arch, DSM) here,
+# before common.mk reads it, so TC_OVERLAY_GCC and everything built on it resolve.
+TC_ARCH_SUFFIX ?= -$(TC_ARCH)-$(TC_VERS)
+# tc_vars.mk supplies these on the cross side and is never generated here, yet
+# tc-capability.mk's libatomic probe composes the compiler path out of them.
+TC_PREFIX   ?= $(TC_TARGET)-
+TC_WORK_DIR ?= $(TC_DIR)/work
+
 include ../../mk/spksrc.native-cc.mk
