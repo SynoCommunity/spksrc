@@ -56,7 +56,13 @@ NATIVE_LDFLAGS  = $(HOST_OPTFLAGS)
 # v3: same binutils, rebuilt with the flags above actually reaching the compiler. Every
 # consumer pins the same rev.
 PKG_REV ?= v3
-ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV)
+# The consumer fetches by PKG_DIST_ARCH, which is not always TC_ARCH: aarch64 takes
+# rtd1296, armv7 armada38x, x64 x86 or apollolake. Read back from the consumer rather
+# than tabulated here, so the name this produces cannot drift from the name fetched.
+TC_DIST_ARCH = $(or $(strip $(shell sed -n 's/^PKG_DIST_ARCH[[:space:]]*=[[:space:]]*//p' \
+                 ../../toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-$(PKG_VERS)/Makefile \
+                 2>/dev/null | sed 's|$$(TC_ARCH)|$(TC_ARCH)|')),$(TC_ARCH))
+ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_DIST_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
 ARCHIVE_KEEP = usr/local
@@ -77,3 +83,26 @@ arch-%:
 	@$(MSG) "===== binutils-$(PKG_VERS): $* ====="
 	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
 	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
+
+##############################################################################
+# Build (and archive) binutils for EVERY toolchain of a given DSM version.
+#
+#   make all-6.2.4                 one arch at a time
+#   make BINUTILS_JOBS=5 all-6.2.4     5 archs at a time (each still max threads)
+#
+# The consumers ARE the arch list -- one consumer, one archive, so there is no table
+# here and no virtual/canonical special case.
+#
+# Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
+# propagates into every sub-make, parallelising toolchain targets not written for it.
+##############################################################################
+BINUTILS_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_binutils-2.30 2>/dev/null | \
+                    sed 's|.*/syno-||; s|-$(1)_binutils-2.30$$||')
+BINUTILS_JOBS ?= 1
+
+.PHONY: all-%
+all-%:
+	@$(MSG) "===== binutils-$(PKG_VERS): all-$* -- $(words $(call BINUTILS_ARCHS,$*)) archs, $(BINUTILS_JOBS) at a time ====="
+	@echo "$(sort $(call BINUTILS_ARCHS,$*))" | tr ' ' '\n' | \
+	   xargs -P $(BINUTILS_JOBS) -I@ $(MAKE) --no-print-directory arch-@-$*
+	@$(MSG) "===== binutils-$(PKG_VERS): all-$* complete ====="

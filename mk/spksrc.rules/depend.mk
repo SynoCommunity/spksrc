@@ -71,7 +71,7 @@ spk-meta-source:
 	   else \
 	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
 	      env -i PATH="$(PATH)" HOME="$(HOME)" \
-	         $(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
+	         $(MAKE) $(FWRD_ARGS_SPK) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
 	   fi ; \
 	done
 
@@ -100,7 +100,7 @@ endif
 	@set -e; \
 	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) $(MAKE) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
 	
 post_depend_target: $(DEPEND_TARGET)

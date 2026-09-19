@@ -10,6 +10,10 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
+# One compiler and one libstdc++ ABI across the whole ffmpeg chain, tvheadend included.
+# Set before spksrc.common.mk, so overlay.mk's own `?=` stands down.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)

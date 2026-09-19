@@ -13,6 +13,11 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --prefix=$(INSTALL_PREFIX)
@@ -43,7 +48,9 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
-  ifeq ($(findstring $(ARCH), $(i686_ARCHS)),)
+  # PowerPC joins i686 out of LTO: gcc 8.5 segfaults in the postreload RTL pass on
+  # 6.1's jpeg2000dec.c, and lto1 is the only path that reaches it.
+  ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(PPC_ARCHS)),)
     CONFIGURE_ARGS += --enable-lto
   endif
 endif

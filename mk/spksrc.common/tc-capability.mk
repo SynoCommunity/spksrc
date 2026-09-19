@@ -4,10 +4,11 @@
 # Lets a package declare what it NEEDS from a toolchain instead of enumerating
 # the architectures where it happens to fail today:
 #
-#   MIN_GLIBC_VERSION = 2.20    needs glibc 2.20 or newer
-#   MIN_GCC_VERSION   = 8       needs gcc 8 or newer
-#   MIN_RUSTC_VERSION = 1.85    needs rustc 1.85 or newer
-#   REQUIRE_64BIT     = 1       needs a 64-bit target
+#   MIN_GLIBC_VERSION  = 2.20   needs glibc 2.20 or newer
+#   MIN_KERNEL_VERSION = 3.10   needs a 3.10 or newer kernel
+#   MIN_GCC_VERSION    = 8      needs gcc 8 or newer
+#   MIN_RUSTC_VERSION  = 1.85   needs rustc 1.85 or newer
+#   REQUIRE_64BIT      = 1      needs a 64-bit target
 #
 # A floor REFUSES the arch. Where a package must instead CHOOSE between versions of
 # itself -- the cross/<pkg> virtuals -- compare TC_GCC / TC_GLIBC / TC_KERNEL / TC_RUSTC
@@ -28,7 +29,11 @@
 
 # Does this toolchain's gcc ship libatomic? Ask it -- a gcc too old to have it also predates
 # __atomic_* and never needs it. Lazy (=), outside the ARCH guard: it runs the cross gcc.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+#
+# The one a build will USE, not the one shipped: an overlay gcc has libatomic exactly where
+# the vendor one predates it. By wildcard -- packages read this file, overlay-gcc.mk not.
+_TC_LIBATOMIC_CC = $(or $(firstword $(wildcard $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/$(TC_PREFIX)gcc-[0-9]*))),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(_TC_LIBATOMIC_CC) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 # Outside the guard on purpose: the native producers read TC_HAS_LIBATOMIC with no ARCH.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
@@ -64,12 +69,29 @@ endif
 endif
 endif
 
-# ---- gcc: the compiler the toolchain ships ----------------------------------
+# ---- kernel: a runtime floor like glibc, and the one gcc cannot mask ---------
+# A driver stack talks to ioctls the running kernel either has or has not. Since the gcc
+# overlay lifts TC_GCC_EFFECTIVE everywhere it exists, this is what still discriminates.
+ifneq ($(strip $(MIN_KERNEL_VERSION)),)
+ifneq ($(strip $(TC_KERNEL)),)
+ifeq ($(call version_ge,$(TC_KERNEL),$(MIN_KERNEL_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),kernel $(TC_KERNEL) < $(MIN_KERNEL_VERSION) (a runtime floor: no toolchain can lift it))
+endif
+endif
+endif
+
+# ---- gcc: the compiler a build will actually use ----------------------------
+# The overlay's version when one is ACTIVE, the toolchain's own otherwise: a floor asks
+# what the compiler can do, and an active gcc overlay changes the answer. TC_GCC itself
+# stays the stock version -- it names consumer directories and drives gcc-abi.mk, both of
+# which must keep reading the vendor compiler.
+TC_GCC_EFFECTIVE = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
+
 # Plain ifeq rather than a nested $(if): version_ge returns empty for false.
 ifneq ($(strip $(MIN_GCC_VERSION)),)
-ifneq ($(strip $(TC_GCC)),)
-ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
-TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),gcc $(TC_GCC) < $(MIN_GCC_VERSION))
+ifneq ($(strip $(TC_GCC_EFFECTIVE)),)
+ifeq ($(call version_ge,$(TC_GCC_EFFECTIVE),$(MIN_GCC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION))
 endif
 endif
 endif
