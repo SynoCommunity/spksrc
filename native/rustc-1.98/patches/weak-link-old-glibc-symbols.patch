@@ -1,0 +1,86 @@
+# Weak-link glibc symbols that libstd references unconditionally but which are absent
+# from the old glibc of legacy DSM toolchains, so std links AND loads there:
+#   getauxval          (glibc 2.16)  ppc853x 2.8, 88f6281 2.15
+#   pthread_setname_np (glibc 2.12)  ppc853x 2.8
+#   pipe2              (glibc 2.9)   ppc853x 2.8
+# Cross-linking does not check the target's glibc, so without this std builds fine and
+# then fails to load on the NAS. On ELF weak! emits an extern_weak reference resolving to
+# NULL when absent; each site falls back (getauxval -> 0 "not found"; thread name -> skip;
+# pipe2 -> pipe + manual CLOEXEC). Harmless on newer glibc.
+#
+# 1.98 note: weak! is a macro 2.0 reached through `use crate::sys::pal::weak::weak;`, and
+# its parameters must be NAMED (`fn f(x: T) -> U`). Unnamed types parse as far as the
+# first `::` and then fail with "no rules expected `::`" -- which is what an earlier port
+# of this patch did, against files that 1.98 had already moved aside, so it compiled and
+# emitted strong references anyway.
+--- library/std/src/sys/pal/unix/stack_overflow.rs
++++ library/std/src/sys/pal/unix/stack_overflow.rs
+@@ -307,7 +307,15 @@
+     /// Modern kernels on modern hardware can have dynamic signal stack sizes.
+     #[cfg(all(any(target_os = "linux", target_os = "android"), not(target_env = "uclibc")))]
+     fn sigstack_size() -> usize {
+-        let dynamic_sigstksz = unsafe { libc::getauxval(libc::AT_MINSIGSTKSZ) };
++        // getauxval() arrived in glibc 2.16; weak-link it so std still links against the
++        // older glibc of a legacy DSM sysroot. Absent -> 0, which is exactly what
++        // getauxval itself returns when the entry is missing, so the max() below copes.
++        use crate::sys::pal::weak::weak;
++        weak!(
++            fn getauxval(type_: libc::c_ulong) -> libc::c_ulong;
++        );
++        let dynamic_sigstksz =
++            match getauxval.get() { Some(f) => unsafe { f(libc::AT_MINSIGSTKSZ) }, None => 0 };
+         // If getauxval couldn't find the entry, it returns 0,
+         // so take the higher of the "constant" and auxval.
+         // This transparently supports older kernels which don't provide AT_MINSIGSTKSZ
+--- library/std/src/sys/pipe/unix.rs
++++ library/std/src/sys/pipe/unix.rs
+@@ -24,9 +24,27 @@
+             target_os = "cygwin",
+             target_os = "redox"
+         ) => {
++            // pipe2() arrived in glibc 2.9; weak-link it and fall back to pipe() plus a
++            // manual CLOEXEC where it is missing.
++            use crate::sys::pal::weak::weak;
++            weak!(
++                fn pipe2(fds: *mut libc::c_int, flags: libc::c_int) -> libc::c_int;
++            );
+             unsafe {
+-                cvt(libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC))?;
+-                Ok((Pipe::from_raw_fd(fds[0]), Pipe::from_raw_fd(fds[1])))
++                match pipe2.get() {
++                    Some(f) => {
++                        cvt(f(fds.as_mut_ptr(), libc::O_CLOEXEC))?;
++                        Ok((Pipe::from_raw_fd(fds[0]), Pipe::from_raw_fd(fds[1])))
++                    }
++                    None => {
++                        cvt(libc::pipe(fds.as_mut_ptr()))?;
++                        let fd0 = Pipe::from_raw_fd(fds[0]);
++                        let fd1 = Pipe::from_raw_fd(fds[1]);
++                        fd0.set_cloexec()?;
++                        fd1.set_cloexec()?;
++                        Ok((fd0, fd1))
++                    }
++                }
+             }
+         }
+         _ => {
+--- library/std/src/sys/thread/unix.rs
++++ library/std/src/sys/thread/unix.rs
+@@ -444,7 +444,16 @@
+         };
+         // Available since glibc 2.12, musl 1.1.16, and uClibc 1.0.20 for Linux,
+         // FreeBSD 12.2 and 13.0, and DragonFly BSD 6.0.
+-        let res = libc::pthread_setname_np(libc::pthread_self(), name.as_ptr());
++        // Weak-linked: glibc 2.12, and a legacy DSM sysroot can be older. Missing simply
++        // means the thread keeps its default name.
++        use crate::sys::pal::weak::weak;
++        weak!(
++            fn pthread_setname_np(thread: libc::pthread_t, name: *const libc::c_char) -> libc::c_int;
++        );
++        let res = match pthread_setname_np.get() {
++            Some(f) => f(libc::pthread_self(), name.as_ptr()),
++            None => 0,
++        };
+         // We have no good way of propagating errors here, but in debug-builds let's check that this actually worked.
+         debug_assert_eq!(res, 0);
+     }
