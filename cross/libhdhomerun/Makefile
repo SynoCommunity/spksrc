@@ -16,7 +16,10 @@ INSTALL_TARGET = libhdhomerun_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-COMPILE_ARGS = CROSS_COMPILE=$(abspath $(CURDIR)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX))
+# Its Makefile builds the tool names from CROSS_COMPILE, a prefix that assumes the
+# compiler is <path>/<target>-gcc and nothing else; ask the toolchain for each tool
+# instead of spelling out a path under toolchain/.
+COMPILE_ARGS = CC="$(call tc,gcc)" STRIP="$(call tc,strip)"
 
 .PHONY: libhdhomerun_install
 libhdhomerun_install:

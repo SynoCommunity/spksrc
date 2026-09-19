@@ -117,6 +117,24 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 19th 2026 — The last spelled-out toolchain path (#7467)"
+
+    The conversion started in [#7441](https://github.com/SynoCommunity/spksrc/pull/7441)
+    and continued in [#7454](https://github.com/SynoCommunity/spksrc/pull/7454) left one
+    package behind.
+
+    - **`cross/libhdhomerun` built its own path** into
+      `toolchain/syno-$(ARCH)-$(TCVERSION)/work/...` and handed it to `CROSS_COMPILE`.
+      `CROSS_COMPILE` can only express a prefix, so it assumes the compiler is
+      `<path>/<target>-gcc` and nothing else.
+
+    - **It names its two tools instead.** Its upstream Makefile assigns `CC` and `STRIP`
+      with `:=`, and a value on the make line overrides that, so
+      `CC="$(call tc,gcc)" STRIP="$(call tc,strip)"` is enough and `CROSS_COMPILE` goes.
+
+    - Byte-identical output before and after on `88f6281-6.2.4` and `x64-7.1`: the
+      binary, the shared library and every installed header.
+
 ??? note "September 19th 2026 — The overlay binutils was built with no optimisation at all (#7469)"
 
     - **An `ENV` line above the include never wins.** `native/binutils-2.30` set
@@ -354,6 +372,7 @@ If you only read one thing, read this. The details are in the dated log below.
       `WORK_DIR`, so every package it visited wrote a `tc_vars.mk` of its own: a single
       `make check` left 141 work directories behind for a command that builds nothing. It
       now forwards it as `depend.mk` does through `$(ENV)`, and the walk reads the root's.
+
 ??? note "September 7th 2026 — An arch exclusion says why, and names every blocker (#7439)"
     - **Seven restated floors gone.** `spk/tvheadend`, `chromaprint`, `comskip` and
       `spk/ffmpeg5-8` each declared `MIN_GCC_VERSION = 4.9`, restating what their own
