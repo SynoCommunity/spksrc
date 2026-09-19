@@ -5,7 +5,7 @@ TC_TARGET = powerpc-e500v2-linux-gnuspe
 PKG_NAME = binutils
 PKG_VERS = 2.30
 PKG_EXT  = txz
-PKG_REV ?= v1
+PKG_REV ?= v3
 EXTRACT_PATH = $(INSTALL_DIR)
 
 DEPENDS =
