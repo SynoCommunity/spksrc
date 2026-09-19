@@ -41,7 +41,10 @@ include ../../mk/spksrc.cross/env-rust.mk
 # reading like a rustup name (<ver>-<target>) grafted with arch/DSM/gcc.
 _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
-_RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
+# The gcc the rust toolchain was BUILT with, which is the overlay's when it is active --
+# the consumer directory says the same, and this id has to name the toolchain rustup
+# actually linked or RUSTUP_TOOLCHAIN points at one that was never installed.
+_RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
 
 # ON = custom from-source build + synology triple; OFF = stock rustup rustc + `unknown`
 # triple, usable only where rustup ships a std (tc-rust.mk reports it). The switch and its
