@@ -117,6 +117,35 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 19th 2026 — The overlay binutils was built with no optimisation at all (#7469)"
+
+    - **An `ENV` line above the include never wins.** `native/binutils-2.30` set
+      `ENV += CFLAGS="-O2"` before including the native front-end, and `env-default.mk`
+      appends its own `ENV += CFLAGS="$(NATIVE_CFLAGS)"` when that include is read.
+      `NATIVE_CFLAGS` is empty, and the last assignment wins in `env VAR=... cmd` -- so
+      `CFLAGS=""` reached configure and make, which also overrides the `-O2` configure
+      would otherwise have chosen. Every published binutils overlay, v1 and v2, is an
+      unoptimised build.
+
+    - **Set `NATIVE_CFLAGS`, don't append to `ENV`.** It is the variable
+      `env-default.mk` reads, so filling it is order-independent and cannot be undone by
+      moving a line. (`native/gcc-8.5` escapes the trap only because its `ENV` line
+      happens to sit below its own include.)
+
+    - **What it buys**, measured on `qoriq-6.2.4`, same host, three runs: `as` on a 2 MB
+      `.s` goes 0.83-0.98s to 0.39s for ten assemblies (~2.2x), `ld -r` 0.31-0.33s to
+      0.24-0.25s for fifty (~1.3x). `ld` shrinks 3441688 to 2929056 bytes, `as` 2491896
+      to 1834688.
+
+    - **`--disable-install-libbfd` goes with it.** The consumers symlink
+      `usr/local/bin/<target>-{ld,as}` and nothing else, but the archive shipped
+      `libbfd.a` and `libopcodes.a` -- and `-ffat-lto-objects` holds both IR and objects
+      in them. On `x86-5.2` that was 7.3 MB and 2.6 MB against 2.3 MB for the whole of
+      `bin/`. The archive goes 9.1 MB to 2.5 MB, below even the unoptimised v1 at 3.1 MB.
+
+    - **v3 archives** are published for the five archs that have a binutils overlay, and
+      each consumer pins the new rev.
+
 ??? note "September 19th 2026 — `make digests` in a toolchain folder, without moving the rules (#7465)"
 
     - **`make digests` worked everywhere except the three front-ends.** `toolchain`,
