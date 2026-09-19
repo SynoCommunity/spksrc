@@ -1,0 +1,16 @@
+[
+  {
+    "step_title": "Before you start",
+    "items": [
+      {
+        "desc": "Caddy's configuration lives in <code>/var/packages/caddy/var/Caddyfile</code> on this NAS - edit it, then restart this package (or run <code>caddy reload</code>) to apply changes. The full instructions below are also in that file's own comments."
+      },
+      {
+        "desc": "<b>Ports 80/443 may already be taken.</b> DSM's Login Portal often holds them (redirecting visitors to the DSM management UI) even with Web Station stopped. That's why the default site here listens on :8880 instead. To free 80/443: Control Panel -> Login Portal -> Advanced -> Applications, edit the \"DSM\" entry's port binding (on DSM 6.x, look for \"Application Portal\" instead)."
+      },
+      {
+        "desc": "<b>Want automatic HTTPS?</b> Point a DNS record at your public IP, forward ports 80 and 443 to this NAS, then replace the <code>:8880</code> block in the Caddyfile with your real domain name. Caddy fetches and renews a Let's Encrypt certificate for it automatically from then on."
+      }
+    ]
+  }
+]
