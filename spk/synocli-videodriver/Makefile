@@ -28,6 +28,10 @@ CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+).<br/>"
 CHANGELOG += "9. Re-publish for DSM 7.2+.<br/>"
 CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu_top) moved to synocli-videodriver-tools: this package now ships libraries only.<br/>"
 
+# The Intel media stack drives i915 ioctls the running kernel either has or has not;
+# DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
+MIN_KERNEL_VERSION = 3.10
+
 include ../../mk/spksrc.common.mk
 
 # Library dependency list shared with the consumer-side meta integration
