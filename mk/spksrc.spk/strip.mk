@@ -60,12 +60,13 @@ TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
 strip_msg:
 	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
-# Carry the copy the binary actually asks for -- matched on the symbol versions it
-# needs -- rather than the first one a plain find turns up. A find by name returns
-# every copy under the toolchain at once (the sysroot's, the compiler's lib64, a
-# multilib), different versions handed to a basename expecting one; choosing by
-# symbol version is right there today, and stays right once several gcc versions
-# coexist under an overlay.
+# Carry the copy every shipped binary can resolve against -- matched on the UNION of
+# the symbol versions they ask for -- rather than the first one a plain find turns up.
+# A find by name returns every copy under the toolchain at once (the sysroot's, the
+# compiler's lib64, a multilib), different versions handed to a basename expecting one.
+# Matching one binary and stopping ships whichever copy satisfied that one, which is the
+# oldest copy whenever the first binary listed is the least demanding; the rest then have
+# nothing to resolve against at runtime.
 define _tclib_helpers
 _provides_() { \
    _lib_="$$1" ; shift ; \
@@ -79,17 +80,6 @@ _versions_needed_() { \
      'index($$0, "File: " so) > 0 { want = 1 ; next } \
       /File:/ { want = 0 } \
       want && /Name:/ { for (i = 1; i <= NF; i++) if ($$i == "Name:") print $$(i+1) }' ; \
-} ; \
-_select_tclib_() { \
-   _tclib_="$$1" ; _bin_="$$2" ; \
-   _soname_=$$(objdump -p "$$_bin_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$$_tclib_" | head -1) ; \
-   [ -n "$$_soname_" ] || return 1 ; \
-   _need_=$$(_versions_needed_ "$$_bin_" "$$_soname_") ; \
-   for _cand_ in $$(find $(TC_TOOLCHAIN_ROOT) -name "$$_tclib_" 2>/dev/null | xargs -r realpath 2>/dev/null | sort -u) ; do \
-      if _provides_ "$$_cand_" $$_need_ ; then echo "$$_cand_" ; return 0 ; fi ; \
-   done ; \
-   echo "===>      WARNING: no $$_tclib_ in the toolchain provides [$$(echo $$_need_ | tr '\n' ' ')] for $$_bin_" >&2 ; \
-   return 1 ; \
 } ; \
 _install_tclib_() { \
    _tclib_="$$1" ; _src_="$$2" ; \
@@ -107,33 +97,40 @@ endef
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
 	for tclib in $(TC_LIBS_DEFAULT); do \
-	echo  "===> SEARCHING for $${tclib}" ; \
-	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
-	  case $${type} in \
-	    lib|bin) \
-	         _src_=$$(_select_tclib_ "$${tclib}" "$(STAGING_DIR)/$${file}" || true) ; \
-	         if [ -n "$${_src_}" ]; then \
-	            echo  "===>  Found in $${file} for library dependency from toolchain ($${tclib})" ; \
-	            _install_tclib_ "$${tclib}" "$${_src_}" ; \
-	            break 2 ; \
-	         fi ;; \
-	  esac ; \
-	done ; \
-	for wheel in $(WORK_DIR)/wheelhouse/*.whl ; do \
-	   [ -e "$${wheel}" ] || continue ; \
-	   for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
-	      _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
-	      unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
-	      _src_=$$(_select_tclib_ "$${tclib}" "$${_tmp_}/$${shlib}" || true) ; \
-	      if [ -n "$${_src_}" ]; then \
-	         echo  "===>  Found in $$(basename $${wheel}) for library dependency from toolchain ($${tclib})" ; \
-	         _install_tclib_ "$${tclib}" "$${_src_}" ; \
-	         rm -fr $${_tmp_} ; \
-	         break 2 ; \
-	      fi ; \
-	      rm -fr $${_tmp_} ; \
-	   done ; \
-	done ; \
+	  echo  "===> SEARCHING for $${tclib}" ; \
+	  _need_all_="" ; _seen_="" ; \
+	  for _f_ in $$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; do \
+	     _b_="$(STAGING_DIR)/$${_f_}" ; \
+	     _sn_=$$(objdump -p "$$_b_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
+	     [ -n "$$_sn_" ] || continue ; \
+	     _seen_=1 ; \
+	     _need_all_="$$_need_all_ $$(_versions_needed_ "$$_b_" "$$_sn_")" ; \
+	  done ; \
+	  for wheel in $(WORK_DIR)/wheelhouse/*.whl ; do \
+	     [ -e "$${wheel}" ] || continue ; \
+	     for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
+	        _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
+	        unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
+	        _sn_=$$(objdump -p "$${_tmp_}/$${shlib}" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
+	        if [ -n "$$_sn_" ]; then \
+	           _seen_=1 ; \
+	           _need_all_="$$_need_all_ $$(_versions_needed_ "$${_tmp_}/$${shlib}" "$$_sn_")" ; \
+	        fi ; \
+	        rm -fr $${_tmp_} ; \
+	     done ; \
+	  done ; \
+	  [ -n "$$_seen_" ] || continue ; \
+	  _need_all_=$$(echo $$_need_all_ | tr ' ' '\n' | grep -v '^$$' | sort -u) ; \
+	  _src_="" ; \
+	  for _cand_ in $$(find $(TC_TOOLCHAIN_ROOT) -name "$${tclib}" 2>/dev/null | xargs -r realpath 2>/dev/null | sort -u) ; do \
+	     if _provides_ "$$_cand_" $$_need_all_ ; then _src_="$$_cand_" ; break ; fi ; \
+	  done ; \
+	  if [ -n "$$_src_" ]; then \
+	     echo  "===>  Providing [$$(echo $$_need_all_ | tr '\n' ' ')] for $${tclib}" ; \
+	     _install_tclib_ "$${tclib}" "$$_src_" ; \
+	  else \
+	     echo  "===>      WARNING: no $${tclib} in the toolchain provides [$$(echo $$_need_all_ | tr '\n' ' ')]" >&2 ; \
+	  fi ; \
 	done
 
 pre_strip_target: strip_msg
