@@ -235,6 +235,7 @@ The architecture **groups** (`x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARC
 |----------|-------------|
 | `MIN_GCC_VERSION` | Refuse archs whose toolchain gcc is below this (capability floor) |
 | `MIN_GLIBC_VERSION` | Refuse archs whose toolchain glibc is below this (runtime floor) |
+| `MIN_KERNEL_VERSION` | Refuse archs whose toolchain kernel is below this (runtime floor) |
 | `MIN_RUSTC_VERSION` | Refuse archs whose toolchain rustc is below this (capability floor) |
 | `REQUIRE_64BIT` | Set to `1` to refuse 32-bit architectures |
 | `REQUIRED_MIN_DSM` | Skip if the DSM toolchain is below this version |

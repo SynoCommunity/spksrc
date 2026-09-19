@@ -90,6 +90,10 @@ CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
 
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# The same floor libva itself declares. x86-5.2 is in x64_ARCHS but runs a 3.2 kernel,
+# so asking for the stack there would make the whole build unsupported instead of
+# quietly leaving vaapi out, which is what this arch wants.
+ifeq ($(call version_ge,$(TC_KERNEL),3.10),1)
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 
@@ -99,6 +103,7 @@ ifeq ($(call version_gt, $(TC_GCC), 5),1)
 DEPENDS += cross/intel-libvpl
 CONFIGURE_ARGS += --enable-qsv
 endif  # TC_GCC > 5
+endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
 

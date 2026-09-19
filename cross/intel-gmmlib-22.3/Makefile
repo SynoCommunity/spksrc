@@ -14,4 +14,8 @@ LICENSE  = MIT
 
 CONFIGURE_ARGS += -DRUN_TEST_SUITE=OFF
 
+# The Intel media stack drives i915 ioctls the running kernel either has or has not;
+# DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
+MIN_KERNEL_VERSION = 3.10
+
 include ../../mk/spksrc.cross-cmake.mk
