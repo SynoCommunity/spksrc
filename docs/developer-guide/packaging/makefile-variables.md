@@ -289,6 +289,7 @@ human-readable reason.
 |----------|-------------|
 | `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
 | `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
+| `MIN_KERNEL_VERSION` | Needs at least this kernel — a runtime floor no toolchain can lift |
 | `MIN_RUSTC_VERSION` | Needs at least this rustc (e.g. `1.85`) |
 | `REQUIRE_64BIT` | Set to `1` when the package needs a 64-bit target |
 

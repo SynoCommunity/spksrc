@@ -4,10 +4,11 @@
 # Lets a package declare what it NEEDS from a toolchain instead of enumerating
 # the architectures where it happens to fail today:
 #
-#   MIN_GLIBC_VERSION = 2.20    needs glibc 2.20 or newer
-#   MIN_GCC_VERSION   = 8       needs gcc 8 or newer
-#   MIN_RUSTC_VERSION = 1.85    needs rustc 1.85 or newer
-#   REQUIRE_64BIT     = 1       needs a 64-bit target
+#   MIN_GLIBC_VERSION  = 2.20   needs glibc 2.20 or newer
+#   MIN_KERNEL_VERSION = 3.10   needs a 3.10 or newer kernel
+#   MIN_GCC_VERSION    = 8      needs gcc 8 or newer
+#   MIN_RUSTC_VERSION  = 1.85   needs rustc 1.85 or newer
+#   REQUIRE_64BIT      = 1      needs a 64-bit target
 #
 # A floor REFUSES the arch. Where a package must instead CHOOSE between versions of
 # itself -- the cross/<pkg> virtuals -- compare TC_GCC / TC_GLIBC / TC_KERNEL / TC_RUSTC
@@ -60,6 +61,17 @@ ifneq ($(strip $(MIN_GLIBC_VERSION)),)
 ifneq ($(strip $(TC_GLIBC)),)
 ifeq ($(call version_ge,$(TC_GLIBC),$(MIN_GLIBC_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),glibc $(TC_GLIBC) < $(MIN_GLIBC_VERSION) (a runtime floor: no toolchain can lift it))
+endif
+endif
+endif
+
+# ---- kernel: a runtime floor like glibc -------------------------------------
+# A driver stack talks to ioctls the running kernel either has or has not. No compiler
+# can supply one, so this refuses the arch outright rather than letting it build.
+ifneq ($(strip $(MIN_KERNEL_VERSION)),)
+ifneq ($(strip $(TC_KERNEL)),)
+ifeq ($(call version_ge,$(TC_KERNEL),$(MIN_KERNEL_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),kernel $(TC_KERNEL) < $(MIN_KERNEL_VERSION) (a runtime floor: no toolchain can lift it))
 endif
 endif
 endif
