@@ -91,8 +91,11 @@ OVERLAY_BINUTILS       ?= 0
 OVERLAY_GCC            ?= 0
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
-# Carried to every sub-make that resolves a toolchain (FWRD_ARGS, spksrc.common.mk). Not
-# RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the child reads itself.
+# Carried to every sub-make that resolves a toolchain WITHIN this package (FWRD_ARGS).
+# Deliberately absent from FWRD_ARGS_SPK: which compiler a package builds with belongs
+# to that package and its own work dir, so an spk built as another's meta decides for
+# itself rather than inheriting its caller's choice. Not RUST_LINK_VIA_BINUTILS: it
+# derives from TC_OVERLAY_RUSTC, which the child reads itself.
 FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC _OVERLAY_FORWARDED
 
 # Set after the test above read the real command line, and carried from here on: a child
