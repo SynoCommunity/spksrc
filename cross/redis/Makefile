@@ -1,5 +1,5 @@
 PKG_NAME = redis
-PKG_VERS = 8.8.2
+PKG_VERS = 8.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases
@@ -24,6 +24,11 @@ CONFIGURE_TARGET = nop
 endif
 
 INSTALL_ARGS = install PREFIX=$(STAGING_INSTALL_PREFIX)
+
+# Redis 8.10 builds its bundled modules (redisearch, redisjson,
+# redistimeseries) by default; this package ships the server core
+# only, as all previous versions did.
+COMPILE_ARGS += build none
 
 # use jemalloc for intel archs
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
