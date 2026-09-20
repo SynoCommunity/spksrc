@@ -1,5 +1,5 @@
 PKG_NAME = libxml2
-PKG_VERS = 2.13.9
+PKG_VERS = 2.15.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.gnome.org/sources/libxml2/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
@@ -12,11 +12,9 @@ COMMENT  = Libxml2 is the XML C parser and toolkit developed for the Gnome proje
 LICENSE  = MIT
 
 CONFIGURE_ARGS  = -DLIBXML2_WITH_PYTHON=OFF
-CONFIGURE_ARGS += -DLIBXML2_WITH_LZMA=OFF
 CONFIGURE_ARGS += -DLIBXML2_WITH_ICONV=OFF
 CONFIGURE_ARGS += -DLIBXML2_WITH_TESTS=OFF
 CONFIGURE_ARGS += -DLIBXML2_WITH_DEBUG=OFF
-CONFIGURE_ARGS += -DHAVE_LIBREADLINE=0
 
 # adjust prefix in xml2-config
 POST_INSTALL_TARGET = libxml2_post_install
