@@ -1,6 +1,6 @@
 SPK_NAME = minio
-SPK_VERS = 2022.10.24
-SPK_REV = 16
+SPK_VERS = 2025.10.15
+SPK_REV = 17
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package includes the 'minio-client' \(mc\).
 DISPLAY_NAME = MinIO
-CHANGELOG = "1. Update to MinIO 2022-10-24T18-35-07Z. Multiple minor feature releases and security releases.<br/>2. Last version supporting legacy “FS-mode” backend. All newer versions will not be able to read data from old installations anymore."
+CHANGELOG = "1. Update to MinIO RELEASE.2025-10-15T17-29-55Z (security fixes, including privilege escalation via STS/service accounts). <br/>2. FS-mode data from old installations cannot be read by newer versions. <br/>3. Upstream MinIO repository has been archived; no further releases are expected."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
 LICENSE = AGPLv3.0
