@@ -117,6 +117,30 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 19th 2026 — One runtime library for all of a package, not for its first binary (#7466)"
+
+    - **The copy that shipped was the one the first binary needed.**
+      `include_toolchain_specific_libraries` walked the plist, matched the first binary
+      that asked for `libatomic` / `libquadmath` / `libgfortran`, installed whichever copy
+      satisfied *it*, and stopped (`break 2`). A find by name returns every copy under the
+      toolchain root at once -- the sysroot's, the compiler's `lib64`, a multilib -- and
+      they are not the same version, so when the first binary listed is the least
+      demanding the oldest copy is what gets carried.
+
+    - **The union decides now.** Every plist `lib`/`bin` entry and every wheel `.so` is
+      read first, their required symbol versions merged, and one copy chosen that provides
+      all of it. The log line changed with it: `Providing [<versions>] for <lib>` instead
+      of `Found in <file>`.
+
+    - **Shown before and after on the same staging tree**: one binary needing
+      `GLIBCXX_3.4`/`CXXABI_1.3.9`, one needing `GLIBCXX_3.4.21`, two candidates under the
+      toolchain root. Before, the older candidate is installed on the strength of the
+      first binary alone; after, the union is
+      `[CXXABI_1.3 CXXABI_1.3.9 GLIBCXX_3.4 GLIBCXX_3.4.21]` and the copy providing all of
+      it wins.
+
+    - `_select_tclib_` is gone: the per-binary selection it implemented has no caller left.
+
 ??? note "September 19th 2026 — The last spelled-out toolchain path (#7467)"
 
     The conversion started in [#7441](https://github.com/SynoCommunity/spksrc/pull/7441)
