@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver
 SPK_VERS = 1.5
-SPK_REV = 9
+SPK_REV = 8
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
