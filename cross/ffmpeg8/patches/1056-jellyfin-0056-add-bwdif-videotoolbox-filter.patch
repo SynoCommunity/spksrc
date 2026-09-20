@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -4120,6 +4120,7 @@ boxblur_opencl_filter_deps="opencl gpl"
+@@ -4123,6 +4123,7 @@ boxblur_opencl_filter_deps="opencl gpl"
  bs2b_filter_deps="libbs2b"
  bwdif_cuda_filter_deps="ffnvcodec"
  bwdif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -155,7 +155,7 @@ Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
 +        if (abs(c - e) > temporal_diff0) {
 +            interpol = (((coef_hf[0] * (prev2_0 + next2_0)
 +                - coef_hf[1] * (prev2_mrefs2 + next2_mrefs2 + prev2_prefs2 + next2_prefs2)
-+                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_mrefs4)) / 4)
++                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_prefs4)) / 4)
 +                + coef_lf[0] * (c + e) - coef_lf[1] * (cur_mrefs3 + cur_prefs3)) / (1 << 13);
 +        } else {
 +            interpol = (coef_sp[0] * (c + e) - coef_sp[1] * (cur_mrefs3 + cur_prefs3)) / (1 << 13);
@@ -196,10 +196,10 @@ Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
 +    }
 +
 +    // Calculate temporal prediction
-+    texture2d<float, accesstype> prev2 = prev;
-+    texture2d<float, accesstype> prev1 = is_second_field ? cur : prev;
-+    texture2d<float, accesstype> next1 = is_second_field ? next : cur;
-+    texture2d<float, accesstype> next2 = next;
++    texture2d<float, accesstype> prev2 = is_second_field ? cur : prev;
++    texture2d<float, accesstype> prev1 = prev;
++    texture2d<float, accesstype> next1 = next;
++    texture2d<float, accesstype> next2 = is_second_field ? next : cur;
 +
 +    T prev2_prefs4 = tex2D<T>(prev2, pos.x, pos.y+ 4);
 +    T prev2_prefs2 = tex2D<T>(prev2, pos.x, pos.y + 2);
@@ -249,10 +249,10 @@ Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
 +    }
 +
 +    // Calculate temporal prediction
-+    texture2d<float, accesstype> prev2 = prev;
-+    texture2d<float, accesstype> prev1 = is_second_field ? cur : prev;
-+    texture2d<float, accesstype> next1 = is_second_field ? next : cur;
-+    texture2d<float, accesstype> next2 = next;
++    texture2d<float, accesstype> prev2 = is_second_field ? cur : prev;
++    texture2d<float, accesstype> prev1 = prev;
++    texture2d<float, accesstype> next1 = next;
++    texture2d<float, accesstype> next2 = is_second_field ? next : cur;
 +
 +    T prev2_prefs4 = tex2D<T>(prev2, pos.x, pos.y+ 4);
 +    T prev2_prefs2 = tex2D<T>(prev2, pos.x, pos.y + 2);
@@ -312,6 +312,40 @@ Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
 +    }
 +    dst.write(pred.xyyy, pos);
 +}
+Index: FFmpeg/libavfilter/metal/vf_yadif_videotoolbox.metal
+===================================================================
+--- libavfilter/metal/vf_yadif_videotoolbox.metal
++++ libavfilter/metal/vf_yadif_videotoolbox.metal
+@@ -88,7 +88,7 @@ T spatial_predictor(T a, T b, T c, T d,
+                     T h, T i, T j, T k, T l, T m, T n)
+ {
+     T spatial_pred = (d + k)/2;
+-    T spatial_score = abs(c - j) + abs(d - k) + abs(e - l);
++    T spatial_score = abs(c - j) + abs(d - k) + abs(e - l) - (1.0f / 255.0f);
+ 
+     T score = abs(b - k) + abs(c - l) + abs(d - m);
+     if (score < spatial_score) {
+@@ -128,7 +128,7 @@ T temporal_predictor(T A, T B, T C, T D,
+     T tdiff1 = (abs(A - F) + abs(B - G)) / 2;
+     T tdiff2 = (abs(K - F) + abs(G - L)) / 2;
+ 
+-    T diff = max3(tdiff0, tdiff1, tdiff2);
++    T diff = max3(tdiff0 / 2, tdiff1, tdiff2);
+ 
+     if (!skip_check) {
+         T maxi = max3(p2 - p3, p2 - p1, min(p0 - p1, p4 - p3));
+@@ -239,9 +239,9 @@ T yadif(
+     T spatial_pred = yadif_compute_spatial<T>(cur, pos);
+ 
+     if (params.is_second_field) {
+-        return yadif_compute_temporal(cur, prev, cur, next, next, spatial_pred, params.skip_spatial_check, pos);
++        return yadif_compute_temporal(cur, cur, prev, next, next, spatial_pred, params.skip_spatial_check, pos);
+     } else {
+-        return yadif_compute_temporal(cur, prev, prev, cur, next, spatial_pred, params.skip_spatial_check, pos);
++        return yadif_compute_temporal(cur, prev, prev, next, cur, spatial_pred, params.skip_spatial_check, pos);
+     }
+ }
+ 
 Index: FFmpeg/libavfilter/vf_bwdif_videotoolbox.m
 ===================================================================
 --- /dev/null
@@ -770,7 +804,17 @@ Index: FFmpeg/libavfilter/vf_yadif_videotoolbox.m
 ===================================================================
 --- libavfilter/vf_yadif_videotoolbox.m
 +++ libavfilter/vf_yadif_videotoolbox.m
-@@ -436,7 +436,8 @@ const FFFilter ff_vf_yadif_videotoolbox
+@@ -95,9 +95,6 @@ static void call_kernel(AVFilterContext
+ 
+     [buffer commit];
+     [buffer waitUntilCompleted];
+-
+-    ff_objc_release(&encoder);
+-    ff_objc_release(&buffer);
+ }
+ 
+ static void filter(AVFilterContext *ctx, AVFrame *dst,
+@@ -436,7 +433,8 @@ const FFFilter ff_vf_yadif_videotoolbox
      .p.name         = "yadif_videotoolbox",
      .p.description  = NULL_IF_CONFIG_SMALL("YADIF for VideoToolbox frames using Metal compute"),
      .p.priv_class   = &yadif_videotoolbox_class,

@@ -66,7 +66,7 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
  #include "libavutil/opt.h"
  #include "libavutil/pixdesc.h"
  
-+#if HAVE_OPENCL_D3D11
++#if CONFIG_D3D11VA
 +#include "libavutil/hwcontext_d3d11va.h"
 +#endif
 +
@@ -86,17 +86,7 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
          } else if (inlink->format == hwfc->format &&
                     (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
                     ctx->reverse) {
-@@ -135,6 +145,9 @@ static int hwmap_config_output(AVFilterL
-             // mapped from that back to the source type.
-             AVBufferRef *source;
-             AVHWFramesContext *frames;
-+#if HAVE_OPENCL_D3D11
-+            D3D11_TEXTURE2D_DESC texDesc = { .BindFlags = D3D11_BIND_DECODER, };
-+#endif
- 
-             ctx->hwframes_ref = av_hwframe_ctx_alloc(device);
-             if (!ctx->hwframes_ref) {
-@@ -148,8 +161,19 @@ static int hwmap_config_output(AVFilterL
+@@ -148,8 +158,21 @@ static int hwmap_config_output(AVFilterL
              frames->width     = hwfc->width;
              frames->height    = hwfc->height;
  
@@ -111,9 +101,11 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
 +                frames->initial_pool_size += (avctx->extra_hw_frames > 2 ? avctx->extra_hw_frames : 2);
 +            }
 +
-+#if HAVE_OPENCL_D3D11
-+            if (frames->format == AV_PIX_FMT_D3D11)
-+                frames->user_opaque = &texDesc;
++#if CONFIG_D3D11VA
++            if (frames->format == AV_PIX_FMT_D3D11) {
++                AVD3D11VAFramesContext *frames_d3d11 = frames->hwctx;
++                frames_d3d11->BindFlags = D3D11_BIND_DECODER;
++            }
 +#endif
  
              err = av_hwframe_ctx_init(ctx->hwframes_ref);
@@ -126,30 +118,22 @@ Index: FFmpeg/libavfilter/vf_hwupload.c
  #include "libavutil/pixdesc.h"
  #include "libavutil/opt.h"
  
-+#if HAVE_OPENCL_D3D11
++#if CONFIG_D3D11VA
 +#include "libavutil/hwcontext_d3d11va.h"
 +#endif
 +
  #include "avfilter.h"
  #include "filters.h"
  #include "formats.h"
-@@ -119,6 +123,9 @@ static int hwupload_config_output(AVFilt
-     FilterLink        *inl = ff_filter_link(inlink);
-     HWUploadContext   *ctx = avctx->priv;
-     int err;
-+#if HAVE_OPENCL_D3D11
-+    D3D11_TEXTURE2D_DESC texDesc = { .BindFlags = D3D11_BIND_DECODER, };
-+#endif
- 
-     av_buffer_unref(&ctx->hwframes_ref);
- 
-@@ -160,6 +167,11 @@ static int hwupload_config_output(AVFilt
+@@ -160,6 +164,13 @@ static int hwupload_config_output(AVFilt
      if (avctx->extra_hw_frames >= 0)
          ctx->hwframes->initial_pool_size = 2 + avctx->extra_hw_frames;
  
-+#if HAVE_OPENCL_D3D11
-+    if (ctx->hwframes->format == AV_PIX_FMT_D3D11)
-+        ctx->hwframes->user_opaque = &texDesc;
++#if CONFIG_D3D11VA
++    if (ctx->hwframes->format == AV_PIX_FMT_D3D11) {
++        AVD3D11VAFramesContext *frames_d3d11 = ctx->hwframes->hwctx;
++        frames_d3d11->BindFlags = D3D11_BIND_DECODER;
++    }
 +#endif
 +
      err = av_hwframe_ctx_init(ctx->hwframes_ref);
@@ -168,7 +152,7 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
      };
  
      hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &tex);
-@@ -304,9 +304,17 @@ static int d3d11va_frames_init(AVHWFrame
+@@ -304,7 +304,7 @@ static int d3d11va_frames_init(AVHWFrame
          .ArraySize  = ctx->initial_pool_size,
          .Usage      = D3D11_USAGE_DEFAULT,
          .BindFlags  = hwctx->BindFlags,
@@ -176,18 +160,8 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
 +        .MiscFlags  = hwctx->MiscFlags | D3D11_RESOURCE_MISC_SHARED,
      };
  
-+#if HAVE_OPENCL_D3D11
-+    if (ctx->user_opaque) {
-+        D3D11_TEXTURE2D_DESC *desc = ctx->user_opaque;
-+        if (desc->BindFlags & D3D11_BIND_DECODER)
-+            texDesc.BindFlags = D3D11_BIND_DECODER;
-+    }
-+#endif
-+
      if (hwctx->texture) {
-         D3D11_TEXTURE2D_DESC texDesc2;
-         ID3D11Texture2D_GetDesc(hwctx->texture, &texDesc2);
-@@ -321,7 +329,7 @@ static int d3d11va_frames_init(AVHWFrame
+@@ -321,7 +321,7 @@ static int d3d11va_frames_init(AVHWFrame
          ctx->initial_pool_size = texDesc2.ArraySize;
          hwctx->BindFlags = texDesc2.BindFlags;
          hwctx->MiscFlags = texDesc2.MiscFlags;

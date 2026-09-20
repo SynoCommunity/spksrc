@@ -17,7 +17,7 @@ Index: FFmpeg/libavfilter/qsvvpp.c
 ===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
-@@ -657,6 +657,9 @@ static int init_vpp_session(AVFilterCont
+@@ -653,6 +653,9 @@ static int init_vpp_session(AVFilterCont
  
          out_frames_hwctx->frame_type      = s->out_mem_mode;
  
@@ -31,7 +31,7 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.h
 ===================================================================
 --- libavutil/hwcontext_d3d11va.h
 +++ libavutil/hwcontext_d3d11va.h
-@@ -183,6 +183,11 @@ typedef struct AVD3D11VAFramesContext {
+@@ -197,6 +197,11 @@ typedef struct AVD3D11VAFramesContext {
       * This field is ignored/invalid if a user-allocated texture is provided.
      */
      AVD3D11FrameDescriptor *texture_infos;
@@ -148,6 +148,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +                                      void                   *logctx)
 +{
 +    const D3D11_BOX box_2x2 = { 0, 0, 0, 2, 2, 1 };
++    const UINT flags = D3D11_ASYNC_GETDATA_DONOTFLUSH;
 +    BOOL data = FALSE;
 +
 +    if (!priv || !device_hwctx || !texture)
@@ -156,19 +157,18 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    av_log(logctx, AV_LOG_DEBUG, "Sync D3D11 texture %d\n", subresource);
 +
 +    device_hwctx->lock(device_hwctx->lock_ctx);
-+    ID3D11DeviceContext_Begin(device_hwctx->device_context, priv->sync_point);
 +
 +    /* Force DX to wait for DXVA DEC/VP by copying 2x2 pixels, which can act as a sync point */
 +    ID3D11DeviceContext_CopySubresourceRegion(device_hwctx->device_context,
 +                                              (ID3D11Resource *)priv->sync_tex_2x2, 0, 0, 0, 0,
 +                                              (ID3D11Resource *)texture, subresource, &box_2x2);
-+    ID3D11DeviceContext_Flush(device_hwctx->device_context);
 +    ID3D11DeviceContext_End(device_hwctx->device_context, priv->sync_point);
++    ID3D11DeviceContext_Flush(device_hwctx->device_context);
 +
 +    while ((S_OK != ID3D11DeviceContext_GetData(device_hwctx->device_context,
 +                                                priv->sync_point,
-+                                                &data,
-+                                                sizeof(data), 0)) || (data != TRUE)) { /* do nothing */ }
++                                                &data, sizeof(data),
++                                                flags)) || (data != TRUE)) { /* do nothing */ }
 +    device_hwctx->unlock(device_hwctx->lock_ctx);
 +}
 +

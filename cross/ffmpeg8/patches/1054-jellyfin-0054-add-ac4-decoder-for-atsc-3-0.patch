@@ -921,7 +921,7 @@ Index: FFmpeg/libavcodec/ac4dec.c
 +        for (int i = 0; i < 5; i++) {
 +            int N_w = transf_lengths[i];
 +            float alpha = kbd_window_alpha[j][i];
-+            float scale = 1.f / N_w;
++            float scale = -1.f / N_w;
 +
 +            if ((ret = av_tx_init(&s->tx_ctx[j][i], &s->tx_fn[j][i],
 +                                  AV_TX_FLOAT_MDCT, 1, N_w, &scale, AV_TX_FULL_IMDCT)))
@@ -8212,7 +8212,7 @@ Index: FFmpeg/libavcodec/ac4dec_data.h
 +    0x031e10,
 +};
 +
-+DECLARE_ASM_CONST(16, float, qwin)[640] = {
++DECLARE_ASM_CONST(32, float, qwin)[640] = {
 +    0,
 +    1.990318758627504e-004,  2.494762615491542e-004,  3.021769445225078e-004,
 +    3.548460080857985e-004,  4.058915811480806e-004,  4.546408052001889e-004,

@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -4121,6 +4121,7 @@ boxblur_opencl_filter_deps="opencl gpl"
+@@ -4124,6 +4124,7 @@ boxblur_opencl_filter_deps="opencl gpl"
  bs2b_filter_deps="libbs2b"
  bwdif_cuda_filter_deps="ffnvcodec"
  bwdif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -10,7 +10,7 @@ Index: FFmpeg/configure
  bwdif_videotoolbox_filter_deps="metal corevideo videotoolbox"
  bwdif_vulkan_filter_deps="vulkan spirv_compiler"
  chromaber_vulkan_filter_deps="vulkan spirv_library"
-@@ -4280,6 +4281,7 @@ xfade_opencl_filter_deps="opencl"
+@@ -4283,6 +4284,7 @@ xfade_opencl_filter_deps="opencl"
  xfade_vulkan_filter_deps="vulkan spirv_library"
  yadif_cuda_filter_deps="ffnvcodec"
  yadif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -52,7 +52,7 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_bwdif_videotoolbox;
  extern const FFFilter ff_vf_bwdif_vulkan;
  extern const FFFilter ff_vf_cas;
-@@ -562,6 +563,7 @@ extern const FFFilter ff_vf_xpsnr;
+@@ -563,6 +564,7 @@ extern const FFFilter ff_vf_xpsnr;
  extern const FFFilter ff_vf_xstack;
  extern const FFFilter ff_vf_yadif;
  extern const FFFilter ff_vf_yadif_cuda;
@@ -228,7 +228,7 @@ Index: FFmpeg/libavfilter/opencl/bwdif.cl
 +        if (fabs(c - e) > temporal_diff0) {
 +            interpol = native_divide((((coef_hf[0] * (prev2_0 + next2_0)
 +                - coef_hf[1] * (prev2_mrefs2 + next2_mrefs2 + prev2_prefs2 + next2_prefs2)
-+                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_mrefs4)) * 0.25f)
++                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_prefs4)) * 0.25f)
 +                + coef_lf[0] * (c + e) - coef_lf[1] * (cur_mrefs3 + cur_prefs3)), (float)(1 << 13));
 +        } else {
 +            interpol = native_divide((coef_sp[0] * (c + e) - coef_sp[1] * (cur_mrefs3 + cur_prefs3)), (float)(1 << 13));
@@ -322,17 +322,17 @@ Index: FFmpeg/libavfilter/opencl/bwdif.cl
 +
 +    if (channels == 1) {
 +        float pred = is_second_field
-+            ? bwdif_compute_float(dst, cur, prev, cur, next, next,
++            ? bwdif_compute_float(dst, cur, cur, prev, next, next,
 +                                  parity, is_field_end, pos)
-+            : bwdif_compute_float(dst, cur, prev, prev, cur, next,
++            : bwdif_compute_float(dst, cur, prev, prev, next, cur,
 +                                  parity, is_field_end, pos);
 +
 +        write_imagef(dst, pos, (float4)(pred, 0.0f, 0.0f, 1.0f));
 +    } else if (channels == 2) {
 +        float2 pred = is_second_field
-+            ? bwdif_compute_float2(dst, cur, prev, cur, next, next,
++            ? bwdif_compute_float2(dst, cur, cur, prev, next, next,
 +                                   parity, is_field_end, pos)
-+            : bwdif_compute_float2(dst, cur, prev, prev, cur, next,
++            : bwdif_compute_float2(dst, cur, prev, prev, next, cur,
 +                                   parity, is_field_end, pos);
 +
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
@@ -375,7 +375,7 @@ Index: FFmpeg/libavfilter/opencl/yadif.cl
 +                              float h, float i, float j, float k, float l, float m, float n)
 +{
 +    float spatial_pred = (d + k) * 0.5f;
-+    float spatial_score = fabs(c - j) + fabs(d - k) + fabs(e - l);
++    float spatial_score = fabs(c - j) + fabs(d - k) + fabs(e - l) - (1.0f / 255.0f);
 +
 +    float score = fabs(b - k) + fabs(c - l) + fabs(d - m);
 +    if (score < spatial_score) {
@@ -424,7 +424,7 @@ Index: FFmpeg/libavfilter/opencl/yadif.cl
 +    float tdiff1 = (fabs(A - F) + fabs(B - G)) * 0.5f;
 +    float tdiff2 = (fabs(K - F) + fabs(G - L)) * 0.5f;
 +
-+    float diff = max3(tdiff0, tdiff1, tdiff2);
++    float diff = max3(tdiff0 * 0.5f, tdiff1, tdiff2);
 +
 +    if (!skip_check) {
 +        float maxi = max3(p2 - p3, p2 - p1, min(p0 - p1, p4 - p3));
@@ -523,18 +523,18 @@ Index: FFmpeg/libavfilter/opencl/yadif.cl
 +    if (channels == 1) {
 +        float spatial_pred = yadif_compute_spatial_float(cur, pos);
 +        float pred = is_second_field
-+            ? yadif_compute_temporal_float(cur, prev, cur, next, next,
++            ? yadif_compute_temporal_float(cur, cur, prev, next, next,
 +                                           spatial_pred, skip_spatial_check, pos)
-+            : yadif_compute_temporal_float(cur, prev, prev, cur, next,
++            : yadif_compute_temporal_float(cur, prev, prev, next, cur,
 +                                           spatial_pred, skip_spatial_check, pos);
 +
 +        write_imagef(dst, pos, (float4)(pred, 0.0f, 0.0f, 1.0f));
 +    } else if (channels == 2) {
 +        float2 spatial_pred = yadif_compute_spatial_float2(cur, pos);
 +        float2 pred = is_second_field
-+            ? yadif_compute_temporal_float2(cur, prev, cur, next, next,
++            ? yadif_compute_temporal_float2(cur, cur, prev, next, next,
 +                                            spatial_pred, skip_spatial_check, pos)
-+            : yadif_compute_temporal_float2(cur, prev, prev, cur, next,
++            : yadif_compute_temporal_float2(cur, prev, prev, next, cur,
 +                                            spatial_pred, skip_spatial_check, pos);
 +
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));

@@ -266,7 +266,7 @@ Index: FFmpeg/libavcodec/rkmppdec.c
   *
   * This file is part of FFmpeg.
   *
-@@ -19,564 +20,1487 @@
+@@ -19,564 +20,1494 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */
  
@@ -566,7 +566,8 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -    RK_S64 paramS64;
 -    RK_S32 paramS32;
 +    RKMPPDecContext *r = avctx->priv_data;
-+
+ 
+-    avctx->pix_fmt = AV_PIX_FMT_DRM_PRIME;
 +    r->last_pts = AV_NOPTS_VALUE;
 +    r->eof = 0;
 +    r->draining = 0;
@@ -585,7 +586,12 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +    }
 +#endif
  
--    avctx->pix_fmt = AV_PIX_FMT_DRM_PRIME;
+-    // create a decoder and a ref to it
+-    decoder = av_refstruct_alloc_ext(sizeof(*decoder), 0,
+-                                     NULL, rkmpp_release_decoder);
+-    if (!decoder) {
+-        ret = AVERROR(ENOMEM);
+-        goto fail;
 +    if (r->mapi) {
 +        r->mapi->reset(r->mctx);
 +        mpp_destroy(r->mctx);
@@ -605,13 +611,7 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        av_buffer_unref(&r->hwframe);
 +    if (r->hwdevice)
 +        av_buffer_unref(&r->hwdevice);
- 
--    // create a decoder and a ref to it
--    decoder = av_refstruct_alloc_ext(sizeof(*decoder), 0,
--                                     NULL, rkmpp_release_decoder);
--    if (!decoder) {
--        ret = AVERROR(ENOMEM);
--        goto fail;
++
 +    return 0;
 +}
 +
@@ -990,17 +990,70 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -static int rkmpp_send_packet(AVCodecContext *avctx, const AVPacket *avpkt)
 +static int rkmpp_export_mastering_display(AVCodecContext *avctx, AVFrame *frame,
 +                                          MppFrameMasteringDisplayMetadata mpp_mastering)
++{
++    AVMasteringDisplayMetadata *mastering = NULL;
++    static const MppFrameMasteringDisplayMetadata zero_meta = { 0 };
++    int mapping[3] = { 0, 1, 2 };
++    int chroma_den;
++    int max_luma_den;
++    int min_luma_den;
++    int ret;
++
++    if (!memcmp(&mpp_mastering, &zero_meta, sizeof(zero_meta)))
++        return 0;
++
++    switch (avctx->codec_id) {
++    case AV_CODEC_ID_HEVC:
++        // HEVC uses a g,b,r ordering, which we convert to a more natural r,g,b
++        mapping[0] = 2;
++        mapping[1] = 0;
++        mapping[2] = 1;
++        chroma_den = 50000;
++        max_luma_den = 10000;
++        min_luma_den = 10000;
++        break;
++    case AV_CODEC_ID_AV1:
++        chroma_den = 1 << 16;
++        max_luma_den = 1 << 8;
++        min_luma_den = 1 << 14;
++        break;
++    default:
++        return 0;
++    }
++
++    ret = ff_decode_mastering_display_new(avctx, frame, &mastering);
++    if (ret < 0)
++        return ret;
++
++    if (mastering) {
++        for (int i = 0; i < 3; i++) {
++            const int j = mapping[i];
++            mastering->display_primaries[i][0] =
++                av_make_q(mpp_mastering.display_primaries[j][0], chroma_den);
++            mastering->display_primaries[i][1] =
++                av_make_q(mpp_mastering.display_primaries[j][1], chroma_den);
++        }
++        mastering->white_point[0] = av_make_q(mpp_mastering.white_point[0], chroma_den);
++        mastering->white_point[1] = av_make_q(mpp_mastering.white_point[1], chroma_den);
++
++        mastering->max_luminance = av_make_q(mpp_mastering.max_luminance, max_luma_den);
++        mastering->min_luminance = av_make_q(mpp_mastering.min_luminance, min_luma_den);
++
++        mastering->has_luminance = 1;
++        mastering->has_primaries = 1;
++    }
++
++    return 0;
++}
++
++static int rkmpp_export_content_light(AVCodecContext *avctx, AVFrame *frame,
++                                      MppFrameContentLightMetadata mpp_light)
  {
 -    RKMPPDecodeContext *rk_context = avctx->priv_data;
 -    RKMPPDecoder *decoder = rk_context->decoder;
--    int ret;
-+    AVMasteringDisplayMetadata *mastering = NULL;
-+    AVFrameSideData *sd = NULL;
-+    int mapping[3] = { 0, 1, 2 };
-+    int chroma_den = 0;
-+    int max_luma_den = 0;
-+    int min_luma_den = 0;
-+    int i;
++    AVContentLightMetadata *light = NULL;
++    static const MppFrameContentLightMetadata zero_meta = { 0 };
+     int ret;
  
 -    // handle EOF
 -    if (!avpkt->size) {
@@ -1009,41 +1062,17 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -        ret = rkmpp_write_data(avctx, NULL, 0, 0);
 -        if (ret)
 -            av_log(avctx, AV_LOG_ERROR, "Failed to send EOS to decoder (code = %d)\n", ret);
--        return ret;
-+    switch (avctx->codec_id) {
-+        case AV_CODEC_ID_HEVC:
-+            // HEVC uses a g,b,r ordering, which we convert to a more natural r,g,b
-+            mapping[0] = 2;
-+            mapping[1] = 0;
-+            mapping[2] = 1;
-+            chroma_den = 50000;
-+            max_luma_den = 10000;
-+            min_luma_den = 10000;
-+            break;
-+        case AV_CODEC_ID_AV1:
-+            chroma_den = 1 << 16;
-+            max_luma_den = 1 << 8;
-+            min_luma_den = 1 << 14;
-+            break;
-+        default:
-+            return 0;
-+    }
++    if (!memcmp(&mpp_light, &zero_meta, sizeof(zero_meta)))
++        return 0;
 +
-+    sd = av_frame_get_side_data(frame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
-+    if (sd)
-+        mastering = (AVMasteringDisplayMetadata *)sd->data;
-+    else
-+        mastering = av_mastering_display_metadata_create_side_data(frame);
-+    if (!mastering)
-+        return AVERROR(ENOMEM);
++    ret = ff_decode_content_light_new(avctx, frame, &light);
++    if (ret < 0)
+         return ret;
 +
-+    for (i = 0; i < 3; i++) {
-+        const int j = mapping[i];
-+        mastering->display_primaries[i][0] = av_make_q(mpp_mastering.display_primaries[j][0], chroma_den);
-+        mastering->display_primaries[i][1] = av_make_q(mpp_mastering.display_primaries[j][1], chroma_den);
++    if (light) {
++        light->MaxCLL  = mpp_light.MaxCLL;
++        light->MaxFALL = mpp_light.MaxFALL;
      }
-+    mastering->white_point[0] = av_make_q(mpp_mastering.white_point[0], chroma_den);
-+    mastering->white_point[1] = av_make_q(mpp_mastering.white_point[1], chroma_den);
  
 -    // on first packet, send extradata
 -    if (decoder->first_packet) {
@@ -1065,66 +1094,35 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -    ret = rkmpp_write_data(avctx, avpkt->data, avpkt->size, avpkt->pts);
 -    if (ret && ret!=AVERROR(EAGAIN))
 -        av_log(avctx, AV_LOG_ERROR, "Failed to write data to decoder (code = %d)\n", ret);
-+    mastering->max_luminance = av_make_q(mpp_mastering.max_luminance, max_luma_den);
-+    mastering->min_luminance = av_make_q(mpp_mastering.min_luminance, min_luma_den);
++    return 0;
++}
  
 -    return ret;
-+    mastering->has_luminance = 1;
-+    mastering->has_primaries = 1;
-+
-+    return 0;
++static void rkmpp_free_mpp_frame(void *opaque, uint8_t *data)
++{
++    MppFrame mpp_frame = (MppFrame)opaque;
++    mpp_frame_deinit(&mpp_frame);
  }
  
 -static void rkmpp_release_frame(void *opaque, uint8_t *data)
-+static int rkmpp_export_content_light(AVFrame *frame,
-+                                      MppFrameContentLightMetadata mpp_light)
++static void rkmpp_free_drm_desc(void *opaque, uint8_t *data)
  {
 -    AVDRMFrameDescriptor *desc = (AVDRMFrameDescriptor *)data;
 -    RKMPPFrameContext *framecontext = opaque;
-+    AVContentLightMetadata *light = NULL;
- 
--    mpp_frame_deinit(&framecontext->frame);
--    av_refstruct_unref(&framecontext->decoder_ref);
-+    AVFrameSideData *sd = av_frame_get_side_data(frame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
-+    if (sd)
-+        light = (AVContentLightMetadata *)sd->data;
-+    else
-+        light = av_content_light_metadata_create_side_data(frame);
-+    if (!light)
-+        return AVERROR(ENOMEM);
- 
--    av_free(desc);
-+    light->MaxCLL  = mpp_light.MaxCLL;
-+    light->MaxFALL = mpp_light.MaxFALL;
-+
-+    return 0;
- }
- 
--static int rkmpp_retrieve_frame(AVCodecContext *avctx, AVFrame *frame)
-+static void rkmpp_free_mpp_frame(void *opaque, uint8_t *data)
- {
--    RKMPPDecodeContext *rk_context = avctx->priv_data;
--    RKMPPDecoder *decoder = rk_context->decoder;
--    int ret;
--    MppFrame mppframe = NULL;
--    MppBuffer buffer = NULL;
-+    MppFrame mpp_frame = (MppFrame)opaque;
-+    mpp_frame_deinit(&mpp_frame);
-+}
-+
-+static void rkmpp_free_drm_desc(void *opaque, uint8_t *data)
-+{
 +    AVRKMPPDRMFrameDescriptor *drm_desc = (AVRKMPPDRMFrameDescriptor *)opaque;
 +    av_free(drm_desc);
 +}
-+
+ 
+-    mpp_frame_deinit(&framecontext->frame);
+-    av_refstruct_unref(&framecontext->decoder_ref);
 +static int frame_create_buf(AVFrame *frame,
 +                            uint8_t* data, int size,
 +                            void (*free)(void *opaque, uint8_t *data),
 +                            void *opaque, int flags)
 +{
 +    int i;
-+
+ 
+-    av_free(desc);
 +    for (i = 0; i < AV_NUM_DATA_POINTERS; i++) {
 +        if (!frame->buf[i]) {
 +            frame->buf[i] = av_buffer_create(data, size, free, opaque, flags);
@@ -1132,10 +1130,16 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        }
 +    }
 +    return AVERROR(EINVAL);
-+}
-+
+ }
+ 
+-static int rkmpp_retrieve_frame(AVCodecContext *avctx, AVFrame *frame)
 +static int rkmpp_export_frame(AVCodecContext *avctx, AVFrame *frame, MppFrame mpp_frame)
-+{
+ {
+-    RKMPPDecodeContext *rk_context = avctx->priv_data;
+-    RKMPPDecoder *decoder = rk_context->decoder;
+-    int ret;
+-    MppFrame mppframe = NULL;
+-    MppBuffer buffer = NULL;
 +    RKMPPDecContext *r = avctx->priv_data;
 +    AVRKMPPDRMFrameDescriptor *desc = NULL;
      AVDRMLayerDescriptor *layer = NULL;
@@ -1218,33 +1222,33 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +    if ((ret = frame_create_buf(frame, (uint8_t *)desc, sizeof(*desc),
 +                                rkmpp_free_drm_desc, desc, AV_BUFFER_FLAG_READONLY)) < 0)
 +        return ret;
++
++    frame->data[0] = (uint8_t *)desc;
  
 -            av_log(avctx, AV_LOG_INFO, "Decoder noticed an info change (%dx%d), format=%d\n",
 -                                        (int)mpp_frame_get_width(mppframe), (int)mpp_frame_get_height(mppframe),
 -                                        (int)mpp_frame_get_fmt(mppframe));
-+    frame->data[0] = (uint8_t *)desc;
- 
--            avctx->width = mpp_frame_get_width(mppframe);
--            avctx->height = mpp_frame_get_height(mppframe);
 +    frame->hw_frames_ctx = av_buffer_ref(r->hwframe);
 +    if (!frame->hw_frames_ctx)
 +        return AVERROR(ENOMEM);
  
--            decoder->mpi->control(decoder->ctx, MPP_DEC_SET_INFO_CHANGE_READY, NULL);
+-            avctx->width = mpp_frame_get_width(mppframe);
+-            avctx->height = mpp_frame_get_height(mppframe);
 +    if ((ret = ff_decode_frame_props(avctx, frame)) < 0)
 +        return ret;
  
--            av_buffer_unref(&decoder->frames_ref);
+-            decoder->mpi->control(decoder->ctx, MPP_DEC_SET_INFO_CHANGE_READY, NULL);
 +    frame->width  = avctx->width;
 +    frame->height = avctx->height;
+ 
+-            av_buffer_unref(&decoder->frames_ref);
++    mpp_frame_pts = mpp_frame_get_pts(mpp_frame);
++    frame->pts    = MPP_PTS_TO_PTS(mpp_frame_pts, avctx->pkt_timebase);
  
 -            decoder->frames_ref = av_hwframe_ctx_alloc(decoder->device_ref);
 -            if (!decoder->frames_ref) {
 -                ret = AVERROR(ENOMEM);
 -                goto fail;
-+    mpp_frame_pts = mpp_frame_get_pts(mpp_frame);
-+    frame->pts    = MPP_PTS_TO_PTS(mpp_frame_pts, avctx->pkt_timebase);
-+
 +    mpp_frame_mode = mpp_frame_get_mode(mpp_frame);
 +    if ((mpp_frame_mode & MPP_FRAME_FLAG_FIELD_ORDER_MASK) == MPP_FRAME_FLAG_DEINTERLACED)
 +        frame->flags |= AV_FRAME_FLAG_INTERLACED;
@@ -1258,13 +1262,14 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +                                              (AVRational) { frame->width, frame->height });
 +    }
 +
-+    if (avctx->codec_id == AV_CODEC_ID_HEVC &&
++    if ((avctx->codec_id == AV_CODEC_ID_HEVC ||
++         avctx->codec_id == AV_CODEC_ID_AV1) &&
 +        (frame->color_trc == AVCOL_TRC_SMPTE2084 ||
 +         frame->color_trc == AVCOL_TRC_ARIB_STD_B67)) {
 +        ret = rkmpp_export_mastering_display(avctx, frame, mpp_frame_get_mastering_display(mpp_frame));
 +        if (ret < 0)
 +            return ret;
-+        ret = rkmpp_export_content_light(frame, mpp_frame_get_content_light(mpp_frame));
++        ret = rkmpp_export_content_light(avctx, frame, mpp_frame_get_content_light(mpp_frame));
 +        if (ret < 0)
 +            return ret;
 +    }
@@ -1291,15 +1296,11 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        clear_unused_sd_frames(r->sd_frame_list, r->last_pts_dovi, mpp_frame_pts); /* display order */
 +    }
 +#endif
-+
-+    return 0;
-+}
  
 -            mppformat = mpp_frame_get_fmt(mppframe);
 -            drmformat = rkmpp_get_frameformat(mppformat);
-+static void rkmpp_export_avctx_color_props(AVCodecContext *avctx, MppFrame mpp_frame)
-+{
-+    int val;
++    return 0;
++}
  
 -            hwframes = (AVHWFramesContext*)decoder->frames_ref->data;
 -            hwframes->format    = AV_PIX_FMT_DRM_PRIME;
@@ -1309,8 +1310,9 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -            ret = av_hwframe_ctx_init(decoder->frames_ref);
 -            if (ret < 0)
 -                goto fail;
-+    if (!avctx || !mpp_frame)
-+        return;
++static void rkmpp_export_avctx_color_props(AVCodecContext *avctx, MppFrame mpp_frame)
++{
++    int val;
  
 -            // here decoder is fully initialized, we need to feed it again with data
 -            ret = AVERROR(EAGAIN);
@@ -1318,6 +1320,9 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -        } else if (mpp_frame_get_eos(mppframe)) {
 -            av_log(avctx, AV_LOG_DEBUG, "Received a EOS frame.\n");
 -            decoder->eos_reached = 1;
++    if (!avctx || !mpp_frame)
++        return;
++
 +    if (avctx->color_primaries == AVCOL_PRI_RESERVED0)
 +        avctx->color_primaries = AVCOL_PRI_UNSPECIFIED;
 +    if ((val = mpp_frame_get_color_primaries(mpp_frame)) &&
@@ -1573,17 +1578,17 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +            ret = AVERROR_EXTERNAL;
 +            goto exit;
 +        }
- 
--            frame->hw_frames_ctx = av_buffer_ref(decoder->frames_ref);
--            if (!frame->hw_frames_ctx) {
--                av_frame_unref(frame);
--                return AVERROR(ENOMEM);
++
 +        if ((ret = r->mapi->control(r->mctx, MPP_DEC_SET_INFO_CHANGE_READY, NULL)) != MPP_OK) {
 +            av_log(avctx, AV_LOG_ERROR, "Failed to set info change ready: %d\n", ret);
 +            ret = AVERROR_EXTERNAL;
 +            goto exit;
 +        }
-+
+ 
+-            frame->hw_frames_ctx = av_buffer_ref(decoder->frames_ref);
+-            if (!frame->hw_frames_ctx) {
+-                av_frame_unref(frame);
+-                return AVERROR(ENOMEM);
 +        /* there's no real info change, export the frame directly */
 +        if (avctx->codec_id == AV_CODEC_ID_MJPEG)
 +            goto export;
@@ -1742,9 +1747,9 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        av_log(avctx, AV_LOG_TRACE, "Failed to put packet: %d\n", ret);
 +        goto fail;
 +    }
-+
-+    return MPP_OK;
  
++    return MPP_OK;
++
 +fail:
 +    if (mpp_frame)
 +        mpp_frame_deinit(&mpp_frame);
@@ -1813,9 +1818,17 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        if ((ret = mpp_buffer_get(r->buf_group_misc, &mpp_buf, pkt->size)) != MPP_OK) {
 +            av_log(avctx, AV_LOG_ERROR, "Failed to get buffer for packet: %d\n", ret);
 +            return AVERROR_EXTERNAL;
-         }
++        }
 +        if (!mpp_buf)
 +            return AVERROR(ENOMEM);
++
++        if ((ret = mpp_buffer_write(mpp_buf, 0, pkt->data, pkt->size)) != MPP_OK) {
++            av_log(avctx, AV_LOG_ERROR, "Failed to write buffer: %d\n", ret);
++            mpp_buffer_put(mpp_buf);
++            return AVERROR_EXTERNAL;
+         }
++        if ((ret = mpp_buffer_sync_partial_end(mpp_buf, 0, pkt->size)) != MPP_OK)
++            av_log(avctx, AV_LOG_DEBUG, "Failed to sync buffer write: %d\n", ret);
  
 -        freeslots = INPUT_MAX_PACKETS - usedslots;
 -        if (freeslots > 0) {
@@ -1825,14 +1838,6 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -                ret = ff_decode_get_packet(avctx, pkt);
 -                if (ret < 0 && ret != AVERROR_EOF) {
 -                    return ret;
-+        if ((ret = mpp_buffer_write(mpp_buf, 0, pkt->data, pkt->size)) != MPP_OK) {
-+            av_log(avctx, AV_LOG_ERROR, "Failed to write buffer: %d\n", ret);
-+            mpp_buffer_put(mpp_buf);
-+            return AVERROR_EXTERNAL;
-+        }
-+        if ((ret = mpp_buffer_sync_partial_end(mpp_buf, 0, pkt->size)) != MPP_OK)
-+            av_log(avctx, AV_LOG_DEBUG, "Failed to sync buffer write: %d\n", ret);
-+
 +        if ((ret = mpp_packet_init_with_buffer(&mpp_pkt, mpp_buf)) != MPP_OK) {
 +            av_log(avctx, AV_LOG_ERROR, "Failed to init packet with buffer: %d\n", ret);
 +            mpp_buffer_put(mpp_buf);
@@ -3563,7 +3568,7 @@ Index: FFmpeg/libavcodec/rkmppenc.c
 +            av_log(avctx, AV_LOG_ERROR, "ff_get_encode_buffer failed: %d\n", ret);
 +            goto exit;
 +        }
-+        memcpy(packet->data, mpp_packet_get_data(mpp_pkt), mpp_pkt_length);
++        memcpy(packet->data, mpp_packet_get_pos(mpp_pkt), mpp_pkt_length);
 +    }
  
 -    int64_t pts = mpp_packet_get_pts(packet);
@@ -4489,7 +4494,7 @@ Index: FFmpeg/libavfilter/rkrga_common.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/rkrga_common.c
-@@ -0,0 +1,1447 @@
+@@ -0,0 +1,1453 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
 + *
@@ -5361,8 +5366,14 @@ Index: FFmpeg/libavfilter/rkrga_common.c
 +    if (!src || !dst)
 +        return AVERROR(EINVAL);
 +
-+    scale_ratio_w = (float)dst->act_w / (float)src->act_w;
-+    scale_ratio_h = (float)dst->act_h / (float)src->act_h;
++    if ((src->rotate_mode & 0x04) == 0x04 /* HAL_TRANSFORM_ROT_90 */ ||
++        (src->rotate_mode & 0x07) == 0x07 /* HAL_TRANSFORM_ROT_270 */) {
++        scale_ratio_w = (float)dst->act_h / (float)src->act_w;
++        scale_ratio_h = (float)dst->act_w / (float)src->act_h;
++    } else {
++        scale_ratio_w = (float)dst->act_w / (float)src->act_w;
++        scale_ratio_h = (float)dst->act_h / (float)src->act_h;
++    }
 +
 +    /* P010 requires RGA3 */
 +    if (!r->has_rga3 &&
@@ -7297,7 +7308,7 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 ===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.c
-@@ -0,0 +1,603 @@
+@@ -0,0 +1,604 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -7603,8 +7614,9 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 +            return AVERROR(ENOMEM);
 +    }
 +
++    avfc->flags |= hwctx->flags;
 +    ret = mpp_buffer_group_get_internal(&avfc->buf_group,
-+                                        MPP_BUFFER_TYPE_DRM | hwctx->flags | avfc->flags);
++                                        MPP_BUFFER_TYPE_DRM | avfc->flags);
 +    if (ret != MPP_OK) {
 +        av_log(hwfc, AV_LOG_ERROR, "Failed to get MPP internal buffer group: %d\n", ret);
 +        return AVERROR_EXTERNAL;
@@ -8210,7 +8222,7 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
 ===================================================================
 --- libswscale/swscale_unscaled.c
 +++ libswscale/swscale_unscaled.c
-@@ -269,6 +269,62 @@ static int nv24ToYuv420Wrapper(SwsIntern
+@@ -269,6 +269,74 @@ static int nv24ToYuv420Wrapper(SwsIntern
      return srcSliceH;
  }
  
@@ -8248,6 +8260,14 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
 +            *tdstY++ = (((tsrcY[4] & 0xFF) << 2) | ((tsrcY[3] >> 6) & 0x3 )) << shift[0];
 +            tsrcY += 5;
 +        }
++        const int y_rem = c->opts.src_w & 3;
++        if (y_rem) {
++            *tdstY++ = (((tsrcY[1] & 0x3) << 8) | (tsrcY[0] & 0xFF)) << shift[0];
++            if (y_rem > 1)
++                *tdstY++ = (((tsrcY[2] & 0xF ) << 6) | ((tsrcY[1] >> 2) & 0x3F)) << shift[0];
++            if (y_rem > 2)
++                *tdstY++ = (((tsrcY[3] & 0x3F) << 4) | ((tsrcY[2] >> 4) & 0xF )) << shift[0];
++        }
 +        src[0] += srcStride[0];
 +        dstY += dstStride[0] / sizeof(uint16_t);
 +    }
@@ -8262,6 +8282,10 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
 +            *tdstV++ = (((tsrcUV[4] & 0xFF) << 2) | ((tsrcUV[3] >> 6) & 0x3 )) << shift[2];
 +            tsrcUV += 5;
 +        }
++        if (c->chrSrcW & 1) {
++            *tdstU++ = (((tsrcUV[1] & 0x3) << 8) | (tsrcUV[0]        & 0xFF)) << shift[1];
++            *tdstV++ = (((tsrcUV[2] & 0xF) << 6) | ((tsrcUV[1] >> 2) & 0x3F)) << shift[2];
++        }
 +        src[1] += srcStride[1];
 +        dstU += dstStride[1] / sizeof(uint16_t);
 +        dstV += dstStride[2] / sizeof(uint16_t);
@@ -8273,7 +8297,7 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
  static int planarToP01xWrapper(SwsInternal *c, const uint8_t *const src8[],
                                 const int srcStride[], int srcSliceY,
                                 int srcSliceH, uint8_t *const dstParam8[],
-@@ -2411,6 +2467,19 @@ void ff_get_unscaled_swscale(SwsInternal
+@@ -2411,6 +2479,19 @@ void ff_get_unscaled_swscale(SwsInternal
          (srcFormat == AV_PIX_FMT_NV24 || srcFormat == AV_PIX_FMT_NV42)) {
          c->convert_unscaled = nv24ToPlanarWrapper;
      }

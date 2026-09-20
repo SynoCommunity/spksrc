@@ -1,0 +1,40 @@
+Index: FFmpeg/fftools/ffmpeg_filter.c
+===================================================================
+--- fftools/ffmpeg_filter.c
++++ fftools/ffmpeg_filter.c
+@@ -2209,7 +2209,7 @@ static int configure_filtergraph(FilterG
+         AVFrame *tmp;
+         while (av_fifo_read(ifp->frame_queue, &tmp, 1) >= 0) {
+             if (ifp->type_src == AVMEDIA_TYPE_SUBTITLE) {
+-                sub2video_frame(&ifp->ifilter, tmp, !fgt->graph);
++                ret = sub2video_frame(&ifp->ifilter, tmp, !fgt->graph);
+             } else {
+                 if (ifp->type_src == AVMEDIA_TYPE_VIDEO) {
+                     if (ifp->displaymatrix_applied)
+@@ -2983,16 +2983,17 @@ static int sub2video_frame(InputFilter *
+     int ret;
+ 
+     if (buffer) {
+-        AVFrame *tmp;
+-
+-        if (!frame)
+-            return 0;
++        // queue a NULL entry for EOF, so it is not lost when
++        // the queue is replayed after configuring the graph
++        AVFrame *tmp = NULL;
++
++        if (frame) {
++            tmp = av_frame_alloc();
++            if (!tmp)
++                return AVERROR(ENOMEM);
+ 
+-        tmp = av_frame_alloc();
+-        if (!tmp)
+-            return AVERROR(ENOMEM);
+-
+-        av_frame_move_ref(tmp, frame);
++            av_frame_move_ref(tmp, frame);
++        }
+ 
+         ret = av_fifo_write(ifp->frame_queue, &tmp, 1);
+         if (ret < 0) {

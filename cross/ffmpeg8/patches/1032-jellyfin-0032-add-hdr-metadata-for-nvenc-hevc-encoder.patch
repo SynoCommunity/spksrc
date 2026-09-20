@@ -23,7 +23,7 @@ Index: FFmpeg/libavcodec/nvenc.c
 +        if (sd) {
 +            AVMasteringDisplayMetadata *mdm = (AVMasteringDisplayMetadata *)sd->data;
 +            // HEVC uses a g,b,r ordering, which we convert from a more natural r,g,b
-+            const int mapping[3] = {2, 0, 1};
++            const int mapping[3] = {1, 2, 0};
 +            const int chroma_den = 50000;
 +            const int luma_den = 10000;
 +

@@ -1,0 +1,651 @@
+Index: FFmpeg/libavcodec/mf_utils.c
+===================================================================
+--- libavcodec/mf_utils.c
++++ libavcodec/mf_utils.c
+@@ -555,13 +555,14 @@ int ff_instantiate_mf(void *log,
+                       MFT_REGISTER_TYPE_INFO *in_type,
+                       MFT_REGISTER_TYPE_INFO *out_type,
+                       int use_hw,
++                      const LUID *hw_luid,
+                       IMFTransform **res)
+ {
+     HRESULT hr;
+     int n;
+     int ret;
+-    IMFActivate **activate;
+-    UINT32 num_activate;
++    IMFActivate **activate = NULL;
++    UINT32 num_activate = 0;
+     IMFActivate *winner = 0;
+     UINT32 flags;
+ 
+@@ -577,10 +578,26 @@ int ff_instantiate_mf(void *log,
+         flags |= MFT_ENUM_FLAG_SYNCMFT;
+     }
+ 
+-    hr = f->MFTEnumEx(category, flags, in_type, out_type, &activate,
+-                      &num_activate);
+-    if (FAILED(hr))
+-        goto error_uninit_mf;
++    // MFTEnum2 is loaded optionally
++    if (use_hw && hw_luid && f->MFTEnum2) {
++        IMFAttributes *attrs = NULL;
++        hr = f->MFCreateAttributes(&attrs, 1);
++        if (SUCCEEDED(hr)) {
++            hr = IMFAttributes_SetBlob(attrs, &ff_MFT_ENUM_ADAPTER_LUID,
++                                       (const UINT8*)hw_luid, sizeof(*hw_luid));
++            if (SUCCEEDED(hr))
++                hr = f->MFTEnum2(category, flags, in_type, out_type, attrs,
++                                 &activate, &num_activate);
++            IMFAttributes_Release(attrs);
++        }
++        if (FAILED(hr))
++            goto error_uninit_mf;
++    } else {
++        hr = f->MFTEnumEx(category, flags, in_type, out_type,
++                          &activate, &num_activate);
++        if (FAILED(hr))
++            goto error_uninit_mf;
++    }
+ 
+     if (log) {
+         if (!num_activate)
+Index: FFmpeg/libavcodec/mf_utils.h
+===================================================================
+--- libavcodec/mf_utils.h
++++ libavcodec/mf_utils.h
+@@ -51,6 +51,8 @@ typedef struct MFFunctions {
+     HRESULT (WINAPI *MFCreateAlignedMemoryBuffer) (DWORD cbMaxLength,
+                                                    DWORD cbAligment,
+                                                    IMFMediaBuffer **ppBuffer);
++    HRESULT (WINAPI *MFCreateAttributes)(IMFAttributes **ppMFAttributes,
++                                         UINT32 cInitialSize);
+     HRESULT (WINAPI *MFCreateSample) (IMFSample **ppIMFSample);
+     HRESULT (WINAPI *MFCreateMediaType) (IMFMediaType **ppMFType);
+     HRESULT (WINAPI *MFCreateDXGISurfaceBuffer) (REFIID riid,
+@@ -66,6 +68,14 @@ typedef struct MFFunctions {
+                                 const MFT_REGISTER_TYPE_INFO *pOutputType,
+                                 IMFActivate ***pppMFTActivate,
+                                 UINT32 *pnumMFTActivate);
++    // MFTEnum2 is missing in pre-Windows 10, version 1703's mfplat.dll.
++    // Therefore we load it optionally.
++    HRESULT (WINAPI *MFTEnum2)(GUID guidCategory, UINT32 Flags,
++                               const MFT_REGISTER_TYPE_INFO *pInputType,
++                               const MFT_REGISTER_TYPE_INFO *pOutputType,
++                               IMFAttributes *pAttributes,
++                               IMFActivate ***pppMFTActivate,
++                               UINT32 *pnumMFTActivate);
+ } MFFunctions;
+ 
+ // These functions do exist in mfapi.h, but are only available within
+@@ -122,6 +132,8 @@ DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_H
+ DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_HEVC_ES, 0x53564548); // FCC('HEVS')
+ DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_AV1, 0x31305641); // FCC('AV01')
+ 
++// This enum is missing from mingw-w64's headers
++DEFINE_GUID(ff_MFT_ENUM_ADAPTER_LUID, 0x1d39518c, 0xe220, 0x4da8, 0xa0, 0x7f, 0xba, 0x17, 0x25, 0x52, 0xd6, 0xb1);
+ 
+ // This enum is missing from mingw-w64's codecapi.h by v7.0.0.
+ enum ff_eAVEncCommonRateControlMode {
+@@ -160,9 +172,19 @@ enum {
+ // header when targeting UWP (where including it with MSVC seems to work,
+ // but fails when built with clang in MSVC mode).
+ enum ff_eAVEncH264VProfile {
+-   ff_eAVEncH264VProfile_Base = 66,
+-   ff_eAVEncH264VProfile_Main = 77,
+-   ff_eAVEncH264VProfile_High = 100,
++    ff_eAVEncH264VProfile_Base = 66,
++    ff_eAVEncH264VProfile_Main = 77,
++    ff_eAVEncH264VProfile_High = 100,
++};
++
++enum ff_eAVEncH265VProfile {
++    ff_eAVEncH265VProfile_Main_420_8  = 1,
++    ff_eAVEncH265VProfile_Main_420_10 = 2,
++};
++
++enum ff_eAVEncAV1VProfile {
++    ff_eAVEncAV1VProfile_Main_420_8  = 1,
++    ff_eAVEncAV1VProfile_Main_420_10 = 2,
+ };
+ 
+ char *ff_hr_str_buf(char *buf, size_t size, HRESULT hr);
+@@ -188,7 +210,8 @@ const CLSID *ff_codec_to_mf_subtype(enum
+ int ff_instantiate_mf(void *log, MFFunctions *f, GUID category,
+                       MFT_REGISTER_TYPE_INFO *in_type,
+                       MFT_REGISTER_TYPE_INFO *out_type,
+-                      int use_hw, IMFTransform **res);
++                      int use_hw, const LUID *hw_luid,
++                      IMFTransform **res);
+ void ff_free_mf(MFFunctions *f, IMFTransform **mft);
+ 
+ #endif
+Index: FFmpeg/libavcodec/mfenc.c
+===================================================================
+--- libavcodec/mfenc.c
++++ libavcodec/mfenc.c
+@@ -23,6 +23,7 @@
+ #endif
+ 
+ #include "encode.h"
++#include "hwconfig.h"
+ #include "mf_utils.h"
+ #include "libavutil/imgutils.h"
+ #include "libavutil/mem.h"
+@@ -38,10 +39,12 @@
+ typedef struct MFContext {
+     AVClass *av_class;
+     HMODULE library;
++#if CONFIG_D3D11VA
+     HMODULE d3d_dll;
+     ID3D11DeviceContext* d3d_context;
+     IMFDXGIDeviceManager *dxgiManager;
+     int resetToken;
++#endif
+ 
+     MFFunctions functions;
+     AVFrame *frame;
+@@ -64,7 +67,9 @@ typedef struct MFContext {
+     int opt_enc_quality;
+     int opt_enc_scenario;
+     int opt_enc_hw;
++#if CONFIG_D3D11VA
+     AVD3D11VADeviceContext* device_hwctx;
++#endif
+ } MFContext;
+ 
+ static int mf_choose_output_type(AVCodecContext *avctx);
+@@ -327,6 +332,7 @@ static int mf_a_avframe_to_sample(AVCode
+     return 0;
+ }
+ 
++#if CONFIG_D3D11VA
+ static int initialize_dxgi_manager(AVCodecContext *avctx)
+ {
+     MFContext *c = avctx->priv_data;
+@@ -354,27 +360,65 @@ static int initialize_dxgi_manager(AVCod
+     return 0;
+ }
+ 
++typedef struct MFD3DFrameHolder {
++    const IUnknownVtbl *lpVtbl;
++    long                ref_count;
++    AVFrame            *frame;
++} MFD3DFrameHolder;
++
++static HRESULT STDMETHODCALLTYPE
++MFD3DFrameHolder_QueryInterface(IUnknown *This, REFIID riid, void **ppvObject)
++{
++    if (!ppvObject)
++        return E_POINTER;
++    if (IsEqualIID(riid, &IID_IUnknown)) {
++        *ppvObject = This;
++        This->lpVtbl->AddRef(This);
++        return S_OK;
++    }
++    *ppvObject = NULL;
++    return E_NOINTERFACE;
++}
++
++static ULONG STDMETHODCALLTYPE MFD3DFrameHolder_AddRef(IUnknown *This)
++{
++    MFD3DFrameHolder *holder = (MFD3DFrameHolder*)This;
++    return InterlockedIncrement(&holder->ref_count);
++}
++
++static ULONG STDMETHODCALLTYPE MFD3DFrameHolder_Release(IUnknown *This)
++{
++    MFD3DFrameHolder *holder = (MFD3DFrameHolder*)This;
++    ULONG count = InterlockedDecrement(&holder->ref_count);
++    if (!count) {
++        av_frame_free(&holder->frame);
++        av_free(holder);
++    }
++    return count;
++}
++
++static const IUnknownVtbl MFD3DFrameHolder_Vtbl = {
++    .QueryInterface = MFD3DFrameHolder_QueryInterface,
++    .AddRef         = MFD3DFrameHolder_AddRef,
++    .Release        = MFD3DFrameHolder_Release
++};
++
++static const GUID GUID_MF_D3D_FRAME_HOLDER = {
++    0xd29f874b, 0x370f, 0x402f,
++    { 0xa3, 0xaf, 0xb6, 0xd1, 0xed, 0xee, 0xd5, 0xe2 }
++};
++
+ static int process_d3d11_frame(AVCodecContext *avctx, const AVFrame *frame, IMFSample **out_sample)
+ {
+     MFContext *c = avctx->priv_data;
+     MFFunctions *func = &c->functions;
+-    AVHWFramesContext *frames_ctx = NULL;
+     ID3D11Texture2D *d3d11_texture = NULL;
+     IMFSample *sample = NULL;
+     IMFMediaBuffer *buffer = NULL;
++    MFD3DFrameHolder *holder = NULL;
+     int subIdx = 0;
+     HRESULT hr;
+ 
+-    frames_ctx = (AVHWFramesContext*)frame->hw_frames_ctx->data;
+-    c->device_hwctx = (AVD3D11VADeviceContext*)frames_ctx->device_ctx->hwctx;
+-
+-    if (!c->dxgiManager) {
+-        hr = initialize_dxgi_manager(avctx);
+-        if (FAILED(hr)) {
+-            return AVERROR_EXTERNAL;
+-        }
+-    }
+-
+     d3d11_texture = (ID3D11Texture2D*)frame->data[0];
+     subIdx = (int)(intptr_t)frame->data[1];
+ 
+@@ -397,18 +441,41 @@ static int process_d3d11_frame(AVCodecCo
+     }
+ 
+     hr = IMFSample_AddBuffer(sample, buffer);
++    IMFMediaBuffer_Release(buffer);
+     if (FAILED(hr)) {
+         av_log(avctx, AV_LOG_ERROR, "Failed to add buffer to sample: %s\n", ff_hr_str(hr));
+-        IMFMediaBuffer_Release(buffer);
+         IMFSample_Release(sample);
+         return AVERROR_EXTERNAL;
+     }
+ 
+-    IMFMediaBuffer_Release(buffer);
++    // Bind the D3D11 frame to the sample to prevent in-flight async
++    // frames from being prematurely released back to the frame pool.
++    holder = av_mallocz(sizeof(*holder));
++    if (!holder) {
++        IMFSample_Release(sample);
++        return AVERROR(ENOMEM);
++    }
++    holder->lpVtbl    = &MFD3DFrameHolder_Vtbl;
++    holder->ref_count = 1;
++    holder->frame     = av_frame_clone(frame);
++    if (!holder->frame) {
++        av_free(holder);
++        IMFSample_Release(sample);
++        return AVERROR(ENOMEM);
++    }
++
++    hr = IMFAttributes_SetUnknown((IMFAttributes*)sample, &GUID_MF_D3D_FRAME_HOLDER, (IUnknown*)holder);
++    holder->lpVtbl->Release((IUnknown*)holder);
++    if (FAILED(hr)) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to bind D3D frame holder to sample: %s\n", ff_hr_str(hr));
++        IMFSample_Release(sample);
++        return AVERROR_EXTERNAL;
++    }
+ 
+     *out_sample = sample;
+     return 0;
+ }
++#endif
+ 
+ static int process_software_frame(AVCodecContext *avctx, const AVFrame *frame, IMFSample **out_sample)
+ {
+@@ -464,8 +531,12 @@ static int mf_v_avframe_to_sample(AVCode
+     int ret;
+ 
+     if (frame->format == AV_PIX_FMT_D3D11) {
++#if CONFIG_D3D11VA
+         // Handle D3D11 hardware frames
+         ret = process_d3d11_frame(avctx, frame, &sample);
++#else
++        ret = AVERROR(ENOSYS);
++#endif
+         if (ret < 0) {
+             return ret;
+         }
+@@ -809,6 +880,8 @@ static int mf_encv_output_adjust(AVCodec
+ {
+     MFContext *c = avctx->priv_data;
+     AVRational framerate;
++    enum AVPixelFormat sw_pix_fmt = (avctx->pix_fmt == AV_PIX_FMT_D3D11)
++                                     ? avctx->sw_pix_fmt : avctx->pix_fmt;
+ 
+     ff_MFSetAttributeSize((IMFAttributes *)type, &MF_MT_FRAME_SIZE, avctx->width, avctx->height);
+     IMFAttributes_SetUINT32(type, &MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
+@@ -821,7 +894,6 @@ static int mf_encv_output_adjust(AVCodec
+ 
+     ff_MFSetAttributeRatio((IMFAttributes *)type, &MF_MT_FRAME_RATE, framerate.num, framerate.den);
+ 
+-    // (MS HEVC supports eAVEncH265VProfile_Main_420_8 only.)
+     if (avctx->codec_id == AV_CODEC_ID_H264) {
+         UINT32 profile = ff_eAVEncH264VProfile_Base;
+         switch (avctx->profile) {
+@@ -833,8 +905,27 @@ static int mf_encv_output_adjust(AVCodec
+             break;
+         }
+         IMFAttributes_SetUINT32(type, &MF_MT_MPEG2_PROFILE, profile);
++    } else if (avctx->codec_id == AV_CODEC_ID_HEVC) {
++        UINT32 profile = ff_eAVEncH265VProfile_Main_420_8;
++        switch (sw_pix_fmt) {
++        case AV_PIX_FMT_P010:
++            profile = ff_eAVEncH265VProfile_Main_420_10;
++            break;
++        }
++        IMFAttributes_SetUINT32(type, &MF_MT_MPEG2_PROFILE, profile);
++    } else if (avctx->codec_id == AV_CODEC_ID_AV1) {
++        UINT32 profile = ff_eAVEncAV1VProfile_Main_420_8;
++        switch (sw_pix_fmt) {
++        case AV_PIX_FMT_P010:
++            profile = ff_eAVEncAV1VProfile_Main_420_10;
++            break;
++        }
++        IMFAttributes_SetUINT32(type, &MF_MT_MPEG2_PROFILE, profile);
+     }
+ 
++    if (avctx->level > 0)
++        IMFAttributes_SetUINT32(type, &MF_MT_MPEG2_LEVEL, (UINT32)avctx->level);
++
+     IMFAttributes_SetUINT32(type, &MF_MT_AVG_BITRATE, avctx->bit_rate);
+ 
+     // Note that some of the ICodecAPI options must be set before SetOutputType.
+@@ -889,11 +980,12 @@ static int64_t mf_encv_input_score(AVCod
+     enum AVPixelFormat pix_fmt = ff_media_type_to_pix_fmt((IMFAttributes *)type);
+ 
+     if (avctx->pix_fmt == AV_PIX_FMT_D3D11) {
+-        if (pix_fmt != AV_PIX_FMT_NV12) {
++        if (pix_fmt != avctx->sw_pix_fmt ||
++            (pix_fmt != AV_PIX_FMT_NV12 &&
++             pix_fmt != AV_PIX_FMT_P010)) {
+             return -1; // can not use
+         }
+-    }
+-    else {
++    } else {
+         if (pix_fmt != avctx->pix_fmt)
+             return -1; // can not use
+     }
+@@ -905,7 +997,9 @@ static int mf_encv_input_adjust(AVCodecC
+ {
+     enum AVPixelFormat pix_fmt = ff_media_type_to_pix_fmt((IMFAttributes *)type);
+     if (avctx->pix_fmt == AV_PIX_FMT_D3D11) {
+-        if (pix_fmt != AV_PIX_FMT_NV12 && pix_fmt != AV_PIX_FMT_D3D11) {
++        if (pix_fmt != avctx->sw_pix_fmt ||
++            (pix_fmt != AV_PIX_FMT_NV12 &&
++             pix_fmt != AV_PIX_FMT_P010)) {
+             av_log(avctx, AV_LOG_ERROR, "unsupported input pixel format set\n");
+             return AVERROR(EINVAL);
+         }
+@@ -1202,13 +1296,62 @@ err:
+     return res;
+ }
+ 
+-static int mf_create(void *log, MFFunctions *f, IMFTransform **mft,
++static int get_luid_from_dxgi_adapter(AVCodecContext *avctx, LUID *luid)
++{
++    int ret = AVERROR_UNKNOWN;
++#if CONFIG_D3D11VA
++    AVHWFramesContext *frames_ctx = NULL;
++    AVHWDeviceContext *dev_ctx = NULL;
++    AVD3D11VADeviceContext *hwctx = NULL;
++    IDXGIDevice *dxgi_dev = NULL;
++    IDXGIAdapter *adapter = NULL;
++    HRESULT hr;
++
++    if (!luid)
++        return AVERROR(EINVAL);
++
++    if (avctx->hw_frames_ctx &&
++        (frames_ctx = (AVHWFramesContext *)avctx->hw_frames_ctx->data))
++        dev_ctx = frames_ctx->device_ctx;
++
++    if (!dev_ctx && avctx->hw_device_ctx)
++        dev_ctx = (AVHWDeviceContext *)avctx->hw_device_ctx->data;
++
++    if (!dev_ctx || dev_ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
++        return AVERROR(EINVAL);
++
++    hwctx = (AVD3D11VADeviceContext *)dev_ctx->hwctx;
++
++    hr = ID3D11Device_QueryInterface(hwctx->device,
++                                     &IID_IDXGIDevice, (void**)&dxgi_dev);
++    if (SUCCEEDED(hr)) {
++        hr = IDXGIDevice_GetAdapter(dxgi_dev, &adapter);
++        if (SUCCEEDED(hr)) {
++            DXGI_ADAPTER_DESC adapter_desc;
++            hr = IDXGIAdapter_GetDesc(adapter, &adapter_desc);
++            if (SUCCEEDED(hr)) {
++                *luid = adapter_desc.AdapterLuid;
++                ret = 0;
++            }
++        }
++    }
++    if (dxgi_dev)
++        IDXGIDevice_Release(dxgi_dev);
++    if (adapter)
++        IDXGIAdapter_Release(adapter);
++#endif
++    return ret;
++}
++
++static int mf_create(AVCodecContext *avctx, MFFunctions *f, IMFTransform **mft,
+                      const AVCodec *codec, int use_hw)
+ {
+     int is_audio = codec->type == AVMEDIA_TYPE_AUDIO;
+     const CLSID *subtype = ff_codec_to_mf_subtype(codec->id);
+     MFT_REGISTER_TYPE_INFO reg = {0};
+     GUID category;
++    const LUID *p_hw_luid = NULL;
++    LUID hw_luid = {0};
+     int ret;
+ 
+     *mft = NULL;
+@@ -1224,9 +1367,15 @@ static int mf_create(void *log, MFFuncti
+     } else {
+         reg.guidMajorType = MFMediaType_Video;
+         category = MFT_CATEGORY_VIDEO_ENCODER;
++
++        if (use_hw && avctx->pix_fmt == AV_PIX_FMT_D3D11) {
++            ret = get_luid_from_dxgi_adapter(avctx, &hw_luid);
++            if (!ret)
++                p_hw_luid = &hw_luid;
++        }
+     }
+ 
+-    if ((ret = ff_instantiate_mf(log, f, category, NULL, &reg, use_hw, mft)) < 0)
++    if ((ret = ff_instantiate_mf(avctx, f, category, NULL, &reg, use_hw, p_hw_luid, mft)) < 0)
+         return ret;
+ 
+     return 0;
+@@ -1262,6 +1411,28 @@ static int mf_init_encoder(AVCodecContex
+     if ((ret = mf_unlock_async(avctx)) < 0)
+         return ret;
+ 
++#if CONFIG_D3D11VA
++    if (c->is_video && use_hw && avctx->pix_fmt == AV_PIX_FMT_D3D11) {
++        AVHWFramesContext *frames_ctx = NULL;
++        AVHWDeviceContext *dev_ctx = NULL;
++
++        if (avctx->hw_frames_ctx &&
++            (frames_ctx = (AVHWFramesContext *)avctx->hw_frames_ctx->data))
++            dev_ctx = frames_ctx->device_ctx;
++
++        if (!dev_ctx && avctx->hw_device_ctx)
++            dev_ctx = (AVHWDeviceContext *)avctx->hw_device_ctx->data;
++
++        if (!dev_ctx || dev_ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
++            return AVERROR(EINVAL);
++
++        c->device_hwctx = (AVD3D11VADeviceContext *)dev_ctx->hwctx;
++
++        if ((ret = initialize_dxgi_manager(avctx)) < 0)
++            return ret;
++    }
++#endif
++
+     hr = IMFTransform_QueryInterface(c->mft, &IID_ICodecAPI, (void **)&c->codec_api);
+     if (!FAILED(hr))
+         av_log(avctx, AV_LOG_VERBOSE, "MFT supports ICodecAPI.\n");
+@@ -1309,23 +1480,25 @@ static int mf_init_encoder(AVCodecContex
+ }
+ 
+ #if !HAVE_UWP
+-#define LOAD_MF_FUNCTION(context, func_name) \
++#define LOAD_MF_FUNCTION(context, func_name, optional) \
+     context->functions.func_name = (void *)dlsym(context->library, #func_name); \
+     if (!context->functions.func_name) { \
+         av_log(context, AV_LOG_ERROR, "DLL mfplat.dll failed to find function "\
+            #func_name "\n"); \
+-        return AVERROR_UNKNOWN; \
++        if (!(optional)) \
++            return AVERROR_UNKNOWN; \
+     }
+ #else
+ // In UWP (which lacks LoadLibrary), just link directly against
+ // the functions - this requires building with new/complete enough
+ // import libraries.
+-#define LOAD_MF_FUNCTION(context, func_name) \
++#define LOAD_MF_FUNCTION(context, func_name, optional) \
+     context->functions.func_name = func_name; \
+     if (!context->functions.func_name) { \
+         av_log(context, AV_LOG_ERROR, "Failed to find function " #func_name \
+                "\n"); \
+-        return AVERROR_UNKNOWN; \
++        if (!(optional)) \
++            return AVERROR_UNKNOWN; \
+     }
+ #endif
+ 
+@@ -1338,7 +1511,9 @@ static int mf_load_library(AVCodecContex
+ 
+ #if !HAVE_UWP
+     c->library = dlopen("mfplat.dll", 0);
++#if CONFIG_D3D11VA
+     c->d3d_dll = dlopen("D3D11.dll", 0);
++#endif
+ 
+     if (!c->library) {
+         av_log(c, AV_LOG_ERROR, "DLL mfplat.dll failed to open\n");
+@@ -1346,15 +1521,23 @@ static int mf_load_library(AVCodecContex
+     }
+ #endif
+ 
+-    LOAD_MF_FUNCTION(c, MFStartup);
+-    LOAD_MF_FUNCTION(c, MFShutdown);
+-    LOAD_MF_FUNCTION(c, MFCreateAlignedMemoryBuffer);
+-    LOAD_MF_FUNCTION(c, MFCreateSample);
+-    LOAD_MF_FUNCTION(c, MFCreateMediaType);
+-    LOAD_MF_FUNCTION(c, MFCreateDXGISurfaceBuffer);
+-    LOAD_MF_FUNCTION(c, MFCreateDXGIDeviceManager);
++    LOAD_MF_FUNCTION(c, MFStartup, 0);
++    LOAD_MF_FUNCTION(c, MFShutdown, 0);
++    LOAD_MF_FUNCTION(c, MFCreateAlignedMemoryBuffer, 0);
++    LOAD_MF_FUNCTION(c, MFCreateAttributes, 0);
++    LOAD_MF_FUNCTION(c, MFCreateSample, 0);
++    LOAD_MF_FUNCTION(c, MFCreateMediaType, 0);
++#if CONFIG_D3D11VA
++    LOAD_MF_FUNCTION(c, MFCreateDXGISurfaceBuffer, 0);
++    LOAD_MF_FUNCTION(c, MFCreateDXGIDeviceManager, 0);
++#endif
+     // MFTEnumEx is missing in Windows Vista's mfplat.dll.
+-    LOAD_MF_FUNCTION(c, MFTEnumEx);
++    LOAD_MF_FUNCTION(c, MFTEnumEx, 0);
++#if CONFIG_D3D11VA
++    // MFTEnum2 is missing in pre-Windows 10, version 1703's mfplat.dll.
++    // Therefore we load it optionally.
++    LOAD_MF_FUNCTION(c, MFTEnum2, 1);
++#endif
+ 
+     return 0;
+ }
+@@ -1369,15 +1552,19 @@ static int mf_close(AVCodecContext *avct
+     if (c->async_events)
+         IMFMediaEventGenerator_Release(c->async_events);
+ 
++#if CONFIG_D3D11VA
+     if (c->dxgiManager)
+         IMFDXGIDeviceManager_Release(c->dxgiManager);
++#endif
+ 
+ #if !HAVE_UWP
+     if (c->library)
+         ff_free_mf(&c->functions, &c->mft);
+ 
+     dlclose(c->library);
++#if CONFIG_D3D11VA
+     dlclose(c->d3d_dll);
++#endif
+     c->library = NULL;
+ #else
+     ff_free_mf(&c->functions, &c->mft);
+@@ -1404,7 +1591,7 @@ static av_cold int mf_init(AVCodecContex
+ 
+ #define OFFSET(x) offsetof(MFContext, x)
+ 
+-#define MF_ENCODER(MEDIATYPE, NAME, ID, OPTS, FMTS, CAPS, DEFAULTS) \
++#define MF_ENCODER(MEDIATYPE, NAME, ID, OPTS, FMTS, CAPS, DEFAULTS, HWCONFIGS) \
+     static const AVClass ff_ ## NAME ## _mf_encoder_class = {                  \
+         .class_name = #NAME "_mf",                                             \
+         .item_name  = av_default_item_name,                                    \
+@@ -1425,6 +1612,7 @@ static av_cold int mf_init(AVCodecContex
+         CAPS                                                                   \
+         .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,                           \
+         .defaults       = DEFAULTS,                                            \
++        .hw_configs     = HWCONFIGS,                                           \
+     };
+ 
+ #define AFMTS \
+@@ -1433,9 +1621,9 @@ static av_cold int mf_init(AVCodecContex
+         .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID |           \
+                           AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,
+ 
+-MF_ENCODER(AUDIO, aac,         AAC, NULL, AFMTS, ACAPS, NULL);
+-MF_ENCODER(AUDIO, ac3,         AC3, NULL, AFMTS, ACAPS, NULL);
+-MF_ENCODER(AUDIO, mp3,         MP3, NULL, AFMTS, ACAPS, NULL);
++MF_ENCODER(AUDIO, aac,         AAC, NULL, AFMTS, ACAPS, NULL, NULL);
++MF_ENCODER(AUDIO, ac3,         AC3, NULL, AFMTS, ACAPS, NULL, NULL);
++MF_ENCODER(AUDIO, mp3,         MP3, NULL, AFMTS, ACAPS, NULL, NULL);
+ 
+ #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
+ static const AVOption venc_opts[] = {
+@@ -1469,12 +1657,42 @@ static const FFCodecDefault defaults[] =
+     { NULL },
+ };
+ 
+-#define VFMTS \
+-        CODEC_PIXFMTS(AV_PIX_FMT_NV12, AV_PIX_FMT_YUV420P, AV_PIX_FMT_D3D11),
++static const AVCodecHWConfigInternal *const hw_configs[] = {
++#if CONFIG_D3D11VA
++    HW_CONFIG_ENCODER_FRAMES(D3D11, D3D11VA),
++    HW_CONFIG_ENCODER_DEVICE(NONE,  D3D11VA),
++#endif
++    NULL,
++};
++
++static const enum AVPixelFormat pix_fmts_10b_8b[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_P010,
++#if CONFIG_D3D11VA
++    AV_PIX_FMT_D3D11,
++#endif
++    AV_PIX_FMT_NONE
++};
++
++static const enum AVPixelFormat pix_fmts_8b[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV420P,
++#if CONFIG_D3D11VA
++    AV_PIX_FMT_D3D11,
++#endif
++    AV_PIX_FMT_NONE
++};
++
++#define VFMTS8 \
++        CODEC_PIXFMTS_ARRAY(pix_fmts_8b),
++#define VFMTS10 \
++        CODEC_PIXFMTS_ARRAY(pix_fmts_10b_8b),
+ #define VCAPS \
++        .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,                 \
+         .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID |           \
+                           AV_CODEC_CAP_DR1,
+ 
+-MF_ENCODER(VIDEO, h264,        H264, venc_opts, VFMTS, VCAPS, defaults);
+-MF_ENCODER(VIDEO, hevc,        HEVC, venc_opts, VFMTS, VCAPS, defaults);
+-MF_ENCODER(VIDEO, av1,         AV1,  venc_opts, VFMTS, VCAPS, defaults);
++MF_ENCODER(VIDEO, h264,        H264, venc_opts, VFMTS8,  VCAPS, defaults, hw_configs);
++MF_ENCODER(VIDEO, hevc,        HEVC, venc_opts, VFMTS10, VCAPS, defaults, hw_configs);
++MF_ENCODER(VIDEO, av1,         AV1,  venc_opts, VFMTS10, VCAPS, defaults, hw_configs);
