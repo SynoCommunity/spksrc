@@ -1,0 +1,114 @@
+Index: FFmpeg/libavcodec/vaapi_encode.c
+===================================================================
+--- libavcodec/vaapi_encode.c
++++ libavcodec/vaapi_encode.c
+@@ -1195,6 +1195,35 @@ fail:
+ #endif
+ }
+ 
++static av_cold void vaapi_encode_probe_overrides(av_unused AVCodecContext *avctx)
++{
++#if !defined(_WIN32)
++    VAAPIEncodeContext *ctx = avctx->priv_data;
++#if VA_CHECK_VERSION(1, 15, 0)
++    VADisplayAttribute attr = {
++        .type = VADisplayPCIID,
++    };
++    VAStatus vas = vaGetDisplayAttributes(ctx->hwctx->display, &attr, 1);
++
++    // AMD VCN/VCE hardware needs additional overrides, while
++    // libva does not provide any feedback functionality.
++    if (vas == VA_STATUS_SUCCESS &&
++        attr.flags != VA_DISPLAY_ATTRIB_NOT_SUPPORTED)
++        ctx->amd_vcn_override = ((attr.value >> 16) & 0xffff) == 0x1002;
++    else
++#endif
++    {
++        const char *vendor = vaQueryVendorString(ctx->hwctx->display);
++        ctx->amd_vcn_override = vendor &&
++            strstr(vendor, "Mesa Gallium driver") &&
++            strstr(vendor, "AMD");
++    }
++
++    if (ctx->amd_vcn_override)
++        av_log(avctx, AV_LOG_DEBUG, "Using overrides for AMD.\n");
++#endif
++}
++
+ static const VAAPIEncodeRCMode vaapi_encode_rc_modes[] = {
+     //                                  Bitrate   Quality
+     //                                     | Maxrate | HRD/VBV
+@@ -2173,6 +2202,8 @@ av_cold int ff_vaapi_encode_init(AVCodec
+ 
+     ctx->hwctx = base_ctx->device->hwctx;
+ 
++    vaapi_encode_probe_overrides(avctx);
++
+     err = vaapi_encode_profile_entrypoint(avctx);
+     if (err < 0)
+         goto fail;
+Index: FFmpeg/libavcodec/vaapi_encode.h
+===================================================================
+--- libavcodec/vaapi_encode.h
++++ libavcodec/vaapi_encode.h
+@@ -264,6 +264,9 @@ typedef struct VAAPIEncodeContext {
+     // Surface alignment required by driver.
+     int             surface_alignment_width;
+     int             surface_alignment_height;
++
++    // Enabling overrides for AMD VCN/VCE.
++    int             amd_vcn_override;
+ } VAAPIEncodeContext;
+ 
+ typedef struct VAAPIEncodeType {
+Index: FFmpeg/libavcodec/vaapi_encode_h265.c
+===================================================================
+--- libavcodec/vaapi_encode_h265.c
++++ libavcodec/vaapi_encode_h265.c
+@@ -320,6 +320,13 @@ static int vaapi_encode_h265_init_sequen
+             bs.bits.max_max_transform_hierarchy_depth_inter;
+         sps->max_transform_hierarchy_depth_intra =
+             bs.bits.max_max_transform_hierarchy_depth_intra;
++
++        if (ctx->amd_vcn_override) {
++            sps->max_transform_hierarchy_depth_inter =
++                sps->log2_diff_max_min_luma_coding_block_size + 1;
++            sps->max_transform_hierarchy_depth_intra =
++                sps->max_transform_hierarchy_depth_inter;
++        }
+     }
+ 
+     // update pps setting according to queried result
+@@ -335,6 +342,9 @@ static int vaapi_encode_h265_init_sequen
+         // 0 will make cu_qp_delta invalid.
+         if (pps->cu_qp_delta_enabled_flag)
+             pps->diff_cu_qp_delta_depth = sps->log2_diff_max_min_luma_coding_block_size;
++
++        if (ctx->amd_vcn_override)
++            pps->diff_cu_qp_delta_depth = 0;
+     }
+ #endif
+ 
+@@ -1020,6 +1030,9 @@ static av_cold int vaapi_encode_h265_con
+         priv->fixed_qp_b   = 30;
+     }
+ 
++    if (ctx->amd_vcn_override)
++        priv->unit_opts.fixed_qp_idr = 26; // pps->init_qp_minus26
++
+     ctx->roi_quant_range = 51 + 6 * (ctx->profile->depth - 8);
+ 
+     return 0;
+Index: FFmpeg/libavformat/movenc.c
+===================================================================
+--- libavformat/movenc.c
++++ libavformat/movenc.c
+@@ -6929,7 +6929,7 @@ int ff_mov_write_packet(AVFormatContext
+     } else if (par->codec_id == AV_CODEC_ID_HEVC && trk->extradata_size[trk->last_stsd_index] > 6 &&
+                (AV_RB24(trk->extradata[trk->last_stsd_index]) == 1 || AV_RB32(trk->extradata[trk->last_stsd_index]) == 1)) {
+         /* extradata is Annex B, assume the bitstream is too and convert it */
+-        int filter_ps = (trk->tag == MKTAG('h','v','c','1'));
++        int filter_ps = 0; // Allow in-band ps for robustness
+         if (trk->hint_track >= 0 && trk->hint_track < mov->nb_tracks) {
+             ret = ff_hevc_annexb2mp4_buf(pkt->data, &reformatted_data,
+                                          &size, filter_ps, NULL);

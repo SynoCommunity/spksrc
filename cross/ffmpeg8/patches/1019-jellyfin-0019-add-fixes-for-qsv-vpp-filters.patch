@@ -241,7 +241,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      outvsi_conf.ColourDescriptionPresent = 1;
  
      if (memcmp(&vpp->invsi_conf, &invsi_conf, sizeof(mfxExtVideoSignalInfo)) ||
-@@ -689,12 +718,23 @@ static int config_output(AVFilterLink *o
+@@ -689,12 +718,28 @@ static int config_output(AVFilterLink *o
  
      if (inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format) {
          if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
@@ -256,10 +256,15 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
 -#endif
 +            /* Compute mode is only available on DG2+ platforms */
 +            if (vpl && get_mfx_platform(ctx, &mfx_platform) == MFX_ERR_NONE) {
++                const AVPixFmtDescriptor *in_desc = av_pix_fmt_desc_get(in_format);
 +                int code_name = mfx_platform.CodeName;
 +                compute = code_name >= 45 &&
 +                          code_name <= 54 &&
 +                          code_name != 50;
++                /* When used with tonemap, only 4:2:0 chroma is supported */
++                if (vpp->tonemap && in_desc &&
++                    !(in_desc->log2_chroma_w && in_desc->log2_chroma_h))
++                    compute = 0;
 +            }
 +
 +            if (mode == -1)
@@ -269,7 +274,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
  
              INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
              SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
-@@ -706,6 +746,13 @@ static int config_output(AVFilterLink *o
+@@ -706,6 +751,13 @@ static int config_output(AVFilterLink *o
  #undef INIT_MFX_EXTBUF
  #undef SET_MFX_PARAM_FIELD
  
@@ -283,7 +288,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      if (vpp->use_frc || vpp->use_crop || vpp->deinterlace || vpp->denoise ||
          vpp->detail || vpp->procamp || vpp->rotate || vpp->hflip ||
          inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format ||
-@@ -884,19 +931,13 @@ static const AVOption vpp_options[] = {
+@@ -884,19 +936,13 @@ static const AVOption vpp_options[] = {
      { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
      { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
      { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
@@ -304,7 +309,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
  
      { "rate", "Generate output at frame rate or field rate, available only for deinterlace mode",
        OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, .unit = "rate" },
-@@ -927,8 +968,9 @@ static const AVOption vpp_options[] = {
+@@ -927,8 +973,9 @@ static const AVOption vpp_options[] = {
      { "out_color_transfer", "Output color transfer characteristics",
        OFFSET(color_transfer_str),  AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
  
@@ -315,7 +320,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      { NULL }
  };
  
-@@ -984,19 +1026,14 @@ static const AVOption qsvscale_options[]
+@@ -984,19 +1031,14 @@ static const AVOption qsvscale_options[]
      { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
      { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
  
@@ -337,7 +342,7 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      { NULL },
  };
  
-@@ -1021,6 +1058,7 @@ static const AVOption qsvdeint_options[]
+@@ -1021,6 +1063,7 @@ static const AVOption qsvdeint_options[]
      { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, .unit = "mode"},
      { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, .unit = "mode"},
  
@@ -345,6 +350,28 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      { NULL },
  };
  
+Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -42,8 +42,6 @@
+ #include "thread.h"
+ #include "compat/w32dlfcn.h"
+ 
+-#define MAX_ARRAY_SIZE 64 // Driver specification limits ArraySize to 64 for decoder-bound resources
+-
+ typedef HRESULT(WINAPI *PFN_CREATE_DXGI_FACTORY)(REFIID riid, void **ppFactory);
+ 
+ static AVOnce functions_loaded = AV_ONCE_INIT;
+@@ -293,8 +291,6 @@ static int d3d11va_frames_init(AVHWFrame
+     hwctx->BindFlags |= device_hwctx->BindFlags;
+     hwctx->MiscFlags |= device_hwctx->MiscFlags;
+ 
+-    ctx->initial_pool_size = FFMIN(ctx->initial_pool_size, MAX_ARRAY_SIZE);
+-
+     texDesc = (D3D11_TEXTURE2D_DESC){
+         .Width      = ctx->width,
+         .Height     = ctx->height,
 Index: FFmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
 --- libavutil/hwcontext_qsv.c

@@ -1,0 +1,1811 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -3535,6 +3535,7 @@ scale_cuda_filter_deps_any="cuda_nvcc cu
+ thumbnail_cuda_filter_deps="ffnvcodec"
+ thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+ tonemap_cuda_filter_deps="ffnvcodec const_nan"
++tonemap_d3d11_filter_deps="d3d11va const_nan d3dcompiler_h"
+ tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+ transpose_cuda_filter_deps="ffnvcodec"
+ transpose_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -560,6 +560,7 @@ OBJS-$(CONFIG_TONEMAP_FILTER)
+ OBJS-$(CONFIG_TONEMAPX_FILTER)               += vf_tonemapx.o
+ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
+                                                 cuda/host_util.o cuda/load_helper.o
++OBJS-$(CONFIG_TONEMAP_D3D11_FILTER)           += vf_tonemap_d3d11.o d3d11/tonemap.o d3d11_filter.o
+ OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
+                                                 opencl/tonemap.o opencl/colorspace_common.o
+ OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
+Index: FFmpeg/libavfilter/allfilters.c
+===================================================================
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -520,6 +520,7 @@ extern const FFFilter ff_vf_tmix;
+ extern const FFFilter ff_vf_tonemap;
+ extern const FFFilter ff_vf_tonemapx;
+ extern const FFFilter ff_vf_tonemap_cuda;
++extern const FFFilter ff_vf_tonemap_d3d11;
+ extern const FFFilter ff_vf_tonemap_opencl;
+ extern const FFFilter ff_vf_tonemap_vaapi;
+ extern const FFFilter ff_vf_tonemap_videotoolbox;
+Index: FFmpeg/libavfilter/vf_tonemap_d3d11.c
+===================================================================
+--- /dev/null
++++ libavfilter/vf_tonemap_d3d11.c
+@@ -0,0 +1,1094 @@
++/*
++ * D3D11 tonemap filter
++ *
++ * Copyright (C) 2026 Gnattu OC <gnattuoc@me.com>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <float.h>
++#include <inttypes.h>
++#include <stdio.h>
++#include <windows.h>
++#ifndef COBJMACROS
++#define COBJMACROS
++#endif
++#include <d3d11.h>
++
++#include "libavutil/common.h"
++#include "libavutil/mathematics.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_d3d11va.h"
++#include "libavutil/dovi_meta.h"
++#include "libavutil/libm.h"
++#include "libavutil/mem.h"
++#include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
++
++#include "colorspace.h"
++#include "filters.h"
++#include "formats.h"
++#include "video.h"
++#include "vf_tonemap_d3d11.h"
++#include "d3d11_source.h"
++#include "d3d11_filter.h"
++
++#define REF_WHITE_SCALE (REFERENCE_WHITE / REFERENCE_WHITE_ALT)
++
++enum TonemapAlgorithm {
++    TONEMAP_NONE,
++    TONEMAP_LINEAR,
++    TONEMAP_GAMMA,
++    TONEMAP_CLIP,
++    TONEMAP_REINHARD,
++    TONEMAP_HABLE,
++    TONEMAP_MOBIUS,
++    TONEMAP_BT2390,
++    TONEMAP_COUNT,
++};
++
++enum TonemapMode {
++    TONEMAP_MODE_MAX,
++    TONEMAP_MODE_RGB,
++    TONEMAP_MODE_LUM,
++    TONEMAP_MODE_ITP,
++    TONEMAP_MODE_AUTO,
++    TONEMAP_MODE_COUNT,
++};
++
++typedef struct TonemapD3D11Params {
++    int width;
++    int height;
++    int tonemap;
++    int tonemap_mode;
++    int trc_in;
++    int trc_out;
++    int full_range_in;
++    int full_range_out;
++    int in_depth;
++    int out_depth;
++    int chroma_loc;
++    int skip_tonemap;
++    int apply_dovi;
++    int pad_i0;
++    int pad_i1;
++    int pad_i2;
++    float tone_param;
++    float desat_param;
++    float peak;
++    float target_peak;
++    float input_quantization_offset;
++    float input_y_scale;
++    float input_uv_scale;
++    float output_quantization_offset;
++    float luma_src[4];
++    float luma_dst[4];
++    float rgb_matrix[3][4];
++    float yuv_matrix[3][4];
++    float rgb2rgb_matrix[3][4];
++    float dovi_ycc2rgb_offset[4];
++    float dovi_rgb_matrix[3][4];
++    float dovi_lms2rgb_matrix[3][4];
++    float dovi_params[6][4];
++    float dovi_pivots[6][4];
++    float dovi_coeffs[24][4];
++    float dovi_mmr[144][4];
++} TonemapD3D11Params;
++
++typedef struct TonemapD3D11Context {
++    const AVClass *class;
++
++    enum AVColorSpace colorspace;
++    enum AVColorTransferCharacteristic trc;
++    enum AVColorPrimaries primaries;
++    enum AVColorRange range;
++    enum AVPixelFormat format;
++    int apply_dovi;
++    int force_output_copy;
++
++    int tonemap;
++    int tonemap_mode;
++    double peak;
++    double src_peak;
++    double target_peak;
++    double param;
++    double final_param;
++    double desat_param;
++
++    AVBufferRef *hw_device_ctx;
++    AVBufferRef *hw_frames_ctx_out;
++    enum AVPixelFormat in_fmt;
++    enum AVPixelFormat out_fmt;
++    const AVPixFmtDescriptor *in_desc;
++    const AVPixFmtDescriptor *out_desc;
++
++    ID3D11Device *device;
++    ID3D11DeviceContext *context;
++    HMODULE d3dcompiler;
++    FFD3DCompileProc D3DCompile;
++    ID3D11ComputeShader *cs;
++    ID3D11Buffer *params_buf;
++    ID3D11Texture2D *src_tex;
++    ID3D11Texture2D *work_tex;
++    int shader_tonemap, shader_mode, shader_trc_in, shader_trc_out;
++    int shader_full_in, shader_full_out, shader_out_depth, shader_skip, shader_dovi;
++    int src_w, src_h;
++    int work_w, work_h;
++    int direct_input_srv;
++    int direct_output_uav;
++
++    struct FFDOVIMetadataRemap dovi;
++    int apply_dovi_frame;
++} TonemapD3D11Context;
++
++
++static const double dovi_lms2rgb_matrix[3][3] =
++{
++    { 3.06441879, -2.16597676,  0.10155818},
++    {-0.65612108,  1.78554118, -0.12943749},
++    { 0.01736321, -0.04725154,  1.03004253},
++};
++
++static const int colorspaces_out[] = {
++    AVCOL_SPC_UNSPECIFIED,
++    AVCOL_SPC_BT709,
++    AVCOL_SPC_BT2020_NCL,
++    -1
++};
++
++static int get_rgb2rgb_matrix(enum AVColorPrimaries in, enum AVColorPrimaries out,
++                              double rgb2rgb[3][3])
++{
++    double rgb2xyz[3][3], xyz2rgb[3][3];
++    const AVColorPrimariesDesc *in_primaries = av_csp_primaries_desc_from_id(in);
++    const AVColorPrimariesDesc *out_primaries = av_csp_primaries_desc_from_id(out);
++
++    if (!in_primaries || !out_primaries)
++        return AVERROR(EINVAL);
++
++    ff_fill_rgb2xyz_table(&out_primaries->prim, &out_primaries->wp, rgb2xyz);
++    ff_matrix_invert_3x3(rgb2xyz, xyz2rgb);
++    ff_fill_rgb2xyz_table(&in_primaries->prim, &in_primaries->wp, rgb2xyz);
++    ff_matrix_mul_3x3(rgb2rgb, rgb2xyz, xyz2rgb);
++    return 0;
++}
++
++static int format_is_supported(enum AVPixelFormat fmt)
++{
++    return fmt == AV_PIX_FMT_NV12 || fmt == AV_PIX_FMT_P010 || fmt == AV_PIX_FMT_P016;
++}
++
++static void release_d3d11_resources(TonemapD3D11Context *s)
++{
++    FF_D3D11_RELEASE(s->cs);
++    FF_D3D11_RELEASE(s->params_buf);
++    FF_D3D11_RELEASE(s->src_tex);
++    FF_D3D11_RELEASE(s->work_tex);
++    s->shader_tonemap = s->shader_mode = s->shader_trc_in = s->shader_trc_out = -1;
++    s->shader_full_in = s->shader_full_out = s->shader_out_depth = s->shader_skip = s->shader_dovi = -1;
++    s->src_w = s->src_h = 0;
++    s->work_w = s->work_h = 0;
++}
++
++static void macro_int(char *buf, size_t size, int value)
++{
++    snprintf(buf, size, "%d", value);
++}
++
++static int compile_shader(AVFilterContext *ctx,
++                          int tonemap, int mode, int trc_in, int trc_out,
++                          int full_in, int full_out, int out_depth,
++                          int skip, int dovi)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    char tonemap_buf[16], mode_buf[16], trc_in_buf[16], trc_out_buf[16];
++    char full_in_buf[16], full_out_buf[16], out_depth_buf[16], skip_buf[16], dovi_buf[16];
++    D3D_SHADER_MACRO macros[] = {
++        { "TONEMAP_ALG", tonemap_buf },
++        { "TONE_MODE", mode_buf },
++        { "INPUT_TRC", trc_in_buf },
++        { "OUTPUT_TRC", trc_out_buf },
++        { "FULL_RANGE_IN_VAL", full_in_buf },
++        { "FULL_RANGE_OUT_VAL", full_out_buf },
++        { "OUT_DEPTH_VAL", out_depth_buf },
++        { "SKIP_TONEMAP_VAL", skip_buf },
++        { "APPLY_DOVI_VAL", dovi_buf },
++        { NULL, NULL },
++    };
++
++    macro_int(tonemap_buf, sizeof(tonemap_buf), tonemap);
++    macro_int(mode_buf, sizeof(mode_buf), mode);
++    macro_int(trc_in_buf, sizeof(trc_in_buf), trc_in);
++    macro_int(trc_out_buf, sizeof(trc_out_buf), trc_out);
++    macro_int(full_in_buf, sizeof(full_in_buf), full_in);
++    macro_int(full_out_buf, sizeof(full_out_buf), full_out);
++    macro_int(out_depth_buf, sizeof(out_depth_buf), out_depth);
++    macro_int(skip_buf, sizeof(skip_buf), skip);
++    macro_int(dovi_buf, sizeof(dovi_buf), dovi);
++
++    FF_D3D11_RELEASE(s->cs);
++    if (ff_d3d11_compile_shader(ctx, s->device, s->D3DCompile,
++                                ff_source_tonemap_hlsl, macros, "tonemap_main",
++                                "cs_5_0", "D3D11 tonemap", &s->cs) < 0)
++        return AVERROR_EXTERNAL;
++
++    s->shader_tonemap = tonemap;
++    s->shader_mode = mode;
++    s->shader_trc_in = trc_in;
++    s->shader_trc_out = trc_out;
++    s->shader_full_in = full_in;
++    s->shader_full_out = full_out;
++    s->shader_out_depth = out_depth;
++    s->shader_skip = skip;
++    s->shader_dovi = dovi;
++    return 0;
++}
++
++static int ensure_compiler_and_params(AVFilterContext *ctx)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    int ret;
++
++    ret = ff_d3d11_load_shader_compiler(ctx, &s->d3dcompiler, &s->D3DCompile);
++    if (ret < 0)
++        return ret;
++
++    if (s->params_buf)
++        return 0;
++
++    return ff_d3d11_create_const_buffer(ctx, s->device, sizeof(TonemapD3D11Params),
++                                        "D3D11 tonemap", &s->params_buf);
++}
++
++static int ensure_shader_variant(AVFilterContext *ctx, const TonemapD3D11Params *params)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    int ret = ensure_compiler_and_params(ctx);
++    if (ret < 0)
++        return ret;
++
++    if (s->cs &&
++        s->shader_tonemap == params->tonemap &&
++        s->shader_mode == params->tonemap_mode &&
++        s->shader_trc_in == params->trc_in &&
++        s->shader_trc_out == params->trc_out &&
++        s->shader_full_in == params->full_range_in &&
++        s->shader_full_out == params->full_range_out &&
++        s->shader_out_depth == params->out_depth &&
++        s->shader_skip == params->skip_tonemap &&
++        s->shader_dovi == params->apply_dovi)
++        return 0;
++
++    av_log(ctx, AV_LOG_DEBUG, "Compiling D3D11 tonemap shader variant: tone=%d mode=%d in_trc=%d out_trc=%d dovi=%d\n",
++           params->tonemap, params->tonemap_mode, params->trc_in, params->trc_out, params->apply_dovi);
++    return compile_shader(ctx, params->tonemap, params->tonemap_mode,
++                          params->trc_in, params->trc_out,
++                          params->full_range_in, params->full_range_out,
++                          params->out_depth, params->skip_tonemap,
++                          params->apply_dovi);
++}
++
++static int ensure_texture(AVFilterContext *ctx, ID3D11Texture2D **tex,
++                          int *cur_w, int *cur_h, int w, int h,
++                          enum AVPixelFormat fmt, UINT bind_flags)
++{
++    TonemapD3D11Context *s = ctx->priv;
++
++    return ff_d3d11_ensure_texture(ctx, s->device, tex, cur_w, cur_h, NULL,
++                                   w, h, ff_d3d11_texture_format(fmt), bind_flags,
++                                   "D3D11 tonemap");
++}
++
++static int create_srv_view(AVFilterContext *ctx, ID3D11Texture2D *tex,
++                           UINT subresource, enum AVPixelFormat fmt, int plane,
++                           int log_level, ID3D11ShaderResourceView **srv)
++{
++    TonemapD3D11Context *s = ctx->priv;
++
++    return ff_d3d11_create_srv(ctx, s->device, tex, subresource,
++                               ff_d3d11_plane_format(fmt, plane),
++                               log_level, "D3D11 tonemap", srv);
++}
++
++static int create_uav_view(AVFilterContext *ctx, ID3D11Texture2D *tex,
++                           UINT subresource, enum AVPixelFormat fmt, int plane,
++                           int log_level, ID3D11UnorderedAccessView **uav)
++{
++    TonemapD3D11Context *s = ctx->priv;
++
++    return ff_d3d11_create_uav(ctx, s->device, tex, subresource,
++                               ff_d3d11_plane_format(fmt, plane),
++                               log_level, "D3D11 tonemap", uav);
++}
++
++static int create_frame_srvs(AVFilterContext *ctx, AVFrame *frame,
++                             ID3D11ShaderResourceView **srvs)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    ID3D11Texture2D *tex = (ID3D11Texture2D *)frame->data[0];
++    UINT subresource = (UINT)(uintptr_t)frame->data[1];
++    int ret;
++
++    ret = create_srv_view(ctx, tex, subresource, s->in_fmt, 0, AV_LOG_DEBUG, &srvs[0]);
++    if (ret < 0)
++        return ret;
++    ret = create_srv_view(ctx, tex, subresource, s->in_fmt, 1, AV_LOG_DEBUG, &srvs[1]);
++    if (ret < 0)
++        FF_D3D11_RELEASE(srvs[0]);
++    return ret;
++}
++
++static int prepare_input_srvs(AVFilterContext *ctx, AVFrame *input,
++                              ID3D11ShaderResourceView **srvs)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    int ret;
++
++    if (s->direct_input_srv) {
++        ret = create_frame_srvs(ctx, input, srvs);
++        if (ret >= 0) {
++            if (s->direct_input_srv < 0) {
++                av_log(ctx, AV_LOG_DEBUG, "D3D11 shader input: direct SRV\n");
++                s->direct_input_srv = 1;
++            }
++            return 0;
++        }
++        if (s->direct_input_srv < 0)
++            av_log(ctx, AV_LOG_DEBUG, "D3D11 shader input: copied to internal SRV texture\n");
++        s->direct_input_srv = 0;
++    }
++
++
++    ret = ensure_texture(ctx, &s->src_tex, &s->src_w, &s->src_h,
++                         input->width, input->height, s->in_fmt,
++                         D3D11_BIND_SHADER_RESOURCE);
++    if (ret < 0)
++        return ret;
++    ff_d3d11_copy_frame_to_texture(s->context, input, s->src_tex);
++    ret = create_srv_view(ctx, s->src_tex, 0, s->in_fmt, 0, AV_LOG_ERROR, &srvs[0]);
++    if (ret < 0)
++        return ret;
++    ret = create_srv_view(ctx, s->src_tex, 0, s->in_fmt, 1, AV_LOG_ERROR, &srvs[1]);
++    if (ret < 0)
++        FF_D3D11_RELEASE(srvs[0]);
++    return ret;
++}
++
++static int prepare_output_uavs(AVFilterContext *ctx, AVFrame *dst,
++                               ID3D11UnorderedAccessView **uavs, int *direct)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    ID3D11Texture2D *tex = (ID3D11Texture2D *)dst->data[0];
++    UINT subresource = (UINT)(uintptr_t)dst->data[1];
++    int ret;
++
++    *direct = 0;
++    if (s->direct_output_uav) {
++        ret = create_uav_view(ctx, tex, subresource, s->out_fmt, 0, AV_LOG_DEBUG, &uavs[0]);
++        if (ret >= 0)
++            ret = create_uav_view(ctx, tex, subresource, s->out_fmt, 1, AV_LOG_DEBUG, &uavs[1]);
++        if (ret >= 0) {
++            if (s->direct_output_uav < 0) {
++                av_log(ctx, AV_LOG_DEBUG, "D3D11 shader output: direct UAV\n");
++                s->direct_output_uav = 1;
++            }
++            *direct = 1;
++            return 0;
++        }
++        FF_D3D11_RELEASE(uavs[0]);
++        FF_D3D11_RELEASE(uavs[1]);
++        if (s->direct_output_uav < 0)
++            av_log(ctx, AV_LOG_DEBUG, "D3D11 shader output: copied from internal UAV texture\n");
++        s->direct_output_uav = 0;
++    }
++
++    ret = ensure_texture(ctx, &s->work_tex, &s->work_w, &s->work_h,
++                         dst->width, dst->height, s->out_fmt,
++                         D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
++    if (ret < 0)
++        return ret;
++    ret = create_uav_view(ctx, s->work_tex, 0, s->out_fmt, 0, AV_LOG_ERROR, &uavs[0]);
++    if (ret < 0)
++        return ret;
++    ret = create_uav_view(ctx, s->work_tex, 0, s->out_fmt, 1, AV_LOG_ERROR, &uavs[1]);
++    if (ret < 0)
++        FF_D3D11_RELEASE(uavs[0]);
++    return ret;
++}
++
++static int probe_output_uav_pool(AVFilterContext *ctx, AVBufferRef *frames_ref)
++{
++    AVHWFramesContext *frames_ctx = (AVHWFramesContext *)frames_ref->data;
++    AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
++    TonemapD3D11Context *s = ctx->priv;
++    AVFrame *frame = NULL;
++    ID3D11Texture2D *tex;
++    ID3D11UnorderedAccessView *uavs[2] = { NULL, NULL };
++    UINT subresource;
++    int ret;
++
++    if (frames_hwctx->texture) {
++        tex = frames_hwctx->texture;
++        subresource = 0;
++    } else {
++        frame = av_frame_alloc();
++        if (!frame)
++            return AVERROR(ENOMEM);
++        ret = av_hwframe_get_buffer(frames_ref, frame, 0);
++        if (ret < 0)
++            goto done;
++        tex = (ID3D11Texture2D *)frame->data[0];
++        subresource = (UINT)(uintptr_t)frame->data[1];
++    }
++
++    ret = create_uav_view(ctx, tex, subresource, s->out_fmt, 0, AV_LOG_DEBUG, &uavs[0]);
++    if (ret >= 0)
++        ret = create_uav_view(ctx, tex, subresource, s->out_fmt, 1, AV_LOG_DEBUG, &uavs[1]);
++
++done:
++    FF_D3D11_RELEASE(uavs[0]);
++    FF_D3D11_RELEASE(uavs[1]);
++    av_frame_free(&frame);
++    return ret;
++}
++
++static void copy_matrix(const double src[3][3], float dst[3][4])
++{
++    for (int i = 0; i < 3; i++) {
++        for (int j = 0; j < 3; j++)
++            dst[i][j] = src[i][j];
++        dst[i][3] = 0.0f;
++    }
++}
++
++
++static void fill_dovi_params(TonemapD3D11Params *params,
++                             const struct FFDOVIMetadataRemap *dovi)
++{
++    double ycc2rgb_offset[3] = { 0 };
++    double lms2rgb[3][3];
++
++    for (int i = 0; i < 3; i++) {
++        for (int j = 0; j < 3; j++)
++            ycc2rgb_offset[i] -= dovi->nonlinear[i][j] * dovi->nonlinear_offset[j];
++        params->dovi_ycc2rgb_offset[i] = ycc2rgb_offset[i];
++    }
++
++    ff_matrix_mul_3x3(lms2rgb, dovi_lms2rgb_matrix, dovi->linear);
++    copy_matrix(dovi->nonlinear, params->dovi_rgb_matrix);
++    copy_matrix(lms2rgb, params->dovi_lms2rgb_matrix);
++
++    for (int c = 0; c < 3; c++) {
++        int has_poly = 0, has_mmr = 0, mmr_single = 1;
++        int mmr_idx = 0, min_order = 3, max_order = 1;
++        const struct FFDOVIReshapeData *comp = &dovi->comp[c];
++
++        if (!comp->num_pivots)
++            continue;
++
++        for (int i = 0; i < comp->num_pivots - 1; i++) {
++            float *coeffs = params->dovi_coeffs[c * 8 + i];
++
++            switch (comp->method[i]) {
++            case 0:
++                has_poly = 1;
++                coeffs[3] = 0.0f;
++                for (int k = 0; k < 3; k++)
++                    coeffs[k] = comp->poly_coeffs[i][k];
++                break;
++            case 1:
++                min_order = FFMIN(min_order, comp->mmr_order[i]);
++                max_order = FFMAX(max_order, comp->mmr_order[i]);
++                mmr_single = !has_mmr;
++                has_mmr = 1;
++                coeffs[3] = (float)comp->mmr_order[i];
++                coeffs[0] = comp->mmr_constant[i];
++                coeffs[1] = (float)mmr_idx;
++                for (int j = 0; j < comp->mmr_order[i]; j++) {
++                    float *mmr = params->dovi_mmr[c * 48 + mmr_idx];
++                    mmr[0] = comp->mmr_coeffs[i][j][0];
++                    mmr[1] = comp->mmr_coeffs[i][j][1];
++                    mmr[2] = comp->mmr_coeffs[i][j][2];
++                    mmr[3] = 0.0f;
++                    mmr[4] = comp->mmr_coeffs[i][j][3];
++                    mmr[5] = comp->mmr_coeffs[i][j][4];
++                    mmr[6] = comp->mmr_coeffs[i][j][5];
++                    mmr[7] = comp->mmr_coeffs[i][j][6];
++                    mmr_idx += 2;
++                }
++                break;
++            }
++        }
++
++        params->dovi_params[c * 2 + 0][0] = comp->num_pivots;
++        params->dovi_params[c * 2 + 0][1] = !!has_mmr;
++        params->dovi_params[c * 2 + 0][2] = !!has_poly;
++        params->dovi_params[c * 2 + 0][3] = mmr_single;
++        params->dovi_params[c * 2 + 1][0] = min_order;
++        params->dovi_params[c * 2 + 1][1] = max_order;
++        params->dovi_params[c * 2 + 1][2] = comp->pivots[0];
++        params->dovi_params[c * 2 + 1][3] = comp->pivots[comp->num_pivots - 1];
++
++        for (int i = 0; i < 8; i++)
++            params->dovi_pivots[c * 2 + (i >> 2)][i & 3] = i < comp->num_pivots - 2 ? comp->pivots[i + 1] : 1e9f;
++    }
++}
++
++static int fill_params(AVFilterContext *avctx, AVFrame *input, AVFrame *output,
++                       TonemapD3D11Params *params)
++{
++    TonemapD3D11Context *s = avctx->priv;
++    const AVLumaCoefficients *luma_src, *luma_dst;
++    double rgb2yuv[3][3], yuv2rgb[3][3], rgb2rgb[3][3] = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
++    int depth = s->in_desc->comp[0].depth == 16 ? 12 : s->in_desc->comp[0].depth;
++    int ret;
++
++    luma_src = av_csp_luma_coeffs_from_avcsp(input->colorspace);
++    if (!luma_src) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported input colorspace %d (%s)\n",
++               input->colorspace, av_color_space_name(input->colorspace));
++        return AVERROR(EINVAL);
++    }
++    luma_dst = av_csp_luma_coeffs_from_avcsp(output->colorspace);
++    if (!luma_dst) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported output colorspace %d (%s)\n",
++               output->colorspace, av_color_space_name(output->colorspace));
++        return AVERROR(EINVAL);
++    }
++
++    ff_fill_rgb2yuv_table(luma_src, rgb2yuv);
++    ff_matrix_invert_3x3(rgb2yuv, yuv2rgb);
++    ff_fill_rgb2yuv_table(luma_dst, rgb2yuv);
++
++    if (input->color_primaries != output->color_primaries) {
++        ret = get_rgb2rgb_matrix(input->color_primaries, output->color_primaries, rgb2rgb);
++        if (ret < 0)
++            return ret;
++    }
++
++    memset(params, 0, sizeof(*params));
++    params->width = input->width;
++    params->height = input->height;
++    params->tonemap = s->tonemap;
++    params->tonemap_mode = s->tonemap_mode == TONEMAP_MODE_AUTO ? TONEMAP_MODE_ITP : s->tonemap_mode;
++    params->trc_in = input->color_trc;
++    params->trc_out = output->color_trc;
++    params->full_range_in = input->color_range == AVCOL_RANGE_JPEG;
++    params->full_range_out = output->color_range == AVCOL_RANGE_JPEG;
++    params->in_depth = s->in_desc->comp[0].depth;
++    params->out_depth = s->out_desc->comp[0].depth;
++    params->chroma_loc = output->chroma_location;
++    params->skip_tonemap = output->color_trc == AVCOL_TRC_SMPTE2084;
++    params->apply_dovi = s->apply_dovi_frame;
++    params->tone_param = s->final_param;
++    params->desat_param = s->desat_param;
++    params->peak = s->src_peak;
++    params->target_peak = s->target_peak;
++    params->input_quantization_offset = QUANTIZATION_OFFSET(depth);
++    params->input_y_scale = INPUT_Y_SCALE(depth);
++    params->input_uv_scale = INPUT_UV_SCALE(depth);
++    params->output_quantization_offset = s->out_desc->comp[0].depth == 10 ? QUANTIZATION_OFFSET(10) : 0.0;
++    params->luma_src[0] = av_q2d(luma_src->cr);
++    params->luma_src[1] = av_q2d(luma_src->cg);
++    params->luma_src[2] = av_q2d(luma_src->cb);
++    params->luma_dst[0] = av_q2d(luma_dst->cr);
++    params->luma_dst[1] = av_q2d(luma_dst->cg);
++    params->luma_dst[2] = av_q2d(luma_dst->cb);
++    copy_matrix(yuv2rgb, params->rgb_matrix);
++    copy_matrix(rgb2yuv, params->yuv_matrix);
++    copy_matrix(rgb2rgb, params->rgb2rgb_matrix);
++    if (s->apply_dovi_frame)
++        fill_dovi_params(params, &s->dovi);
++    return 0;
++}
++
++static int run_filter(AVFilterContext *ctx, AVFrame *output, AVFrame *input)
++{
++    TonemapD3D11Context *s = ctx->priv;
++    ID3D11ShaderResourceView *srvs[2] = { NULL, NULL };
++    ID3D11ShaderResourceView *null_srvs[2] = { NULL, NULL };
++    ID3D11UnorderedAccessView *uavs[2] = { NULL, NULL };
++    ID3D11UnorderedAccessView *null_uavs[2] = { NULL, NULL };
++    ID3D11Buffer *null_cb[1] = { NULL };
++    D3D11_MAPPED_SUBRESOURCE mapped;
++    TonemapD3D11Params params;
++    int direct_output = 0;
++    HRESULT hr;
++    int ret;
++
++    ret = prepare_input_srvs(ctx, input, srvs);
++    if (ret < 0)
++        goto fail;
++    ret = prepare_output_uavs(ctx, output, uavs, &direct_output);
++    if (ret < 0)
++        goto fail;
++    ret = fill_params(ctx, input, output, &params);
++    if (ret < 0)
++        goto fail;
++
++    ret = ensure_shader_variant(ctx, &params);
++    if (ret < 0)
++        goto fail;
++
++    hr = s->context->lpVtbl->Map(s->context, (ID3D11Resource *)s->params_buf,
++                                 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
++    if (FAILED(hr)) {
++        av_log(ctx, AV_LOG_ERROR, "Failed mapping D3D11 tonemap constant buffer: HRESULT 0x%lX\n",
++               (unsigned long)hr);
++        ret = AVERROR_EXTERNAL;
++        goto fail;
++    }
++    memcpy(mapped.pData, &params, sizeof(params));
++    s->context->lpVtbl->Unmap(s->context, (ID3D11Resource *)s->params_buf, 0);
++
++    s->context->lpVtbl->CSSetConstantBuffers(s->context, 0, 1, &s->params_buf);
++    s->context->lpVtbl->CSSetShaderResources(s->context, 0, 2, srvs);
++    s->context->lpVtbl->CSSetUnorderedAccessViews(s->context, 0, 2, uavs, NULL);
++    s->context->lpVtbl->CSSetShader(s->context, s->cs, NULL, 0);
++    s->context->lpVtbl->Dispatch(s->context,
++                                 (((params.width + 1) >> 1) + TONEMAP_D3D11_TGX - 1) / TONEMAP_D3D11_TGX,
++                                 (((params.height + 1) >> 1) + TONEMAP_D3D11_TGY - 1) / TONEMAP_D3D11_TGY,
++                                 1);
++
++    s->context->lpVtbl->CSSetShader(s->context, NULL, NULL, 0);
++    s->context->lpVtbl->CSSetShaderResources(s->context, 0, 2, null_srvs);
++    s->context->lpVtbl->CSSetUnorderedAccessViews(s->context, 0, 2, null_uavs, NULL);
++    s->context->lpVtbl->CSSetConstantBuffers(s->context, 0, 1, null_cb);
++
++    if (!direct_output)
++        ff_d3d11_copy_texture_to_frame(s->context, s->work_tex, output);
++
++fail:
++    s->context->lpVtbl->CSSetShader(s->context, NULL, NULL, 0);
++    s->context->lpVtbl->CSSetShaderResources(s->context, 0, 2, null_srvs);
++    s->context->lpVtbl->CSSetUnorderedAccessViews(s->context, 0, 2, null_uavs, NULL);
++    s->context->lpVtbl->CSSetConstantBuffers(s->context, 0, 1, null_cb);
++    FF_D3D11_RELEASE(srvs[0]);
++    FF_D3D11_RELEASE(srvs[1]);
++    FF_D3D11_RELEASE(uavs[0]);
++    FF_D3D11_RELEASE(uavs[1]);
++    return ret;
++}
++
++static int tonemap_d3d11_filter_frame(AVFilterLink *inlink, AVFrame *input)
++{
++    AVFilterContext *avctx = inlink->dst;
++    AVFilterLink *outlink = avctx->outputs[0];
++    TonemapD3D11Context *s = avctx->priv;
++    AVFrame *output = NULL;
++    int ret;
++
++    if (!input->hw_frames_ctx)
++        return AVERROR(EINVAL);
++
++    s->apply_dovi_frame = 0;
++    if (s->apply_dovi) {
++        AVFrameSideData *dovi_sd = av_frame_get_side_data(input, AV_FRAME_DATA_DOVI_METADATA);
++        if (dovi_sd) {
++            const AVDOVIMetadata *metadata = (const AVDOVIMetadata *)dovi_sd->data;
++            const AVDOVIRpuDataHeader *rpu = av_dovi_get_header(metadata);
++            if (rpu->disable_residual_flag) {
++                ff_map_dovi_metadata(&s->dovi, metadata);
++                s->apply_dovi_frame = 1;
++                input->color_trc = AVCOL_TRC_SMPTE2084;
++                input->colorspace = AVCOL_SPC_BT2020_NCL;
++                input->color_primaries = AVCOL_PRI_BT2020;
++                if (rpu->bl_video_full_range_flag)
++                    input->color_range = AVCOL_RANGE_JPEG;
++            }
++        }
++    }
++
++    if (input->color_trc == AVCOL_TRC_UNSPECIFIED)
++        input->color_trc = AVCOL_TRC_SMPTE2084;
++
++    if (input->color_trc != AVCOL_TRC_SMPTE2084 && input->color_trc != AVCOL_TRC_ARIB_STD_B67) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported input transfer function: %s\n",
++               av_color_transfer_name(input->color_trc));
++        ret = AVERROR(ENOSYS);
++        goto fail;
++    }
++
++    if (input->colorspace == AVCOL_SPC_UNSPECIFIED)
++        input->colorspace = AVCOL_SPC_BT2020_NCL;
++    if (input->color_primaries == AVCOL_PRI_UNSPECIFIED)
++        input->color_primaries = AVCOL_PRI_BT2020;
++    if (input->color_range == AVCOL_RANGE_UNSPECIFIED)
++        input->color_range = AVCOL_RANGE_MPEG;
++    output = ff_get_video_buffer(outlink, outlink->w, outlink->h);
++    if (!output) {
++        ret = AVERROR(ENOMEM);
++        goto fail;
++    }
++    ret = av_frame_copy_props(output, input);
++    if (ret < 0)
++        goto fail;
++    output->colorspace = input->colorspace;
++    output->color_primaries = input->color_primaries;
++    output->color_range = input->color_range;
++
++    if (s->peak) {
++        s->src_peak = s->peak / 10.0f * REF_WHITE_SCALE;
++    } else if (s->apply_dovi_frame) {
++        s->src_peak = ff_determine_dovi_signal_peak((const AVDOVIMetadata *)av_frame_get_side_data(input, AV_FRAME_DATA_DOVI_METADATA)->data, 0) * REF_WHITE_SCALE;
++        av_log(avctx, AV_LOG_DEBUG, "Computed DOVI signal peak: %f at pts %"PRId64"\n",
++               s->src_peak, input->pts);
++    } else {
++        s->src_peak = ff_determine_signal_peak(input) * REF_WHITE_SCALE;
++        av_log(avctx, AV_LOG_DEBUG, "Computed signal peak: %f at pts %"PRId64"\n",
++               s->src_peak, input->pts);
++    }
++    if (s->src_peak <= REF_WHITE_SCALE)
++        s->src_peak = 10.0f * REF_WHITE_SCALE;
++
++    if (s->trc != -1)
++        output->color_trc = s->trc;
++    if (output->color_trc == AVCOL_TRC_UNSPECIFIED)
++        output->color_trc = AVCOL_TRC_BT709;
++    if (s->primaries != -1)
++        output->color_primaries = s->primaries;
++    if (output->color_primaries == AVCOL_PRI_UNSPECIFIED)
++        output->color_primaries = AVCOL_PRI_BT709;
++    if (outlink->colorspace != AVCOL_SPC_UNSPECIFIED)
++        output->colorspace = outlink->colorspace;
++    else if (s->colorspace != -1)
++        output->colorspace = s->colorspace;
++    else
++        output->colorspace = AVCOL_SPC_BT709;
++    output->color_range = outlink->color_range == AVCOL_RANGE_UNSPECIFIED ? AVCOL_RANGE_MPEG : outlink->color_range;
++
++    ret = run_filter(avctx, output, input);
++    if (ret < 0)
++        goto fail;
++
++    if (output->color_trc != AVCOL_TRC_SMPTE2084) {
++        av_frame_remove_side_data(output, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++        av_frame_remove_side_data(output, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++    }
++    av_frame_remove_side_data(output, AV_FRAME_DATA_DOVI_RPU_BUFFER);
++    av_frame_remove_side_data(output, AV_FRAME_DATA_DOVI_METADATA);
++
++    av_frame_free(&input);
++    return ff_filter_frame(outlink, output);
++
++fail:
++    av_frame_free(&input);
++    av_frame_free(&output);
++    return ret;
++}
++
++static int tonemap_d3d11_config_input(AVFilterLink *inlink)
++{
++    AVFilterContext *avctx = inlink->dst;
++    FilterLink *inl = ff_filter_link(inlink);
++
++    if (!inl->hw_frames_ctx) {
++        av_log(avctx, AV_LOG_ERROR, "D3D11 tonemap requires a hardware frames context on input.\n");
++        return AVERROR(EINVAL);
++    }
++    return 0;
++}
++
++static int tonemap_d3d11_config_output(AVFilterLink *outlink)
++{
++    AVFilterContext *avctx = outlink->src;
++    AVFilterLink *inlink = avctx->inputs[0];
++    FilterLink *inl = ff_filter_link(inlink);
++    FilterLink *outl = ff_filter_link(outlink);
++    TonemapD3D11Context *s = avctx->priv;
++    AVHWFramesContext *in_frames_ctx;
++    AVHWDeviceContext *device_ctx;
++    AVD3D11VADeviceContext *d3d11_ctx;
++    AVHWFramesContext *frames_ctx;
++    AVD3D11VAFramesContext *frames_hwctx;
++    enum AVPixelFormat out_fmt;
++    int ret;
++
++    if (!inl->hw_frames_ctx)
++        return AVERROR(EINVAL);
++    in_frames_ctx = (AVHWFramesContext *)inl->hw_frames_ctx->data;
++    out_fmt = s->format == AV_PIX_FMT_NONE ? in_frames_ctx->sw_format : s->format;
++
++    if (!format_is_supported(in_frames_ctx->sw_format)) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported input format: %s\n",
++               av_get_pix_fmt_name(in_frames_ctx->sw_format));
++        return AVERROR(ENOSYS);
++    }
++    if (!format_is_supported(out_fmt)) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported output format: %s\n",
++               av_get_pix_fmt_name(out_fmt));
++        return AVERROR(ENOSYS);
++    }
++
++    s->in_fmt = in_frames_ctx->sw_format;
++    s->out_fmt = out_fmt;
++    s->in_desc = av_pix_fmt_desc_get(s->in_fmt);
++    s->out_desc = av_pix_fmt_desc_get(s->out_fmt);
++    if (s->in_desc->comp[0].depth != 10 && s->in_desc->comp[0].depth != 16) {
++        av_log(avctx, AV_LOG_ERROR, "Unsupported input format depth: %d\n",
++               s->in_desc->comp[0].depth);
++        return AVERROR(ENOSYS);
++    }
++
++    if (!s->hw_device_ctx) {
++        s->hw_device_ctx = av_buffer_ref(in_frames_ctx->device_ref);
++        if (!s->hw_device_ctx)
++            return AVERROR(ENOMEM);
++    }
++    device_ctx = (AVHWDeviceContext *)s->hw_device_ctx->data;
++    d3d11_ctx = (AVD3D11VADeviceContext *)device_ctx->hwctx;
++    s->device = d3d11_ctx->device;
++    s->context = d3d11_ctx->device_context;
++
++    outlink->w = inlink->w;
++    outlink->h = inlink->h;
++    outlink->time_base = inlink->time_base;
++    s->direct_output_uav = -1;
++    s->direct_input_srv = -1;
++    s->shader_tonemap = s->shader_mode = s->shader_trc_in = s->shader_trc_out = -1;
++    s->shader_full_in = s->shader_full_out = s->shader_out_depth = s->shader_skip = s->shader_dovi = -1;
++    for (int direct = !s->force_output_copy; direct >= 0; direct--) {
++        s->hw_frames_ctx_out = av_hwframe_ctx_alloc(s->hw_device_ctx);
++        if (!s->hw_frames_ctx_out)
++            return AVERROR(ENOMEM);
++
++        frames_ctx = (AVHWFramesContext *)s->hw_frames_ctx_out->data;
++        frames_ctx->format = AV_PIX_FMT_D3D11;
++        frames_ctx->sw_format = s->out_fmt;
++        frames_ctx->width = outlink->w;
++        frames_ctx->height = outlink->h;
++        frames_ctx->initial_pool_size = 10;
++        if (avctx->extra_hw_frames > 0)
++            frames_ctx->initial_pool_size += avctx->extra_hw_frames;
++
++        frames_hwctx = frames_ctx->hwctx;
++        frames_hwctx->MiscFlags = 0;
++        frames_hwctx->BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
++        if (direct)
++            frames_hwctx->BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
++        if (s->out_fmt == AV_PIX_FMT_NV12)
++            frames_hwctx->BindFlags |= D3D11_BIND_VIDEO_ENCODER;
++
++        ret = av_hwframe_ctx_init(s->hw_frames_ctx_out);
++        if (ret >= 0 && direct) {
++            ret = probe_output_uav_pool(avctx, s->hw_frames_ctx_out);
++            if (ret >= 0) {
++                s->direct_output_uav = 1;
++                av_log(avctx, AV_LOG_DEBUG, "D3D11 shader output: direct UAV\n");
++                break;
++            }
++            av_buffer_unref(&s->hw_frames_ctx_out);
++            av_log(avctx, AV_LOG_DEBUG, "D3D11 shader output: copied from internal UAV texture\n");
++            continue;
++        } else if (ret >= 0) {
++            s->direct_output_uav = 0;
++            break;
++        }
++
++        av_buffer_unref(&s->hw_frames_ctx_out);
++        if (direct)
++            av_log(avctx, AV_LOG_DEBUG, "D3D11 shader output: UAV encoder pool rejected, using internal UAV texture\n");
++    }
++    if (ret < 0)
++        return ret;
++    if (s->force_output_copy)
++        av_log(avctx, AV_LOG_DEBUG, "D3D11 shader output: forced copy from internal UAV texture\n");
++
++    av_buffer_unref(&outl->hw_frames_ctx);
++    outl->hw_frames_ctx = av_buffer_ref(s->hw_frames_ctx_out);
++    if (!outl->hw_frames_ctx)
++        return AVERROR(ENOMEM);
++
++    if (s->trc != AVCOL_TRC_SMPTE2084 && s->trc != -1) {
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++    }
++    return 0;
++}
++
++static av_cold int tonemap_d3d11_preinit(AVFilterContext *avctx)
++{
++    TonemapD3D11Context *s = avctx->priv;
++    s->final_param = NAN;
++    return 0;
++}
++
++static av_cold int tonemap_d3d11_init(AVFilterContext *avctx)
++{
++    TonemapD3D11Context *s = avctx->priv;
++
++    if (s->tonemap_mode == TONEMAP_MODE_AUTO)
++        s->tonemap_mode = TONEMAP_MODE_ITP;
++
++    switch (s->tonemap) {
++    case TONEMAP_GAMMA:
++        if (isnan(s->param))
++            s->final_param = 1.8f;
++        break;
++    case TONEMAP_REINHARD:
++        if (!isnan(s->param))
++            s->final_param = (1.0f - s->param) / s->param;
++        break;
++    case TONEMAP_MOBIUS:
++        if (isnan(s->param))
++            s->final_param = 0.3f;
++        break;
++    case TONEMAP_BT2390:
++        if (isnan(s->param))
++            s->final_param = 1.0f;
++        else
++            s->final_param = av_clipd(s->param, 0.5f, 2.0f);
++        break;
++    }
++    if (isnan(s->final_param))
++        s->final_param = 1.0f;
++
++    s->target_peak = 1.0f;
++    return 0;
++}
++
++static av_cold void tonemap_d3d11_uninit(AVFilterContext *avctx)
++{
++    TonemapD3D11Context *s = avctx->priv;
++    release_d3d11_resources(s);
++    av_buffer_unref(&s->hw_device_ctx);
++    av_buffer_unref(&s->hw_frames_ctx_out);
++    ff_d3d11_unload_shader_compiler(&s->d3dcompiler, &s->D3DCompile);
++}
++
++static int tonemap_d3d11_query_formats(AVFilterContext *avctx)
++{
++    TonemapD3D11Context *s = avctx->priv;
++    AVFilterFormats *formats;
++    int ret;
++    const enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_D3D11, AV_PIX_FMT_NONE };
++
++    // single format
++    formats = ff_make_format_list(pix_fmts);
++    ret = ff_formats_ref(formats, &avctx->inputs[0]->outcfg.formats);
++    if (ret < 0)
++        return ret;
++
++    ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.formats);
++    if (ret < 0)
++        return ret;
++
++    // colorspaces and ranges
++    if ((ret = ff_formats_ref(ff_all_color_spaces(),
++                              &avctx->inputs[0]->outcfg.color_spaces)) < 0)
++        return ret;
++
++    if ((ret = ff_formats_ref(ff_all_color_ranges(),
++                              &avctx->inputs[0]->outcfg.color_ranges)) < 0)
++        return ret;
++
++    formats = s->colorspace != -1
++        ? ff_make_formats_list_singleton(s->colorspace)
++        : ff_make_format_list(colorspaces_out);
++    if ((ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.color_spaces)) < 0)
++        return ret;
++
++    formats = s->range != -1
++        ? ff_make_formats_list_singleton(s->range)
++        : ff_all_color_ranges();
++    if ((ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.color_ranges)) < 0)
++        return ret;
++
++    return 0;
++}
++
++#define OFFSET(x) offsetof(TonemapD3D11Context, x)
++#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
++static const AVOption tonemap_d3d11_options[] = {
++    { "tonemap", "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, { .i64 = TONEMAP_BT2390 }, TONEMAP_NONE, TONEMAP_COUNT - 1, FLAGS, "tonemap" },
++        { "none",     0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_NONE },     0, 0, FLAGS, "tonemap" },
++        { "linear",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_LINEAR },   0, 0, FLAGS, "tonemap" },
++        { "gamma",    0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_GAMMA },    0, 0, FLAGS, "tonemap" },
++        { "clip",     0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_CLIP },     0, 0, FLAGS, "tonemap" },
++        { "reinhard", 0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_REINHARD }, 0, 0, FLAGS, "tonemap" },
++        { "hable",    0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_HABLE },    0, 0, FLAGS, "tonemap" },
++        { "mobius",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MOBIUS },   0, 0, FLAGS, "tonemap" },
++        { "bt2390",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_BT2390 },   0, 0, FLAGS, "tonemap" },
++    { "tonemap_mode", "Tonemap mode selection", OFFSET(tonemap_mode), AV_OPT_TYPE_INT, { .i64 = TONEMAP_MODE_AUTO }, TONEMAP_MODE_MAX, TONEMAP_MODE_COUNT - 1, FLAGS, "tonemap_mode" },
++        { "max",  0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX },  0, 0, FLAGS, "tonemap_mode" },
++        { "rgb",  0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB },  0, 0, FLAGS, "tonemap_mode" },
++        { "lum",  0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_LUM },  0, 0, FLAGS, "tonemap_mode" },
++        { "itp",  0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_ITP },  0, 0, FLAGS, "tonemap_mode" },
++        { "auto", 0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_AUTO }, 0, 0, FLAGS, "tonemap_mode" },
++    { "transfer", "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
++    { "t",        "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
++        { "bt709",     0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_BT709 },     0, 0, FLAGS, "transfer" },
++        { "bt2020",    0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_BT2020_10 }, 0, 0, FLAGS, "transfer" },
++        { "smpte2084", 0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_SMPTE2084 }, 0, 0, FLAGS, "transfer" },
++    { "matrix", "Set colorspace matrix", OFFSET(colorspace), AV_OPT_TYPE_INT, { .i64 = AVCOL_SPC_BT709 }, -1, INT_MAX, FLAGS, "matrix" },
++    { "m",      "Set colorspace matrix", OFFSET(colorspace), AV_OPT_TYPE_INT, { .i64 = AVCOL_SPC_BT709 }, -1, INT_MAX, FLAGS, "matrix" },
++        { "bt709",  0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_SPC_BT709 },      0, 0, FLAGS, "matrix" },
++        { "bt2020", 0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_SPC_BT2020_NCL }, 0, 0, FLAGS, "matrix" },
++    { "primaries", "Set color primaries", OFFSET(primaries), AV_OPT_TYPE_INT, { .i64 = AVCOL_PRI_BT709 }, -1, INT_MAX, FLAGS, "primaries" },
++    { "p",         "Set color primaries", OFFSET(primaries), AV_OPT_TYPE_INT, { .i64 = AVCOL_PRI_BT709 }, -1, INT_MAX, FLAGS, "primaries" },
++        { "bt709",  0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_PRI_BT709 },  0, 0, FLAGS, "primaries" },
++        { "bt2020", 0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_PRI_BT2020 }, 0, 0, FLAGS, "primaries" },
++    { "range", "Set color range", OFFSET(range), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, FLAGS, "range" },
++    { "r",     "Set color range", OFFSET(range), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, FLAGS, "range" },
++        { "tv",      0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, "range" },
++        { "pc",      0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, "range" },
++        { "limited", 0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, "range" },
++        { "full",    0, 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, "range" },
++    { "format", "Output pixel format", OFFSET(format), AV_OPT_TYPE_PIXEL_FMT, { .i64 = AV_PIX_FMT_NONE }, AV_PIX_FMT_NONE, INT_MAX, FLAGS, "fmt" },
++    { "apply_dovi", "Apply Dolby Vision metadata if possible", OFFSET(apply_dovi), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
++    { "force_output_copy", "Force output through an internal unordered-access texture", OFFSET(force_output_copy), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
++    { "peak", "Signal peak override", OFFSET(peak), AV_OPT_TYPE_DOUBLE, { .dbl = 0 }, 0, DBL_MAX, FLAGS },
++    { "param", "Tonemap parameter", OFFSET(param), AV_OPT_TYPE_DOUBLE, { .dbl = NAN }, DBL_MIN, DBL_MAX, FLAGS },
++    { "desat", "Desaturation parameter", OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, { .dbl = 0 }, 0, DBL_MAX, FLAGS },
++    { NULL }
++};
++
++AVFILTER_DEFINE_CLASS(tonemap_d3d11);
++
++static const AVFilterPad tonemap_d3d11_inputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .filter_frame = tonemap_d3d11_filter_frame,
++        .config_props = tonemap_d3d11_config_input,
++    },
++};
++
++static const AVFilterPad tonemap_d3d11_outputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .config_props = tonemap_d3d11_config_output,
++    },
++};
++
++const FFFilter ff_vf_tonemap_d3d11 = {
++    .p.name         = "tonemap_d3d11",
++    .p.description  = NULL_IF_CONFIG_SMALL("Perform HDR to SDR conversion with tonemapping on D3D11 frames."),
++    .priv_size      = sizeof(TonemapD3D11Context),
++    .p.priv_class   = &tonemap_d3d11_class,
++    .preinit        = tonemap_d3d11_preinit,
++    .init           = tonemap_d3d11_init,
++    .uninit         = tonemap_d3d11_uninit,
++    FILTER_INPUTS(tonemap_d3d11_inputs),
++    FILTER_OUTPUTS(tonemap_d3d11_outputs),
++    FILTER_QUERY_FUNC(tonemap_d3d11_query_formats),
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++    .p.flags        = AVFILTER_FLAG_HWDEVICE,
++};
+Index: FFmpeg/libavfilter/vf_tonemap_d3d11.h
+===================================================================
+--- /dev/null
++++ libavfilter/vf_tonemap_d3d11.h
+@@ -0,0 +1,29 @@
++/*
++ * D3D11 tonemap filter shader constants
++ *
++ * Copyright (C) 2026 Gnattu OC <gnattuoc@me.com>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVFILTER_TONEMAP_D3D11_H
++#define AVFILTER_TONEMAP_D3D11_H
++
++#define TONEMAP_D3D11_TGX 16
++#define TONEMAP_D3D11_TGY 16
++
++#endif /* AVFILTER_TONEMAP_D3D11_H */
+Index: FFmpeg/libavfilter/d3d11/tonemap.hlsl
+===================================================================
+--- /dev/null
++++ libavfilter/d3d11/tonemap.hlsl
+@@ -0,0 +1,626 @@
++/*
++ * D3D11 tonemap
++ *
++ * Copyright (C) 2026 Gnattu OC <gnattuoc@me.com>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++Texture2DArray<float4> src_y  : register(t0);
++Texture2DArray<float4> src_uv : register(t1);
++
++RWTexture2DArray<float>  dst_y  : register(u0);
++RWTexture2DArray<float2> dst_uv : register(u1);
++
++cbuffer Params : register(b0) {
++    int width;
++    int height;
++    int tonemap;
++    int tonemap_mode;
++    int trc_in;
++    int trc_out;
++    int full_range_in;
++    int full_range_out;
++    int in_depth;
++    int out_depth;
++    int chroma_loc;
++    int skip_tonemap;
++    int apply_dovi;
++    int pad_i0;
++    int pad_i1;
++    int pad_i2;
++    float tone_param;
++    float desat_param;
++    float peak;
++    float target_peak;
++    float input_quantization_offset;
++    float input_y_scale;
++    float input_uv_scale;
++    float output_quantization_offset;
++    float3 luma_src; float pad0;
++    float3 luma_dst; float pad1;
++    row_major float3x3 rgb_matrix;
++    row_major float3x3 yuv_matrix;
++    row_major float3x3 rgb2rgb_matrix;
++    float3 dovi_ycc2rgb_offset; float dovi_pad0;
++    row_major float3x3 dovi_rgb_matrix;
++    row_major float3x3 dovi_lms2rgb_matrix;
++    float4 dovi_params[6];
++    float4 dovi_pivots[6];
++    float4 dovi_coeffs[24];
++    float4 dovi_mmr[144];
++};
++
++// d3d compiler at optimization level 3 would remove dead branches when comparing with those constants
++#ifndef TONEMAP_ALG
++#define TONEMAP_ALG tonemap
++#endif
++#ifndef TONE_MODE
++#define TONE_MODE tonemap_mode
++#endif
++#ifndef INPUT_TRC
++#define INPUT_TRC trc_in
++#endif
++#ifndef OUTPUT_TRC
++#define OUTPUT_TRC trc_out
++#endif
++#ifndef FULL_RANGE_IN_VAL
++#define FULL_RANGE_IN_VAL full_range_in
++#endif
++#ifndef FULL_RANGE_OUT_VAL
++#define FULL_RANGE_OUT_VAL full_range_out
++#endif
++#ifndef OUT_DEPTH_VAL
++#define OUT_DEPTH_VAL out_depth
++#endif
++#ifndef SKIP_TONEMAP_VAL
++#define SKIP_TONEMAP_VAL skip_tonemap
++#endif
++#ifndef APPLY_DOVI_VAL
++#define APPLY_DOVI_VAL apply_dovi
++#endif
++
++#define FLOAT_EPS 1e-6
++#define ST2084_MAX_LUMINANCE 10000.0
++#define ARIB_B67_MAX_LUMINANCE 1000.0
++#define REFERENCE_WHITE_ALT 203.0
++#define ST2084_M1 0.1593017578125
++#define ST2084_M2 78.84375
++#define ST2084_C1 0.8359375
++#define ST2084_C2 18.8515625
++#define ST2084_C3 18.6875
++#define ARIB_B67_A 0.17883277
++#define ARIB_B67_B 0.28466892
++#define ARIB_B67_C 0.55991073
++#define BT2446B_HLG_LW 291.0
++#define BT2446B_HLG_GAMMA 1.03
++
++float eotf_st2084_common(float x)
++{
++    x = max(x, 0.0);
++    float xpow = pow(x, 1.0 / ST2084_M2);
++    float num  = max(xpow - ST2084_C1, 0.0);
++    float den  = max(ST2084_C2 - ST2084_C3 * xpow, FLOAT_EPS);
++    return pow(num / den, 1.0 / ST2084_M1);
++}
++
++float eotf_st2084(float x)
++{
++    return eotf_st2084_common(x) * ST2084_MAX_LUMINANCE / REFERENCE_WHITE_ALT;
++}
++
++float inverse_eotf_st2084_common(float x)
++{
++    x = max(x, 0.0);
++    float xpow = pow(x, ST2084_M1);
++    float num  = (ST2084_C1 - 1.0) + (ST2084_C2 - ST2084_C3) * xpow;
++    float den  = 1.0 + ST2084_C3 * xpow;
++    return pow(1.0 + num / den, ST2084_M2);
++}
++
++float inverse_eotf_st2084(float x)
++{
++    return inverse_eotf_st2084_common(x * REFERENCE_WHITE_ALT / ST2084_MAX_LUMINANCE);
++}
++
++float3 eotf_st2084x3(float3 x)
++{
++    return float3(eotf_st2084_common(x.x),
++                  eotf_st2084_common(x.y),
++                  eotf_st2084_common(x.z)) * ST2084_MAX_LUMINANCE / REFERENCE_WHITE_ALT;
++}
++
++float3 inverse_eotf_bt1886x3(float3 x)
++{
++    return float3(x.x > 0.0 ? pow(x.x, 1.0 / 2.4) : 0.0,
++                  x.y > 0.0 ? pow(x.y, 1.0 / 2.4) : 0.0,
++                  x.z > 0.0 ? pow(x.z, 1.0 / 2.4) : 0.0);
++}
++
++float get_luma_src(float3 c)
++{
++    return dot(luma_src, c);
++}
++
++float get_luma_dst(float3 c)
++{
++    return dot(luma_dst, c);
++}
++
++float3 eotf_arib_b67x3(float3 x)
++{
++    float pk    = ARIB_B67_MAX_LUMINANCE / REFERENCE_WHITE_ALT;
++    float gamma = 1.2;
++
++    if (OUTPUT_TRC != 16) {
++        pk    = BT2446B_HLG_LW / REFERENCE_WHITE_ALT;
++        gamma = BT2446B_HLG_GAMMA;
++    }
++
++    float3 a = 4.0 * x * x;
++    float3 b = exp((x - ARIB_B67_C) * (1.0 / ARIB_B67_A)) + ARIB_B67_B;
++    x = float3(x.x > 0.5 ? b.x : a.x,
++               x.y > 0.5 ? b.y : a.y,
++               x.z > 0.5 ? b.z : a.z);
++    x *= 1.0 / 12.0;
++
++    float l = get_luma_src(x);
++    return x * pk * pow(max(l, 0.0), gamma - 1.0);
++}
++
++float3 linearize(float3 c)
++{
++    return INPUT_TRC == 18 ? eotf_arib_b67x3(c) : eotf_st2084x3(c);
++}
++
++float3 delinearize(float3 c)
++{
++    return OUTPUT_TRC == 16 ? c : inverse_eotf_bt1886x3(c);
++}
++
++float hable_f(float x)
++{
++    float a = 0.15, b = 0.50, c = 0.10, d = 0.20, e = 0.02, f = 0.30;
++    return (x * (x * a + b * c) + d * e) / (x * (x * a + b) + d * f) - e / f;
++}
++
++float tone_direct(float s, float pk, float tpk)
++{
++    return s;
++}
++
++float tone_linear(float s, float pk, float tpk)
++{
++    return s * tone_param / pk;
++}
++
++float tone_gamma(float s, float pk, float tpk)
++{
++    float p = s > 0.05 ? s / pk : 0.05 / pk;
++    float v = pow(p, 1.0 / tone_param);
++    return s > 0.05 ? v : (s * v / 0.05);
++}
++
++float tone_clip(float s, float pk, float tpk)
++{
++    return saturate(s * tone_param);
++}
++
++float tone_reinhard(float s, float pk, float tpk)
++{
++    return s / (s + tone_param) * (pk + tone_param) / pk;
++}
++
++float tone_hable(float s, float pk, float tpk)
++{
++    return hable_f(s) / hable_f(pk);
++}
++
++float tone_mobius(float s, float pk, float tpk)
++{
++    float j = tone_param;
++
++    if (s <= j)
++        return s;
++
++    float a = -j * j * (pk - 1.0) / (j * j - 2.0 * j + pk);
++    float b = (j * j - 2.0 * j * pk + pk) / max(pk - 1.0, FLOAT_EPS);
++    return (b * b + 2.0 * b * j + j * j) / (b - a) * (s + a) / (s + b);
++}
++
++float tone_bt2390(float s, float pk_pq, float tpk_pq)
++{
++    float scale   = pk_pq > 0.0 ? 1.0 / pk_pq : 1.0;
++    float spq     = s * scale;
++    float max_lum = tpk_pq * scale;
++
++    float ks  = (1.0 + tone_param) * max_lum - tone_param;
++    float tb  = (spq - ks) / (1.0 - ks);
++    float tb2 = tb * tb;
++    float tb3 = tb2 * tb;
++    float pb  = (2.0 * tb3 - 3.0 * tb2 + 1.0) * ks +
++                (tb3 - 2.0 * tb2 + tb) * (1.0 - ks) +
++                (-2.0 * tb3 + 3.0 * tb2) * max_lum;
++    float sig = spq < ks ? spq : pb;
++
++    return sig * pk_pq;
++}
++
++float tone_func(float s, float pk, float tpk)
++{
++    if (TONEMAP_ALG == 1)
++        return tone_linear(s, pk, tpk);
++    if (TONEMAP_ALG == 2)
++        return tone_gamma(s, pk, tpk);
++    if (TONEMAP_ALG == 3)
++        return tone_clip(s, pk, tpk);
++    if (TONEMAP_ALG == 4)
++        return tone_reinhard(s, pk, tpk);
++    if (TONEMAP_ALG == 5)
++        return tone_hable(s, pk, tpk);
++    if (TONEMAP_ALG == 6)
++        return tone_mobius(s, pk, tpk);
++    if (TONEMAP_ALG == 7)
++        return tone_bt2390(s, pk, tpk);
++    return tone_direct(s, pk, tpk);
++}
++
++float3 yuv2rgb(float y, float u, float v)
++{
++    if (y > 0.0)
++        y += input_quantization_offset;
++    if (u > 0.0)
++        u += input_quantization_offset;
++    if (v > 0.0)
++        v += input_quantization_offset;
++
++    if (FULL_RANGE_IN_VAL == 0) {
++        y = input_y_scale * y - 0.07305936073;
++        u = input_uv_scale * u - 0.5714285714;
++        v = input_uv_scale * v - 0.5714285714;
++    } else {
++        u -= 0.5;
++        v -= 0.5;
++    }
++
++    return mul(rgb_matrix, float3(y, u, v));
++}
++
++float3 rgb2yuv(float3 c)
++{
++    float3 yuv = mul(yuv_matrix, c);
++
++    if (FULL_RANGE_OUT_VAL == 0) {
++        if (OUT_DEPTH_VAL > 8) {
++            yuv.x = floor(((219.0 * yuv.x +  16.0) * 256.0) + 0.5) / 65535.0;
++            yuv.y = floor(((224.0 * yuv.y + 128.0) * 256.0) + 0.5) / 65535.0;
++            yuv.z = floor(((224.0 * yuv.z + 128.0) * 256.0) + 0.5) / 65535.0;
++        } else {
++            yuv.x = floor((219.0 * yuv.x +  16.0) + 0.5) / 255.0;
++            yuv.y = floor((224.0 * yuv.y + 128.0) + 0.5) / 255.0;
++            yuv.z = floor((224.0 * yuv.z + 128.0) + 0.5) / 255.0;
++        }
++    } else {
++        yuv.yz += 0.5;
++    }
++
++    if (yuv.x > 0.0)
++        yuv.x -= output_quantization_offset;
++    if (yuv.y > 0.0)
++        yuv.y -= output_quantization_offset;
++    if (yuv.z > 0.0)
++        yuv.z -= output_quantization_offset;
++
++    return saturate(yuv);
++}
++
++float3 lrgb2lrgb(float3 c)
++{
++    return mul(rgb2rgb_matrix, c);
++}
++
++float parabolic(float x, float t0, float x0, float y0)
++{
++    float s  = (y0 - t0) / sqrt(x0 - y0);
++    float ox = t0 - s * s * 0.25;
++    float oy = t0 - s * sqrt(s * s * 0.25);
++    return x < t0 ? x : s * sqrt(x - ox) + oy;
++}
++
++float3 gamut_compress(float3 rgb)
++{
++    float ac  = max(max(rgb.x, rgb.y), rgb.z);
++    float3 d  = ac == 0.0 ? float3(0.0, 0.0, 0.0) : (float3(ac, ac, ac) - rgb) / abs(ac);
++    float3 cd = float3(parabolic(d.x, 1.050508660266247,  1.5187050250638159, 1.0),
++                       parabolic(d.y, 0.940509816042432,  1.0750082769546088, 1.0),
++                       parabolic(d.z, 0.9771607996420639, 1.0887800403483898, 1.0));
++    cd = min(cd, 1.0);
++    return float3(ac, ac, ac) - cd * abs(ac);
++}
++
++void lrgb2ictcp(float3 c, out float i, out float ct, out float cp)
++{
++    float l = 0.412109375    * c.x + 0.52392578125  * c.y + 0.06396484375  * c.z;
++    float m = 0.166748046875 * c.x + 0.720458984375 * c.y + 0.11279296875  * c.z;
++    float s = 0.024169921875 * c.x + 0.075439453125 * c.y + 0.900390625    * c.z;
++
++    l = inverse_eotf_st2084(l);
++    m = inverse_eotf_st2084(m);
++    s = inverse_eotf_st2084(s);
++
++    i  = 0.5            * l + 0.5            * m;
++    ct = 1.61376953125  * l - 3.323486328125 * m + 1.709716796875 * s;
++    cp = 4.378173828125 * l - 4.24560546875  * m - 0.132568359375 * s;
++}
++
++float3 ictcp2lrgb(float i, float ct, float cp)
++{
++    float l = i + 0.008609037037933 * ct + 0.111029625003026 * cp;
++    float m = i - 0.008609037037933 * ct - 0.111029625003026 * cp;
++    float s = i + 0.560031335710679 * ct - 0.320627174987319 * cp;
++
++    l = eotf_st2084(l);
++    m = eotf_st2084(m);
++    s = eotf_st2084(s);
++
++    return float3( 3.436606694333079 * l - 2.506452118656270 * m + 0.069845424323191 * s,
++                  -0.791329555598929 * l + 1.983600451792291 * m - 0.192270896193362 * s,
++                  -0.025949899690593 * l - 0.098913714711726 * m + 1.124863614402319 * s);
++}
++
++float3 map_rgb(float3 c)
++{
++    float sig = max(max(c.x, max(c.y, c.z)), FLOAT_EPS);
++
++    if (TONE_MODE == 1) {
++        float3 so = max(c, float3(FLOAT_EPS, FLOAT_EPS, FLOAT_EPS));
++        float3 sn = so;
++        if (TONEMAP_ALG == 7) {
++            float sp = inverse_eotf_st2084(peak);
++            float dp = inverse_eotf_st2084(target_peak);
++            sn = float3(tone_func(inverse_eotf_st2084(min(so.x, peak)), sp, dp),
++                        tone_func(inverse_eotf_st2084(min(so.y, peak)), sp, dp),
++                        tone_func(inverse_eotf_st2084(min(so.z, peak)), sp, dp));
++            sn = float3(eotf_st2084(sn.x), eotf_st2084(sn.y), eotf_st2084(sn.z));
++        } else {
++            sn = float3(tone_func(so.x, peak, target_peak),
++                        tone_func(so.y, peak, target_peak),
++                        tone_func(so.z, peak, target_peak));
++        }
++        sn = min(sn, float3(1.0, 1.0, 1.0));
++        return c * (sn / so);
++    }
++
++    float so = TONE_MODE == 0 ? sig : max(dot(luma_src, c), FLOAT_EPS);
++    float sn;
++    if (TONEMAP_ALG == 7) {
++        float sp = inverse_eotf_st2084(peak);
++        float dp = inverse_eotf_st2084(target_peak);
++        sn = eotf_st2084(tone_func(inverse_eotf_st2084(min(so, peak)), sp, dp));
++    } else {
++        sn = tone_func(so, peak, target_peak);
++    }
++    sn = min(sn, 1.0);
++    return c * (sn / so);
++}
++
++float3 map_itp(float3 c)
++{
++    if (TONEMAP_ALG == 7)
++        c = min(c, peak);
++
++    float i, ct, cp;
++    lrgb2ictcp(c, i, ct, cp);
++    float io = max(i, FLOAT_EPS);
++
++    if (desat_param > 0.0) {
++        float coeff = exp(-pow(eotf_st2084(i) - (target_peak - desat_param) * 0.5, 2.0) / (2.0 * peak));
++        ct *= coeff;
++        cp *= coeff;
++    }
++
++    if (TONEMAP_ALG == 7) {
++        i = tone_func(i, inverse_eotf_st2084(peak), inverse_eotf_st2084(target_peak));
++    } else {
++        i = eotf_st2084(i);
++        i = tone_func(i, peak, target_peak);
++        i = inverse_eotf_st2084(i);
++    }
++    i = min(i, 1.0);
++
++    float factor = min(i / io, io / i);
++    ct *= factor;
++    cp *= factor;
++
++    return ictcp2lrgb(i, ct, cp);
++}
++
++float3 dovi_ycc2rgb(float3 yuv)
++{
++    return mul(dovi_rgb_matrix, yuv) + dovi_ycc2rgb_offset;
++}
++
++float3 dovi_lms2linear_rgb(float3 c)
++{
++    c = float3(eotf_st2084_common(c.x),
++               eotf_st2084_common(c.y),
++               eotf_st2084_common(c.z));
++    c = max(mul(dovi_lms2rgb_matrix, c), float3(0.0, 0.0, 0.0));
++    return c * (ST2084_MAX_LUMINANCE / REFERENCE_WHITE_ALT);
++}
++
++float dovi_poly(float s, float4 coeffs)
++{
++    return (coeffs.z * s + coeffs.y) * s + coeffs.x;
++}
++
++float dovi_mmr_eval(float3 sig, float4 coeffs, int base_idx, int mmr_single,
++                    int min_order, int max_order)
++{
++    int idx   = mmr_single != 0 ? 0 : (int)coeffs.y;
++    int order = (int)coeffs.w;
++
++    float4 sx = float4(sig.x * sig.y, sig.x * sig.z, sig.y * sig.z,
++                       sig.x * sig.y * sig.z);
++    float r = coeffs.x + dot(dovi_mmr[base_idx + idx + 0].xyz, sig) +
++              dot(dovi_mmr[base_idx + idx + 1], sx);
++
++    if (max_order >= 2 && (min_order >= 2 || order >= 2)) {
++        float3 sig2 = sig * sig;
++        float4 sx2  = sx * sx;
++        r += dot(dovi_mmr[base_idx + idx + 2].xyz, sig2) +
++             dot(dovi_mmr[base_idx + idx + 3], sx2);
++
++        if (max_order == 3 && (min_order == 3 || order >= 3))
++            r += dot(dovi_mmr[base_idx + idx + 4].xyz, sig2 * sig) +
++                 dot(dovi_mmr[base_idx + idx + 5], sx2 * sx);
++    }
++
++    return r;
++}
++
++float dovi_reshape_channel(float3 sig, int ch)
++{
++    int po = ch * 2;
++    int co = ch * 8;
++    int mo = ch * 48;
++
++    float4 p0 = dovi_params[po + 0];
++    float4 p1 = dovi_params[po + 1];
++
++    int num = (int)p0.x;
++    if (num <= 0)
++        return sig[ch];
++
++    int has_mmr    = (int)p0.y;
++    int has_poly   = (int)p0.z;
++    int mmr_single = (int)p0.w;
++    int min_order  = (int)p1.x;
++    int max_order  = (int)p1.y;
++    float lo = p1.z;
++    float hi = p1.w;
++
++    float s = clamp(sig[ch], 0.0, 1.0);
++
++    int ci = 0;
++    if (ch == 0 && num > 2) {
++        [unroll] for (int i = 0; i < 7; i++)
++            ci += s >= dovi_pivots[po + (i >> 2)][i & 3] ? 1 : 0;
++    }
++
++    float4 coeffs = dovi_coeffs[co + ci];
++    bool poly = (has_mmr != 0 && has_poly != 0) ? coeffs.w == 0.0 : has_poly != 0;
++    float r = poly ? dovi_poly(s, coeffs)
++                   : dovi_mmr_eval(sig, coeffs, mo, mmr_single, min_order, max_order);
++
++    return clamp(r, lo, hi);
++}
++
++float3 dovi_reshape(float3 yuv)
++{
++    float3 sig = clamp(yuv, 0.0, 1.0);
++    return float3(dovi_reshape_channel(sig, 0),
++                  dovi_reshape_channel(sig, 1),
++                  dovi_reshape_channel(sig, 2));
++}
++
++float3 process(float3 yuv)
++{
++    if (APPLY_DOVI_VAL != 0)
++        yuv = dovi_reshape(yuv);
++
++    float3 c;
++    if (APPLY_DOVI_VAL != 0) {
++        c = dovi_ycc2rgb(yuv);
++        c = dovi_lms2linear_rgb(c);
++    } else {
++        c = yuv2rgb(yuv.x, yuv.y, yuv.z);
++        c = linearize(c);
++    }
++
++    if (TONE_MODE == 0 || TONE_MODE == 1)
++        c = lrgb2lrgb(c);
++
++    if (SKIP_TONEMAP_VAL == 0) {
++        if (desat_param > 0.0 && TONE_MODE != 3) {
++            float sig   = max(max(c.x, max(c.y, c.z)), FLOAT_EPS);
++            float luma  = TONE_MODE == 2 ? max(dot(luma_src, c), FLOAT_EPS) : get_luma_dst(c);
++            float coeff = max(sig - 0.18, FLOAT_EPS) / max(sig, FLOAT_EPS);
++            coeff = pow(coeff, 10.0 / desat_param);
++            c = lerp(c, float3(luma, luma, luma), float3(coeff, coeff, coeff));
++        }
++        c = TONE_MODE == 3 ? map_itp(c) : map_rgb(c);
++    }
++
++    if (TONE_MODE != 0 && TONE_MODE != 1)
++        c = lrgb2lrgb(c);
++    if (TONE_MODE != 0 && TONE_MODE != 1)
++        c = gamut_compress(c);
++
++    c = saturate(c);
++    return rgb2yuv(delinearize(c));
++}
++
++float3 chroma_sample(float3 a, float3 b, float3 c, float3 d)
++{
++    if (chroma_loc == 1)
++        return (a + c) * 0.5;
++    if (chroma_loc == 3)
++        return a;
++    if (chroma_loc == 4)
++        return (a + b) * 0.5;
++    if (chroma_loc == 5)
++        return c;
++    if (chroma_loc == 6)
++        return (c + d) * 0.5;
++    return (a + b + c + d) * 0.25;
++}
++
++[numthreads(16, 16, 1)]
++void tonemap_main(uint3 id : SV_DispatchThreadID)
++{
++    uint cw = (width + 1) >> 1;
++    uint ch = (height + 1) >> 1;
++    uint x = id.x << 1;
++    uint y = id.y << 1;
++
++    if (id.x >= cw || id.y >= ch || x >= (uint)width || y >= (uint)height)
++        return;
++
++    float2 uv = src_uv.Load(int4(id.x, id.y, 0, 0)).rg;
++
++    float3 yuv0 = float3(src_y.Load(int4(x, y, 0, 0)).r, uv);
++    float3 yuv1 = float3(src_y.Load(int4(min(x + 1, (uint)width - 1), y, 0, 0)).r, uv);
++    float3 yuv2 = float3(src_y.Load(int4(x, min(y + 1, (uint)height - 1), 0, 0)).r, uv);
++    float3 yuv3 = float3(src_y.Load(int4(min(x + 1, (uint)width - 1), min(y + 1, (uint)height - 1), 0, 0)).r, uv);
++
++    float3 c0 = process(yuv0);
++    float3 c1 = process(yuv1);
++    float3 c2 = process(yuv2);
++    float3 c3 = process(yuv3);
++
++    dst_y[uint3(x, y, 0)] = c0.x;
++    if (x + 1 < (uint)width)
++        dst_y[uint3(x + 1, y, 0)] = c1.x;
++    if (y + 1 < (uint)height)
++        dst_y[uint3(x, y + 1, 0)] = c2.x;
++    if (x + 1 < (uint)width && y + 1 < (uint)height)
++        dst_y[uint3(x + 1, y + 1, 0)] = c3.x;
++
++    float3 cc = chroma_sample(c0, c1, c2, c3);
++    dst_uv[uint3(id.x, id.y, 0)] = cc.yz;
++}
+Index: FFmpeg/libavfilter/d3d11_source.h
+===================================================================
+--- libavfilter/d3d11_source.h
++++ libavfilter/d3d11_source.h
+@@ -25,5 +25,6 @@
+ 
+ extern const char *ff_source_deint_hlsl;
+ extern const char *ff_source_overlay_hlsl;
++extern const char *ff_source_tonemap_hlsl;
+ 
+ #endif /* AVFILTER_D3D11_SOURCE_H */

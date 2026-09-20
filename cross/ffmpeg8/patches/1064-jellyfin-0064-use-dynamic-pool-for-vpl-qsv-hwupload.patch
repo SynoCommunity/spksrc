@@ -54,8 +54,8 @@ Index: FFmpeg/libavfilter/vf_hwupload.c
  typedef struct HWUploadContext {
      const AVClass *class;
  
-@@ -165,6 +169,15 @@ static int hwupload_config_output(AVFilt
-         ctx->hwframes->user_opaque = &texDesc;
+@@ -171,6 +175,15 @@ static int hwupload_config_output(AVFilt
+     }
  #endif
  
 +#if CONFIG_QSVVPP

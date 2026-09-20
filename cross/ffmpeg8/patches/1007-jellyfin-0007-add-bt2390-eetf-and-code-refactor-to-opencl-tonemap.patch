@@ -2324,7 +2324,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +
 +            if (max_compute_units >= 40)
 +                ctx->tradeoff = 0;
-+	    else if (device_name) {
++            else if (device_name) {
 +                const char *excluded_devices[5] = { "Arc", "Iris", "Xe", "770", "750" };
 +                for (i = 0; i < FF_ARRAY_ELEMS(excluded_devices); i++) {
 +                    if (strstr(device_name, excluded_devices[i])) {

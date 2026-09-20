@@ -28,12 +28,12 @@ Index: FFmpeg/libavcodec/bsf/av1_metadata.c
  } AV1MetadataContext;
  
  
-@@ -140,6 +145,42 @@ static int av1_metadata_update_fragment(
+@@ -140,6 +145,40 @@ static int av1_metadata_update_fragment(
          }
      }
  
-+    if (ctx->remove_dovi ||ctx->remove_hdr10plus) {
-+        int provider_code, provider_oriented_code, application_identifier;
++    if (ctx->remove_dovi || ctx->remove_hdr10plus) {
++        int provider_code, provider_oriented_code;
 +        for (i = frag->nb_units - 1; i >= 0; i--) {
 +            if (frag->units[i].type == AV1_OBU_METADATA) {
 +                AV1RawOBU *obu = frag->units[i].content;
@@ -52,17 +52,15 @@ Index: FFmpeg/libavcodec/bsf/av1_metadata.c
 +                    if (provider_oriented_code == 0x800) {
 +                        av_log(bsf, AV_LOG_DEBUG, "Removing Dolby Vision RPU\n");
 +                        ff_cbs_delete_unit(frag, i);
++                        continue;
 +                    }
 +                }
 +
-+                if (ctx->remove_hdr10plus && provider_code == ITU_T_T35_PROVIDER_CODE_SAMSUNG) {
-+                    provider_oriented_code = AV_RB16(t35->payload + 2);
-+                    application_identifier = AV_RB8(t35->payload + 4);
-+                    // HDR10+ Metadata
-+                    if (provider_oriented_code == 0x01 && application_identifier == 0x04) {
-+                        av_log(bsf, AV_LOG_DEBUG, "Removing HDR10+ Metadata\n");
-+                        ff_cbs_delete_unit(frag, i);
-+                    }
++                if (ctx->remove_hdr10plus &&
++                    ff_itut35_is_hdr10plus(t35->itu_t_t35_country_code,
++                                          t35->payload, t35->payload_size)) {
++                    av_log(bsf, AV_LOG_DEBUG, "Removing HDR10+ Metadata\n");
++                    ff_cbs_delete_unit(frag, i);
 +                }
 +            }
 +        }
@@ -71,7 +69,7 @@ Index: FFmpeg/libavcodec/bsf/av1_metadata.c
      return 0;
  }
  
-@@ -158,6 +199,12 @@ static int av1_metadata_init(AVBSFContex
+@@ -158,6 +197,12 @@ static int av1_metadata_init(AVBSFContex
          .header.obu_type = AV1_OBU_TEMPORAL_DELIMITER,
      };
  
@@ -84,7 +82,7 @@ Index: FFmpeg/libavcodec/bsf/av1_metadata.c
      return ff_cbs_bsf_generic_init(bsf, &av1_metadata_type);
  }
  
-@@ -206,6 +253,13 @@ static const AVOption av1_metadata_optio
+@@ -206,6 +251,13 @@ static const AVOption av1_metadata_optio
          OFFSET(delete_padding), AV_OPT_TYPE_BOOL,
          { .i64 = 0 }, 0, 1, FLAGS},
  
@@ -102,15 +100,18 @@ Index: FFmpeg/libavcodec/bsf/h265_metadata.c
 ===================================================================
 --- libavcodec/bsf/h265_metadata.c
 +++ libavcodec/bsf/h265_metadata.c
-@@ -26,6 +26,7 @@
+@@ -24,8 +24,10 @@
+ #include "cbs.h"
+ #include "cbs_bsf.h"
  #include "cbs_h265.h"
++#include "cbs_sei.h"
  #include "h2645data.h"
  #include "h265_profile_level.h"
 +#include "itut35.h"
  
  #include "hevc/hevc.h"
  
-@@ -65,6 +66,8 @@ typedef struct H265MetadataContext {
+@@ -65,6 +67,8 @@ typedef struct H265MetadataContext {
      int level;
      int level_guess;
      int level_warned;
@@ -119,32 +120,50 @@ Index: FFmpeg/libavcodec/bsf/h265_metadata.c
  } H265MetadataContext;
  
  
-@@ -475,6 +478,38 @@ static int h265_metadata_update_fragment
-             if (err < 0)
-                 return err;
-         }
-+        if (ctx->remove_hdr10plus) {
-+            // This implementation is not strictly correct as it does not decode the entire NAL.
-+            // There could be multiple SEIs packed within a single NAL, and some of them may not be HDR10+ metadata.
-+            // The current implementation simply removes the entire NAL without further inspection.
-+            if (au->units[i].type == HEVC_NAL_SEI_PREFIX && au->units[i].data_size > 8 * sizeof(uint8_t)) {
-+                uint8_t *nal_sei = au->units[i].data;
-+                // This Matches ITU-T T.35 SMPTE ST 2094-40
-+                if (nal_sei[0] == 0x4E && nal_sei[1] == 0x01 && nal_sei[2] == 0x04) {
-+                    if (nal_sei[4] == ITU_T_T35_COUNTRY_CODE_US && nal_sei[6] == ITU_T_T35_PROVIDER_CODE_SAMSUNG) {
-+                        // identifier for HDR10+
-+                        const uint8_t smpte2094_40_provider_oriented_code = 0x01;
-+                        const uint8_t smpte2094_40_application_identifier = 0x04;
-+                        if (nal_sei[8] == smpte2094_40_provider_oriented_code && nal_sei[9] == smpte2094_40_application_identifier) {
-+                            av_log(bsf, AV_LOG_DEBUG, "Found HDR10+ metadata, removing NAL\n");
-+                            ff_cbs_delete_unit(au, i);
-+                        }
-+                    }
+@@ -412,6 +416,37 @@ static int h265_metadata_update_sps(AVBS
+     return 0;
+ }
+ 
++static void h265_metadata_remove_hdr10plus(CodedBitstreamFragment *au)
++{
++    int i, j;
 +
-+                }
-+            }
++    for (i = au->nb_units - 1; i >= 0; i--) {
++        CodedBitstreamUnit *unit = &au->units[i];
++        H265RawSEI *sei;
++
++        if (unit->type != HEVC_NAL_SEI_PREFIX &&
++            unit->type != HEVC_NAL_SEI_SUFFIX)
++            continue;
++
++        sei = unit->content;
++        for (j = sei->message_list.nb_messages - 1; j >= 0; j--) {
++            SEIRawMessage *message = &sei->message_list.messages[j];
++            SEIRawUserDataRegistered *t35;
++
++            if (message->payload_type != SEI_TYPE_USER_DATA_REGISTERED_ITU_T_T35)
++                continue;
++
++            t35 = message->payload;
++            if (ff_itut35_is_hdr10plus(t35->itu_t_t35_country_code,
++                                      t35->data, t35->data_length))
++                ff_cbs_sei_delete_message(&sei->message_list, j);
 +        }
++
++        if (!sei->message_list.nb_messages)
++            ff_cbs_delete_unit(au, i);
 +    }
++}
++
+ static int h265_metadata_update_fragment(AVBSFContext *bsf, AVPacket *pkt,
+                                          CodedBitstreamFragment *au)
+ {
+@@ -477,6 +512,20 @@ static int h265_metadata_update_fragment
+         }
+     }
+ 
++    if (ctx->remove_hdr10plus)
++        h265_metadata_remove_hdr10plus(au);
 +
 +    if (ctx->remove_dovi && au->nb_units) {
 +        if (au->units[au->nb_units - 1].type == HEVC_NAL_UNSPEC62) { // Dolby Vision RPU
@@ -155,10 +174,12 @@ Index: FFmpeg/libavcodec/bsf/h265_metadata.c
 +            ff_cbs_delete_unit(au, au->nb_units - 1);
 +            av_log(bsf, AV_LOG_DEBUG, "Removing Dolby Vision EL\n");
 +        }
-     }
- 
++    }
++
      return 0;
-@@ -489,6 +524,11 @@ static const CBSBSFType h265_metadata_ty
+ }
+ 
+@@ -489,6 +538,11 @@ static const CBSBSFType h265_metadata_ty
  
  static int h265_metadata_init(AVBSFContext *bsf)
  {
@@ -170,17 +191,88 @@ Index: FFmpeg/libavcodec/bsf/h265_metadata.c
      return ff_cbs_bsf_generic_init(bsf, &h265_metadata_type);
  }
  
-@@ -574,6 +614,13 @@ static const AVOption h265_metadata_opti
+@@ -574,6 +628,13 @@ static const AVOption h265_metadata_opti
      { LEVEL("8.5", 255) },
  #undef LEVEL
  
 +    { "remove_dovi", "Remove Dolby Vision EL and RPU",
 +      OFFSET(remove_dovi), AV_OPT_TYPE_BOOL,
 +      { .i64 = 0 }, 0, 1, FLAGS },
-+    { "remove_hdr10plus", "Remove NALs including HDR10+ metadata",
++    { "remove_hdr10plus", "Remove HDR10+ metadata",
 +      OFFSET(remove_hdr10plus), AV_OPT_TYPE_BOOL,
 +      { .i64 = 0 }, 0, 1, FLAGS },
 +
      { NULL }
  };
  
+Index: FFmpeg/libavcodec/cbs_sei.c
+===================================================================
+--- libavcodec/cbs_sei.c
++++ libavcodec/cbs_sei.c
+@@ -544,8 +544,7 @@ int ff_cbs_sei_find_message(CodedBitstre
+     return AVERROR(ENOENT);
+ }
+ 
+-static void cbs_sei_delete_message(SEIRawMessageList *list,
+-                                   int position)
++void ff_cbs_sei_delete_message(SEIRawMessageList *list, int position)
+ {
+     SEIRawMessage *message;
+ 
+@@ -580,7 +579,7 @@ void ff_cbs_sei_delete_message_type(Code
+ 
+         for (j = list->nb_messages - 1; j >= 0; j--) {
+             if (list->messages[j].payload_type == payload_type)
+-                cbs_sei_delete_message(list, j);
++                ff_cbs_sei_delete_message(list, j);
+         }
+     }
+ }
+Index: FFmpeg/libavcodec/cbs_sei.h
+===================================================================
+--- libavcodec/cbs_sei.h
++++ libavcodec/cbs_sei.h
+@@ -260,6 +260,11 @@ int ff_cbs_sei_find_message(CodedBitstre
+                             SEIRawMessage **message);
+ 
+ /**
++ * Delete the message at the given position from a message list.
++ */
++void ff_cbs_sei_delete_message(SEIRawMessageList *list, int position);
++
++/**
+  * Delete all messages with the given payload type from an access unit.
+  */
+ void ff_cbs_sei_delete_message_type(CodedBitstreamContext *ctx,
+Index: FFmpeg/libavcodec/itut35.h
+===================================================================
+--- libavcodec/itut35.h
++++ libavcodec/itut35.h
+@@ -19,6 +19,11 @@
+ #ifndef AVCODEC_ITUT35_H
+ #define AVCODEC_ITUT35_H
+ 
++#include <stddef.h>
++#include <stdint.h>
++
++#include "libavutil/intreadwrite.h"
++
+ #define ITU_T_T35_COUNTRY_CODE_CN 0x26
+ #define ITU_T_T35_COUNTRY_CODE_UK 0xB4
+ #define ITU_T_T35_COUNTRY_CODE_US 0xB5
+@@ -38,4 +43,15 @@
+ #define ITU_T_T35_PROVIDER_CODE_AOM          0x5890
+ #define ITU_T_T35_PROVIDER_CODE_SAMSUNG      0x003C
+ 
++/* payload starts after the country code and includes the application version. */
++static inline int ff_itut35_is_hdr10plus(uint8_t country_code,
++                                        const uint8_t *payload, size_t payload_size)
++{
++    return country_code == ITU_T_T35_COUNTRY_CODE_US &&
++           payload_size >= 6 &&
++           AV_RB16(payload)     == ITU_T_T35_PROVIDER_CODE_SAMSUNG &&
++           AV_RB16(payload + 2) == 0x0001 &&
++           payload[4]          == 0x04;
++}
++
+ #endif /* AVCODEC_ITUT35_H */

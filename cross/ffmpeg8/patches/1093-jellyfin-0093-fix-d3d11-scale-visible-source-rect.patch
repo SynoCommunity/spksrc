@@ -1,0 +1,35 @@
+diff --git a/libavfilter/vf_scale_d3d11.c b/libavfilter/vf_scale_d3d11.c
+index c301f4a0c9..aab98c8cec 100644
+--- libavfilter/vf_scale_d3d11.c
++++ libavfilter/vf_scale_d3d11.c
+@@ -206,8 +206,12 @@ static int scale_d3d11_filter_frame(AVFilterLink *inlink, AVFrame *in)
+         ID3D11Texture2D *input_texture = (ID3D11Texture2D *)in->data[0];
+         input_texture->lpVtbl->GetDesc(input_texture, &textureDesc);
+ 
+-        s->inputWidth = textureDesc.Width;
+-        s->inputHeight = textureDesc.Height;
++        /* D3D11 decoder textures may be padded (for example 1920x1152
++         * for a visible 1920x1080 frame).  Configure and sample only the
++         * visible frame area, otherwise the VP may scale uninitialized
++         * padding and show a green strip at the bottom. */
++        s->inputWidth = in->width;
++        s->inputHeight = in->height;
+         s->input_format = textureDesc.Format;
+ 
+         ret = scale_d3d11_configure_processor(s, ctx);
+@@ -265,6 +269,15 @@ static int scale_d3d11_filter_frame(AVFilterLink *inlink, AVFrame *in)
+         goto fail;
+     }
+ 
++    {
++        RECT srcRect = { 0, 0, in->width, in->height };
++        RECT dstRect = { 0, 0, s->width, s->height };
++        videoContext->lpVtbl->VideoProcessorSetStreamSourceRect(videoContext, s->processor,
++                                                                0, TRUE, &srcRect);
++        videoContext->lpVtbl->VideoProcessorSetStreamDestRect(videoContext, s->processor,
++                                                              0, TRUE, &dstRect);
++    }
++
+     ///< Process the frame
+     hr = videoContext->lpVtbl->VideoProcessorBlt(videoContext, s->processor, s->outputView, 0, 1, &stream);
+     if (FAILED(hr)) {

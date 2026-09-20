@@ -4,7 +4,8 @@ SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 4
 SPK_ICON = src/ffmpeg8.png
 CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
-CHANGELOG += "2. Internal build options now follow toolchain capabilities"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities<br/>"
+CHANGELOG += "3. Update to jellyfin 8.1.2-5 patchset"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
