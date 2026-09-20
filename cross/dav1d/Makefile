@@ -3,6 +3,9 @@ PKG_VERS = 1.5.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.videolan.org/pub/videolan/dav1d/$(PKG_VERS)
+# Fallback: official VideoLAN mirror (verified byte-identical),
+# used when download.videolan.org is unreachable.
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/videolan/dav1d/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

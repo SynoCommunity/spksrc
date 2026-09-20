@@ -3,6 +3,9 @@ PKG_VERS = 1.4.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.videolan.org/pub/videolan/libbluray/$(PKG_VERS)
+# Fallback: official VideoLAN mirror (verified byte-identical),
+# used when ftp.videolan.org is unreachable.
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/videolan/libbluray/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/freetype cross/fontconfig
