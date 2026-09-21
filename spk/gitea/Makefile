@@ -1,12 +1,12 @@
 SPK_NAME = gitea
-SPK_VERS = 1.27.2
-SPK_REV = 30
+SPK_VERS = 1.27.3
+SPK_REV = 31
 SPK_ICON = src/gitea.png
 
 MAINTAINER = wkobiela
 DESCRIPTION  = Gitea is a community managed lightweight code hosting solution written in Go.
 DISPLAY_NAME = Gitea
-CHANGELOG = "1. Update to v1.27.2. <br/>2. Security update for CVE-2026-60004."
+CHANGELOG = "Update to v1.27.3 (security fixes for access-control bypasses across packages, actions, api and repos)."
 
 LICENSE = MIT
 
