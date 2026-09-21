@@ -20,15 +20,18 @@
 #                           name is appended to each and tried in turn.
 #
 # Files:
-#  $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)download_done-$(PKG_VERS)
 #                          Generic download completion cookie
 #                          (used when PKG_DIST_ARCH is unset)
-#  $(WORK_DIR)/.$(COOKIE_PREFIX)<arch>-download_done
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)<arch>-download_done-$(PKG_VERS)
 #                          Architecture-specific download completion cookie
 #                          (used when PKG_DIST_ARCH is set)
 #
 # Notes:
 #  - The download target is idempotent and guarded by a completion cookie.
+#    The cookie carries PKG_VERS so a version bump invalidates download
+#    state by construction; re-resolution no-ops cheaply when the file
+#    is already present.
 #  - Per download method, the actual work lives in a DOWNLOAD_<METHOD> macro
 #    (git / svn / hg / http) selected by PKG_DOWNLOAD_METHOD; download_target
 #    only loops over $(URLS) and dispatches to the right macro.
@@ -50,10 +53,14 @@ ifeq ($(strip $(FLOCK_TIMEOUT)),)
 FLOCK_TIMEOUT = 300
 endif
 
+# The cookie carries PKG_VERS so that a version bump invalidates download
+# state by construction (same pattern as the WHEEL_*_COOKIE variants):
+# a new version re-resolves, which no-ops cheaply when the file is
+# already in distrib/.
 ifneq ($(strip $(PKG_DIST_ARCH)),)
-DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)$(PKG_DIST_ARCH)-download_done
+DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)$(PKG_DIST_ARCH)-download_done-$(PKG_VERS)
 else
-DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
+DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)download_done-$(PKG_VERS)
 endif
 
 ifeq ($(strip $(PRE_DOWNLOAD_TARGET)),)

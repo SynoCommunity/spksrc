@@ -39,6 +39,10 @@ DIGESTS_FILE ?= digests
 .PHONY: digests-%
 digests-%:
 	@$(MSG) "Generate digests for $(NAME) [$*]"
+	@if [ ! -s $(DIST_FILE) ]; then \
+	  echo "error: distribution file '$(DIST_FILE)' is missing or empty, refusing to generate digests" >&2 ; \
+	  exit 1 ; \
+	fi
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
 	    SHA1)     tool=sha1sum ;; \
@@ -68,6 +72,10 @@ else
 # PKG_DIST_ARCH, producing a single DIGESTS_FILE.
 $(DIGESTS_FILE): download
 	@$(MSG) "Generate digests for $(NAME)"
+	@if [ ! -s $(DIST_FILE) ]; then \
+	  echo "error: distribution file '$(DIST_FILE)' is missing or empty, refusing to generate digests" >&2 ; \
+	  exit 1 ; \
+	fi
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
