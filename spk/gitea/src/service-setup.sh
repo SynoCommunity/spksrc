@@ -24,8 +24,9 @@ service_postinst ()
     # Relocate data paths written by previous versions into the wipe zone
     # (@appstore, removed on every upgrade) to persistent storage. Only
     # our own old default is rewritten; custom user paths are untouched,
-    # and a second run is a no-op.
-    sed -i -e "s|/volume1/@appstore/gitea/bin/data|${SYNOPKG_PKGVAR}/data|g" ${CFG_FILE}
+    # and a second run is a no-op. The old prefix is derived from the
+    # install location so installs on any volume are covered.
+    sed -i -e "s|${SYNOPKG_PKGDEST}/bin/data|${SYNOPKG_PKGVAR}/data|g" ${CFG_FILE}
 }
 
 # service_restore is called by post_upgrade before restoring files from ${TMP_DIR}
