@@ -1,6 +1,6 @@
 SPK_NAME = vaultwarden
-SPK_VERS = 1.37.2
-SPK_REV = 5
+SPK_VERS = 1.37.3
+SPK_REV = 6
 SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 DISPLAY_NAME = Vaultwarden
-CHANGELOG = "1. Update Vaultwarden to v1.37.2. <br/>2. Fixes the invite issue and compatibility with the latest Bitwarden clients."
+CHANGELOG = "Update Vaultwarden to v1.37.3 (security fixes: 2FA remember-token revocation, pre-login/auth rate limiting)."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3
