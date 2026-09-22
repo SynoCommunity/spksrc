@@ -10,19 +10,25 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Current base: master 5ce3ff63c (merged Sep 11th 2026), with uknunknown's
-dev_transcoding_2026 head f9c549a95 rebased onto it (400658886; earlier
-914870f28 on fd698529f) -- his own branch still sits on 45cbe4adb, so that
-rebase is done here rather than pulled. If he rebases upstream himself the
-resulting hash will differ; regenerate then.
+Current base: master 13cd6820b (merged Sep 22nd 2026), with uknunknown's
+dev_transcoding_2026 head d68b98abb rebased onto it (601ba8246; earlier
+400658886 on 5ce3ff63c).  He rebases his own branch now -- it sat on
+fc13bd6db, two commits behind -- so regenerate whenever his head moves.
+That rebase had one conflict, in Containerfile.debian: upstream added
+--enable-vue_cache/--disable-vue_build where his commit drops
+--enable-nvenc/--enable-qsv, and both were kept.
 
 Nothing is carried on top any more. Everything this package used to patch
-separately has been taken upstream into PR #2117:
+separately has been taken upstream into PR #2117, the Matroska/WebM Title
+fix (muxer_mkv.c) that was patch 101 here included -- uknunknown merged it
+into his branch on Sep 21st, so 101 is gone.  The older ones:
 
   101 hwaccel decode fallback      102 audio ch_layout compare
   103 audio drop dead legacy args  104 audio stale aresample comment
   105 profile sharer double free   106 video recover first frame pts
   107 globalheaders av start       108 globalheaders av passthru
+
+(that 101 is the old numbering, before the Title patch took the number)
 
 uknunknown also added a fix of his own in context.c, filling a missing pts from
 the packet fed to av_parser_parse2() -- which attacks the same first-frame
