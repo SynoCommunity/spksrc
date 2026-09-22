@@ -278,7 +278,7 @@ dependency-tree:
 	@echo $$(perl -e 'print "\\\t" x $(MAKELEVEL),"\n"')+ $(NAME) $(PKG_VERS)
 	@for depend in $$(echo "$(ALL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
-	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend \
+	  DEPENDENCY_WALK=1 $(MAKE) $(FWRD_ARGS) -s -C ../../$$depend \
 	      $(if $(ARCH),ARCH=$(ARCH)) \
 	      $(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 	      dependency-tree ; \
