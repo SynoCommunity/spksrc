@@ -11,7 +11,12 @@
 				"profile_name": "ruTorrent",
 				"profile_desc": "PHP profile for ruTorrent",
 				"backend": 13,
-				"extensions": [],
+				"extensions": [
+					"openssl",
+					"phar",
+					"sqlite3",
+					"zip"
+				],
 				"user": "sc-rutorrent",
 				"open_basedir": null,
 				"group": "http"
