@@ -226,6 +226,14 @@ service_restore ()
     if ! grep -q "^system\.daemon\.set" "${RTORRENT_RC}"; then
         sed -i '1i # Run in daemon mode (no ncurses UI)\nsystem.daemon.set = true\n' "${RTORRENT_RC}"
     fi
+    # rtorrent 0.16 enforces a 512 floor on network.http.max_open and
+    # network.max_open_sockets; raise restored configs that predate it
+    for max_open_key in network.http.max_open.set network.max_open_sockets.set; do
+        current_max_open=$(sed -n -e "s|^${max_open_key} *= *\([0-9]*\).*|\1|p" "${RTORRENT_RC}" | head -n 1)
+        if [ -n "${current_max_open}" ] && [ "${current_max_open}" -lt 512 ]; then
+            sed -i -e "s|^${max_open_key} *=.*|${max_open_key} = 512|" "${RTORRENT_RC}"
+        fi
+    done
 
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
     cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/share"

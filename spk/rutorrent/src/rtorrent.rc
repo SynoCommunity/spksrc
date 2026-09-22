@@ -19,10 +19,11 @@ port_range = 6881-6999
 
 # File handle limits optimized for ulimit of 1024
 # (DSM default, leave headroom for rtorrent internals)
-# network.http.max_open floor is 512 as of rtorrent 0.16
+# network.http.max_open and network.max_open_sockets floors are 512
+# as of rtorrent 0.16
 network.http.max_open.set = 512
 network.max_open_files.set = 600
-network.max_open_sockets.set = 300
+network.max_open_sockets.set = 512
 
 # Peer throttling to manage connection overhead
 throttle.min_peers.normal.set = 20
