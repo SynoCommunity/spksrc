@@ -25,7 +25,7 @@ PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/rtorrent -n -o import=${RTORRENT_RC}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/rtorrent -n -D -o import=${RTORRENT_RC}"
 
 fix_shared_folders_rights()
 {
