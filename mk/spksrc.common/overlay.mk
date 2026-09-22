@@ -42,9 +42,10 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # ---- REQUESTED (versions) ----------------------------------------------------------
 # The directory-name form (…_rust-1.82_gcc-4.9.3), not the consumer's PKG_VERS (1.82.0).
 # A second build of a component lands beside the first; this picks between them.
-OVERLAY_RUSTC_VERS     ?= 1.82
 OVERLAY_BINUTILS_VERS  ?= 2.30
 OVERLAY_GCC_VERS       ?= 8.5
+# OVERLAY_RUSTC_VERS is NOT pinned here: it defaults to the newest this arch ships, and
+# is computed below because the candidate set depends on OVERLAY_GCC_VERS.
 
 # ---- AVAILABLE ---------------------------------------------------------------------
 # Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
@@ -52,13 +53,41 @@ OVERLAY_GCC_VERS       ?= 8.5
 _OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
 _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
 _OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
-# A rust toolchain is built against a specific gcc, and its directory says which. With
-# the gcc overlay on, take the one built against it; with it off, the vendor one. Both
-# coexist, so OVERLAY_GCC=0 keeps working -- and the _gcc-* glob alone would match two.
+# A rust toolchain is built against a specific gcc, and its directory says which. Both
+# variants coexist, so the _gcc-* glob alone would match two; these split them -- first
+# across EVERY version the arch ships, to choose the default version from the right pool.
+_RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
+_RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
+
+# The pool the default is picked from: the gcc-overlay builds when that overlay is on and
+# this arch has any, the vendor-gcc ones otherwise. Same preference as the selection below,
+# applied one step earlier so "newest" means newest OF THE VARIANT that will be used --
+# picking 1.98 from the gcc-8.5 pool and then failing to find a vendor 1.98 would be worse
+# than picking the newest vendor version in the first place.
+_RUSTC_POOL           := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
+                           $(or $(_RUSTC_ANY_MATCHED),$(_RUSTC_ANY_VENDOR)),\
+                           $(_RUSTC_ANY_VENDOR))
+# Directory name -> bare version (syno-qoriq-6.2.4_rust-1.98_gcc-8.5 -> 1.98), newest first.
+_RUSTC_POOL_VERS      := $(shell printf '%s\n' $(patsubst $(_OVERLAY_TC)_rust-%,%,$(notdir $(_RUSTC_POOL))) \
+                           | sed 's/_gcc-.*//' | sort -Vru)
+
+# Newest available, unless the caller pinned one. `?=` is the whole mechanism: a command
+# line, the environment or a package Makefile all win over it, which is what "default"
+# means here -- nothing below can tell the difference.
+OVERLAY_RUSTC_VERS    ?= $(firstword $(_RUSTC_POOL_VERS))
+
 _OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
+_OVERLAY_RUSTC_MATCHED := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
+_OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
+
+# With the gcc overlay ON, PREFER the rustc built against it, and fall back to the vendor
+# one where that arch has none: a rust toolchain built with the vendor gcc still links
+# against the same glibc, so it stays usable -- having no rustc overlay at all would not.
+# With the gcc overlay OFF, only the vendor one is a candidate; taking the gcc-8.5 build
+# there would pair it with a compiler it was not built against.
 TC_OVERLAY_RUSTC      := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
-                           $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL)),\
-                           $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL)))
+                           $(or $(_OVERLAY_RUSTC_MATCHED),$(_OVERLAY_RUSTC_VENDOR)),\
+                           $(_OVERLAY_RUSTC_VENDOR))
 TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
 TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
@@ -105,7 +134,18 @@ _OVERLAY_FORWARDED := 1
 # A backstop for a sub-make nobody forwards to, and the only way the _VERS pins travel:
 # objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
 export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
-export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
+export OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
+# OVERLAY_RUSTC_VERS is exported ONLY once it has a value. It is derived from the rust
+# consumer dirs this arch ships, and there are contexts where that list is legitimately
+# empty -- a toolchain consumer directory resolves _OVERLAY_TC to syno-native, which owns
+# no rust overlay. Exporting it there would put an EMPTY value in the environment of every
+# sub-make, and `?=` cannot override an environment variable that is set, even to nothing:
+# the child would inherit "no version" and disable its own overlay. `export` alone is
+# enough to create that empty value, so the guard has to be on the export, not the
+# assignment.
+ifneq ($(strip $(OVERLAY_RUSTC_VERS)),)
+export OVERLAY_RUSTC_VERS
+endif
 
 # Exported as a BACKSTOP, not as the mechanism. An exported value arrives with environment
 # origin, which any `OVERLAY_x = ...` in a package Makefile overrides -- so it cannot
@@ -147,6 +187,10 @@ OVERLAY_RUSTC_VERSION_MISSING    = $(if $(_OVERLAY_RUSTC_ANY),$(if $(strip $(TC_
 OVERLAY_BINUTILS_VERSION_MISSING = $(if $(_OVERLAY_BINUTILS_ANY),$(if $(strip $(TC_OVERLAY_BINUTILS)),,1))
 OVERLAY_GCC_VERSION_MISSING      = $(if $(_OVERLAY_GCC_ANY),$(if $(strip $(TC_OVERLAY_GCC)),,1))
 OVERLAY_GCC_NO_BINUTILS          = $(if $(strip $(TC_OVERLAY_GCC)),$(if $(strip $(TC_OVERLAY_BINUTILS)),,$(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),1)))
+# Not a failure: the gcc overlay is on, this arch ships no rustc built against it, and the
+# vendor-gcc one was taken instead. Worth saying, because the rust std then comes from a
+# different compiler than the C around it.
+OVERLAY_RUSTC_GCC_FALLBACK       = $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),$(if $(strip $(_OVERLAY_RUSTC_MATCHED)),,$(if $(strip $(_OVERLAY_RUSTC_VENDOR)),1)))
 
 # Text only; a define is inert, so it costs the packages reading this file nothing. Emitted
 # from a recipe: this file is re-parsed several times per build, so $(warning) would repeat.
@@ -168,6 +212,14 @@ $(MSG) "*********************************************************************"
 endef
 
 OVERLAY_WARN_RUSTC_VERSION_MISSING    = $(call overlay_warn_version_missing,rust,OVERLAY_RUSTC_VERS,$(OVERLAY_RUSTC_VERS),$(_OVERLAY_RUSTC_ANY))
+
+define OVERLAY_WARN_RUSTC_GCC_FALLBACK
+$(MSG) "*********************************************************************" ; \
+$(MSG) "*** No rust $(OVERLAY_RUSTC_VERS) overlay built with gcc $(OVERLAY_GCC_VERS) for [$(_OVERLAY_TC)]" ; \
+$(MSG) "*** Using $(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(_OVERLAY_RUSTC_VENDOR))) instead" ; \
+$(MSG) "*** The rust std is built against the vendor gcc, the C around it is not" ; \
+$(MSG) "*********************************************************************"
+endef
 OVERLAY_WARN_BINUTILS_VERSION_MISSING = $(call overlay_warn_version_missing,binutils,OVERLAY_BINUTILS_VERS,$(OVERLAY_BINUTILS_VERS),$(_OVERLAY_BINUTILS_ANY))
 OVERLAY_WARN_GCC_VERSION_MISSING      = $(call overlay_warn_version_missing,gcc,OVERLAY_GCC_VERS,$(OVERLAY_GCC_VERS),$(_OVERLAY_GCC_ANY))
 
