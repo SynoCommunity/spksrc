@@ -1,0 +1,12 @@
+--- backports/backports.txt-orig	2021-01-22 16:56:29.373941502 +0000
++++ backports/backports.txt	2021-01-22 16:48:18.631173349 +0000
+@@ -132,6 +132,9 @@ add v4.5_vb2_cpu_access.patch
+ add v4.4_gpio_chip_parent.patch
+ add v4.4_user_pages_flag.patch
+ 
++[4.4.60]
++delete v4.4_user_pages_flag.patch
++
+ [4.3.1023]
+ delete v4.4_user_pages_flag.patch
+ add v4.3_bt87x_const_fix.patch
