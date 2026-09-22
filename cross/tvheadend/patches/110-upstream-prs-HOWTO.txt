@@ -7,11 +7,11 @@ can be dropped on its own once merged or abandoned.
   113    tvheadend#2249     record-from-buffer        7da8972b7  HTSP timeshift through the channel cache
   114    tvheadend#2249     record-from-buffer        3abf9d918  packet timeshift double free
 
-The PR branches sit on a later master than the distrib tarball
+The PR branches sit on a different master than the distrib tarball
 (PKG_GIT_HASH in ../Makefile).  Take only each commit's own change,
 `git diff <commit>~1 <commit>` -- never `git diff ${PKG_GIT_HASH} <commit>`,
 which would drag in every master commit in between.  They apply after
-000-004, 100 and 101, in that order.  Once PKG_GIT_HASH moves past a merged
+000-004 and 100, in that order.  Once PKG_GIT_HASH moves past a merged
 PR, drop its patch, as 110 (tvheadend#2129) was once merged as 5ce3ff63c.
 
 The text before the first "--- " line of a patch is its header (what it does,
