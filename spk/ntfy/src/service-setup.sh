@@ -1,0 +1,4 @@
+
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/ntfy serve --config ${SYNOPKG_PKGVAR}/server.yml"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
