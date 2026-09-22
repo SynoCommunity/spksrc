@@ -11,12 +11,8 @@ RUTORRENT_WEB_DIR="/var/services/web_packages/${SYNOPKG_PKGNAME}"
 # rtorrent configuration file location
 RTORRENT_RC=${RUTORRENT_WEB_DIR}/conf/rtorrent.rc
 
-# Determine PHP binary path based on DSM version (rutorrent requires DSM >= 7)
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -lt 2 ]; then
-    PHP_BIN="/usr/local/bin/php80"
-else
-    PHP_BIN="/usr/local/bin/php82"
-fi
+# PHP binary path (DSM 7.2+, PHP 8.4 package)
+PHP_BIN="/usr/local/bin/php84"
 
 MEDIAINFO_BIN="/var/packages/mediainfo/target/bin/mediainfo"
 # Set HOME for rtorrent to find .rtorrent.rc symlink
@@ -225,9 +221,8 @@ service_restore ()
     cp -apf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc" "${RTORRENT_RC}"
     rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
 
-    # Upgrade migrations for rtorrent.rc: drop legacy PHP 7.4 execute hooks,
-    # and ensure daemon mode is enabled (required for running without screen)
-    sed -i -e "/\/var\/packages\/PHP7\.4\/target\/usr\/local\/bin\/php74/d" "${RTORRENT_RC}"
+    # Upgrade migrations for rtorrent.rc: ensure daemon mode is enabled
+    # (required for running without screen)
     if ! grep -q "^system\.daemon\.set" "${RTORRENT_RC}"; then
         sed -i '1i # Run in daemon mode (no ncurses UI)\nsystem.daemon.set = true\n' "${RTORRENT_RC}"
     fi
