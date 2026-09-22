@@ -74,9 +74,10 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 VIDEODRV    ?= 1
 VIDEODRV_ON  = $(if $(filter 0 off OFF,$(strip $(VIDEODRV))),,1)
 
-# Carried to every crossing: a meta that disagrees links a libdrm its consumer cannot
-# resolve, which is the same class of hazard as an overlay's ABI.
+# Carried to every crossing, an spk boundary included: whether the meta is in at all is
+# a decision about the run, and one that disagrees links a libdrm nobody can resolve.
 FWRD_VARS += VIDEODRV
+FWRD_VARS_SPK += VIDEODRV
 
 ### Overlay decisions -- AFTER local.mk: both use ?=, so the first read wins and that has
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
@@ -85,6 +86,11 @@ include $(BASEDIR)/mk/spksrc.common/overlay.mk
 # The switches named above, as command-line variables. Here and not lower down: stage0's
 # $(shell) below is the first crossing to read them.
 FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
+
+# What survives an spk -> spk crossing. Narrower on purpose: which compiler a package
+# builds with belongs to that package and its own work dir, so a meta recomputes it
+# instead of inheriting whatever its caller happened to choose.
+FWRD_ARGS_SPK = $(foreach v,$(sort $(FWRD_VARS_SPK)),$(v)='$($(v))')
 
 # One asks for debug symbols, the other strips them. env-default.mk lets the first win by
 # if/else, while cmake, ninja and install test the second on its own and still strip.
