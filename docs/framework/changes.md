@@ -117,6 +117,40 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 19th 2026 — A kernel floor, for what no compiler can lift (#7468)"
+
+    - **`MIN_KERNEL_VERSION` joins the capability floors**, beside `MIN_GLIBC_VERSION`
+      and `MIN_GCC_VERSION`. A package declares the kernel it needs and the arch is
+      refused with a reason, instead of being listed in an `UNSUPPORTED_ARCHS` line that
+      says where it fails but never why.
+
+    - **It is a runtime floor, like glibc.** A gcc floor asks what the compiler can do,
+      and a newer compiler answers it. A kernel floor asks what the machine running the
+      binary can do; nothing in the toolchain changes that answer.
+
+    - **The Intel media stack is the case in point.** libva, gmmlib, intel-media-driver,
+      intel-mediasdk and `synocli-videodriver` talk to i915 ioctls; DSM 5.2 ships a 3.2
+      kernel that predates the render-node interface libva needs. They now declare
+      `MIN_KERNEL_VERSION = 3.10` rather than enumerating archs:
+
+        ```makefile
+        # cross/libva/Makefile
+        MIN_KERNEL_VERSION = 3.10
+        ```
+
+      `x86-5.2` and `evansport-6.2.4` (kernel 3.2.40) and `evansport-7.0` (3.2.101) are
+      refused with `kernel <version> < 3.10 (a runtime floor: no toolchain can lift it)`.
+      `x64-6.2.4` (3.10.105), `x64-7.1`, `apollolake-7.1`, `braswell-6.2.4` and
+      `x86-6.2.4` were checked to still build, and no package loses an arch it ships on
+      today: `synocli-videodriver` already stops at `REQUIRED_MIN_DSM = 6` and excludes
+      `i686_ARCHS`, and `synocli-videodriver-tools` at `6.2.4`.
+
+    - **`cross/tvheadend` gets the same floor**, because it does not have it by
+      inheritance. It adds `cross/libva` for the whole of `x64_ARCHS`, and `x86` is in
+      that list while running a 3.2 kernel -- so without a guard the floor would turn a
+      missing vaapi into an unsupported package. Guarding the `DEPENDS` leaves `x86-5.2`
+      building tvheadend exactly as before, without the video stack.
+
 ??? note "September 19th 2026 — One runtime library for all of a package, not for its first binary (#7466)"
 
     - **The copy that shipped was the one the first binary needed.**
