@@ -1,14 +1,12 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.7.0
-SPK_REV  = 8
+SPK_VERS = 3.8.2
+SPK_REV = 9
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
 
-# compiler too old for cross/libzim
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# compiler for cross/libzim
+MIN_GCC_VERSION = 7.5
 
 HOMEPAGE = https://www.kiwix.org/
 DESCRIPTION = Kiwix is an offline reader for online content like Wikipedia, Project Gutenberg, or TED Talks. It makes knowledge available to people with no or limited internet access. The software as well as the content is free to use for anyone.
@@ -16,7 +14,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "1. Update multiple dependencies"
+CHANGELOG = "Update kiwix-tools to v3.8.2 and update dependencies."
 
 SERVICE_USER = auto
 STARTABLE = yes
