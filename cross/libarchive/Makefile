@@ -1,5 +1,5 @@
 PKG_NAME = libarchive
-PKG_VERS = 3.7.3
+PKG_VERS = 3.8.9
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libarchive/libarchive/releases/download/v$(PKG_VERS)
