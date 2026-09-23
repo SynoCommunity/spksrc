@@ -56,6 +56,10 @@ _OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
 # A rust toolchain is built against a specific gcc, and its directory says which. Both
 # variants coexist, so the _gcc-* glob alone would match two; these split them -- first
 # across EVERY version the arch ships, to choose the default version from the right pool.
+# Every rust consumer this arch ships, minus any marked BROKEN/DISABLED -- the same
+# escape hatch packages use. The base toolchain provisions all of them; see below.
+_OVERLAY_RUSTC_ENABLED := $(foreach d,$(_OVERLAY_RUSTC_ANY),\
+                            $(if $(wildcard $(d)/BROKEN $(d)/DISABLED),,$(d)))
 _RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
 _RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
 
