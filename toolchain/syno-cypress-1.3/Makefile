@@ -4,6 +4,7 @@ TC_TYPE = SRM
 TC_KERNEL = 4.4.60
 TC_GLIBC = 2.32
 TC_GCC = 10.3.0
+TC_BINUTILS = 2.35.1
 
 TC_DIST = cypress-gcc1030_glibc232_srm-1.3
 TC_EXT = tar.xz

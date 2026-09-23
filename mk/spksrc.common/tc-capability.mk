@@ -7,6 +7,7 @@
 #   MIN_GLIBC_VERSION  = 2.20   needs glibc 2.20 or newer
 #   MIN_KERNEL_VERSION = 3.10   needs a 3.10 or newer kernel
 #   MIN_GCC_VERSION    = 8      needs gcc 8 or newer
+#   MIN_BINUTILS_VERSION = 2.20 needs binutils 2.20 or newer (as/ld)
 #   MIN_RUSTC_VERSION  = 1.85   needs rustc 1.85 or newer
 #   REQUIRE_64BIT      = 1      needs a 64-bit target
 #
@@ -39,9 +40,10 @@ _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
 # The toolchain's own gcc / glibc / kernel, read from where it declares them --
 # statically, so a package can gate on any of them before anything is built (the
 # kernel one, for instance, for an API that appeared in a given release).
-TC_GCC    := $(shell sed -n 's/^TC_GCC *= *//p'    $(_TC_CAP_MK) 2>/dev/null)
-TC_GLIBC  := $(shell sed -n 's/^TC_GLIBC *= *//p'  $(_TC_CAP_MK) 2>/dev/null)
-TC_KERNEL := $(shell sed -n 's/^TC_KERNEL *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+TC_GCC      := $(shell sed -n 's/^TC_GCC *= *//p'      $(_TC_CAP_MK) 2>/dev/null)
+TC_GLIBC    := $(shell sed -n 's/^TC_GLIBC *= *//p'    $(_TC_CAP_MK) 2>/dev/null)
+TC_KERNEL   := $(shell sed -n 's/^TC_KERNEL *= *//p'   $(_TC_CAP_MK) 2>/dev/null)
+TC_BINUTILS := $(shell sed -n 's/^TC_BINUTILS *= *//p' $(_TC_CAP_MK) 2>/dev/null)
 
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and
@@ -82,6 +84,20 @@ ifneq ($(strip $(MIN_GCC_VERSION)),)
 ifneq ($(strip $(TC_GCC)),)
 ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),gcc $(TC_GCC) < $(MIN_GCC_VERSION))
+endif
+endif
+endif
+
+# ---- binutils: the assembler and linker the toolchain ships ------------------
+# A build-time floor like gcc, not a runtime one: it asks what as/ld can encode and
+# resolve, and a newer binutils answers it. The vendor toolchains span 2.18.50 (2008) to
+# 2.38, so an object a current compiler emits can carry a relocation or a debug format
+# the shipped linker never learned -- which is a property of the linker, not of the
+# architecture it happens to target.
+ifneq ($(strip $(MIN_BINUTILS_VERSION)),)
+ifneq ($(strip $(TC_BINUTILS)),)
+ifeq ($(call version_ge,$(TC_BINUTILS),$(MIN_BINUTILS_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),binutils $(TC_BINUTILS) < $(MIN_BINUTILS_VERSION))
 endif
 endif
 endif

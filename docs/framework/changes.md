@@ -117,6 +117,69 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 23rd 2026 — A linker floor, for what a newer as and ld can lift (#7495)"
+
+    - **`MIN_BINUTILS_VERSION` joins the capability floors**, beside `MIN_GCC_VERSION`,
+      `MIN_GLIBC_VERSION`, `MIN_KERNEL_VERSION` and `MIN_RUSTC_VERSION`. A package states
+      the assembler and linker it needs, and the architectures whose toolchain is older
+      are refused with a reason.
+
+    - **It is a build-time floor, like gcc.** It asks what `as` and `ld` can encode and
+      resolve, and a newer binutils answers it. That distinguishes it from glibc and the
+      kernel, which ask about the machine the binary will run on and which nothing in the
+      toolchain can change.
+
+    - **`TC_BINUTILS` is declared by every toolchain**, beside `TC_GCC`, `TC_GLIBC` and
+      `TC_KERNEL`. Not one value is inferred: all 115 distinct toolchain archives were
+      downloaded and their own `<target>-ld --version` read, covering the 188
+      declarations. It comes out as one binutils per gcc generation --
+
+        | gcc | binutils | | gcc | binutils |
+        |-----|----------|-|-----|----------|
+        | 4.3.7 | 2.18.50 | | 4.9.4 | 2.25 |
+        | 4.6.4 | 2.22 | | 7.5.0 | 2.30 |
+        | 4.7.3 | 2.22 | | 8.5.0 | 2.30 |
+        | 4.8.3 | 2.24 | | 10.3.0 | 2.35.1 |
+        | 4.9.3 | 2.25 | | 12.2.0 | 2.38 |
+
+      -- but that was worth confirming rather than assuming, because the toolchains do not
+      come from one place: `88f6281` ships a Marvell build, `ppc853x` a plain GNU one,
+      the DSM 6.2.4 family crosstool-NG/Linaro, DSM 7.x plain GNU again. binutils tracks
+      the compiler, not the DSM release -- `hi3535-6.2.4` sits on gcc 4.8.3 with 2.24
+      while its 4.9.3 neighbours in the same release are on 2.25, and `comcerto2k-7.1`
+      pulls the same 4.9.3 archive as `comcerto2k-6.1` in a lineup otherwise on 8.5.0.
+
+      The span is the point: an object a current compiler emits can carry a relocation or
+      a debug format a 2008 linker never learned.
+
+    - **`bandwhich` and `dutree` are the first two converted.** Both carried
+      `UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)` under a comment quoting
+      `unknown relocation type 95`. Reloc 95 is `R_PPC_TLSGD`, the marker `ld` needs to
+      resolve the TLS general-dynamic sequence rustc emits; binutils grew it for 32-bit
+      PowerPC on 2009-03-04 and shipped it in 2.20. Reproduced directly -- the same object
+      fails to link with `ppc853x-5.2`'s 2.18.50 and links with 2.25 and 2.30:
+
+        ```
+        ld (2.18.50): tls.o: unknown relocation type 95 for symbol x
+        ld (2.25):    ELF 32-bit MSB, PowerPC
+        ld (2.30):    ELF 32-bit MSB pie, PowerPC
+        ```
+
+      They now declare `MIN_BINUTILS_VERSION = 2.20`. Exactly one toolchain in the tree
+      falls under it -- `ppc853x-5.2` -- so the set of refused architectures is unchanged;
+      what changes is that the refusal names the linker, and lifts itself if that
+      architecture ever gets a newer one.
+
+    - **What was deliberately *not* converted.** `cross/dua` and `cross/procs` exclude the
+      same architectures under a comment quoting
+      `Dwarf Error: found dwarf version '4', this reader only handles version 2 and 3`.
+      That line is not the failure: a DWARF-4 object links cleanly on 2.18.50. It appears
+      only when `ld` already has an error to report and cannot read the debug info well
+      enough to name a file and line -- so it is 2.18.50 printing a worse diagnostic about
+      some other problem. Converting those two to a linker floor would have encoded a
+      cause that was never verified; they keep their arch list until someone reproduces
+      the real one.
+
 ??? note "September 19th 2026 — A kernel floor, for what no compiler can lift (#7468)"
 
     - **`MIN_KERNEL_VERSION` joins the capability floors**, beside `MIN_GLIBC_VERSION`

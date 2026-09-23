@@ -5,6 +5,7 @@ TC_VERS = 7.3
 TC_KERNEL = 4.4.302
 TC_GLIBC = 2.36
 TC_GCC = 12.2.0
+TC_BINUTILS = 2.38
 
 TC_DIST = armada37xx-gcc1220_glibc236_armv8-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%2037xx%20Linux%204.4.302
