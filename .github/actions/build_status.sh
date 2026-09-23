@@ -28,10 +28,11 @@ echo "SUCCESS:"
 if [ -f "${BUILD_SUCCESS_FILE}" ]; then
     cat "${BUILD_SUCCESS_FILE}"
     if [ -d packages ]; then
-        # show built package files
+        # show built package files, oldest first: the SUCCESS list above is chronological,
+        # and an alphabetical listing hides that e.g. synocli-videodriver was built first.
         echo ""
         echo "ARTIFACTS:"
-        ls -gh --time-style +"%Y.%m.%d %H:%M:%S"  packages/*
+        ls -ghrt --time-style +"%Y.%m.%d %H:%M:%S"  packages/*
         echo ""
     fi
 else
