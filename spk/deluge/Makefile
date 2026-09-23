@@ -15,8 +15,9 @@ STARTABLE = yes
 CHANGELOG  = "1. Migrate to python314<br/>"
 CHANGELOG += "2. Update libtorrent to 2.0.14<br/>"
 CHANGELOG += "3. Update all wheels<br/>"
-CHANGELOG += "4. Pin setuptools to 81.0.0 to fix launch error.<br/>"
-CHANGELOG += "5. Replace GeoIP C binding with pygeoip, as used upstream."
+CHANGELOG += "4. Pin setuptools to 81.0.0 to fix launch error<br/>"
+CHANGELOG += "5. Replace GeoIP C binding with pygeoip, as used upstream<br/>"
+CHANGELOG += "6. Migrate to libboost 1.92.0"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -46,8 +47,8 @@ include ../../mk/spksrc.common.mk
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl3
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.86
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
+DEPENDS += cross/boost_1.92
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_92_0
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
