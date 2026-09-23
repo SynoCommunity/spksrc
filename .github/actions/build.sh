@@ -108,6 +108,33 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
     MAKE_ARGS="publish-"
 fi
 
+# A package can be finished before the loop reaches it: every spk builds its own metas
+# through BUILD_DEPENDS, so an ffmpeg builds synocli-videodriver ahead of itself. Its .spk
+# is then already in ./packages -- the same artefact this script uses below to call a build
+# successful -- while the loop has not got to its name yet.
+#
+# Judging "what is left" by how far the loop got therefore overstates it. A budget-stopped
+# run reported synocli-videodriver as not processed when it had been built two hours
+# earlier and consumed seven times since. Ask the artefact instead, and record the package
+# as done on the way past so it lands in exactly one of the two lists.
+still_pending() {
+    local out="" pkg spkname spkdate
+    for pkg in $1; do
+        spkname=$(sed -n -e '/^SPK_NAME/ s/.*= *//p' "spk/${pkg}/Makefile" 2>/dev/null)
+        if [ -n "${spkname}" ] && ls -1 ./packages/${spkname}_*.spk >/dev/null 2>&1; then
+            if ! grep -q -- "- ${pkg}: (${GH_ARCH}) DONE" "${BUILD_SUCCESS_FILE}" 2>/dev/null; then
+                # Date the .spk, not this pass: we notice it at the next package boundary,
+                # which can be hours after the dependency actually produced it.
+                spkdate=$(date -r "$(ls -1t ./packages/${spkname}_*.spk | head -1)" +"%Y.%m.%d %H:%M:%S")
+                echo "${spkdate} - ${pkg}: (${GH_ARCH}) DONE (built as a dependency)" >> "${BUILD_SUCCESS_FILE}"
+            fi
+            continue
+        fi
+        out+="${pkg} "
+    done
+    echo "${out}" | xargs
+}
+
 # Initialize remaining packages list for tracking build progress
 remaining_packages="${build_packages}"
 
@@ -122,6 +149,7 @@ budget_hit=0
 
 for package in ${build_packages}; do
     # Persist not-yet-completed packages (current + pending) for the checkpoint.
+    remaining_packages=$(still_pending "${remaining_packages}")
     echo "${remaining_packages}" | tr ' ' '\n' | grep -v '^$' > "${BUILD_REMAINING_FILE}"
 
     # Stop at this package boundary if the build-time budget is exhausted, so the
@@ -199,7 +227,10 @@ for package in ${build_packages}; do
 
     # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
     if [ ${result} -eq 0 ] && [ "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2>/dev/null)" ]; then
-        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE" >> ${BUILD_SUCCESS_FILE}
+        # The loop walks the full list, so it also reaches a package still_pending already
+        # recorded as built by a dependency -- one line per package, keep the first.
+        grep -q -- "- ${package}: (${GH_ARCH}) DONE" "${BUILD_SUCCESS_FILE}" 2>/dev/null || \
+            echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE" >> ${BUILD_SUCCESS_FILE}
     # Ensure it's not a false-positive due to pre-check
     elif tail -15 build.log | grep -viq 'spksrc.rules/pre-check.mk'; then
         cat build.log >> ${BUILD_ERROR_LOGFILE}
