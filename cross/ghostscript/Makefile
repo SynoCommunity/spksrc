@@ -1,13 +1,10 @@
 PKG_NAME = ghostscript
 PKG_REALNAME = ghostpdl
-PKG_VERS = 10.06.0
+PKG_VERS = 10.08.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REALNAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$(subst .,,$(PKG_VERS))
 PKG_DIR = $(PKG_REALNAME)-$(PKG_VERS)
-
-# pngrutil.c:(.text+0x3436): undefined reference to `png_init_filter_functions_neon'
-UNSUPPORTED_ARCHS = comcerto2k
 
 # ghostscript is almost self contained (and statically linked)
 DEPENDS = cross/fontconfig
