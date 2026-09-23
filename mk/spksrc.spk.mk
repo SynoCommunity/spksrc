@@ -341,24 +341,30 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 ### Packaging rules
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
+	$(call keep_previous,$@)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
+	# --sort=name and gzip -n: without them the archive carries the directory order
+	# and the time of the run, so two identical builds differ byte for byte.
+	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpf - --owner=root --group=root --sort=name --files-from=/dev/stdin | gzip -n > $@)
+	$(call restore_if_same,$@)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
 define dsm_script_redirect
 $(create_target_dir)
+$(call keep_previous,$@)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo '. $$(dirname $$0)/installer' >> $@
 echo '$$(basename $$0) $(INSTALLER_OUTPUT)' >> $@
 chmod 755 $@
+$(call restore_if_same,$@)
 endef
 
 define dsm_script_copy
 $(create_target_dir)
 $(MSG) "Creating $@"
-cp $< $@
+cp -p $< $@
 chmod 755 $@
 endef
 
@@ -381,6 +387,8 @@ icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
+	$(call keep_previous,$(WORK_DIR)/PACKAGE_ICON.PNG)
+	$(call keep_previous,$(WORK_DIR)/PACKAGE_ICON_256.PNG)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	(convert $(SPK_ICON) -resize 72x72 -strip -sharpen 0x2 - > $(WORK_DIR)/PACKAGE_ICON.PNG)
 else
@@ -388,13 +396,19 @@ else
 endif
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	(convert $(SPK_ICON) -resize 256x256 -strip -sharpen 0x2 - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
+	$(call restore_if_same,$(WORK_DIR)/PACKAGE_ICON.PNG)
+	$(call restore_if_same,$(WORK_DIR)/PACKAGE_ICON_256.PNG)
 	$(eval SPK_CONTENT += PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
 .PHONY: info-checksum
 info-checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
-	@sed -i -e "s|checksum=\".*|checksum=\"$$(md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)\"|g" $(WORK_DIR)/INFO
+	@# `sed -i` rewrites INFO every time, which makes it newer than the .spk and forces a
+	@# repackage even when the checksum is the same. Compare first.
+	@_sum=$$(md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1) ; \
+	 grep -q "checksum=\"$${_sum}\"" $(WORK_DIR)/INFO 2>/dev/null || \
+	 sed -i -e "s|checksum=\".*|checksum=\"$${_sum}\"|g" $(WORK_DIR)/INFO
 
 
 # file names to be used with "find" command
@@ -417,7 +431,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
@@ -466,13 +480,13 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \;
 	@if [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile.sh" ] && [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile" ]; then \
 		rm "$(DSM_WIZARDS_DIR)/uninstall_uifile"; \
 	fi
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
 	   $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
-	   find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
+	   find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
 	@if [ -d "$(DSM_WIZARDS_DIR)" ]; then \
 	   find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
@@ -485,7 +499,7 @@ conf:
 ifneq ($(strip $(CONF_DIR)),)
 	@$(MSG) "Preparing conf"
 	@mkdir -p $(DSM_CONF_DIR)
-	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
+	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f -p {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -496,7 +510,20 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+# Its files are .PHONY on purpose, so make stops seeing them as files and repackaged every
+# run. Keep the regeneration; let a digest of what actually goes in decide instead.
+.PHONY: spk-inputs
+spk-inputs: $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+	@cd $(WORK_DIR) && find $(SPK_CONTENT) -type f 2>/dev/null | sort | xargs -r md5sum | md5sum > .spk-inputs.new
+	@if cmp -s $(WORK_DIR)/.spk-inputs.new $(WORK_DIR)/.spk-inputs ; then \
+	   rm -f $(WORK_DIR)/.spk-inputs.new ; \
+	 else \
+	   mv -f $(WORK_DIR)/.spk-inputs.new $(WORK_DIR)/.spk-inputs ; \
+	 fi
+
+$(WORK_DIR)/.spk-inputs: spk-inputs ;
+
+$(SPK_FILE_NAME): $(WORK_DIR)/.spk-inputs
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
