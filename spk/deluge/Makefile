@@ -1,9 +1,9 @@
 SPK_NAME = deluge
 SPK_VERS = 2.2.0
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/deluge.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
@@ -12,7 +12,11 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update libtorrent to 2.0.12. <br/>2. Update all other wheels. <br/>3. Pin setuptools to 81.0.0 to fix launch error."
+CHANGELOG  = "1. Migrate to python314<br/>"
+CHANGELOG += "2. Update libtorrent to 2.0.14<br/>"
+CHANGELOG += "3. Update all wheels<br/>"
+CHANGELOG += "4. Pin setuptools to 81.0.0 to fix launch error.<br/>"
+CHANGELOG += "5. Replace GeoIP C binding with pygeoip, as used upstream."
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -34,14 +38,13 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = deluge_extra_install
+POST_SERVICE_TARGET = deluge_extra_install
 
 include ../../mk/spksrc.common.mk
 
 # [libtorrent]
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl3
-DEPENDS += cross/geoip
 DEPENDS += cross/libiconv
 DEPENDS += cross/boost_1.86
 BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
@@ -70,5 +73,7 @@ deluge_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 644 src/core.conf $(STAGING_DIR)/var/core.conf
 	install -m 644 src/autoadd.conf $(STAGING_DIR)/var/autoadd.conf
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
 
 include ../../mk/spksrc.spk-meta.mk
