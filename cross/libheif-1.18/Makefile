@@ -13,6 +13,9 @@ DEPENDS += cross/x265
 DEPENDS += cross/libwebp
 DEPENDS += cross/gdk-pixbuf
 
+# frozen fallback line for pre-8.5 toolchains (no upstream maintenance
+# branch exists for it); selected by cross/libheif, never bumped
+
 # ARMv5 and OLD_PPC_ARCHS fail on cross/libde265
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
