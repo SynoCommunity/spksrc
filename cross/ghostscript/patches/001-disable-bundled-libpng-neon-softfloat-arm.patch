@@ -1,0 +1,16 @@
+--- configure.orig
++++ configure
+@@ -9991,6 +9991,13 @@
+                   CFLAGS="$CFLAGS -DPNG_ARM_NEON_OPT=0"
+                 fi
+             ;;
++            *arm-*-linux-gnueabi)
++                # 32-bit soft-float ARM (e.g. comcerto2k): the bundled
++                # libpng enables NEON references that are never linked.
++                if test x"$GCC" = x"yes"; then
++                  CFLAGS="$CFLAGS -DPNG_ARM_NEON_OPT=0"
++                fi
++            ;;
+           esac
+  else
+           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5

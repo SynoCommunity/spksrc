@@ -5,8 +5,6 @@ SPK_ICON = src/ghostscript.png
 
 DEPENDS = cross/ghostscript
 
-UNSUPPORTED_ARCHS = comcerto2k
-
 MAINTAINER = hgy59
 DESCRIPTION = Ghostscript is an interpreter for the PostScript® language and PDF files.
 DISPLAY_NAME = ghostscript
