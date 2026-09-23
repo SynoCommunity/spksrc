@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/dutree
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = A tool to analyze file system usage written in Rust.
 DISPLAY_NAME = $(SPK_NAME)
