@@ -113,16 +113,3 @@ define create_target_dir
 @mkdir -p $$(dirname $@)
 endef
 
-# An unconditional recipe renews its file's mtime even when the bytes are identical, so
-# everything downstream rebuilds for nothing. Bracket such a recipe with these two.
-
-# Path is explicit: some callers are .PHONY targets writing files other than $@. The copy
-# is kept outside the tree, since creating it beside the file would renew its directory.
-define keep_previous
-@mkdir -p $(WORK_DIR)/.stable && cp -f -p $(1) $(WORK_DIR)/.stable/$$(echo '$(1)' | md5sum | cut -c1-32) 2>/dev/null || true
-endef
-
-define restore_if_same
-@_p=$(WORK_DIR)/.stable/$$(echo '$(1)' | md5sum | cut -c1-32) ; \
- if [ -f $$_p ] && cmp -s $(1) $$_p ; then touch -r $$_p $(1) ; fi ; rm -f $$_p
-endef

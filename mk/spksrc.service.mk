@@ -132,7 +132,6 @@ SERVICE_FILES =
 # Generate service-setup from SERVICE variables
 $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@echo "### Generic variables and functions" > $@
 	@echo '### -------------------------------' >> $@
 	@echo '' >> $@
@@ -225,7 +224,6 @@ ifneq ($(strip $(SERVICE_SETUP)),)
 	@echo '' >> $@
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
-	$(call restore_if_same,$@)
 
 # Define resources for
 # - firewall rules/port definitions (DSM >= 6.0-5936)
@@ -237,7 +235,6 @@ endif
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@$(MSG) "Creating $@"
 	@echo '{}' > $@
 ifneq ($(strip $(SERVICE_PORT)),)
@@ -289,7 +286,6 @@ ifneq ($(strip $(VIDEODRIVER)),)
 # e.g. Grant access to GPU device files {"video-driver":{}}
 	@jq '."video-driver" = {}' $@ | sponge $@
 endif
-	$(call restore_if_same,$@)
 
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
@@ -348,7 +344,6 @@ endif
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
 	@$(MSG) "Creating $@"
 	@$(MSG) '(privilege) run-as: package'
@@ -370,7 +365,6 @@ else
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
 endif
-	$(call restore_if_same,$@)
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
@@ -410,7 +404,6 @@ ifeq ($(strip $(FWPORTS)),)
 ifneq ($(strip $(SERVICE_PORT)),)
 $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@echo "[$(SPK_NAME)]" > $@
 ifneq ($(strip $(SERVICE_PORT_TITLE)),)
 	@echo "title=\"$(SERVICE_PORT_TITLE)\"" >> $@
@@ -424,7 +417,6 @@ else
 endif
 	@echo "port_forward=\"yes\"" >> $@
 	@echo "dst.ports=\"${SERVICE_PORT}/tcp\"" >> $@
-	$(call restore_if_same,$@)
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
@@ -451,9 +443,7 @@ ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
 ifneq ($(wildcard $(DSM_UI_CONFIG)),)
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	cat $(DSM_UI_CONFIG) > $@
-	$(call restore_if_same,$@)
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 else ifneq ($(strip $(SERVICE_PORT)),)
 # Set some defaults
@@ -474,7 +464,6 @@ SERVICE_DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 endif
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${SERVICE_DESC}" \
 		--arg id "com.synocommunity.packages.${SPK_NAME}" \
@@ -485,7 +474,6 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 		--arg type "${SERVICE_TYPE}" \
 		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
 		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
-	$(call restore_if_same,$@)
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
 endif

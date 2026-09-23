@@ -339,32 +339,40 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@$(dsm_resource_copy)
 
 ### Packaging rules
+
+# Reproducible builds: one date for everything the packaging writes. Taken from the last
+# commit touching this package, so it answers "which revision is this" and not "when did
+# you run make" -- rebuilding it next year gives the same bytes. Overridable, and git
+# metadata survives a checkout where file mtimes do not, so CI gets the same value.
+SOURCE_DATE_EPOCH ?= $(or $(shell git log -1 --format=%ct -- $(CURDIR) 2>/dev/null),\
+                          $(shell date -r $(firstword $(wildcard $(CURDIR)/Makefile)) +%s 2>/dev/null))
+export SOURCE_DATE_EPOCH
+
+# tar reads it for member dates, gzip needs -n for its header, and ImageMagick honours it
+# for the PNG tIME chunk -- the three producers whose output carried the time of the run.
+TAR_REPRODUCIBLE = --sort=name --mtime=@$(SOURCE_DATE_EPOCH) --owner=root --group=root
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
-	$(call keep_previous,$@)
 	@[ -f $@ ] && rm $@ || true
 	# --sort=name and gzip -n: without them the archive carries the directory order
 	# and the time of the run, so two identical builds differ byte for byte.
-	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpf - --owner=root --group=root --sort=name --files-from=/dev/stdin | gzip -n > $@)
-	$(call restore_if_same,$@)
+	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpf - $(TAR_REPRODUCIBLE) --files-from=/dev/stdin | gzip -n > $@)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
 define dsm_script_redirect
 $(create_target_dir)
-$(call keep_previous,$@)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo '. $$(dirname $$0)/installer' >> $@
 echo '$$(basename $$0) $(INSTALLER_OUTPUT)' >> $@
 chmod 755 $@
-$(call restore_if_same,$@)
 endef
 
 define dsm_script_copy
 $(create_target_dir)
 $(MSG) "Creating $@"
-cp -p $< $@
+cp $< $@
 chmod 755 $@
 endef
 
@@ -387,8 +395,6 @@ icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-	$(call keep_previous,$(WORK_DIR)/PACKAGE_ICON.PNG)
-	$(call keep_previous,$(WORK_DIR)/PACKAGE_ICON_256.PNG)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	(convert $(SPK_ICON) -resize 72x72 -strip -sharpen 0x2 - > $(WORK_DIR)/PACKAGE_ICON.PNG)
 else
@@ -396,8 +402,6 @@ else
 endif
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	(convert $(SPK_ICON) -resize 256x256 -strip -sharpen 0x2 - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
-	$(call restore_if_same,$(WORK_DIR)/PACKAGE_ICON.PNG)
-	$(call restore_if_same,$(WORK_DIR)/PACKAGE_ICON_256.PNG)
 	$(eval SPK_CONTENT += PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
@@ -431,7 +435,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \;
+	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
@@ -480,13 +484,13 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 	@if [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile.sh" ] && [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile" ]; then \
 		rm "$(DSM_WIZARDS_DIR)/uninstall_uifile"; \
 	fi
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
 	   $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
-	   find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f -p {} $(DSM_WIZARDS_DIR) \; ;\
+	   find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
 	@if [ -d "$(DSM_WIZARDS_DIR)" ]; then \
 	   find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
@@ -499,7 +503,7 @@ conf:
 ifneq ($(strip $(CONF_DIR)),)
 	@$(MSG) "Preparing conf"
 	@mkdir -p $(DSM_CONF_DIR)
-	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f -p {} $(DSM_CONF_DIR) \;
+	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -525,7 +529,7 @@ $(WORK_DIR)/.spk-inputs: spk-inputs ;
 
 $(SPK_FILE_NAME): $(WORK_DIR)/.spk-inputs
 	$(create_target_dir)
-	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
+	(cd $(WORK_DIR) && tar cpf $@ $(TAR_REPRODUCIBLE) $(SPK_CONTENT))
 
 package: $(SPK_FILE_NAME)
 
