@@ -1,5 +1,5 @@
 PKG_NAME = libheif
-PKG_VERS = 1.23.5
+PKG_VERS = 1.20.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/strukturag/libheif/releases/download/v$(PKG_VERS)
@@ -13,9 +13,9 @@ DEPENDS += cross/x265
 DEPENDS += cross/libwebp
 DEPENDS += cross/gdk-pixbuf
 
-# mandates C++20 incl. defaulted comparisons (verified: GCC 8.5 fails,
-# GCC 12.2 builds green)
-MIN_GCC_VERSION = 10
+# last libheif line building on GCC 8.5 era toolchains (verified);
+# newer releases need defaulted comparisons (GCC 10+)
+MIN_GCC_VERSION = 8.5
 
 HOMEPAGE = http://www.libheif.org
 COMMENT  = libheif is a ISO/IEC 23008-12:2017 HEIF file format decoder and encoder.
