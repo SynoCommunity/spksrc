@@ -187,16 +187,20 @@ ifeq ($(OVERLAY_RUSTC_ON),1)
 TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 endif
 
-# Pull the rust overlay .txz via the consumer-dir DEPENDS -- whenever one ships, so the archive
-# is provisioned even with the overlay switched off.
-ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
-DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
+# ALL of them, not the one this context happens to select: the choice is per PACKAGE --
+# an spk with the gcc overlay takes the rustc built against it, one without takes the
+# vendor build -- while this toolchain is built once per run. Provisioning only the first
+# left python314 asking rustup for a toolchain nobody had installed.
+ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED)),)
+DEPENDS += $(addprefix toolchain/,$(notdir $(_OVERLAY_RUSTC_ENABLED)))
 endif
 
-# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
-# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
-# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
+# OVERLAY_<component> family together, base layer first: overlay-binutils sets the shim
+# path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-gcc, overlay-rustc and tc_vars all
+# read; overlay-gcc resolves the compiler suffix tc_vars appends; and overlay-rustc
+# resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
 include ../../mk/spksrc.toolchain/overlay-binutils.mk
+include ../../mk/spksrc.toolchain/overlay-gcc.mk
 include ../../mk/spksrc.toolchain/overlay-rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 

@@ -44,6 +44,11 @@ native-depend_msg_target:
 
 # Called for 'make all-supported' prior to
 # parallalizing build for every arch targets
+# The two native loops keep their `env -i` isolation and are deliberately NOT given
+# FWRD_ARGS: these are host tools, and the one native package that cares about a switch
+# (native/rustc-1.98, which must build through the gcc overlay) sets its own `?=` default.
+# Forwarding a 0 into it would override that and break it -- the opposite of what the
+# switch means for a host tool.
 native-depend: native-depend_msg_target
 	@set -e; \
 	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
@@ -71,7 +76,7 @@ spk-meta-source:
 	   else \
 	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
 	      env -i PATH="$(PATH)" HOME="$(HOME)" \
-	         $(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
+	         $(MAKE) $(FWRD_ARGS_SPK) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
 	   fi ; \
 	done
 
@@ -95,12 +100,12 @@ endif
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
 	do \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
 	@set -e; \
 	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) $(MAKE) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
 	
 post_depend_target: $(DEPEND_TARGET)

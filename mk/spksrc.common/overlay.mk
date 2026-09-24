@@ -12,7 +12,7 @@
 #   REQUESTED  did the caller ask for it?                   OVERLAY_<c>
 #   ACTIVE     both of the above                            OVERLAY_<c>_ON
 #
-# Variables by role -- <c> is RUSTC or BINUTILS:
+# Variables by role -- <c> is RUSTC, BINUTILS or GCC:
 #
 #   contract  TC_OVERLAY_<c>      consumer dir, empty when the arch ships none
 #             OVERLAY_<c>         the switch (local.mk / environment / command line)
@@ -26,7 +26,8 @@
 #
 #   internal  _OVERLAY_TC                the toolchain dir name
 #             _OVERLAY_<c>_ANY           any version, ignoring OVERLAY_<c>_VERS
-#             _OVERLAY_BINUTILS_WANTED   global overlay or the narrow rust link
+#             _OVERLAY_BINUTILS_WANTED   global overlay, the narrow rust link, or a
+#                                        gcc overlay (which has no as/ld of its own)
 #
 # Warnings are TEXT here; the targets printing them live in
 # spksrc.toolchain/overlay-<c>.mk, since a recipe needs a build context and this
@@ -41,48 +42,159 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # ---- REQUESTED (versions) ----------------------------------------------------------
 # The directory-name form (…_rust-1.82_gcc-4.9.3), not the consumer's PKG_VERS (1.82.0).
 # A second build of a component lands beside the first; this picks between them.
-OVERLAY_RUSTC_VERS     ?= 1.82
 OVERLAY_BINUTILS_VERS  ?= 2.30
+OVERLAY_GCC_VERS       ?= 8.5
+# OVERLAY_RUSTC_VERS is NOT pinned here: it defaults to the newest this arch ships, and
+# is computed below because the candidate set depends on OVERLAY_GCC_VERS.
 
 # ---- AVAILABLE ---------------------------------------------------------------------
 # Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
 # "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
 _OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
 _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
-TC_OVERLAY_RUSTC      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
-TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS)_gcc-*)
+_OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
+# A rust toolchain is built against a specific gcc, and its directory says which. Both
+# variants coexist, so the _gcc-* glob alone would match two; these split them -- first
+# across EVERY version the arch ships, to choose the default version from the right pool.
+# Every rust consumer this arch ships, minus any marked BROKEN/DISABLED -- the same
+# escape hatch packages use. The base toolchain provisions all of them; see below.
+_OVERLAY_RUSTC_ENABLED := $(foreach d,$(_OVERLAY_RUSTC_ANY),\
+                            $(if $(wildcard $(d)/BROKEN $(d)/DISABLED),,$(d)))
+_RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
+_RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
+
+# The pool the default is picked from: the gcc-overlay builds when that overlay is on and
+# this arch has any, the vendor-gcc ones otherwise. Same preference as the selection below,
+# applied one step earlier so "newest" means newest OF THE VARIANT that will be used --
+# picking 1.98 from the gcc-8.5 pool and then failing to find a vendor 1.98 would be worse
+# than picking the newest vendor version in the first place.
+_RUSTC_POOL           := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
+                           $(or $(_RUSTC_ANY_MATCHED),$(_RUSTC_ANY_VENDOR)),\
+                           $(_RUSTC_ANY_VENDOR))
+# Directory name -> bare version (syno-qoriq-6.2.4_rust-1.98_gcc-8.5 -> 1.98), newest first.
+_RUSTC_POOL_VERS      := $(shell printf '%s\n' $(patsubst $(_OVERLAY_TC)_rust-%,%,$(notdir $(_RUSTC_POOL))) \
+                           | sed 's/_gcc-.*//' | sort -Vru)
+
+# Newest available, unless the caller pinned one. `?=` is the whole mechanism: a command
+# line, the environment or a package Makefile all win over it, which is what "default"
+# means here -- nothing below can tell the difference.
+OVERLAY_RUSTC_VERS    ?= $(firstword $(_RUSTC_POOL_VERS))
+
+_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
+_OVERLAY_RUSTC_MATCHED := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
+_OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
+
+# With the gcc overlay ON, PREFER the rustc built against it, and fall back to the vendor
+# one where that arch has none: a rust toolchain built with the vendor gcc still links
+# against the same glibc, so it stays usable -- having no rustc overlay at all would not.
+# With the gcc overlay OFF, only the vendor one is a candidate; taking the gcc-8.5 build
+# there would pair it with a compiler it was not built against.
+TC_OVERLAY_RUSTC      := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
+                           $(or $(_OVERLAY_RUSTC_MATCHED),$(_OVERLAY_RUSTC_VENDOR)),\
+                           $(_OVERLAY_RUSTC_VENDOR))
+TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
+TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
 # ---- REQUESTED (switches) ----------------------------------------------------------
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,
 #                        these archs ship an overlay because the stock std does not fit.
 # OVERLAY_BINUTILS       GLOBAL: overlay as/ld for EVERY compile. Needs a matched modern
-#                        gcc, hence off by default.
+#                        gcc, hence off by default -- OVERLAY_GCC is what matches it.
 # RUST_LINK_VIA_BINUTILS NARROW: only the Rust link takes the overlay ld; C keeps the vendor's.
+# OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix.
+#                        Off by default: installing one must not silently move any
+#                        existing package onto a different compiler.
+#
+# Was binutils REFUSED, or merely left at a default? Only the command line and the
+# environment express a refusal -- local.mk holds a ?= default like this file, so "file"
+# cannot tell the two apart. This decides between forcing binutils on for gcc and warning
+# that the pair was broken on purpose.
+#
+# Ignore a forwarded set: FWRD_ARGS re-emits these on the sub-make command line, which
+# would turn local.mk's default into an apparent refusal in every dependency. The
+# top-level make is the one that sees the real command line, and warns once.
+#
+# The command line only, not the environment: the switches are exported below, so every
+# sub-make sees them in its environment and would read the export itself as a refusal.
+# Cost: `OVERLAY_BINUTILS=0 make ...` as a shell variable warns nothing. Say it on the
+# command line, where make can tell it apart from what it exported itself.
+_OVERLAY_BINUTILS_ASKED := $(if $(_OVERLAY_FORWARDED),,$(if $(findstring command,$(origin OVERLAY_BINUTILS)),1))
 OVERLAY_RUSTC          ?= 1
 OVERLAY_BINUTILS       ?= 0
+OVERLAY_GCC            ?= 0
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
-# Carried to every sub-make that resolves a toolchain (FWRD_ARGS, spksrc.common.mk). Not
-# RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the child reads itself.
-FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS
+# Carried to every sub-make that resolves a toolchain WITHIN this package (FWRD_ARGS).
+# Deliberately absent from FWRD_ARGS_SPK: which compiler a package builds with belongs
+# to that package and its own work dir, so an spk built as another's meta decides for
+# itself rather than inheriting its caller's choice. Not RUST_LINK_VIA_BINUTILS: it
+# derives from TC_OVERLAY_RUSTC, which the child reads itself.
+FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC _OVERLAY_FORWARDED
+
+# Set after the test above read the real command line, and carried from here on: a child
+# must not mistake the value it was handed for a request of its own.
+_OVERLAY_FORWARDED := 1
+
+# A backstop for a sub-make nobody forwards to, and the only way the _VERS pins travel:
+# objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
+export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+export OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
+# OVERLAY_RUSTC_VERS is exported ONLY once it has a value. It is derived from the rust
+# consumer dirs this arch ships, and there are contexts where that list is legitimately
+# empty -- a toolchain consumer directory resolves _OVERLAY_TC to syno-native, which owns
+# no rust overlay. Exporting it there would put an EMPTY value in the environment of every
+# sub-make, and `?=` cannot override an environment variable that is set, even to nothing:
+# the child would inherit "no version" and disable its own overlay. `export` alone is
+# enough to create that empty value, so the guard has to be on the export, not the
+# assignment.
+ifneq ($(strip $(OVERLAY_RUSTC_VERS)),)
+export OVERLAY_RUSTC_VERS
+endif
+
+# Exported as a BACKSTOP, not as the mechanism. An exported value arrives with environment
+# origin, which any `OVERLAY_x = ...` in a package Makefile overrides -- so it cannot
+# enforce one compiler across a tree on its own. FWRD_ARGS can, because a
+# command-line variable outranks everything. The export only covers a sub-make nobody
+# forwarded to, where inheriting the switch beats inheriting nothing.
+export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
 
 # ---- ACTIVE ------------------------------------------------------------------------
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
 # environment or the command line. The wildcards above stay immediate.
 OVERLAY_RUSTC_ON     = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),1))
-OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS))),1))
+# A gcc overlay turns this on unconditionally: gcc reaches as/ld only through
+# OVERLAY_BINUTILS_FLAG, so the pair is ONE decision. There is deliberately no way to
+# refuse it -- gcc 8.5 on the vendor as/ld cannot assemble what it emits, so obeying such
+# a request would only buy a confusing failure later. A package therefore activates
+# OVERLAY_GCC alone. No cycle: OVERLAY_GCC_ON tests availability, not this.
+OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(OVERLAY_GCC_ON),1))
 
-# Both uses pull the same archive; they differ only in scope.
-_OVERLAY_BINUTILS_WANTED    = $(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(filter 1,$(strip $(RUST_LINK_VIA_BINUTILS))),1)
+# gcc asked for, binutils explicitly refused. Unsupported: gcc 8.5 then drives the vendor
+# as/ld, which cannot assemble what it emits.
+# Overridden rather than obeyed: say so instead of flipping it in silence.
+OVERLAY_BINUTILS_FORCED = $(if $(_OVERLAY_BINUTILS_ASKED),$(if $(OVERLAY_GCC_ON),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS))),,1)))
+# GCC additionally requires binutils to be available: it drives as/ld through -B into that
+# overlay's shim, and the vendor ones cannot assemble what a modern gcc emits.
+OVERLAY_GCC_ON       = $(if $(strip $(TC_OVERLAY_GCC)),$(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),1)))
+
+# All three uses pull the same archive; they differ only in scope. The gcc overlay ships
+# no as/ld of its own, so without this it would silently drive the vendor ones.
+_OVERLAY_BINUTILS_WANTED    = $(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(filter 1,$(strip $(RUST_LINK_VIA_BINUTILS)))$(filter 1 on ON,$(strip $(OVERLAY_GCC))),1)
 OVERLAY_BINUTILS_PROVISION  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_WANTED))
 
 # ---- Degraded states, and what to say about them ------------------------------------
 # Disjoint by construction, so the order they are reported in carries no meaning. There is
-# no UNMATCHED: "global overlay on a vendor gcc it is not matched to" is exactly
-# OVERLAY_BINUTILS_ON while no gcc overlay exists, so the target tests that.
+# no UNMATCHED: "global overlay as/ld on a gcc it is not matched to" is exactly
+# OVERLAY_BINUTILS_ON without OVERLAY_GCC_ON, so the target tests that pair.
 OVERLAY_BINUTILS_MISSING         = $(if $(_OVERLAY_BINUTILS_ANY),,$(_OVERLAY_BINUTILS_WANTED))
 OVERLAY_RUSTC_VERSION_MISSING    = $(if $(_OVERLAY_RUSTC_ANY),$(if $(strip $(TC_OVERLAY_RUSTC)),,1))
 OVERLAY_BINUTILS_VERSION_MISSING = $(if $(_OVERLAY_BINUTILS_ANY),$(if $(strip $(TC_OVERLAY_BINUTILS)),,1))
+OVERLAY_GCC_VERSION_MISSING      = $(if $(_OVERLAY_GCC_ANY),$(if $(strip $(TC_OVERLAY_GCC)),,1))
+OVERLAY_GCC_NO_BINUTILS          = $(if $(strip $(TC_OVERLAY_GCC)),$(if $(strip $(TC_OVERLAY_BINUTILS)),,$(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),1)))
+# Not a failure: the gcc overlay is on, this arch ships no rustc built against it, and the
+# vendor-gcc one was taken instead. Worth saying, because the rust std then comes from a
+# different compiler than the C around it.
+OVERLAY_RUSTC_GCC_FALLBACK       = $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),$(if $(strip $(_OVERLAY_RUSTC_MATCHED)),,$(if $(strip $(_OVERLAY_RUSTC_VENDOR)),1)))
 
 # Text only; a define is inert, so it costs the packages reading this file nothing. Emitted
 # from a recipe: this file is re-parsed several times per build, so $(warning) would repeat.
@@ -104,12 +216,39 @@ $(MSG) "*********************************************************************"
 endef
 
 OVERLAY_WARN_RUSTC_VERSION_MISSING    = $(call overlay_warn_version_missing,rust,OVERLAY_RUSTC_VERS,$(OVERLAY_RUSTC_VERS),$(_OVERLAY_RUSTC_ANY))
+
+define OVERLAY_WARN_RUSTC_GCC_FALLBACK
+$(MSG) "*********************************************************************" ; \
+$(MSG) "*** No rust $(OVERLAY_RUSTC_VERS) overlay built with gcc $(OVERLAY_GCC_VERS) for [$(_OVERLAY_TC)]" ; \
+$(MSG) "*** Using $(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(_OVERLAY_RUSTC_VENDOR))) instead" ; \
+$(MSG) "*** The rust std is built against the vendor gcc, the C around it is not" ; \
+$(MSG) "*********************************************************************"
+endef
 OVERLAY_WARN_BINUTILS_VERSION_MISSING = $(call overlay_warn_version_missing,binutils,OVERLAY_BINUTILS_VERS,$(OVERLAY_BINUTILS_VERS),$(_OVERLAY_BINUTILS_ANY))
+OVERLAY_WARN_GCC_VERSION_MISSING      = $(call overlay_warn_version_missing,gcc,OVERLAY_GCC_VERS,$(OVERLAY_GCC_VERS),$(_OVERLAY_GCC_ANY))
 
 define OVERLAY_WARN_BINUTILS_UNMATCHED
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** OVERLAY_BINUTILS=1: every compile uses binutils $(OVERLAY_BINUTILS_VERS) as/ld" ; \
 $(MSG) "*** paired with the vendor gcc $(TC_GCC), which it is not matched to." ; \
-$(MSG) "*** This can cause build failures or non-functional binaries." ; \
+$(MSG) "*** Set OVERLAY_GCC=1 to pair it with gcc $(OVERLAY_GCC_VERS) instead." ; \
+$(MSG) "*********************************************************************"
+endef
+
+define OVERLAY_WARN_BINUTILS_FORCED
+$(MSG) "*********************************************************************" ; \
+$(MSG) "*** OVERLAY_BINUTILS=0 ignored: OVERLAY_GCC=1 requires binutils $(OVERLAY_BINUTILS_VERS)" ; \
+$(MSG) "*** gcc $(OVERLAY_GCC_VERS) drives as/ld through it; the vendor ones" ; \
+$(MSG) "*** cannot assemble what it emits. Turn OVERLAY_GCC off for the stock one." ; \
+$(MSG) "*********************************************************************"
+endef
+
+# The gcc overlay drives as/ld through -B into the binutils shim. Without that shim it
+# would reach for the vendor ones -- ld 2.18 on ppc853x -- so say so rather than proceed.
+define OVERLAY_WARN_GCC_NO_BINUTILS
+$(MSG) "*********************************************************************" ; \
+$(MSG) "*** OVERLAY_GCC=1 for [$(_OVERLAY_TC)], but no binutils overlay is active" ; \
+$(MSG) "*** gcc $(OVERLAY_GCC_VERS) would fall back to the vendor as/ld ($(TC_GCC) era)" ; \
+$(MSG) "*** Overlay disabled -- provide binutils $(OVERLAY_BINUTILS_VERS) for this arch" ; \
 $(MSG) "*********************************************************************"
 endef
