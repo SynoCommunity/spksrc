@@ -1,5 +1,5 @@
 PKG_NAME = djvulibre
-PKG_VERS = 3.5.28
+PKG_VERS = 3.5.30
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/djvu/files/DjVuLibre/$(PKG_VERS)
