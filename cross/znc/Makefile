@@ -1,5 +1,5 @@
 PKG_NAME = znc
-PKG_VERS = 1.10.2
+PKG_VERS = 1.10.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases
@@ -16,17 +16,16 @@ PKG_DIST_MIRRORS = https://distfiles.gentoo.org/distfiles/c9
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Ensure C++17 compatibility
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 7
 
 HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
 ifeq ($(strip $(PYTHON_PACKAGE)),)
-BUILD_DEPENDS = cross/python312
+BUILD_DEPENDS = python314
 endif
+
 CONFIGURE_ARGS += -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
