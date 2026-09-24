@@ -6,8 +6,9 @@ PKG_DIST_SITE = https://github.com/nachoparker/dutree/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# linker error: unknown relocation type 95 for symbol...
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Reloc 95 is R_PPC_TLSGD, which ld learned in binutils 2.20; ppc853x-5.2 is still on
+# 2.18.50 and answers "unknown relocation type 95". The linker is short, not the arch.
+MIN_BINUTILS_VERSION = 2.20
 
 DEPENDS =
 

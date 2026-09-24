@@ -288,6 +288,7 @@ human-readable reason.
 | Variable | Description |
 |----------|-------------|
 | `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
+| `MIN_BINUTILS_VERSION` | Needs at least this binutils — the `as` and `ld` the toolchain ships |
 | `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
 | `MIN_KERNEL_VERSION` | Needs at least this kernel — a runtime floor no toolchain can lift |
 | `MIN_RUSTC_VERSION` | Needs at least this rustc (e.g. `1.85`) |
@@ -299,6 +300,9 @@ MIN_GCC_VERSION = 8
 
 # Needs Rust edition 2024 → rustc 1.85 or newer
 MIN_RUSTC_VERSION = 1.85
+
+# Needs an ld that knows R_PPC_TLSGD → binutils 2.20 or newer
+MIN_BINUTILS_VERSION = 2.20
 
 # Needs a 64-bit target (e.g. SVT-AV1)
 REQUIRE_64BIT = 1

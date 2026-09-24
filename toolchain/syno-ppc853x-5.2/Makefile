@@ -3,6 +3,7 @@ TC_VERS = 5.2
 TC_KERNEL = 2.6.32
 TC_GLIBC = 2.8
 TC_GCC = 4.3.7
+TC_BINUTILS = 2.18.50
 
 TC_DIST = 853x-gcc4374_eglibc2874_qoriq-GPL
 TC_DIST_SITE_URL = https://github.com/SynoCommunity/spksrc/releases/download/
