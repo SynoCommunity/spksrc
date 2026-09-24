@@ -154,6 +154,50 @@ If you only read one thing, read this. The details are in the dated log below.
       the run, and one that disagrees links a libdrm nobody can resolve. Which compiler a
       package builds with is not — that belongs to the package and its own work dir, so a
       meta recomputes it rather than inheriting whatever its caller happened to choose.
+??? note "September 24th 2026 — An spk is rebuilt only when it changed, and is reproducible (#7499)"
+
+    - **The `.spk` was rebuilt on every invocation**, with different bytes each time, so its
+      timestamp recorded the last repackaging rather than the build. That is what made a
+      budget-stopped CI run look as though `synocli-videodriver` had been built *after*
+      ffmpeg when it had been built two hours before it.
+
+    - **`make --debug=b` names the cause**: `Prerequisite scripts/service-setup does not
+      exist` — for a file that is plainly there. `spksrc.service.mk` declares six generated
+      files `.PHONY` so a changed variable can never leave a stale one behind. The cost is
+      that make stops seeing them as files, and anything depending on them is remade
+      unconditionally.
+
+    - **The guarantee is kept and the decision moved.** A phony `spk-inputs` target still
+      runs every time and digests what actually goes into the package; it rewrites
+      `.spk-inputs` only when that digest changes, and the `.spk` hangs off that file alone.
+      `SPK_CONTENT` is complete by then, because icons and wizards extend it from inside
+      their own recipes, which are prerequisites of `spk-inputs`.
+
+    - **`SOURCE_DATE_EPOCH` makes the archive reproducible**, and covers the three producers
+      at once: `tar` reads it for member dates, `gzip` needs only `-n`, and ImageMagick
+      honours it for the PNG `tIME` chunk that `-strip` does not remove. The value is the
+      last commit touching the package, so it answers "which revision is this" rather than
+      "when did you run make"; it falls back to the Makefile's mtime outside a git tree and
+      yields to the environment. git metadata survives a checkout where file mtimes do not,
+      so CI gets the same value as a workstation.
+
+    - **Being reproducible and knowing when to repackage stay separate questions.** The
+      content digest compares the mtimes on disk, not the ones written into the archive — so
+      no producer upstream has to be deterministic, the cross builds whose libraries land in
+      the staging tree included.
+
+    - **Measured** on `spk/demoservice` (noarch) and `spk/mercurial` (x64-7.1 — icon,
+      `SERVICE_SETUP`, python meta, wheels; 20 members including both PNGs and
+      `WIZARD_UIFILES`):
+
+        ```
+        two builds, nothing changed     identical, not repackaged
+        source script edited            repackaged, content changed
+        after that edit, build again    identical, not repackaged
+        two CLEAN rebuilds              identical
+        source reverted                 original bytes
+        ```
+
 ??? note "September 23rd 2026 — A linker floor, for what a newer as and ld can lift (#7495)"
 
     - **`MIN_BINUTILS_VERSION` joins the capability floors**, beside `MIN_GCC_VERSION`,
