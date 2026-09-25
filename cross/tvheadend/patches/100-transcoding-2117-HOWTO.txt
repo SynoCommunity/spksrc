@@ -10,13 +10,13 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Current base: master 13cd6820b (merged Sep 22nd 2026), with uknunknown's
-dev_transcoding_2026 head d68b98abb rebased onto it (601ba8246; earlier
-400658886 on 5ce3ff63c).  He rebases his own branch now -- it sat on
-fc13bd6db, two commits behind -- so regenerate whenever his head moves.
-That rebase had one conflict, in Containerfile.debian: upstream added
---enable-vue_cache/--disable-vue_build where his commit drops
---enable-nvenc/--enable-qsv, and both were kept.
+Current base: master 547f8bfae (merged Sep 24th 2026), with uknunknown's
+dev_transcoding_2026 head d68b98abb rebased onto it (a2ec9c209; earlier
+601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  His own branch still sits
+on fc13bd6db, so that rebase is done here; regenerate whenever either head
+moves.  It conflicts every time in Containerfile.debian, always the same
+way: upstream has --enable-vue_cache/--disable-vue_build where his commit
+drops --enable-nvenc/--enable-qsv, and both are kept.
 
 Nothing is carried on top any more. Everything this package used to patch
 separately has been taken upstream into PR #2117, the Matroska/WebM Title
