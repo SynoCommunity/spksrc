@@ -117,6 +117,43 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 24th 2026 — The switches reach every crossing, and the spk one narrows (#7497)"
+
+    - **Eight sub-make crossings still dropped `FWRD_ARGS`**, so a build-wide switch
+      reached part of a build and not the rest. #7458 gave the switches one list; this
+      finishes carrying it.
+
+    - **What gets lost is not obvious.** A value given on the command line survives a bare
+      sub-make on its own, through `MAKEFLAGS`. A value set in a package Makefile, or left
+      at its `?=` default, does not:
+
+        ```
+        VIDEODRV from the command line   sub-make without FWRD_ARGS sees 7
+        VIDEODRV set in the Makefile     sub-make without FWRD_ARGS sees nothing
+        VIDEODRV left at its default     sub-make without FWRD_ARGS sees nothing
+        ```
+
+      So the crossings that dropped it worked for whoever typed `VIDEODRV=0` on the
+      command line, and silently did not for anyone else.
+
+    - **Now forwarded**: the `cat_PLIST` walk into a dependency and its spk-side twin (the
+      plist must describe what was built, not what a default would have built), the
+      `cross/*` dependency loop and `NATIVE_DEPENDS`, the dependency-tree walker (a tree
+      computed without the switches can name packages the build will not produce — the
+      shape of the phantom-arch bug #7431 fixed), and `kernel-required`, which recurses
+      over `BUILD_DEPENDS` and `DEPENDS` whose contents themselves vary with the switches.
+
+    - **The two native loops keep their `env -i` isolation**, deliberately and with a
+      comment saying so: they build host tools, and the one native package that cares
+      about a switch sets its own `?=` default. Forwarding a `0` into it would override
+      that default and break it, which is the opposite of what the switch means for a host
+      tool.
+
+    - **The spk → spk crossing goes the other way and gets narrower.** `FWRD_ARGS_SPK`
+      carries `VIDEODRV` alone: whether a meta is in the build at all is a decision about
+      the run, and one that disagrees links a libdrm nobody can resolve. Which compiler a
+      package builds with is not — that belongs to the package and its own work dir, so a
+      meta recomputes it rather than inheriting whatever its caller happened to choose.
 ??? note "September 23rd 2026 — A linker floor, for what a newer as and ld can lift (#7495)"
 
     - **`MIN_BINUTILS_VERSION` joins the capability floors**, beside `MIN_GCC_VERSION`,
