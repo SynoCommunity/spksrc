@@ -1,0 +1,4 @@
+lnk:lib/libImath.so
+lnk:lib/libImath-3_2.so
+lnk:lib/libImath-3_2.so.30
+lib:lib/libImath-3_2.so.30.3.2.3
