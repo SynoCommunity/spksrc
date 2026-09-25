@@ -38,36 +38,7 @@ SPK_COMMANDS = bin/caddy
 
 POST_STRIP_TARGET = caddy_extra_install
 
-# spksrc's copy/strip/icon build stages are gated by one-shot cookie files
-# under each work-<arch>-<tcversion>/ directory: once created, nothing
-# but `make clean`/`smart-clean` clears them - there's no reverse
-# dependency on this package's own src/ files or this Makefile, so an
-# edited Caddyfile or icon is silently ignored by a plain `make` (the
-# staging/ copy it feeds was already made, once, and is never touched
-# again). Since the "does the cookie already exist" check that decides
-# whether the real rebuild rule even gets defined happens at
-# Makefile-parse time (inside the spksrc.spk.mk include below),
-# invalidation has to happen earlier still: drop the strip/icon cookies
-# here whenever what actually feeds them is newer, so a plain `make`
-# picks up such a change instead of silently reusing a stale copy.
-$(shell for cookie in work-*/.strip_done work-*/.icon_done; do \
-	[ -e "$$cookie" ] || continue; \
-	for src in src/Caddyfile src/caddy.png Makefile; do \
-		[ "$$src" -nt "$$cookie" ] 2>/dev/null && { rm -f "$$cookie"; break; }; \
-	done; \
-done)
-
 include ../../mk/spksrc.spk.mk
-
-# $(WORK_DIR)/INFO (defined in spksrc.spk.mk) has no prerequisites of its
-# own at all - not even a cookie, just a plain file target - so once it
-# exists it's permanently "up to date" no matter what changes in this
-# Makefile (SPK_REV, DESCRIPTION, ADMIN_PORT, ...). Confirmed the hard
-# way: a rebuilt .spk kept shipping an INFO file frozen at SPK_REV 1 long
-# after later revisions. Unlike the cookies above there's no parse-time
-# gate to work around - Make will happily merge an extra prerequisite
-# declared here with the recipe already defined in spksrc.spk.mk.
-$(WORK_DIR)/INFO: Makefile
 
 .PHONY: caddy_extra_install
 caddy_extra_install:
