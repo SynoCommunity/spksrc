@@ -7,10 +7,10 @@ DEPENDS = cross/caddy
 
 REQUIRED_MIN_DSM = 7.0
 
-# Keep in sync with cross/caddy: no 32-bit x86 or classic PowerPC/ppc64le
-# build is published upstream, and hi3535's ABI match with upstream's armv7
-# (hardfloat) build hasn't been verified.
-UNSUPPORTED_ARCHS = $(i686_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
+# Keep in sync with cross/caddy: Go has no 32-bit PowerPC target, and
+# hi3535 (ARMv7L) is excluded pending someone actually asking for/testing
+# it, not because of any known build or ABI problem.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = cjheath
 DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile. Edit it, then restart the package, or run caddy reload, to apply changes. The default site listens on port 8880. See the comments in the Caddyfile for switching to ports 80 and 443.
