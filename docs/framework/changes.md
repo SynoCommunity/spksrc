@@ -179,6 +179,35 @@ If you only read one thing, read this. The details are in the dated log below.
       some other problem. Converting those two to a linker floor would have encoded a
       cause that was never verified; they keep their arch list until someone reproduces
       the real one.
+??? note "September 23rd 2026 — A rustc floor reads the toolchain the build selects (#7500)"
+
+    - **The floor answered with the oldest rustc the arch ships.** `MIN_RUSTC_VERSION`
+      compares against `TC_RUSTC`, and `tc-capability.mk` resolved that from
+      `$(firstword $(wildcard .../syno-<arch>-<vers>_rust-*/Makefile))` -- the first entry
+      a glob happens to return, which sorts oldest-first. Harmless while an architecture
+      carried exactly one Rust consumer, wrong the moment it carries several.
+
+    - **What that cost.** An arch can now ship 1.82 and 1.98, each in a vendor-gcc and a
+      gcc-overlay variant. `overlay.mk` narrows the pool to the variant in use and takes
+      the newest of it, so the build receives 1.98.1 -- while the floor kept reading
+      1.82.0 and refused the arch. On `qoriq-6.2.4` with the gcc overlay active:
+
+        ```
+        bat-latest  (MIN_RUSTC_VERSION = 1.87)   rustc 1.82.0 < 1.87
+        eza-latest  (1.85)                       rustc 1.82.0 < 1.85
+        lsd-latest  (1.85)                       rustc 1.82.0 < 1.85
+        ms-edit     (1.85)                       rustc 1.82.0 < 1.85
+        fd-latest   (1.90)                       rustc 1.82.0 < 1.90
+        ```
+
+      All five clear the floor now. With the gcc overlay off, where 1.82.0 really is what
+      the build gets, all five are refused again -- the floor tells the truth in both
+      directions rather than in one.
+
+    - **It reads `TC_OVERLAY_RUSTC`**, the consumer `overlay.mk` already selected, which
+      is also where `spksrc.toolchain.mk` resolves `TC_RUSTC` from. A capability answers
+      for the toolchain the build will actually use; anything else is a floor about a
+      compiler nobody invokes.
 
 ??? note "September 19th 2026 — A kernel floor, for what no compiler can lift (#7468)"
 
