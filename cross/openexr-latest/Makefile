@@ -22,6 +22,4 @@ CONFIGURE_ARGS += -DOPENEXR_BUILD_UTILS=OFF
 CONFIGURE_ARGS += -DINSTALL_OPENEXR_EXAMPLES=OFF
 CONFIGURE_ARGS += -DINSTALL_OPENEXR_DOCS=OFF
 
-include ../../mk/spksrc.common.mk
-
 include ../../mk/spksrc.cross-cmake.mk
