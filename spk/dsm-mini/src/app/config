@@ -1,0 +1,19 @@
+{
+    "dsm-mini.js": {
+        "SYNOCOMMUNITY.DsmMini.AppInstance": {
+            "type": "app",
+            "title": "DSM mini",
+            "desc": "Settings for the Telegram bot and Mini App",
+            "icon": "images/dsm-mini-{0}.png",
+            "allUsers": false,
+            "allowMultiInstance": false,
+            "appWindow": "SYNOCOMMUNITY.DsmMini.AppWindow",
+            "depend": ["SYNOCOMMUNITY.DsmMini.AppWindow"]
+        },
+        "SYNOCOMMUNITY.DsmMini.AppWindow": {
+            "type": "lib",
+            "title": "DSM mini",
+            "icon": "images/dsm-mini-{0}.png"
+        }
+    }
+}
