@@ -1,0 +1,194 @@
+Watchdog for an encoder that stops returning: a GPU reset (i915 "Hang on
+vcs0") leaves a QSV/VAAPI encode call inside the driver, so the consecutive-
+error counter never advances -- there is no error to count -- and the transcode
+thread sits there while its subscription cannot be torn down.  Nothing in the
+process can interrupt a call stuck in a driver, so this does not rescue the
+stream: it names the cause in the log, pointing at the kernel log where the GPU
+reset is, and arms the error counter so the stream dies the moment it returns.
+
+Ours, on top of patch 100 (tvheadend#2117).
+
+--- src/transcoding/transcode/context.c.orig
++++ src/transcoding/transcode/context.c
+@@ -689,11 +689,103 @@ tvh_context_receive_packet(TVHContext *self)
+ // selected 50 because terestrial DVB can have longer chunks of error; so allow 1 sec of curruption
+ #define TVH_MAX_ENCODE_ERRORS 50
+ 
++/* encoder watchdog ========================================================= */
++
++/*
++ * A hardware encoder can stop returning altogether rather than returning an
++ * error: an i915 GPU reset ("Hang on vcs0") while encoding through QSV or
++ * VAAPI leaves avcodec_send_frame() inside the driver, and the counter above
++ * never advances because there is no error to count.  The transcode thread
++ * then sits there, its subscription cannot be torn down, and the input queue
++ * spends its time discarding data -- as seen until the server was stopped by
++ * hand.
++ *
++ * Nothing in this process can interrupt a call stuck in a driver, so this
++ * watchdog does not rescue the stream.  It names the cause in the log instead
++ * of leaving an unexplained freeze, and arms the error counter so the stream
++ * is dropped the moment the driver returns.
++ */
++#define TVH_ENCODE_STALL_TIME sec2mono(20)
++#define TVH_ENCODE_WATCHDOG_PERIOD sec2mono(5)
++
++static tvh_mutex_t tvh_encode_watchdog_lock = TVH_THREAD_MUTEX_INITIALIZER;
++static tvh_cond_t tvh_encode_watchdog_cond;
++static LIST_HEAD(, tvh_context) tvh_encode_watchdog_list;
++static pthread_t tvh_encode_watchdog_tid;
++static int tvh_encode_watchdog_run;
++
++static void
++tvh_context_watchdog_check(void)
++{
++    TVHContext *self;
++    int64_t enter, now = mclk();
++
++    tvh_mutex_lock(&tvh_encode_watchdog_lock);
++    LIST_FOREACH(self, &tvh_encode_watchdog_list, watchdog_link) {
++        enter = atomic_get_s64(&self->encode_enter);
++        if (!enter || self->encode_stalled ||
++            now - enter < TVH_ENCODE_STALL_TIME)
++            continue;
++        self->encode_stalled = 1;
++        // so the stream stops at once if the call ever returns
++        self->encode_errors = TVH_MAX_ENCODE_ERRORS;
++        tvh_context_log(self, LOG_ERR,
++            "encoder has not returned for %"PRId64" s: the hardware encoder "
++            "looks stuck (a GPU reset shows up in the kernel log as \"GPU "
++            "HANG\"); this stream is lost and its thread cannot be freed "
++            "before tvheadend restarts",
++            mono2sec(now - enter));
++    }
++    tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++}
++
++static void *
++tvh_context_watchdog_thread(void *aux)
++{
++    tvh_mutex_lock(&tvh_encode_watchdog_lock);
++    while (tvh_encode_watchdog_run) {
++        tvh_cond_timedwait(&tvh_encode_watchdog_cond,
++                           &tvh_encode_watchdog_lock,
++                           mclk() + TVH_ENCODE_WATCHDOG_PERIOD);
++        if (!tvh_encode_watchdog_run)
++            break;
++        tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++        tvh_context_watchdog_check();
++        tvh_mutex_lock(&tvh_encode_watchdog_lock);
++    }
++    tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++    return NULL;
++}
++
++void
++tvh_context_watchdog_start(void)
++{
++    LIST_INIT(&tvh_encode_watchdog_list);
++    tvh_cond_init(&tvh_encode_watchdog_cond, 1);
++    tvh_encode_watchdog_run = 1;
++    tvh_thread_create(&tvh_encode_watchdog_tid, NULL,
++                      tvh_context_watchdog_thread, NULL, "tvh:encwd");
++}
++
++void
++tvh_context_watchdog_stop(void)
++{
++    if (!tvh_encode_watchdog_run)
++        return;
++    tvh_mutex_lock(&tvh_encode_watchdog_lock);
++    tvh_encode_watchdog_run = 0;
++    tvh_cond_signal(&tvh_encode_watchdog_cond, 0);
++    tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++    pthread_join(tvh_encode_watchdog_tid, NULL);
++    tvh_cond_destroy(&tvh_encode_watchdog_cond);
++}
++
+ static int
+ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
+ {
+     int ret = -1;
+ 
++    atomic_set_s64(&self->encode_enter, mclk());
+     if (!(ret = avframe ? _context_encode(self, avframe) : 0)) {
+         while ((ret = avcodec_send_frame(self->oavctx, avframe)) == AVERROR(EAGAIN)) {
+             if ((ret = tvh_context_receive_packet(self))) {
+@@ -704,6 +796,7 @@ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
+     if (!ret) {
+         ret = tvh_context_receive_packet(self);
+     }
++    atomic_set_s64(&self->encode_enter, 0);
+     if ((ret = (ret == AVERROR_EOF) ? 0 : ret)) {
+         av_frame_unref(avframe);
+         // Track consecutive encode failures. A hardware encoder (e.g. h264_vaapi)
+@@ -1553,6 +1646,10 @@ tvh_context_create(TVHStream *stream, TVHCodecProfile *profile,
+         tvh_context_destroy(self);
+         return NULL;
+     }
++    tvh_mutex_lock(&tvh_encode_watchdog_lock);
++    LIST_INSERT_HEAD(&tvh_encode_watchdog_list, self, watchdog_link);
++    tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++    self->watchdog_linked = 1;
+     if (input_gh) {
+         pktbuf_ref_inc(input_gh);
+         self->input_gh = input_gh;
+@@ -1565,6 +1662,12 @@ void
+ tvh_context_destroy(TVHContext *self)
+ {
+     if (self) {
++        if (self->watchdog_linked) {
++            tvh_mutex_lock(&tvh_encode_watchdog_lock);
++            LIST_REMOVE(self, watchdog_link);
++            tvh_mutex_unlock(&tvh_encode_watchdog_lock);
++            self->watchdog_linked = 0;
++        }
+         TVHPKT_CLEAR(self->src_pkt);
+         if (self->avfltgraph) {
+             avfilter_graph_free(&self->avfltgraph); // frees filter contexts
+--- src/transcoding/transcode/internals.h.orig
++++ src/transcoding/transcode/internals.h
+@@ -202,6 +202,12 @@ struct tvh_context {
+     // consecutive encode-failure counter; once it reaches TVH_MAX_ENCODE_ERRORS
+     // the stream is torn down cleanly instead of looping forever (or crashing).
+     int encode_errors;
++    // watchdog: monotonic time the encoder was entered (0 = not inside it),
++    // and whether the watchdog has already reported this context as stuck.
++    volatile int64_t encode_enter;
++    int encode_stalled;
++    int watchdog_linked;
++    LIST_ENTRY(tvh_context) watchdog_link;
+ };
+ 
+ int
+@@ -273,6 +279,12 @@ tvh_context_create(TVHStream *stream, TVHCodecProfile *profile,
+ void
+ tvh_context_destroy(TVHContext *self);
+ 
++void
++tvh_context_watchdog_start(void);
++
++void
++tvh_context_watchdog_stop(void);
++
+ 
+ /* TVHContextHelper ========================================================= */
+ 
+--- src/transcoding/transcode/module.c.orig
++++ src/transcoding/transcode/module.c
+@@ -51,6 +51,7 @@ transcode_init()
+ {
+     tvh_context_types_register();
+     tvh_context_helpers_register();
++    tvh_context_watchdog_start();
+ #if ENABLE_HWACCELS
+     hwaccels_init();
+ #endif
+@@ -62,6 +63,7 @@ transcode_done()
+ #if ENABLE_HWACCELS
+     hwaccels_done();
+ #endif
++    tvh_context_watchdog_stop();
+     tvh_context_helpers_forget();
+     tvh_context_types_forget();
+ }
