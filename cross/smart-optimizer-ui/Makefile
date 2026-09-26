@@ -17,10 +17,10 @@ include ../../mk/spksrc.cross-install.mk
 .PHONY: smart_optimizer_ui_install
 
 smart_optimizer_ui_install:
-@install -d $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui
-@cp -p $(EXTRACT_PATH)/smart-optimizer-ui.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
-@cp -p $(EXTRACT_PATH)/radarr-smart-optimizer.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
-@cp -p $(EXTRACT_PATH)/sonarr-smart-optimizer.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
-@cp -a $(EXTRACT_PATH)/assets $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
-@sed -i 's/const SMART_ADMIN_DEVELOPMENT_BUILD = true;/const SMART_ADMIN_DEVELOPMENT_BUILD = false;/' $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/assets/fragments/admin-update-mode.html
-@sed -i '/^def download_latest_update():$$/a\    raise RuntimeError("Self-update is disabled for the SynoCommunity package. Use Synology Package Center to update Smart Optimizer UI.")' $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/smart-optimizer-ui.py
+	@install -d $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui
+	@cp -p $(EXTRACT_PATH)/smart-optimizer-ui.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
+	@cp -p $(EXTRACT_PATH)/radarr-smart-optimizer.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
+	@cp -p $(EXTRACT_PATH)/sonarr-smart-optimizer.py $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
+	@cp -a $(EXTRACT_PATH)/assets $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/
+	@sed -i 's/const SMART_ADMIN_DEVELOPMENT_BUILD = true;/const SMART_ADMIN_DEVELOPMENT_BUILD = false;/' $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/assets/fragments/admin-update-mode.html
+	@sed -i '/^def download_latest_update():$$/a\    raise RuntimeError("Self-update is disabled for the SynoCommunity package. Use Synology Package Center to update Smart Optimizer UI.")' $(STAGING_INSTALL_PREFIX)/share/smartoptimizerui/smart-optimizer-ui.py
