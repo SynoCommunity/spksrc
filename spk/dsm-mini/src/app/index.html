@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSM mini</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --line: #e3e5e8; --text: #1c1d1f;
+    --muted: #6b7075; --accent: #2b7de9; --bad: #d93025; --good: #137333;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 18px; background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  h2 { font-size: 15px; font-weight: 600; margin: 22px 0 8px; }
+  h2:first-child { margin-top: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  .row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+  .row:last-child { margin-bottom: 0; }
+  label { font-weight: 500; }
+  .hint { color: var(--muted); font-size: 12px; }
+  input[type=text], input[type=password] {
+    font: inherit; padding: 7px 9px; border: 1px solid var(--line);
+    border-radius: 6px; background: #fff; color: inherit; width: 100%;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .pick { display: flex; align-items: flex-start; gap: 9px; padding: 7px 0; cursor: pointer; }
+  .pick input { margin-top: 2px; flex: none; }
+  .pick .hint { display: block; }
+  button {
+    font: inherit; font-weight: 500; padding: 8px 16px; border-radius: 6px;
+    border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer;
+  }
+  button.ghost { background: #fff; color: var(--accent); }
+  button:disabled { opacity: .55; cursor: default; }
+  .bar { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .note { padding: 10px 12px; border-radius: 6px; font-size: 13px; }
+  .note.bad { background: #fdeceb; color: var(--bad); }
+  .note.good { background: #e7f4ec; color: var(--good); }
+  .note.info { background: #eaf2fd; color: #14498f; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .kv:first-child { border-top: 0; }
+  .kv span:last-child { color: var(--muted); text-align: right; word-break: break-all; }
+  .steps { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+  .steps li { margin: 4px 0; }
+  code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  pre {
+    background: var(--bg); padding: 8px 10px; border-radius: 6px; font-size: 12px;
+    white-space: pre-wrap; word-break: break-all; margin: 8px 0 0; user-select: all;
+  }
+  .status { border-left: 4px solid var(--accent); margin-bottom: 18px; }
+  .status.good { border-left-color: var(--good); }
+  .status.bad { border-left-color: var(--bad); }
+  .status h3 { font-size: 15px; margin: 0 0 6px; }
+  .status p { margin: 6px 0 0; }
+  /* A reason can be a whole sentence: it reads from the left, beside its label. */
+  .status .kv { display: grid; grid-template-columns: 90px 1fr; }
+  .status .kv span:last-child { text-align: left; color: var(--text); }
+  .card > p.hint:first-child { margin-top: 0; }
+  .row .err { color: var(--bad); font-size: 12px; }
+  .row .err:empty { display: none; }
+  .row.bad input { border-color: var(--bad); }
+  details { margin-top: 22px; }
+  summary { cursor: pointer; font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  #proxy { margin-top: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div id="status"></div>
+<div id="app"><p class="hint" data-t="loading">Loading…</p></div>
+<script>
+  // The scripts are asked for under the address the page itself was opened
+  // with, which the DSM window makes new every time: DSM's web server sends
+  // no Cache-Control, and an old app.js against a new service is a screen
+  // that half works. Opened without it, as in a plain browser tab, they load
+  // as they are.
+  (function () {
+    var v = /[?&]v=([0-9]+)/.exec(location.search);
+    var q = v ? '?v=' + v[1] : '';
+    document.write('<script src="i18n.js' + q + '"><\/script><script src="app.js' + q + '"><\/script>');
+  })();
+</script>
+</body>
+</html>
