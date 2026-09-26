@@ -1,0 +1,32 @@
+Keep the QSV scaler width even: vpp_qsv rejects w=-2, so w=-1 could round to
+an odd width (1280x720 to h=384 gives 683) while the encoder uses the profile's
+even 682.  An odd width has no 4:2:0 chroma plane and hung the Apollolake media
+engine (i915 "Hang on vcs0" in tvh:sharer, hevc_qsv), wedging tvheadend.
+
+Proposed on top of patch 100 (tvheadend#2117); not in uknunknown's branch yet.
+
+--- src/transcoding/transcode/hwaccels/qsv.c.orig
++++ src/transcoding/transcode/hwaccels/qsv.c
+@@ -131,8 +131,20 @@ static int set_hwframe_ctx(AVCodecContext *ctx, AVBufferRef *hw_device_ctx)
+ 
+ static int qsv_get_scale_filter(AVCodecContext *iavctx, int height, char *filter, size_t filter_len)
+ {
+-    // NOTE: vpp_qsv does not accept -2 (but -1 does the same thing)
+-    if (str_snprintf(filter, filter_len, "w=-1:h=%d:scale_mode=2", height)){
++    const TVHContext *ctx = iavctx->opaque;
++    const int width = ((TVHVideoCodecProfile *)ctx->profile)->size.num;
++
++    // NOTE: vpp_qsv does not accept -2, and -1 rounds to the nearest width,
++    // which can be odd: 1280x720 scaled to h=384 gives 683.  An odd width
++    // has no 4:2:0 chroma plane and has been seen to hang the media engine
++    // (i915 "Hang on vcs0" while encoding hevc_qsv).  The profile already
++    // holds the even width the encoder is configured with, so ask vpp_qsv
++    // for exactly that; -1 stays the fallback when it is unknown.
++    if (width > 0) {
++        if (str_snprintf(filter, filter_len, "w=%d:h=%d:scale_mode=2", width, height)) {
++            return -1;
++        }
++    } else if (str_snprintf(filter, filter_len, "w=-1:h=%d:scale_mode=2", height)) {
+         return -1;
+     }
+     return 0;

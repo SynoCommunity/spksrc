@@ -18,17 +18,25 @@ moves.  It conflicts every time in Containerfile.debian, always the same
 way: upstream has --enable-vue_cache/--disable-vue_build where his commit
 drops --enable-nvenc/--enable-qsv, and both are kept.
 
-Nothing is carried on top any more. Everything this package used to patch
+Patch 101 is a fix of ours on top of this one, not (yet) in his branch:
+vpp_qsv rejects w=-2, so the QSV scale filter asked for w=-1, which rounds to
+the nearest width and can land on an odd one -- 1280x720 scaled to h=384 gives
+683 where the encoder uses the profile's even 682.  On Apollolake that hung the
+media engine (i915 "Hang on vcs0" in the sharer thread, encoding hevc_qsv) and
+wedged tvheadend until it was stopped.  Drop 101 once it is upstream.
+
+Apart from that, nothing is carried on top any more. Everything this package used to patch
 separately has been taken upstream into PR #2117, the Matroska/WebM Title
-fix (muxer_mkv.c) that was patch 101 here included -- uknunknown merged it
-into his branch on Sep 21st, so 101 is gone.  The older ones:
+fix (muxer_mkv.c) included -- uknunknown merged that one into his branch on
+Sep 21st, so the patch this package carried for it is gone.  The older ones:
 
   101 hwaccel decode fallback      102 audio ch_layout compare
   103 audio drop dead legacy args  104 audio stale aresample comment
   105 profile sharer double free   106 video recover first frame pts
   107 globalheaders av start       108 globalheaders av passthru
 
-(that 101 is the old numbering, before the Title patch took the number)
+(those numbers are the old flat numbering, before patches were grouped
+by PR)
 
 uknunknown also added a fix of his own in context.c, filling a missing pts from
 the packet fed to av_parser_parse2() -- which attacks the same first-frame
