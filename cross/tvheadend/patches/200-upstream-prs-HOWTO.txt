@@ -1,0 +1,145 @@
+Numbering: each upstream PR or branch gets a hundred of its own, and the
+patches we add on top of it follow within that hundred.
+
+  000-004  the package's own patches
+  100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
+  101-103    fixes on top of it: even QSV scaler width, 360 as the default
+             profile height, and a watchdog for a stuck encoder
+  200      tvheadend#2160, imagecache fetch rework
+  300      tvheadend#2206, stable stream/PID mapping
+  400      LiBe-net's shared per-channel cache, which supersedes the three
+           patches this package carried for tvheadend#2249
+  401-403    fixes on top of it
+
+This file covers 200 and up; 100 to 103 have their own HOWTO next to it.
+
+300 and 400 come from the same branch, in that order: 400 is what the branch
+adds on top of #2206.  One of its commits (dvr_event_updated() use after
+free) is already upstream as c28ad9e3e and must stay dropped -- `git rebase`
+drops it on its own.
+
+tvheadend#2249 (th0ma7, record-from-buffer) is what 400 grew out of: its
+three commits are inside 400 in reworked form, so this package no longer
+carries them separately.  If 400 is dropped, 300 goes with it and the #2249
+patches come back instead.
+
+Regenerating 300 and 400 means rebasing his branch, because it sits on an
+older master than the distrib tarball:
+
+  cd <clone of https://github.com/LiBe-net/tvheadend>
+  git fetch origin test-pr2206-shared-cache-storage && git fetch upstream master
+  git branch -f libe-on-<base> origin/test-pr2206-shared-cache-storage
+  git checkout libe-on-<base>
+  git rebase --onto ${PKG_GIT_HASH} <old base> libe-on-<base>
+
+Two conflicts recur, both resolved by keeping both sides:
+  - Containerfile.debian, as for patch 100;
+  - src/dvr/dvr.h, where upstream's dvr_stop_recording_deferred() meets his
+    dvr_entry_cache_replay_done() declaration.
+
+Then 300 is `git diff --no-prefix ${PKG_GIT_HASH} <last #2206 commit>` and 400
+is what follows it -- but 400 must be regenerated against the tree the earlier
+patches produce (see below): his headers_complete() rewrite in
+src/plumbing/globalheaders.c lands on lines patch 100 re-indents.  Resolve that
+one with a three-way merge (`git merge-file`, his side wins: the conflict is
+whitespace only).
+
+Patches 401-403 are fixes of our own on top of 400, one per subject so each
+can be sent upstream or dropped on its own:
+
+  401  use upstream's dvr_stop_recording_deferred() (c6b4509a5) for a
+       finished cache replay instead of a second copy of that mechanism
+  402  bound the expired EPG events kept resolvable for a Record request;
+       with "Unlimited time" retention they were never released
+  403  make the cache write-behind RAM configurable instead of a 32 MB
+       hard-coded global budget, which drops cache payload when reached
+
+They come from branch libe-fixes in the LiBe-net clone, one commit each:
+
+  F=$P/401-cache-deferred-stop.patch
+  { awk '/^--- /{exit} {print}' $F
+    git diff --no-prefix <commit>~1 <commit> | tvh_patch; } > $F.new && mv $F.new $F
+
+The patches apply in numeric order, after 000-004 and 100-103.  Once PKG_GIT_HASH
+moves past merged work, drop its patch, as the imagecache audit tool patch was once
+merged as 5ce3ff63c.
+
+The text before the first "--- " line of a patch is its header (what it does,
+which PR and commit): keep it when regenerating.
+
+
+# Converter: `git diff --no-prefix` -> the `patch -p0` ".orig" style used here
+
+tvh_patch() {
+  awk '/^(diff --git|index |new file mode|deleted file mode|old mode|new mode|similarity index|rename from|rename to)/ { next }
+       /^--- / { l = $0
+                 if ((getline n) > 0 && n ~ /^\+\+\+ /) { f = substr(n, 5); print "--- " f ".orig"; print "+++ " f }
+                 else { print l; print n }
+                 next }
+       { print }'
+}
+
+
+# Regenerate patch 200 from its commit
+
+P=<spksrc>/cross/tvheadend/patches
+cd <tvheadend clone>
+git fetch https://github.com/th0ma7/tvheadend.git imagecache-fetch-rework
+C=fc8f89bbc                                  # the head, from the table
+F=$P/200-imagecache-fetch-rework-2160.patch
+{ awk '/^--- /{exit} {print}' $F             # keep the header
+  git diff --no-prefix ${PKG_GIT_HASH} $C | tvh_patch; } > $F.new && mv $F.new $F
+
+When the PR is updated, its head commit changes: take the new hash from the
+PR (or `git log` on the branch) and update the table above.
+
+
+# Regenerate a patch against the patched tree (400)
+
+A patch whose context an earlier patch of the chain has changed applies with
+fuzz -- 400 in src/plumbing/globalheaders.c, whose headers_complete() 100
+re-indents.  Fuzz can misplace or duplicate a hunk, so regenerate such a patch
+against the tree the earlier patches produce: apply the chain up to it, apply
+the new work, diff the two trees.
+
+HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
+F=$P/400-shared-channel-cache.patch
+rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
+git archive $HASH | tar -x -C /tmp/pa
+(cd /tmp/pa && for p in $(ls $P/*.patch | sort); do
+   [ "$p" = "$F" ] && break; patch -p0 -s < $p; done)
+cp -a /tmp/pa /tmp/pb
+# the branch's own diff, its globalheaders.c hunk rejected:
+git diff --no-prefix <last 2206 commit> <branch head> | tvh_patch \
+  | (cd /tmp/pb && patch -p0)
+# resolve that one file with a three-way merge, his side winning:
+git show $HASH:src/plumbing/globalheaders.c > /tmp/gh.base
+git show <branch head>:src/plumbing/globalheaders.c > /tmp/gh.theirs
+cp /tmp/pa/src/plumbing/globalheaders.c /tmp/gh.merged
+git merge-file /tmp/gh.merged /tmp/gh.base /tmp/gh.theirs   # keep his hunks
+cp /tmp/gh.merged /tmp/pb/src/plumbing/globalheaders.c
+rm -f /tmp/pb/src/plumbing/globalheaders.c.rej
+{ awk '/^--- /{exit} {print}' $F
+  diff -urN /tmp/pa /tmp/pb | awk '
+    /^--- \/tmp\/pa\//{ sub(/^--- \/tmp\/pa\//,""); sub(/\t.*$/,"");
+                        print "--- " $0 ".orig"; next }
+    /^\+\+\+ \/tmp\/pb\//{ sub(/^\+\+\+ \/tmp\/pb\//,""); sub(/\t.*$/,"");
+                        print "+++ " $0; next }
+    /^(Only in|diff -urN)/ { next }
+    { print }'; } > $F.new && mv $F.new $F
+
+
+# Verify the whole chain
+
+Do not trust `patch --dry-run` alone: a patch whose change is already there can
+still apply with fuzz and duplicate the block.  Apply the chain to a pristine
+tree and require no fuzz and no reject:
+
+rm -rf /tmp/chk && mkdir /tmp/chk && git archive $HASH | tar -x -C /tmp/chk
+cd /tmp/chk && for p in $(ls $P/*.patch | sort); do
+  patch -p0 < $p | grep -iE 'fuzz|FAILED|reject' | sed "s|^|$(basename $p): |"
+done
+
+Then compare the files a PR touches with its head, `git show <head>:<file>`:
+they should be identical, except files 100 also patches (htsp_server.c,
+parsers.c, service.c, ...).

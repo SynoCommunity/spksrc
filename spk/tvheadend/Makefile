@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = ddb984f4
-SPK_GIT_DATE = 20260807
+SPK_GIT_HASH = 547f8bfa
+SPK_GIT_DATE = 20260924
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 50
@@ -32,8 +32,10 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG  = "1. Update to latest git version ddb984f4 of August 7th 2026<br/>"
-CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding<br/>"
+CHANGELOG  = "1. Update to latest git version 547f8bfa of September 24th 2026<br/>"
+CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding \(TVH-\#2117\)<br/>"
+CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP timeshift and keep tuned channels \(TVH-\#2206 + \#2249\)<br/>"
+CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/
@@ -72,8 +74,16 @@ WHEELS += src/requirements-pure.txt
 export TVH_VERS
 
 POST_SERVICE_TARGET = tvh_post_service
+POST_STRIP_TARGET = tvh_extra_install
 
 include ../../mk/spksrc.spk-meta.mk
+
+# Post-remove command deleting the comskip and scene marker files left next
+# to a removed recording
+.PHONY: tvh_extra_install
+tvh_extra_install:
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 src/tv_postremove_cleanup.sh $(STAGING_DIR)/bin/tv_postremove_cleanup.sh
 
 .PHONY: tvh_post_service
 tvh_post_service:
