@@ -1,0 +1,38 @@
+# _mm256_setr_m128i and _mm256_set_m128i are missing in GCC < 8
+# headers, breaking the AVX2 build on older x86 toolchains. Provide
+# them in terms of the AVX/AVX2 primitives that are available.
+#
+--- aom_dsp/x86/convolve_avx2.h.orig	2026-09-25 17:47:10.051028413 +0000
++++ aom_dsp/x86/convolve_avx2.h	2026-09-25 17:47:16.398832697 +0000
+@@ -19,6 +19,14 @@
+ #include "aom_dsp/x86/mem_sse2.h"
+ #include "aom_dsp/x86/synonyms.h"
+ 
++#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ < 8)
++// _mm256_setr_m128i was added in GCC 8. Provide it for older compilers
++// in terms of AVX/AVX2 primitives.
++static inline __m256i _mm256_setr_m128i(__m128i lo, __m128i hi) {
++  return _mm256_inserti128_si256(_mm256_castsi128_si256(lo), hi, 1);
++}
++#endif
++
+ #include "av1/common/convolve.h"
+ #include "av1/common/filter.h"
+ 
+--- aom_dsp/flow_estimation/x86/disflow_avx2.c.orig	2026-09-25 17:48:31.044531218 +0000
++++ aom_dsp/flow_estimation/x86/disflow_avx2.c	2026-09-25 17:49:32.674631038 +0000
+@@ -18,6 +18,14 @@
+ #include "aom_dsp/x86/synonyms.h"
+ #include "aom_dsp/x86/synonyms_avx2.h"
+ 
++#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ < 8)
++// _mm256_set_m128i was added in GCC 8. Provide it for older compilers
++// in terms of AVX/AVX2 primitives.
++static inline __m256i _mm256_set_m128i(__m128i hi, __m128i lo) {
++  return _mm256_inserti128_si256(_mm256_castsi128_si256(lo), hi, 1);
++}
++#endif
++
+ #include "config/aom_dsp_rtcd.h"
+ 
+ #if DISFLOW_PATCH_SIZE != 8
