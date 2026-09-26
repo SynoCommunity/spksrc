@@ -1,18 +1,51 @@
-Patches 111-114 carry open tvheadend PRs, one patch per PR commit, so each
-can be dropped on its own once merged or abandoned.
+Patches 111-113 carry unmerged tvheadend work, so each can be dropped on
+its own once merged or abandoned.
 
-  patch  PR                 th0ma7/tvheadend branch   commit
-  111    tvheadend#2160     imagecache-fetch-rework   fc8f89bbc  (the whole PR)
-  112    tvheadend#2249     record-from-buffer        efb98e2f1  record from the channel cache
-  113    tvheadend#2249     record-from-buffer        7da8972b7  HTSP timeshift through the channel cache
-  114    tvheadend#2249     record-from-buffer        3abf9d918  packet timeshift double free
+  patch  what                                       source
+  111    tvheadend#2160, imagecache fetch rework    th0ma7/tvheadend
+                                                    imagecache-fetch-rework
+                                                    fc8f89bbc (the whole PR)
+  112    tvheadend#2206, stable stream/PID mapping  LiBe-net/tvheadend, the
+                                                    three PR commits, up to
+                                                    fca5040a3
+  113    shared per-channel cache (supersedes the   LiBe-net/tvheadend branch
+         three commits carried for #2249)           test-pr2206-shared-cache-storage,
+                                                    061924166..a9f594499
 
-The PR branches sit on a different master than the distrib tarball
-(PKG_GIT_HASH in ../Makefile).  Take only each commit's own change,
-`git diff <commit>~1 <commit>` -- never `git diff ${PKG_GIT_HASH} <commit>`,
-which would drag in every master commit in between.  They apply after
-000-004 and 100, in that order.  Once PKG_GIT_HASH moves past a merged
-PR, drop its patch, as 110 (tvheadend#2129) was once merged as 5ce3ff63c.
+112 and 113 come from the same branch, in that order: 113 is what the branch
+adds on top of #2206.  One of its commits (dvr_event_updated() use after
+free) is already upstream as c28ad9e3e and must stay dropped -- `git rebase`
+drops it on its own.
+
+tvheadend#2249 (th0ma7, record-from-buffer) is what 113 grew out of: its
+three commits are inside 113 in reworked form, so this package no longer
+carries them separately.  If 113 is dropped, 112 goes with it and the #2249
+patches come back instead.
+
+Regenerating 112 and 113 means rebasing his branch, because it sits on an
+older master than the distrib tarball:
+
+  cd <clone of https://github.com/LiBe-net/tvheadend>
+  git fetch origin test-pr2206-shared-cache-storage && git fetch upstream master
+  git branch -f libe-on-<base> origin/test-pr2206-shared-cache-storage
+  git checkout libe-on-<base>
+  git rebase --onto ${PKG_GIT_HASH} <old base> libe-on-<base>
+
+Two conflicts recur, both resolved by keeping both sides:
+  - Containerfile.debian, as for patch 100;
+  - src/dvr/dvr.h, where upstream's dvr_stop_recording_deferred() meets his
+    dvr_entry_cache_replay_done() declaration.
+
+Then 112 is `git diff --no-prefix ${PKG_GIT_HASH} <last #2206 commit>` and 113
+is what follows it -- but 113 must be regenerated against the tree the earlier
+patches produce (see below): his headers_complete() rewrite in
+src/plumbing/globalheaders.c lands on lines patch 100 re-indents.  Resolve that
+one with a three-way merge (`git merge-file`, his side wins: the conflict is
+whitespace only).
+
+The patches apply after 000-004 and 100, in that order.  Once PKG_GIT_HASH
+moves past merged work, drop its patch, as 110 (tvheadend#2129) was once
+merged as 5ce3ff63c.
 
 The text before the first "--- " line of a patch is its header (what it does,
 which PR and commit): keep it when regenerating.
@@ -30,43 +63,53 @@ tvh_patch() {
 }
 
 
-# Regenerate one patch from its commit (111, 112, 114)
+# Regenerate patch 111 from its commit
 
 P=<spksrc>/cross/tvheadend/patches
 cd <tvheadend clone>
-git fetch https://github.com/th0ma7/tvheadend.git \
-    imagecache-fetch-rework record-from-buffer
-C=3abf9d918                                  # the commit, from the table
-F=$P/114-timeshift-skip-live-double-free.patch
+git fetch https://github.com/th0ma7/tvheadend.git imagecache-fetch-rework
+C=fc8f89bbc                                  # the head, from the table
+F=$P/111-imagecache-fetch-rework-2160.patch
 { awk '/^--- /{exit} {print}' $F             # keep the header
-  git diff --no-prefix $C~1 $C | tvh_patch; } > $F.new && mv $F.new $F
+  git diff --no-prefix ${PKG_GIT_HASH} $C | tvh_patch; } > $F.new && mv $F.new $F
 
 When the PR is updated, its head commit changes: take the new hash from the
 PR (or `git log` on the branch) and update the table above.
 
 
-# Regenerate against the patched tree (113)
+# Regenerate a patch against the patched tree (113)
 
-A commit whose context was changed by an earlier patch of the chain applies
-with fuzz -- 113 in src/parsers/parsers.c, next to lines 100 adds.  Fuzz can
-misplace or duplicate a hunk, so regenerate such a patch against the tree the
-earlier patches produce: apply the chain up to it, apply the commit, diff.
+A patch whose context an earlier patch of the chain has changed applies with
+fuzz -- 113 in src/plumbing/globalheaders.c, whose headers_complete() 100
+re-indents.  Fuzz can misplace or duplicate a hunk, so regenerate such a patch
+against the tree the earlier patches produce: apply the chain up to it, apply
+the new work, diff the two trees.
 
 HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
-C=7da8972b7
-F=$P/113-htsp-timeshift-channel-cache.patch
+F=$P/113-shared-channel-cache.patch
 rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
 git archive $HASH | tar -x -C /tmp/pa
 (cd /tmp/pa && for p in $(ls $P/*.patch | sort); do
    [ "$p" = "$F" ] && break; patch -p0 -s < $p; done)
 cp -a /tmp/pa /tmp/pb
-git diff --no-prefix $C~1 $C | tvh_patch | (cd /tmp/pb && patch -p0 -s)
-# check by hand that the fuzzed hunk landed where it should, then:
+# the branch's own diff, its globalheaders.c hunk rejected:
+git diff --no-prefix <last 2206 commit> <branch head> | tvh_patch \
+  | (cd /tmp/pb && patch -p0)
+# resolve that one file with a three-way merge, his side winning:
+git show $HASH:src/plumbing/globalheaders.c > /tmp/gh.base
+git show <branch head>:src/plumbing/globalheaders.c > /tmp/gh.theirs
+cp /tmp/pa/src/plumbing/globalheaders.c /tmp/gh.merged
+git merge-file /tmp/gh.merged /tmp/gh.base /tmp/gh.theirs   # keep his hunks
+cp /tmp/gh.merged /tmp/pb/src/plumbing/globalheaders.c
+rm -f /tmp/pb/src/plumbing/globalheaders.c.rej
 { awk '/^--- /{exit} {print}' $F
-  for f in $(git diff --name-only $C~1 $C); do
-    if [ -f /tmp/pa/$f ]; then diff -u --label $f.orig --label $f /tmp/pa/$f /tmp/pb/$f
-    else diff -u --label $f.orig --label $f /dev/null /tmp/pb/$f; fi
-  done; } > $F.new && mv $F.new $F
+  diff -urN /tmp/pa /tmp/pb | awk '
+    /^--- \/tmp\/pa\//{ sub(/^--- \/tmp\/pa\//,""); sub(/\t.*$/,"");
+                        print "--- " $0 ".orig"; next }
+    /^\+\+\+ \/tmp\/pb\//{ sub(/^\+\+\+ \/tmp\/pb\//,""); sub(/\t.*$/,"");
+                        print "+++ " $0; next }
+    /^(Only in|diff -urN)/ { next }
+    { print }'; } > $F.new && mv $F.new $F
 
 
 # Verify the whole chain
