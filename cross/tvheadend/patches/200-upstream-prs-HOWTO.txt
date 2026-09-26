@@ -3,8 +3,9 @@ patches we add on top of it follow within that hundred.
 
   000-004  the package's own patches
   100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
-  101-103    fixes on top of it: even QSV scaler width, 360 as the default
-             profile height, and a watchdog for a stuck encoder
+  101-104    fixes on top of it: even QSV scaler width, 360 as the default
+             profile height, a watchdog for a stuck encoder, and the output
+             geometry handed to the muxer
   200      tvheadend#2160, imagecache fetch rework
   300      tvheadend#2206, stable stream/PID mapping
   400      LiBe-net's shared per-channel cache, which supersedes the three
@@ -14,7 +15,7 @@ patches we add on top of it follow within that hundred.
            (30 s nonces answered with a bare 401 make a browser ask for the
            password again on every click once anonymous web access is off)
 
-This file covers 200 and up; 100 to 103 have their own HOWTO next to it.
+This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
 
 300 and 400 come from the same branch, in that order: 400 is what the branch
 adds on top of #2206.  One of its commits (dvr_event_updated() use after
