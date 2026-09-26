@@ -10,6 +10,9 @@ patches we add on top of it follow within that hundred.
   400      LiBe-net's shared per-channel cache, which supersedes the three
            patches this package carried for tvheadend#2249
   401-403    fixes on top of it
+  500      ours, tied to no PR: tell a client its digest nonce went stale
+           (30 s nonces answered with a bare 401 make a browser ask for the
+           password again on every click once anonymous web access is off)
 
 This file covers 200 and up; 100 to 103 have their own HOWTO next to it.
 
@@ -60,7 +63,7 @@ They come from branch libe-fixes in the LiBe-net clone, one commit each:
   { awk '/^--- /{exit} {print}' $F
     git diff --no-prefix <commit>~1 <commit> | tvh_patch; } > $F.new && mv $F.new $F
 
-The patches apply in numeric order, after 000-004 and 100-103.  Once PKG_GIT_HASH
+The patches apply in numeric order.  Once PKG_GIT_HASH
 moves past merged work, drop its patch, as the imagecache audit tool patch was once
 merged as 5ce3ff63c.
 
