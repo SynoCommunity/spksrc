@@ -3,7 +3,7 @@ SPK_VERS = 2.1.0
 SPK_REV = 1
 SPK_ICON = src/smartoptimizerui.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 
 DEPENDS = cross/smart-optimizer-ui
 
@@ -16,7 +16,6 @@ HOMEPAGE = https://github.com/MrRobot-88/Smart-Optimizer-UI
 LICENSE = MIT
 
 STARTABLE = yes
-REQUIRED_MIN_DSM = 7.2
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
