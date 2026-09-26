@@ -1,0 +1,843 @@
+Stable MPEG-TS stream and PID mapping across source PID changes: unique
+teletext component indexes, pass-through recording PIDs kept stable, and the
+stream map restored after a timeshift seek.
+
+tvheadend/tvheadend#2206 (LiBe-net), commits 16dcbf9de 10a50dc7d fca5040a3,
+rebased here onto master 547f8bfae.
+
+--- src/esstream.c.orig
++++ src/esstream.c
+@@ -458,14 +458,11 @@ elementary_stream_create_parent
+   TAILQ_FOREACH(st, &set->set_all, es_link) {
+     if(st->es_index > idx)
+       idx = st->es_index;
+-    if(pid != -1 && st->es_pid == pid) {
+-      if (parent_pid >= 0 && st->es_parent_pid != parent_pid)
+-        goto create;
++    if(pid != -1 && st->es_pid == pid &&
++       (parent_pid < 0 || st->es_parent_pid == parent_pid))
+       return st;
+-    }
+   }
+ 
+-create:
+   st = calloc(1, sizeof(elementary_stream_t));
+   st->es_index = idx + 1;
+ 
+--- src/muxer/muxer_pass.c.orig
++++ src/muxer/muxer_pass.c
+@@ -30,6 +30,8 @@
+ #include "muxer_pass.h"
+ #include "spawn.h"
+ 
++#define PASS_PID_COUNT 8192
++
+ typedef struct pass_muxer {
+   muxer_t;
+ 
+@@ -46,6 +48,12 @@ typedef struct pass_muxer {
+ 
+   /* Streaming components */
+   streaming_start_t *pm_ss;
++  uint16_t          *pm_pid_map;
++  int8_t            *pm_pid_cc;
++  uint8_t           *pm_pid_rewrite_cc;
++  uint8_t           *pm_pid_buf;
++  size_t             pm_pid_buf_size;
++  uint8_t            pm_pid_active;
+ 
+   /* TS muxing */
+   uint8_t  pm_rewrite_sdt;
+@@ -72,6 +80,241 @@ typedef struct pass_muxer {
+ static void
+ pass_muxer_write(muxer_t *m, const void *data, size_t size);
+ 
++static uint16_t
++pass_muxer_map_pid(const pass_muxer_t *pm, uint16_t pid)
++{
++  if (pm->pm_pid_map == NULL || pid >= PASS_PID_COUNT)
++    return pid;
++  return pm->pm_pid_map[pid];
++}
++
++static int
++pass_muxer_component_match(const streaming_start_component_t *old,
++                           const streaming_start_component_t *new)
++{
++  int audio_match;
++  int index_match;
++  int language_match;
++  int score;
++
++  if (old->es_type != new->es_type)
++    return -1;
++
++  audio_match = SCT_ISAUDIO(new->es_type) &&
++                old->es_audio_type == new->es_audio_type;
++  index_match = old->es_index == new->es_index;
++  language_match = old->es_lang[0] && new->es_lang[0] &&
++                   !memcmp(old->es_lang, new->es_lang,
++                           sizeof(old->es_lang));
++
++  /* Follow a real language match first. Without one, the stable component
++   * index remains the primary identity; audio role breaks language ties. */
++  if (language_match)
++    score = 16 + (audio_match ? 4 : 0) + (index_match ? 2 : 0);
++  else
++    score = (index_match ? 8 : 0) + (audio_match ? 2 : 0);
++  if (old->es_parent_pid && old->es_parent_pid == new->es_parent_pid)
++    score++;
++  return score;
++}
++
++static int
++pass_muxer_stable_component(const streaming_start_component_t *ssc)
++{
++  return ssc->es_pid >= 0 && ssc->es_pid < PASS_PID_COUNT &&
++         (SCT_ISAV(ssc->es_type) || ssc->es_type == SCT_TELETEXT ||
++          ssc->es_type == SCT_DVBSUB || ssc->es_type == SCT_PCR);
++}
++
++static int
++pass_muxer_pid_conflict(const streaming_start_t *ss,
++                        const streaming_start_component_t *ssc,
++                        uint16_t output_pid)
++{
++  int i;
++
++  if (output_pid == ssc->es_pid)
++    return 0;
++  if (output_pid == DVB_PAT_PID || output_pid == ss->ss_pmt_pid ||
++      output_pid == ss->ss_pcr_pid)
++    return 1;
++  for (i = 0; i < ss->ss_num_components; i++)
++    if (&ss->ss_components[i] != ssc &&
++        ss->ss_components[i].es_pid == output_pid)
++      return 1;
++  return 0;
++}
++
++static uint16_t *
++pass_muxer_pid_map_create(void)
++{
++  uint16_t *map;
++  int i;
++
++  map = malloc(sizeof(*map) * PASS_PID_COUNT);
++  if (map == NULL)
++    return NULL;
++  for (i = 0; i < PASS_PID_COUNT; i++)
++    map[i] = i;
++  return map;
++}
++
++static int
++pass_muxer_pid_state_init(pass_muxer_t *pm, uint16_t *map)
++{
++  int8_t *cc;
++  uint8_t *rewrite_cc;
++
++  cc = malloc(PASS_PID_COUNT);
++  rewrite_cc = calloc(PASS_PID_COUNT, sizeof(*rewrite_cc));
++  if (cc == NULL || rewrite_cc == NULL) {
++    free(cc);
++    free(rewrite_cc);
++    return -1;
++  }
++  memset(cc, -1, PASS_PID_COUNT);
++  pm->pm_pid_map = map;
++  pm->pm_pid_cc = cc;
++  pm->pm_pid_rewrite_cc = rewrite_cc;
++  return 0;
++}
++
++static int
++pass_muxer_best_component(const pass_muxer_t *pm,
++                          const streaming_start_component_t *new,
++                          const uint8_t *used)
++{
++  const streaming_start_component_t *old;
++  int best;
++  int best_score;
++  int i;
++  int score;
++
++  best = -1;
++  best_score = -1;
++  for (i = 0; i < pm->pm_ss->ss_num_components; i++) {
++    old = &pm->pm_ss->ss_components[i];
++    if (used[i] || !pass_muxer_stable_component(old))
++      continue;
++    score = pass_muxer_component_match(old, new);
++    if (score > best_score) {
++      best = i;
++      best_score = score;
++    }
++  }
++  return best;
++}
++
++static void
++pass_muxer_map_component(pass_muxer_t *pm, const streaming_start_t *ss,
++                         const streaming_start_component_t *new,
++                         uint16_t *map, uint8_t *used, uint8_t *claimed)
++{
++  const streaming_start_component_t *old;
++  int best;
++  uint16_t output_pid;
++
++  if (!pass_muxer_stable_component(new))
++    return;
++  best = pass_muxer_best_component(pm, new, used);
++  if (best < 0)
++    return;
++
++  old = &pm->pm_ss->ss_components[best];
++  output_pid = pass_muxer_map_pid(pm, old->es_pid);
++  if (output_pid >= PASS_PID_COUNT || claimed[output_pid] ||
++      pass_muxer_pid_conflict(ss, new, output_pid))
++    return;
++
++  used[best] = 1;
++  claimed[output_pid] = 1;
++  map[new->es_pid] = output_pid;
++  if (new->es_pid == output_pid)
++    return;
++
++  pm->pm_pid_active = 1;
++  pm->pm_pid_rewrite_cc[output_pid] = 1;
++  tvhdebug(LS_PASS, "%s: remap input PID %d (%s) to stable PID %d",
++           pm->pm_filename ?: "Pass muxer", new->es_pid,
++           streaming_component_type2txt(new->es_type), output_pid);
++}
++
++static void
++pass_muxer_update_pid_map(pass_muxer_t *pm, const streaming_start_t *ss)
++{
++  uint16_t *map;
++  uint8_t *used;
++  uint8_t claimed[PASS_PID_COUNT] = { 0 };
++  int i;
++
++  if (!pm->pm_seekable || !pm->m_config.u.pass.m_rewrite_pmt)
++    return;
++
++  map = pass_muxer_pid_map_create();
++  if (map == NULL)
++    return;
++
++  if (pm->pm_pid_map == NULL) {
++    if (pass_muxer_pid_state_init(pm, map))
++      free(map);
++    return;
++  }
++
++  if (pm->pm_ss == NULL) {
++    free(pm->pm_pid_map);
++    pm->pm_pid_map = map;
++    return;
++  }
++
++  used = calloc(pm->pm_ss->ss_num_components, sizeof(*used));
++  if (used == NULL) {
++    free(map);
++    return;
++  }
++  for (i = 0; i < ss->ss_num_components; i++)
++    pass_muxer_map_component(pm, ss, &ss->ss_components[i], map, used, claimed);
++
++  free(used);
++  free(pm->pm_pid_map);
++  pm->pm_pid_map = map;
++}
++
++static void
++pass_muxer_track_cc(pass_muxer_t *pm, const uint8_t *tsb, int len, uint16_t pid)
++{
++  if (pm->pm_pid_cc == NULL || pid >= PASS_PID_COUNT)
++    return;
++  while (len >= 188) {
++    pm->pm_pid_cc[pid] = tsb[3] & 0x0f;
++    tsb += 188;
++    len -= 188;
++  }
++}
++
++static void
++pass_muxer_remap_ts(pass_muxer_t *pm, uint8_t *pkt, int len,
++                    uint16_t output_pid)
++{
++  int adaptation_control;
++  int cc;
++  int left;
++
++  for (left = len; left >= 188; pkt += 188, left -= 188) {
++    adaptation_control = (pkt[3] >> 4) & 0x03;
++    cc = pkt[3] & 0x0f;
++    if (pm->pm_pid_cc && pm->pm_pid_cc[output_pid] >= 0) {
++      cc = pm->pm_pid_cc[output_pid];
++      if (adaptation_control == 1 || adaptation_control == 3)
++        cc = (cc + 1) & 0x0f;
++      pkt[3] = (pkt[3] & 0xf0) | cc;
++    }
++    pkt[1] = (pkt[1] & 0xe0) | (output_pid >> 8);
++    pkt[2] = output_pid & 0xff;
++    if (pm->pm_pid_cc)
++      pm->pm_pid_cc[output_pid] = cc;
++  }
++}
++
+ /*
+  * Rewrite a PAT packet to only include the service included in the transport stream.
+  */
+@@ -137,6 +380,10 @@ pass_muxer_pmt_cb(mpegts_psi_table_t *mt, const uint8_t *buf, int len)
+   out[ol + 0] = pm->pm_dst_sid >> 8;
+   out[ol + 1] = pm->pm_dst_sid & 0xff;
+   memcpy(out + ol + 2, buf + 2, 7);
++  pid = (buf[5] & 0x1f) << 8 | buf[6];
++  pid = pass_muxer_map_pid(pm, pid);
++  out[ol + 5] = (out[ol + 5] & 0xe0) | (pid >> 8);
++  out[ol + 6] = pid & 0xff;
+ 
+   ol  += 9;     /* skip common descriptors */
+   buf += 9 + l;
+@@ -165,6 +412,9 @@ pass_muxer_pmt_cb(mpegts_psi_table_t *mt, const uint8_t *buf, int len)
+     }
+     if (i < pm->pm_ss->ss_num_components) {
+       memcpy(out + ol, buf, 5 + l);
++      pid = pass_muxer_map_pid(pm, pid);
++      out[ol + 1] = (out[ol + 1] & 0xe0) | (pid >> 8);
++      out[ol + 2] = pid & 0xff;
+       ol += 5 + l;
+     }
+ 
+@@ -450,6 +700,8 @@ pass_muxer_reconfigure(muxer_t* m, const struct streaming_start *ss)
+   pm->pm_rewrite_nit = !!pm->m_config.u.pass.m_rewrite_nit;
+   pm->pm_rewrite_eit = !!pm->m_config.u.pass.m_rewrite_eit;
+ 
++  pass_muxer_update_pid_map(pm, ss);
++
+   for(i=0; i < ss->ss_num_components; i++) {
+     ssc = &ss->ss_components[i];
+     if (!SCT_ISVIDEO(ssc->es_type) && !SCT_ISAUDIO(ssc->es_type))
+@@ -620,76 +872,129 @@ pass_muxer_write(muxer_t *m, const void *data, size_t size)
+ /**
+  * Write TS packets to the file descriptor
+  */
+-static void
+-pass_muxer_write_ts(muxer_t *m, pktbuf_t *pb)
++static int
++pass_muxer_rewrite_enabled(const pass_muxer_t *pm)
+ {
+-  pass_muxer_t *pm = (pass_muxer_t*)m;
+-  int l, pid;
+-  uint8_t *tsb, *pkt = pktbuf_ptr(pb);
+-  size_t  len = pktbuf_len(pb), len2;
+-  
+-  /* Rewrite PAT/PMT in operation */
+-  if (pm->m_config.u.pass.m_rewrite_pat || pm->m_config.u.pass.m_rewrite_pmt ||
+-      pm->pm_rewrite_sdt || pm->pm_rewrite_nit || pm->pm_rewrite_eit) {
+-
+-    for (tsb = pktbuf_ptr(pb), len2 = pktbuf_len(pb), len = 0;
+-         len2 > 0; tsb += l, len2 -= l) {
+-
+-      pid = (tsb[1] & 0x1f) << 8 | tsb[2];
+-      l = mpegts_word_count(tsb, len2, 0x001FFF00);
+-
+-      /* Process */
+-      if ( (pm->m_config.u.pass.m_rewrite_pat && pid == DVB_PAT_PID) ||
+-           (pm->m_config.u.pass.m_rewrite_pmt && pid == pm->pm_pmt_pid) ||
+-           (pm->pm_rewrite_sdt && pid == DVB_SDT_PID) ||
+-           (pm->pm_rewrite_nit && pid == DVB_NIT_PID) ||
+-           (pm->pm_rewrite_eit && pid == DVB_EIT_PID) ) {
+-
+-        /* Flush */
+-        if (len)
+-          pass_muxer_write(m, pkt, len);
+-
+-        /* Store new start point (after these packets) */
+-        pkt = tsb + l;
+-        len = 0;
++  return pm->m_config.u.pass.m_rewrite_pat ||
++         pm->m_config.u.pass.m_rewrite_pmt ||
++         pm->pm_rewrite_sdt || pm->pm_rewrite_nit || pm->pm_rewrite_eit;
++}
+ 
+-        /* PAT */
+-        if (pid == DVB_PAT_PID) {
++static int
++pass_muxer_output_buffer(pass_muxer_t *pm, const uint8_t *src, size_t len)
++{
++  uint8_t *buf;
++
++  if (!pm->pm_pid_active)
++    return 0;
++  if (pm->pm_pid_buf_size < len) {
++    buf = realloc(pm->pm_pid_buf, len);
++    if (buf == NULL) {
++      pm->pm_error = ENOMEM;
++      pm->m_errors++;
++      return -1;
++    }
++    pm->pm_pid_buf = buf;
++    pm->pm_pid_buf_size = len;
++  }
++  memcpy(pm->pm_pid_buf, src, len);
++  return 0;
++}
+ 
+-          dvb_table_parse(&pm->pm_pat, "-", tsb, l, 1, 0, pass_muxer_pat_cb);
++static int
++pass_muxer_rewrite_pid(const pass_muxer_t *pm, int pid)
++{
++  return (pm->m_config.u.pass.m_rewrite_pat && pid == DVB_PAT_PID) ||
++         (pm->m_config.u.pass.m_rewrite_pmt && pid == pm->pm_pmt_pid) ||
++         (pm->pm_rewrite_sdt && pid == DVB_SDT_PID) ||
++         (pm->pm_rewrite_nit && pid == DVB_NIT_PID) ||
++         (pm->pm_rewrite_eit && pid == DVB_EIT_PID);
++}
+ 
+-        /* SDT */
+-        } else if (pid == DVB_SDT_PID) {
+-        
+-          dvb_table_parse(&pm->pm_sdt, "-", tsb, l, 1, 0, pass_muxer_sdt_cb);
++static void
++pass_muxer_parse_tables(pass_muxer_t *pm, const uint8_t *src, int len, int pid)
++{
++  if (pid == DVB_PAT_PID)
++    dvb_table_parse(&pm->pm_pat, "-", src, len, 1, 0, pass_muxer_pat_cb);
++  else if (pid == DVB_SDT_PID)
++    dvb_table_parse(&pm->pm_sdt, "-", src, len, 1, 0, pass_muxer_sdt_cb);
++  else if (pid == DVB_NIT_PID)
++    dvb_table_parse(&pm->pm_nit, "-", src, len, 1, 0, pass_muxer_nit_cb);
++  else if (pid == DVB_EIT_PID)
++    dvb_table_parse(&pm->pm_eit, "-", src, len, 1, 0, pass_muxer_eit_cb);
++
++  if (pid == pm->pm_pmt_pid)
++    dvb_table_parse(&pm->pm_pmt, "-", src, len, 1, 0, pass_muxer_pmt_cb);
++}
+ 
+-        /* NIT */
+-        } else if (pid == DVB_NIT_PID) {
+-        
+-          dvb_table_parse(&pm->pm_nit, "-", tsb, l, 1, 0, pass_muxer_nit_cb);
++static void
++pass_muxer_flush_table(muxer_t *m, pass_muxer_t *pm, const uint8_t *pkt,
++                       size_t write_len, const uint8_t *src, int len, int pid)
++{
++  if (write_len)
++    pass_muxer_write(m, pkt, write_len);
++  pass_muxer_parse_tables(pm, src, len, pid);
++}
+ 
+-        /* EIT */
+-        } else if (pid == DVB_EIT_PID) {
+-        
+-          dvb_table_parse(&pm->pm_eit, "-", tsb, l, 1, 0, pass_muxer_eit_cb);
+-        }
+-		
+-        /* PMT */
+-        if (pid == pm->pm_pmt_pid) {
++static void
++pass_muxer_process_payload(pass_muxer_t *pm, const uint8_t *src, size_t offset,
++                           int len, int pid)
++{
++  uint16_t output_pid;
+ 
+-          dvb_table_parse(&pm->pm_pmt, "-", tsb, l, 1, 0, pass_muxer_pmt_cb);
++  output_pid = pass_muxer_map_pid(pm, pid);
++  if (output_pid != pid ||
++      (pm->pm_pid_rewrite_cc && pm->pm_pid_rewrite_cc[output_pid]))
++    pass_muxer_remap_ts(pm, pm->pm_pid_buf + offset, len, output_pid);
++  else
++    pass_muxer_track_cc(pm, src, len, output_pid);
++}
+ 
+-        }
++static void
++pass_muxer_write_ts(muxer_t *m, pktbuf_t *pb)
++{
++  pass_muxer_t *pm = (pass_muxer_t*)m;
++  int len;
++  int pid;
++  const uint8_t *out;
++  const uint8_t *pkt;
++  const uint8_t *src;
++  size_t left;
++  size_t offset;
++  size_t write_len;
++
++  src = pktbuf_ptr(pb);
++  pkt = src;
++  write_len = pktbuf_len(pb);
++  if (pass_muxer_rewrite_enabled(pm)) {
++    if (pass_muxer_output_buffer(pm, src, write_len))
++      return;
+ 
+-      /* Record */
++    out = pm->pm_pid_active ? pm->pm_pid_buf : src;
++    pkt = out;
++    left = write_len;
++    offset = 0;
++    write_len = 0;
++    while (left > 0) {
++      pid = (src[1] & 0x1f) << 8 | src[2];
++      len = mpegts_word_count(src, left, 0x001FFF00);
++      if (pass_muxer_rewrite_pid(pm, pid)) {
++        pass_muxer_flush_table(m, pm, pkt, write_len, src, len, pid);
++        pkt = out + len;
++        write_len = 0;
+       } else {
+-        len += l;
++        pass_muxer_process_payload(pm, src, offset, len, pid);
++        write_len += len;
+       }
++      src += len;
++      out += len;
++      offset += len;
++      left -= len;
+     }
+   }
+ 
+-  if (len)
+-    pass_muxer_write(m, pkt, len);
++  if (write_len)
++    pass_muxer_write(m, pkt, write_len);
+ }
+ 
+ 
+@@ -766,6 +1071,11 @@ pass_muxer_destroy(muxer_t *m)
+   if (pm->pm_ss)
+     streaming_start_unref(pm->pm_ss);
+ 
++  free(pm->pm_pid_map);
++  free(pm->pm_pid_cc);
++  free(pm->pm_pid_rewrite_cc);
++  free(pm->pm_pid_buf);
++
+   dvb_table_parse_done(&pm->pm_pat);
+   dvb_table_parse_done(&pm->pm_pmt);
+   dvb_table_parse_done(&pm->pm_sdt);
+--- src/timeshift.c.orig
++++ src/timeshift.c
+@@ -41,6 +41,18 @@ struct timeshift_conf timeshift_conf;
+ memoryinfo_t timeshift_memoryinfo = { .my_name = "Timeshift" };
+ memoryinfo_t timeshift_memoryinfo_ram = { .my_name = "Timeshift RAM buffer" };
+ 
++void
++timeshift_play_start_set(timeshift_t *ts, streaming_start_t *ss)
++{
++  if (ss == ts->smt_play)
++    return;
++  if (ss)
++    streaming_start_ref(ss);
++  if (ts->smt_play)
++    streaming_start_unref(ts->smt_play);
++  ts->smt_play = ss;
++}
++
+ /*
+  * Packet log
+  */
+@@ -327,6 +339,60 @@ timeshift_packet( timeshift_t *ts, streaming_message_t *sm )
+   return 0;
+ }
+ 
++static int64_t
++timeshift_packet_rebase_target(int64_t last_pts, int64_t adjusted_pts)
++{
++  int64_t delta;
++
++  if (adjusted_pts >= last_pts - 90000)
++    return adjusted_pts;
++
++  /* Keep a normal 33-bit wrap unwrapped on the monotonic timeshift axis.
++   * The two-second window matches the discontinuity handling in tsfix. */
++  delta = pts_diff(last_pts, adjusted_pts);
++  if (delta >= 0 && delta <= 2 * 90000)
++    return last_pts + delta;
++
++  return last_pts + 1;
++}
++
++static void
++timeshift_packet_rebase( timeshift_t *ts, streaming_message_t *sm )
++{
++  th_pkt_t *pkt = sm->sm_data;
++  th_pkt_t *pkt2;
++
++  if (ts->pts_rebase_pending &&
++      pkt->pkt_pts != PTS_UNSET &&
++      pkt->pkt_type != SCT_TELETEXT) {
++    int64_t adjusted_pts = pkt->pkt_pts + ts->start_pts;
++    int64_t last_pts = ts_rescale_inv(ts->last_wr_time, 1000000);
++    int64_t target_pts =
++      timeshift_packet_rebase_target(last_pts, adjusted_pts);
++
++    if (target_pts != adjusted_pts) {
++      ts->start_pts = target_pts - pkt->pkt_pts;
++      tvhdebug(LS_TIMESHIFT,
++               "ts %d rebase packet clock after source reconfiguration:"
++               " offset=%"PRId64,
++               ts->id, ts->start_pts);
++    }
++    ts->pts_rebase_pending = 0;
++  }
++
++  if (ts->start_pts) {
++    pkt2 = pkt_copy_shallow(pkt);
++    pkt_ref_dec(pkt);
++    sm->sm_data = pkt2;
++    if (pkt2->pkt_pts != PTS_UNSET)
++      pkt2->pkt_pts += ts->start_pts;
++    if (pkt2->pkt_dts != PTS_UNSET)
++      pkt2->pkt_dts += ts->start_pts;
++    if (pkt2->pkt_pcr != PTS_UNSET)
++      pkt2->pkt_pcr += ts->start_pts;
++  }
++}
++
+ /*
+  * Receive data
+  */
+@@ -335,7 +401,6 @@ static void timeshift_input
+ {
+   int type = sm->sm_type;
+   timeshift_t *ts = opaque;
+-  th_pkt_t *pkt, *pkt2;
+ 
+   if (ts->exit)
+     return;
+@@ -349,19 +414,16 @@ static void timeshift_input
+     streaming_msg_free(sm);
+   } else {
+ 
+-    /* Change PTS/DTS offsets */
+-    if (ts->packet_mode && ts->start_pts && type == SMT_PACKET) {
+-      pkt = sm->sm_data;
+-      pkt2 = pkt_copy_shallow(pkt);
+-      pkt_ref_dec(pkt);
+-      sm->sm_data = pkt2;
+-      if (pkt2->pkt_pts != PTS_UNSET) pkt2->pkt_pts += ts->start_pts;
+-      if (pkt2->pkt_dts != PTS_UNSET) pkt2->pkt_dts += ts->start_pts;
+-    }
++    /* Keep the packet clock monotonic across a source reconfiguration. */
++    if (ts->packet_mode && type == SMT_PACKET)
++      timeshift_packet_rebase(ts, sm);
+ 
+-    /* Check for exit */
++    /* Check for exit / source reconfiguration. */
++    if (type == SMT_STOP && sm->sm_code == SM_CODE_SOURCE_RECONFIGURED)
++      ts->pts_rebase_pending = 1;
+     else if (type == SMT_EXIT ||
+-        (type == SMT_STOP && sm->sm_code != SM_CODE_SOURCE_RECONFIGURED))
++             (type == SMT_STOP &&
++              sm->sm_code != SM_CODE_SOURCE_RECONFIGURED))
+       ts->exit = 1;
+ 
+     else if (type == SMT_MPEGTS)
+@@ -439,6 +501,8 @@ timeshift_destroy(streaming_target_t *pad)
+ 
+   if (ts->smt_start)
+     streaming_start_unref(ts->smt_start);
++  if (ts->smt_play)
++    streaming_start_unref(ts->smt_play);
+ 
+   if (ts->path)
+     free(ts->path);
+@@ -479,6 +543,7 @@ streaming_target_t *timeshift_create
+   ts->last_wr_time = 0;
+   ts->buf_time   = 0;
+   ts->start_pts  = 0;
++  ts->pts_rebase_pending = 0;
+   ts->ref_time   = 0;
+   ts->seek.file  = NULL;
+   ts->seek.frame = NULL;
+--- src/timeshift/private.h.orig
++++ src/timeshift/private.h
+@@ -102,7 +102,8 @@ typedef struct timeshift {
+   int                         packet_mode;///< Packet mode (otherwise MPEG-TS data mode)
+   int                         dobuf;      ///< Buffer packets (store)
+   int64_t                     last_wr_time;///< Last write time in us (PTS conversion)
+-  int64_t                     start_pts;  ///< Start time for packets (PTS)
++  int64_t                     start_pts;  ///< PTS offset after source reconfiguration
++  uint8_t                     pts_rebase_pending; ///< Check next packet for PTS reset
+   int64_t                     ref_time;   ///< Start time in us (monoclock)
+   int64_t                     buf_time;   ///< Last buffered time in us (PTS conversion)
+   int                         backlog_max;///< Maximum component index in backlog
+@@ -136,6 +137,7 @@ typedef struct timeshift {
+   uint8_t                         audio_packet_counter; ///< Counter for audio packets in audio-only streams
+ 
+   streaming_start_t          *smt_start;  ///< Streaming start info
++  streaming_start_t          *smt_play;   ///< Stream info currently sent to the client
+ 
+ } timeshift_t;
+ 
+@@ -173,6 +175,7 @@ ssize_t timeshift_write_eof     ( timeshift_file_t *tsf );
+  */
+ void *timeshift_reader ( void *p );
+ void *timeshift_writer ( void *p );
++void timeshift_play_start_set ( timeshift_t *ts, streaming_start_t *ss );
+ 
+ /*
+  * File management
+--- src/timeshift/timeshift_reader.c.orig
++++ src/timeshift/timeshift_reader.c
+@@ -252,6 +252,70 @@ static ssize_t _read_msg ( timeshift_file_t *tsf, int fd, streaming_message_t **
+   return cnt;
+ }
+ 
++static streaming_message_t *
++_timeshift_find_sstart(timeshift_file_t *tsf, off_t pos)
++{
++  timeshift_index_data_t *ti;
++
++  ti = TAILQ_LAST(&tsf->sstart, timeshift_index_data_list);
++  while (ti && ti->pos > pos)
++    ti = TAILQ_PREV(ti, timeshift_index_data_list, link);
++
++  return ti ? ti->data : NULL;
++}
++
++static int
++_timeshift_sstart_layout_differs(const streaming_start_t *a,
++                                 const streaming_start_t *b)
++{
++  int i;
++
++  if (a == b)
++    return 0;
++  if (a == NULL || b == NULL)
++    return 1;
++  if (a->ss_service_id != b->ss_service_id ||
++      a->ss_pmt_pid != b->ss_pmt_pid ||
++      a->ss_pcr_pid != b->ss_pcr_pid ||
++      a->ss_num_components != b->ss_num_components)
++    return 1;
++
++  for (i = 0; i < a->ss_num_components; i++)
++    if (a->ss_components[i].es_index != b->ss_components[i].es_index ||
++        a->ss_components[i].es_type != b->ss_components[i].es_type)
++      return 1;
++
++  return 0;
++}
++
++static void
++_timeshift_apply_sstart(timeshift_t *ts, timeshift_file_t *tsf, off_t pos)
++{
++  streaming_message_t *sm = _timeshift_find_sstart(tsf, pos);
++  streaming_start_t *ss;
++  int reconfigured;
++
++  if (sm == NULL || sm->sm_data == NULL)
++    return;
++
++  ss = sm->sm_data;
++  if (ss == ts->smt_play)
++    return;
++
++  reconfigured =
++    ts->smt_play && _timeshift_sstart_layout_differs(ts->smt_play, ss);
++  tvhdebug(LS_TIMESHIFT,
++           "ts %d replay stream start at buffer position %"PRId64
++           " (source reconfigured: %d)",
++           ts->id, (int64_t)pos, reconfigured);
++
++  if (reconfigured)
++    streaming_target_deliver2(ts->output, streaming_msg_create_code(
++      SMT_STOP, SM_CODE_SOURCE_RECONFIGURED));
++  streaming_target_deliver2(ts->output, streaming_msg_clone(sm));
++  timeshift_play_start_set(ts, ss);
++}
++
+ /* **************************************************************************
+  * Utilities
+  * *************************************************************************/
+@@ -407,15 +471,16 @@ static int _timeshift_do_skip
+  */
+ static int _timeshift_read
+   ( timeshift_t *ts, timeshift_seek_t *seek,
+-    streaming_message_t **sm, int *wait )
++    streaming_message_t **sm, int *wait, int apply_sstart )
+ {
+   timeshift_file_t *tsf = seek->file;
+   ssize_t r;
+-  off_t off = 0;
++  off_t off;
+ 
+   *sm = NULL;
+ 
+   if (tsf) {
++    off = tsf->roff;
+ 
+     /* Open file */
+     if (tsf->rfd < 0 && !tsf->ram) {
+@@ -441,6 +506,9 @@ static int _timeshift_read
+     tvhtrace(LS_TIMESHIFT, "ts %d seek to %jd (fd %i) read msg %p/%"PRId64" (%"PRId64")",
+              ts->id, (intmax_t)off, tsf->rfd, *sm, *sm ? (*sm)->sm_time : -1, (int64_t)r);
+ 
++    if (*sm && apply_sstart)
++      _timeshift_apply_sstart(ts, tsf, off);
++
+     /* Special case - EOF */
+     if (r <= sizeof(size_t) || tsf->roff > tsf->size || *sm == NULL) {
+       timeshift_file_get(seek->file); /* _read_close decreases file reference */
+@@ -463,7 +531,7 @@ static int _timeshift_flush_to_live
+   streaming_message_t *sm;
+ 
+   while (seek->file) {
+-    if (_timeshift_read(ts, seek, &sm, wait) == -1)
++    if (_timeshift_read(ts, seek, &sm, wait, 1) == -1)
+       return -1;
+     if (!sm) break;
+     timeshift_packet_log("ouf", ts, sm);
+@@ -535,6 +603,7 @@ void *timeshift_reader ( void *p )
+   int64_t mono_now, mono_play_time = 0, mono_last_status = 0;
+   int64_t deliver, deliver0, pause_time = 0, last_time = 0, skip_time = 0;
+   int64_t i64;
++  off_t read_pos = 0;
+   streaming_message_t *sm = NULL, *ctrl = NULL;
+   streaming_skip_t *skip = NULL;
+   tvhpoll_t *pd;
+@@ -806,7 +875,8 @@ void *timeshift_reader ( void *p )
+       }
+ 
+       /* Find packet */
+-      if (_timeshift_read(ts, seek, &sm, &wait) == -1) {
++      read_pos = seek->file ? seek->file->roff : 0;
++      if (_timeshift_read(ts, seek, &sm, &wait, !skip) == -1) {
+         tvh_mutex_unlock(&ts->state_mutex);
+         break;
+       }
+@@ -829,6 +899,10 @@ void *timeshift_reader ( void *p )
+         tvhdebug(LS_TIMESHIFT, "ts %d skip failed (%d)", ts->id, sm ? sm->sm_type : -1);
+       }
+       streaming_target_deliver2(ts->output, ctrl);
++
++      /* The skip handler flushes queued output before acknowledging a seek. */
++      if (skip && sm && seek->file)
++        _timeshift_apply_sstart(ts, seek->file, read_pos);
+     } else {
+       streaming_msg_free(ctrl);
+     }
+--- src/timeshift/timeshift_writer.c.orig
++++ src/timeshift/timeshift_writer.c
+@@ -381,13 +381,15 @@ static void _process_msg
+       tvh_mutex_lock(&ts->state_mutex);
+       if (!teletext) /* do not use time from teletext packets */
+         ts->buf_time = sm->sm_time;
++      if (sm->sm_type == SMT_START)
++        _update_smt_start(ts, (streaming_start_t *)sm->sm_data);
+       if (ts->state == TS_LIVE) {
++        if (sm->sm_type == SMT_START)
++          timeshift_play_start_set(ts, (streaming_start_t *)sm->sm_data);
+         streaming_target_deliver2(ts->output, streaming_msg_clone(sm));
+         if (sm->sm_type == SMT_PACKET)
+           timeshift_packet_log("liv", ts, sm);
+       }
+-      if (sm->sm_type == SMT_START)
+-        _update_smt_start(ts, (streaming_start_t *)sm->sm_data);
+       /* do buffering, but without teletext packets */
+       if (ts->dobuf && !teletext) {
+         if ((tsf = timeshift_filemgr_get(ts, sm->sm_time)) != NULL) {

@@ -20,7 +20,7 @@ DISPLAY_NAME = Tvheadend
 STARTABLE = yes
 CHANGELOG  = "1. Update to latest git version 547f8bfa of September 24th 2026<br/>"
 CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding \(TVH-\#2117\)<br/>"
-CHANGELOG += "3. Experimental Record from Cache using Timeshift \(TVH-\#2249\)<br/>"
+CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP timeshift and keep tuned channels \(TVH-\#2206 + \#2249\)<br/>"
 CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 LICENSE = GPL v3
 
