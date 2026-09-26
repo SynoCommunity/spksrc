@@ -43,6 +43,22 @@ src/plumbing/globalheaders.c lands on lines patch 100 re-indents.  Resolve that
 one with a three-way merge (`git merge-file`, his side wins: the conflict is
 whitespace only).
 
+Patches 114-116 are fixes of our own on top of 113, one per subject so each
+can be sent upstream or dropped on its own:
+
+  114  use upstream's dvr_stop_recording_deferred() (c6b4509a5) for a
+       finished cache replay instead of a second copy of that mechanism
+  115  bound the expired EPG events kept resolvable for a Record request;
+       with "Unlimited time" retention they were never released
+  116  make the cache write-behind RAM configurable instead of a 32 MB
+       hard-coded global budget, which drops cache payload when reached
+
+They come from branch libe-fixes in the LiBe-net clone, one commit each:
+
+  F=$P/114-cache-deferred-stop.patch
+  { awk '/^--- /{exit} {print}' $F
+    git diff --no-prefix <commit>~1 <commit> | tvh_patch; } > $F.new && mv $F.new $F
+
 The patches apply after 000-004 and 100, in that order.  Once PKG_GIT_HASH
 moves past merged work, drop its patch, as 110 (tvheadend#2129) was once
 merged as 5ce3ff63c.

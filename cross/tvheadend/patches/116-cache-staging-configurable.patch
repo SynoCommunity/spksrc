@@ -1,0 +1,97 @@
+Make the channel cache write-behind RAM configurable ("Channel cache
+write-behind RAM (MB)", default 32 MB, what the hard-coded budget was):
+reaching it drops cache payload with a "storage writer backlog" gap.
+
+Proposed on top of patch 113 (LiBe-net's shared channel cache).
+
+--- src/timeshift.c.orig
++++ src/timeshift.c
+@@ -102,6 +102,7 @@ void timeshift_init ( void )
+   timeshift_conf.cache_keepalive            = 15;
+   timeshift_conf.cache_keepalive_min_period = 60;
+   timeshift_conf.cache_keepalive_max        = 4;
++  timeshift_conf.cache_staging              = 32;
+   timeshift_conf.max_size                   = 10000 * (size_t)1048576; // 10G
+ 
+   idclass_register(&timeshift_conf_class);
+@@ -362,6 +363,18 @@ const idclass_t timeshift_conf_class = {
+       .off    = offsetof(timeshift_conf_t, cache_keepalive_max),
+       .opts   = PO_ADVANCED,
+     },
++    {
++      .type   = PT_U32,
++      .id     = "cache_staging",
++      .name   = N_("Channel cache write-behind RAM (MB)"),
++      .desc   = N_("RAM the shared channel caches may use together to hold "
++                   "blocks on their way to storage. Raise it when the log "
++                   "reports cache gaps from a \"storage writer backlog\" on "
++                   "a busy server or slow storage. This is transient memory, "
++                   "separate from the retained \"Maximum RAM size\"."),
++      .off    = offsetof(timeshift_conf_t, cache_staging),
++      .opts   = PO_EXPERT,
++    },
+     {}
+   }
+ };
+--- src/timeshift.h.orig
++++ src/timeshift.h
+@@ -43,6 +43,7 @@ typedef struct timeshift_conf {
+   uint32_t  cache_keepalive;
+   uint32_t  cache_keepalive_min_period;
+   uint32_t  cache_keepalive_max;
++  uint32_t  cache_staging;    ///< Write-behind RAM for disk cache blocks, MB
+ } timeshift_conf_t;
+ 
+ extern struct timeshift_conf timeshift_conf;
+--- src/timeshift/timeshift_svcbuf.c.orig
++++ src/timeshift/timeshift_svcbuf.c
+@@ -53,7 +53,7 @@
+ #define SVCBUF_SEG_SIZE   (64 * 1024 * 1024)  ///< Segment file size
+ #define SVCBUF_READ_SIZE  (188 * 348)         ///< Replay chunk, whole TS packets
+ #define SVCBUF_QUEUE_MAX  (32 * 1024 * 1024)  ///< Consumer backlog to wait on
+-#define SVCBUF_STAGING_MAX (32 * 1024 * 1024)  ///< Global disk write-behind RAM
++#define SVCBUF_STAGING_DEFAULT (32 * 1024 * 1024) ///< Global disk write-behind RAM
+ 
+ typedef struct svcbuf_seg {
+   TAILQ_ENTRY(svcbuf_seg) link;
+@@ -97,9 +97,19 @@ static tvh_mutex_t svcbuf_staging_lock =
+   TVH_THREAD_MUTEX_INITIALIZER;
+ static uint64_t svcbuf_staging_size;
+ 
++/* Configured budget, or the default when unset */
++static uint64_t
++svcbuf_staging_max ( void )
++{
++  const uint64_t mb = timeshift_conf.cache_staging;
++
++  return mb ? mb * (uint64_t)1048576 : SVCBUF_STAGING_DEFAULT;
++}
++
+ static int
+ svcbuf_staging_reserve ( size_t size )
+ {
++  const uint64_t max = svcbuf_staging_max();
+   int ok = 0;
+ 
+   if (size == 0)
+@@ -107,9 +117,8 @@ svcbuf_staging_reserve ( size_t size )
+ 
+   tvh_mutex_lock(&svcbuf_staging_lock);
+ 
+-  if ((uint64_t)size <= SVCBUF_STAGING_MAX &&
+-      svcbuf_staging_size <=
+-        SVCBUF_STAGING_MAX - (uint64_t)size) {
++  if ((uint64_t)size <= max &&
++      svcbuf_staging_size <= max - (uint64_t)size) {
+     svcbuf_staging_size += size;
+     ok = 1;
+   }
+@@ -809,7 +818,7 @@ svcbuf_input ( void *opaque, streaming_message_t *sm )
+       /*
+        * For keep_ram blocks the retained RAM budget was reserved above.
+        * Disk staging is deliberately outside that retained-cache budget
+-       * and remains bounded by the global SVCBUF_STAGING_MAX budget.
++       * and remains bounded by the configured write-behind budget.
+        */
+ 
+       tvh_mutex_unlock(&sb->lock);
