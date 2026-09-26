@@ -3,14 +3,15 @@ patches we add on top of it follow within that hundred.
 
   000-004  the package's own patches
   100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
-  101        fix on top of it: keep the QSV scaler width even
+  101-103    fixes on top of it: even QSV scaler width, 360 as the default
+             profile height, and a watchdog for a stuck encoder
   200      tvheadend#2160, imagecache fetch rework
   300      tvheadend#2206, stable stream/PID mapping
   400      LiBe-net's shared per-channel cache, which supersedes the three
            patches this package carried for tvheadend#2249
   401-403    fixes on top of it
 
-This file covers 200 and up; 100 and 101 have their own HOWTO next to it.
+This file covers 200 and up; 100 to 103 have their own HOWTO next to it.
 
 300 and 400 come from the same branch, in that order: 400 is what the branch
 adds on top of #2206.  One of its commits (dvr_event_updated() use after
@@ -59,7 +60,7 @@ They come from branch libe-fixes in the LiBe-net clone, one commit each:
   { awk '/^--- /{exit} {print}' $F
     git diff --no-prefix <commit>~1 <commit> | tvh_patch; } > $F.new && mv $F.new $F
 
-The patches apply in numeric order, after 000-004, 100 and 101.  Once PKG_GIT_HASH
+The patches apply in numeric order, after 000-004 and 100-103.  Once PKG_GIT_HASH
 moves past merged work, drop its patch, as the imagecache audit tool patch was once
 merged as 5ce3ff63c.
 

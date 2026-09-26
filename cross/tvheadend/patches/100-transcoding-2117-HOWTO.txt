@@ -18,7 +18,20 @@ moves.  It conflicts every time in Containerfile.debian, always the same
 way: upstream has --enable-vue_cache/--disable-vue_build where his commit
 drops --enable-nvenc/--enable-qsv, and both are kept.
 
-Patch 101 is a fix of ours on top of this one, not (yet) in his branch:
+Patches 101 to 103 are ours on top of this one, not (yet) in his branch, each
+generated from its own commit on a local branch over his:
+
+  101  keep the QSV scaler width even
+  102  ship 360 rather than 384 as the default profile height: 16:9 does not
+       divide into 384, so each path rounds the width its own way, while 360 is
+       a whole 640 for 16:9 and 480 for 4:3 (a fresh install only)
+  103  a watchdog for an encoder that stops returning: a GPU reset leaves the
+       QSV/VAAPI call inside the driver, where the consecutive-error counter
+       cannot see it.  It cannot free the stuck thread -- nothing in the process
+       can -- but it names the cause in the log and arms that counter, so the
+       stream dies as soon as the driver returns
+
+101 in detail:
 vpp_qsv rejects w=-2, so the QSV scale filter asked for w=-1, which rounds to
 the nearest width and can land on an odd one -- 1280x720 scaled to h=384 gives
 683 where the encoder uses the profile's even 682.  On Apollolake that hung the

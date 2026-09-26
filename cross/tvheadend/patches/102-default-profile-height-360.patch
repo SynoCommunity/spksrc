@@ -1,0 +1,98 @@
+Ship 360 rather than 384 as the default height of the WEBTV codec profiles:
+16:9 does not divide into 384 (1280x720 to h=384 wants 682.67, so every path
+rounds it its own way), while 360 is a whole 640 for 16:9 and 480 for 4:3.
+
+Ours, on top of patch 100 (tvheadend#2117).  Only affects a fresh install.
+
+--- data/conf/transcoder/codecs.orig
++++ data/conf/transcoder/codecs
+@@ -3,7 +3,7 @@
+         "description": "WEBTV codec VP8",
+         "name": "webtv-vp8",
+         "codec_name": "libvpx",
+-        "height": 384,
++        "height": 360,
+         "deadline": 1,
+         "crf": 28,
+         "cpu-used": 8
+@@ -12,7 +12,7 @@
+         "description": "WEBTV codec VP8 VAAPI",
+         "name": "webtv-vp8-vaapi",
+         "codec_name": "vp8_vaapi",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
+@@ -22,7 +22,7 @@
+         "description": "WEBTV codec VP9",
+         "name": "webtv-vp9",
+         "codec_name": "libvpx-vp9",
+-        "height": 384,
++        "height": 360,
+         "deadline": 1,
+         "crf": 28,
+         "cpu-used": 8
+@@ -31,7 +31,7 @@
+         "description": "WEBTV codec VP9 VAAPI",
+         "name": "webtv-vp9-vaapi",
+         "codec_name": "vp9_vaapi",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
+@@ -41,7 +41,7 @@
+         "description": "WEBTV codec H264",
+         "name": "webtv-h264",
+         "codec_name": "libx264",
+-        "height": 384,
++        "height": 360,
+         "preset": "faster",
+         "tune": "zerolatency"
+     },
+@@ -49,7 +49,7 @@
+         "description": "WEBTV codec H264 QSV",
+         "name": "webtv-h264-qsv",
+         "codec_name": "h264_qsv",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
+@@ -59,7 +59,7 @@
+         "description": "WEBTV codec H264 VAAPI",
+         "name": "webtv-h264-vaapi",
+         "codec_name": "h264_vaapi",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
+@@ -69,7 +69,7 @@
+         "description": "WEBTV codec HEVC",
+         "name": "webtv-hevc",
+         "codec_name": "libx265",
+-        "height": 384,
++        "height": 360,
+         "preset": "ultrafast",
+         "tune": "fastdecode"
+     },
+@@ -77,7 +77,7 @@
+         "description": "WEBTV codec HEVC QSV",
+         "name": "webtv-hevc-qsv",
+         "codec_name": "hevc_qsv",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
+@@ -87,7 +87,7 @@
+         "description": "WEBTV codec HEVC VAAPI",
+         "name": "webtv-hevc-vaapi",
+         "codec_name": "hevc_vaapi",
+-        "height": 384,
++        "height": 360,
+         "bit_rate": 1500,
+         "max_bit_rate": 2000,
+         "hwaccel": true,
