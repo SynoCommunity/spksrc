@@ -1,28 +1,28 @@
-Patches 111-113 carry unmerged tvheadend work, so each can be dropped on
-its own once merged or abandoned.
+Numbering: each upstream PR or branch gets a hundred of its own, and the
+patches we add on top of it follow within that hundred.
 
-  patch  what                                       source
-  111    tvheadend#2160, imagecache fetch rework    th0ma7/tvheadend
-                                                    imagecache-fetch-rework
-                                                    fc8f89bbc (the whole PR)
-  112    tvheadend#2206, stable stream/PID mapping  LiBe-net/tvheadend, the
-                                                    three PR commits, up to
-                                                    fca5040a3
-  113    shared per-channel cache (supersedes the   LiBe-net/tvheadend branch
-         three commits carried for #2249)           test-pr2206-shared-cache-storage,
-                                                    061924166..a9f594499
+  000-004  the package's own patches
+  100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
+  101        fix on top of it: keep the QSV scaler width even
+  200      tvheadend#2160, imagecache fetch rework
+  300      tvheadend#2206, stable stream/PID mapping
+  400      LiBe-net's shared per-channel cache, which supersedes the three
+           patches this package carried for tvheadend#2249
+  401-403    fixes on top of it
 
-112 and 113 come from the same branch, in that order: 113 is what the branch
+This file covers 200 and up; 100 and 101 have their own HOWTO next to it.
+
+300 and 400 come from the same branch, in that order: 400 is what the branch
 adds on top of #2206.  One of its commits (dvr_event_updated() use after
 free) is already upstream as c28ad9e3e and must stay dropped -- `git rebase`
 drops it on its own.
 
-tvheadend#2249 (th0ma7, record-from-buffer) is what 113 grew out of: its
-three commits are inside 113 in reworked form, so this package no longer
-carries them separately.  If 113 is dropped, 112 goes with it and the #2249
+tvheadend#2249 (th0ma7, record-from-buffer) is what 400 grew out of: its
+three commits are inside 400 in reworked form, so this package no longer
+carries them separately.  If 400 is dropped, 300 goes with it and the #2249
 patches come back instead.
 
-Regenerating 112 and 113 means rebasing his branch, because it sits on an
+Regenerating 300 and 400 means rebasing his branch, because it sits on an
 older master than the distrib tarball:
 
   cd <clone of https://github.com/LiBe-net/tvheadend>
@@ -36,31 +36,31 @@ Two conflicts recur, both resolved by keeping both sides:
   - src/dvr/dvr.h, where upstream's dvr_stop_recording_deferred() meets his
     dvr_entry_cache_replay_done() declaration.
 
-Then 112 is `git diff --no-prefix ${PKG_GIT_HASH} <last #2206 commit>` and 113
-is what follows it -- but 113 must be regenerated against the tree the earlier
+Then 300 is `git diff --no-prefix ${PKG_GIT_HASH} <last #2206 commit>` and 400
+is what follows it -- but 400 must be regenerated against the tree the earlier
 patches produce (see below): his headers_complete() rewrite in
 src/plumbing/globalheaders.c lands on lines patch 100 re-indents.  Resolve that
 one with a three-way merge (`git merge-file`, his side wins: the conflict is
 whitespace only).
 
-Patches 114-116 are fixes of our own on top of 113, one per subject so each
+Patches 401-403 are fixes of our own on top of 400, one per subject so each
 can be sent upstream or dropped on its own:
 
-  114  use upstream's dvr_stop_recording_deferred() (c6b4509a5) for a
+  401  use upstream's dvr_stop_recording_deferred() (c6b4509a5) for a
        finished cache replay instead of a second copy of that mechanism
-  115  bound the expired EPG events kept resolvable for a Record request;
+  402  bound the expired EPG events kept resolvable for a Record request;
        with "Unlimited time" retention they were never released
-  116  make the cache write-behind RAM configurable instead of a 32 MB
+  403  make the cache write-behind RAM configurable instead of a 32 MB
        hard-coded global budget, which drops cache payload when reached
 
 They come from branch libe-fixes in the LiBe-net clone, one commit each:
 
-  F=$P/114-cache-deferred-stop.patch
+  F=$P/401-cache-deferred-stop.patch
   { awk '/^--- /{exit} {print}' $F
     git diff --no-prefix <commit>~1 <commit> | tvh_patch; } > $F.new && mv $F.new $F
 
-The patches apply after 000-004 and 100, in that order.  Once PKG_GIT_HASH
-moves past merged work, drop its patch, as 110 (tvheadend#2129) was once
+The patches apply in numeric order, after 000-004, 100 and 101.  Once PKG_GIT_HASH
+moves past merged work, drop its patch, as the imagecache audit tool patch was once
 merged as 5ce3ff63c.
 
 The text before the first "--- " line of a patch is its header (what it does,
@@ -79,13 +79,13 @@ tvh_patch() {
 }
 
 
-# Regenerate patch 111 from its commit
+# Regenerate patch 200 from its commit
 
 P=<spksrc>/cross/tvheadend/patches
 cd <tvheadend clone>
 git fetch https://github.com/th0ma7/tvheadend.git imagecache-fetch-rework
 C=fc8f89bbc                                  # the head, from the table
-F=$P/111-imagecache-fetch-rework-2160.patch
+F=$P/200-imagecache-fetch-rework-2160.patch
 { awk '/^--- /{exit} {print}' $F             # keep the header
   git diff --no-prefix ${PKG_GIT_HASH} $C | tvh_patch; } > $F.new && mv $F.new $F
 
@@ -93,16 +93,16 @@ When the PR is updated, its head commit changes: take the new hash from the
 PR (or `git log` on the branch) and update the table above.
 
 
-# Regenerate a patch against the patched tree (113)
+# Regenerate a patch against the patched tree (400)
 
 A patch whose context an earlier patch of the chain has changed applies with
-fuzz -- 113 in src/plumbing/globalheaders.c, whose headers_complete() 100
+fuzz -- 400 in src/plumbing/globalheaders.c, whose headers_complete() 100
 re-indents.  Fuzz can misplace or duplicate a hunk, so regenerate such a patch
 against the tree the earlier patches produce: apply the chain up to it, apply
 the new work, diff the two trees.
 
 HASH=$(sed -n 's/^PKG_GIT_HASH = //p' <spksrc>/cross/tvheadend/Makefile)
-F=$P/113-shared-channel-cache.patch
+F=$P/400-shared-channel-cache.patch
 rm -rf /tmp/pa /tmp/pb && mkdir /tmp/pa
 git archive $HASH | tar -x -C /tmp/pa
 (cd /tmp/pa && for p in $(ls $P/*.patch | sort); do
