@@ -25,6 +25,10 @@ generated from its own commit on a local branch over his:
   102  ship 360 rather than 384 as the default profile height: 16:9 does not
        divide into 384, so each path rounds the width its own way, while 360 is
        a whole 640 for 16:9 and 480 for 4:3 (a fresh install only)
+  104  give the output component the geometry the filters produce: the muxer
+       writes the component's size into the container, so a WebM VP8 track
+       announced 1920x1080 while its frames were 640x360 (H264/HEVC/VP9 hide
+       it, their bitstreams carry the size)
   103  a watchdog for an encoder that stops returning: a GPU reset leaves the
        QSV/VAAPI call inside the driver, where the consecutive-error counter
        cannot see it.  It cannot free the stuck thread -- nothing in the process
