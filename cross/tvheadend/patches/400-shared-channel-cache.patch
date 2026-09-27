@@ -3252,10 +3252,11 @@ master 547f8bfae.
                  skip_time = 0x7fffffffffffffffLL;
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
-@@ -0,0 +1,1718 @@
+@@ -0,0 +1,1719 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
++ *  Copyright (C) 2026 LiBe-net
 + *
 + *  This program is free software: you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -4973,10 +4974,11 @@ master 547f8bfae.
 +}
 --- src/timeshift/timeshift_svcbuf.h.orig
 +++ src/timeshift/timeshift_svcbuf.h
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,65 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
++ *  Copyright (C) 2026 LiBe-net
 + *
 + *  This program is free software: you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -5040,10 +5042,11 @@ master 547f8bfae.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1779 @@
+@@ -0,0 +1,1780 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
++ *  Copyright (C) 2026 LiBe-net
 + *
 + *  This program is free software: you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -6822,10 +6825,11 @@ master 547f8bfae.
 +}
 --- src/timeshift/timeshift_svcts.h.orig
 +++ src/timeshift/timeshift_svcts.h
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,39 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
++ *  Copyright (C) 2026 LiBe-net
 + *
 + *  This program is free software: you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
