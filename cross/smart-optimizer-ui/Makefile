@@ -5,6 +5,7 @@ PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MrRobot-88/Smart-Optimizer-UI/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = Smart-Optimizer-UI-$(PKG_VERS)
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 HOMEPAGE = https://github.com/MrRobot-88/Smart-Optimizer-UI
 COMMENT = Web UI and optimizer engines for Radarr and Sonarr
