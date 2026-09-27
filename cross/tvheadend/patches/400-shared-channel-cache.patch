@@ -1,16 +1,22 @@
-Shared per-channel cache: record from the cache, HTSP timeshift through it,
-recording of a programme still held in the cache, RAM-then-disk cache storage,
-keeping a tuned channel (and its cache) alive after the last viewer leaves,
-and a scheduled cache warmup driven by the DVR.
+Shared per-channel cache of raw MPEG-TS and what it makes possible: recording
+from the cache (a recording started late begins at the programme's start), HTSP
+timeshift through that same cache, recording a programme still held in it,
+RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
+channel change, a DVR-driven cache warmup, seven fixes of ours on top, and the
+one-line SMT_SKIP_LIVE double free in the classic timeshift reader.
 
-Supersedes the three commits this package carried for tvheadend#2249: LiBe-net
-reworked them on top of #2206 (patch 112) and extended them.
+tvheadend/tvheadend#2249, everything it carries beyond #2206 (patch 300):
+commits 4 to 16 of th0ma7/tvheadend branch record-from-buffer, head 0d0c91ac8.
 
-Branch test-pr2206-shared-cache-storage of https://github.com/LiBe-net/tvheadend,
-commits 061924166..a9f594499 (one of them, the dvr_event_updated() use after
-free, is already upstream as c28ad9e3e and was dropped), rebased here onto
-master 547f8bfae.
+The last three of those fixes answer SonarCloud on the PR: a null dereference
+in dvr_entry_watched_timer_arm(), an alloca() the analyser cannot bound in
+headers_complete(), and the genre-list use after free.  That last one is the
+same commit #2160 carries, so it arrives here with 400 rather than 200 -- it is
+in 400's range, and 200 keeps applying either way.
 
+Regenerated against the tree the earlier patches produce -- LiBe-net's
+headers_complete() rewrite lands on lines patch 100 re-indents, resolved with a
+three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 --- docs/class/timeshift.md.orig
 +++ docs/class/timeshift.md
 @@ -10,6 +10,27 @@
@@ -709,6 +715,17 @@ master 547f8bfae.
          continue;
  
        // check for valid states
+@@ -2301,8 +2398,8 @@
+ dvr_entry_watched_timer_arm(dvr_entry_t* de)
+ {
+   if (!de || !de->de_watched ||
+-      dvr_entry_get_removal_days(de) == DVR_RET_REM_FOREVER ||
+-      !de->de_config || !de->de_config->dvr_removal_after_playback)
++      !de->de_config || !de->de_config->dvr_removal_after_playback ||
++      dvr_entry_get_removal_days(de) == DVR_RET_REM_FOREVER)
+     return;
+ 
+   char t1buf[32];
 @@ -2461,6 +2558,19 @@
    }
  
@@ -1062,20 +1079,23 @@ master 547f8bfae.
    /* EPG thinks that the program is running */
    if (de->de_segment_stop_extra) {
      const time_t stop = dvr_entry_get_stop_time(de);
-@@ -3188,6 +3575,38 @@
+@@ -3188,6 +3575,31 @@
  
  
  
 +/*
 + * Complete a cache-owned recording after its DVR worker consumed the
-+ * gate's terminal STOP.  The zero-delay global timer is intentional:
-+ * dvr_stop_recording() joins the worker thread, so it cannot be called
-+ * synchronously by that worker.
++ * gate's terminal STOP.  The stop is deferred because dvr_stop_recording()
++ * joins the worker thread and so cannot be called by that worker itself --
++ * which is what dvr_stop_recording_deferred() exists for.
++ *
++ * Clearing the cache flags first keeps dvr_entry_set_timer() from starting
++ * the historical replay over again in the meantime.
 + */
-+static void
-+dvr_timer_cache_replay_done(void *aux)
++void
++dvr_entry_cache_replay_done(dvr_entry_t *de)
 +{
-+  dvr_entry_t *de = aux;
++  lock_assert(&global_lock);
 +
 +  if (de->de_sched_state != DVR_RECORDING ||
 +      (!de->de_cache_retro && !de->de_cache_full))
@@ -1084,24 +1104,14 @@ master 547f8bfae.
 +  de->de_cache_retro = 0;
 +  de->de_cache_full  = 0;
 +
-+  dvr_stop_recording(de, de->de_last_error, 1, 0);
-+}
-+
-+void
-+dvr_entry_cache_replay_done(dvr_entry_t *de)
-+{
-+  lock_assert(&global_lock);
-+
-+  if (de->de_sched_state == DVR_RECORDING &&
-+      (de->de_cache_retro || de->de_cache_full))
-+    gtimer_arm_rel(&de->de_timer, dvr_timer_cache_replay_done, de, 0);
++  dvr_stop_recording_deferred(de, de->de_last_error);
 +}
 +
 +
  /**
   *
   */
-@@ -3207,6 +3626,34 @@
+@@ -3207,6 +3619,34 @@
    tvhinfo(LS_DVR, "\"%s\" on \"%s\" recorder starting",
  	  lang_str_get(de->de_title, NULL), DVR_CH_NAME(de));
  
@@ -1136,7 +1146,7 @@ master 547f8bfae.
    /*
     * The running flag is updated only on the event change. When the DVR
     * entry is added too late, the running timers might not be updated.
-@@ -3237,6 +3684,13 @@
+@@ -3237,6 +3677,13 @@
    de->de_segment_stop_extra = 0;
    stop = dvr_entry_get_stop_time(de);
  
@@ -1150,7 +1160,7 @@ master 547f8bfae.
    dvr_entry_trace_time2(de, "original stop", de->de_stop, "stop", stop, "stop timer set");
  
    gtimer_arm_absn(&de->de_timer, dvr_timer_stop_recording, de, stop);
-@@ -3257,7 +3711,7 @@
+@@ -3257,7 +3704,7 @@
    }
  
    // if duplicate, then delete it now, don't record!
@@ -1159,7 +1169,7 @@ master 547f8bfae.
      dvr_entry_cancel_delete(de, 1);
      return;
    }
-@@ -3502,6 +3956,15 @@
+@@ -3502,6 +3949,15 @@
    return dvr_entry_class_time_set(de, &de->de_start_extra, *(time_t *)v);
  }
  
@@ -1175,7 +1185,7 @@ master 547f8bfae.
  static int
  dvr_entry_class_stop_set(void *o, const void *_v)
  {
-@@ -4532,6 +4995,19 @@
+@@ -4532,6 +4988,19 @@
        .desc     = N_("Enable/disable the entry."),
        .off      = offsetof(dvr_entry_t, de_enabled),
      },
@@ -1388,7 +1398,7 @@ master 547f8bfae.
  #include "htsp_server.h"
  #include "epggrab.h"
  #include "imagecache.h"
-@@ -491,6 +494,141 @@
+@@ -491,6 +494,166 @@
    return 0;
  }
  
@@ -1408,6 +1418,15 @@ master 547f8bfae.
 +} epg_retro_event_t;
 +
 +static LIST_HEAD(, epg_retro_event) epg_retro_events;
++static uint32_t epg_retro_count;
++
++/*
++ * With "Unlimited time" retention the holds below have no expiry of their
++ * own, so bound their number: only the most recent ones can still overlap
++ * what the channel caches actually hold.  Generous enough for a day of
++ * programmes on a large channel list, small next to an EPG database.
++ */
++#define EPG_RETRO_MAX 2048
 +
 +static void
 +_epg_retro_release ( epg_retro_event_t *r )
@@ -1416,19 +1435,34 @@ master 547f8bfae.
 +
 +  LIST_REMOVE(r, link);
 +  free(r);
++  epg_retro_count--;
 +  ebc->ops->putref(ebc);
 +}
 +
 +static void
 +_epg_retro_purge ( void )
 +{
-+  epg_retro_event_t *r, *next;
++  epg_retro_event_t *r, *next, *oldest;
 +  time_t now = gclk();
 +
 +  for (r = LIST_FIRST(&epg_retro_events); r != NULL; r = next) {
 +    next = LIST_NEXT(r, link);
 +    if (r->expires && r->expires <= now)
 +      _epg_retro_release(r);
++  }
++
++  /* over the cap, the programme which ended first goes */
++  while (epg_retro_count > EPG_RETRO_MAX) {
++    oldest = LIST_FIRST(&epg_retro_events);
++    LIST_FOREACH(r, &epg_retro_events, link)
++      if (r->ebc->stop < oldest->ebc->stop)
++        oldest = r;
++    tvhdebug(LS_EPG,
++             "drop retained event %u (%s): %u retained events is the limit",
++             oldest->ebc->id,
++             epg_broadcast_get_title(oldest->ebc, NULL),
++             EPG_RETRO_MAX);
++    _epg_retro_release(oldest);
 +  }
 +}
 +
@@ -1485,6 +1519,7 @@ master 547f8bfae.
 +  r->ebc = ebc;
 +  r->expires = expires;
 +  LIST_INSERT_HEAD(&epg_retro_events, r, link);
++  epg_retro_count++;
 +
 +  if (expires)
 +    tvhdebug(LS_EPG,
@@ -1530,7 +1565,7 @@ master 547f8bfae.
  static void _epg_channel_rem_broadcast
    ( channel_t *ch, epg_broadcast_t *ebc, epg_broadcast_t *ebc_new )
  {
-@@ -512,6 +650,8 @@
+@@ -512,6 +675,8 @@
    channel_t *ch = (channel_t*)p;
    char tm1[32];
  
@@ -1539,7 +1574,7 @@ master 547f8bfae.
    /* Clear now/next */
    if ((cur = ch->ch_epg_now)) {
      if (cur->running != EPG_RUNNING_STOP && cur->running != EPG_RUNNING_NOTSET) {
-@@ -533,6 +673,7 @@
+@@ -533,6 +698,7 @@
        tvhdebug(LS_EPG, "expire event %u (%s) from %s",
                 ebc->id, epg_broadcast_get_title(ebc, NULL),
                 channel_get_name(ch, channel_blank_name));
@@ -1547,7 +1582,7 @@ master 547f8bfae.
        _epg_channel_rem_broadcast(ch, ebc, NULL);
        continue; // skip to next
  
-@@ -732,6 +873,8 @@
+@@ -732,6 +898,8 @@
  void epg_channel_unlink ( channel_t *ch )
  {
    epg_broadcast_t *ebc;
@@ -1556,7 +1591,44 @@ master 547f8bfae.
    while ((ebc = RB_FIRST(&ch->ch_epg_schedule)))
      _epg_channel_rem_broadcast(ch, ebc, NULL);
    gtimer_disarm(&ch->ch_epg_timer);
-@@ -2826,6 +2969,8 @@
+@@ -1496,19 +1664,32 @@
+   ( epg_broadcast_t *b, epg_genre_list_t *genre, epg_changes_t *changed )
+ {
+   int save = 0;
+-  epg_genre_t *g1, *g2;
++  epg_genre_t *g1, *g2, *last = NULL;
+ 
+   if (!b) return 0;
+ 
+   if (changed) *changed |= EPG_CHANGED_GENRE;
+ 
++  /* Its own list: nothing to change, and it must not be emptied below
++   * while it is searched */
++  if (genre == &b->genre) return 0;
++
+   g1 = LIST_FIRST(&b->genre);
++  LIST_INIT(&b->genre);
+ 
+-  /* Remove old */
++  /* Remove old: relink the entries still wanted, in order, and free the
++   * others.  Same result as unlinking them in place, but the list head is
++   * rewritten explicitly: static analysers do not follow LIST_REMOVE()
++   * updating it through le_prev, and took the head for a freed entry. */
+   while (g1) {
+     g2 = LIST_NEXT(g1, link);
+-    if (!epg_genre_list_contains(genre, g1, 0)) {
+-      LIST_REMOVE(g1, link);
++    if (epg_genre_list_contains(genre, g1, 0)) {
++      if (last)
++        LIST_INSERT_AFTER(last, g1, link);
++      else
++        LIST_INSERT_HEAD(&b->genre, g1, link);
++      last = g1;
++    } else {
+       free(g1);
+       save = 1;
+     }
+@@ -2826,6 +3007,8 @@
  {
    epg_broadcast_t **broad;
  
@@ -1583,7 +1655,115 @@ master 547f8bfae.
  } htsp_subscription_t;
  
  
-@@ -1445,6 +1454,8 @@
+@@ -376,6 +385,95 @@
+   return ret;
+ }
+ 
++#if ENABLE_TIMESHIFT
++
++/*
++ * Where the viewer of this subscription is, in wall clock.
++ *
++ * Watching live is the common case and counts just as much: the viewer is at
++ * the live edge, which in a recording backfilled from the cache is however far
++ * the programme has got.  A position behind live is taken from what svcts
++ * reports, as long as it reported recently enough to be trusted.
++ */
++static int
++htsp_cache_playhead ( htsp_subscription_t *hs, time_t *when )
++{
++  int64_t shift_us = 0;
++
++  if (hs->hs_s == NULL || hs->hs_s->ths_channel == NULL)
++    return 0;
++
++  if (hs->hs_timeshift_status_mono &&
++      mclk() - hs->hs_timeshift_status_mono <= sec2mono(5))
++    shift_us = ts_rescale(hs->hs_timeshift_shift, 1000000);
++  if (shift_us < 0)
++    shift_us = 0;
++
++  *when = gclk() - (time_t)(shift_us / 1000000);
++  return 1;
++}
++
++/*
++ * Remember inside the recording where the viewer had got to.
++ *
++ * Record pressed half an hour into a film, then the television goes off: the
++ * recording carries on, and the next day the client should resume where the
++ * viewer stopped rather than at the programme's start.  tvheadend already
++ * keeps that as de_playposition and hands it to clients over HTSP -- what was
++ * missing is writing it while the channel cache is what feeds the recording.
++ *
++ * 'only' restricts the update to one entry (just created, so not recording
++ * yet); NULL updates whatever is recording that channel around the playhead.
++ * global_lock held.
++ *
++ * A viewer who only passed through leaves a position a few seconds in, which
++ * is what "resume where I stopped" means for it as much as for a film.
++ */
++static void
++htsp_cache_record_position
++  ( htsp_connection_t *htsp, htsp_subscription_t *hs, dvr_entry_t *only )
++{
++  dvr_entry_t *de;
++  channel_t *ch;
++  time_t when, start, file_start, file_stop;
++  int filecount;
++  uint32_t pos;
++
++  lock_assert(&global_lock);
++
++  if (!htsp_cache_playhead(hs, &when))
++    return;
++  ch = hs->hs_s->ths_channel;
++
++  LIST_FOREACH(de, &ch->ch_dvrs, de_channel_link) {
++    if (only && de != only)
++      continue;
++    if (!only && de->de_sched_state != DVR_RECORDING)
++      continue;
++    start = dvr_entry_get_start_time(de, 0);
++    if (when < start || when > dvr_entry_get_stop_time(de))
++      continue;
++    /*
++     * The position counts from the start of the file, and a backfilled
++     * recording begins where the cache reached, which is the scheduled
++     * start only when the cache went back that far.
++     */
++    if (!dvr_get_files_details(de, &file_start, &file_stop, &filecount) &&
++        filecount == 1 && file_start > 0 && file_start <= when)
++      start = file_start;
++    pos = when - start;
++    if (de->de_playposition == pos)
++      continue;
++    de->de_playposition = pos;
++    idnode_changed(&de->de_id);
++    tvhdebug(LS_HTSP, "%s: play position of \"%s\" set to %u s",
++             htsp->htsp_logname, lang_str_get(de->de_title, NULL) ?: "",
++             pos);
++  }
++}
++
++#endif /* ENABLE_TIMESHIFT */
++
+ /**
+  *
+  */
+@@ -384,6 +482,11 @@
+ {
+   th_subscription_t *ts = hs->hs_s;
+ 
++#if ENABLE_TIMESHIFT
++  /* the viewer is leaving: keep its place in whatever it was recording */
++  htsp_cache_record_position(htsp, hs, NULL);
++#endif
++
+   hs->hs_s = NULL;
+   mtimer_disarm(&hs->hs_s_bytes_out_timer);
+ 
+@@ -1445,6 +1548,8 @@
      LIST_FOREACH(de, &e->channel->ch_dvrs, de_channel_link) {
        if (de->de_bcast != e)
          continue;
@@ -1592,7 +1772,7 @@ master 547f8bfae.
        if (dvr_entry_verify(de, htsp->htsp_granted_access, 1))
          continue;
        htsmsg_add_u32(out, "dvrId", idnode_get_short_uuid(&de->de_id));
-@@ -1721,17 +1732,20 @@
+@@ -1721,17 +1826,20 @@
  
    /* Send all autorecs */
    TAILQ_FOREACH(dae, &autorec_entries, dae_link)
@@ -1616,7 +1796,7 @@ master 547f8bfae.
        htsp_send_message(htsp, htsp_build_dvrentry(htsp, de, "dvrEntryAdd", htsp->htsp_language, 0), NULL);
  
    /* Send EPG updates */
-@@ -1997,7 +2011,7 @@
+@@ -1997,7 +2105,7 @@
    l = htsmsg_create_list();
  
    LIST_FOREACH(cfg, &dvrconfigs, config_link)
@@ -1625,7 +1805,7 @@ master 547f8bfae.
        uuid = idnode_uuid_as_str(&cfg->dvr_id, ubuf);
        if (htsp->htsp_granted_access->aa_dvrcfgs) {
          HTSMSG_FOREACH(f, htsp->htsp_granted_access->aa_dvrcfgs) {
-@@ -2023,6 +2037,134 @@
+@@ -2023,6 +2131,134 @@
    return out;
  }
  
@@ -1760,7 +1940,7 @@ master 547f8bfae.
  /**
   * add a Dvrentry
   */
-@@ -2039,19 +2181,60 @@
+@@ -2039,19 +2275,60 @@
    int64_t start, stop;
    uint32_t u32;
    channel_t *ch = NULL;
@@ -1829,7 +2009,7 @@ master 547f8bfae.
  
    /* Options */
    conf = htsmsg_create_map();
-@@ -2111,11 +2294,35 @@
+@@ -2111,11 +2388,50 @@
        htsmsg_add_u32(conf, "age_rating", u32);
    }
  
@@ -1862,10 +2042,25 @@ master 547f8bfae.
 +            "%s: addDvrEntry: DVR entry created, state=%d",
 +            htsp->htsp_logname, (int)de->de_sched_state);
 +
++#if ENABLE_TIMESHIFT
++  /*
++   * Recording what is being watched from the cache: start the entry with the
++   * viewer's place in it, so a client resumes there instead of at the start.
++   */
++  if (de != NULL) {
++    htsp_subscription_t *hs;
++    LIST_FOREACH(hs, &htsp->htsp_subscriptions, hs_link)
++      if (hs->hs_s && hs->hs_s->ths_channel == de->de_channel) {
++        htsp_cache_record_position(htsp, hs, de);
++        break;
++      }
++  }
++#endif
++
    dvr_status = de != NULL ? de->de_sched_state : DVR_NOSTATE;
  
    /* Create response */
-@@ -2151,7 +2358,8 @@
+@@ -2151,7 +2467,8 @@
      return NULL;
    }
  
@@ -1875,7 +2070,7 @@ master 547f8bfae.
      *out = htsp_error(htsp, N_("DVR entry not found"));
      return NULL;
    }
-@@ -2896,6 +3104,10 @@
+@@ -2896,6 +3213,10 @@
    memset(&skip, 0, sizeof(skip));
    skip.type = SMT_SKIP_LIVE;
    tvhtrace(LS_HTSP_SUB, "live");
@@ -1886,7 +2081,7 @@ master 547f8bfae.
    subscription_set_skip(hs->hs_s, &skip);
  
    htsp_reply(htsp, in, htsmsg_create_map());
-@@ -3894,6 +4106,9 @@
+@@ -3894,6 +4215,9 @@
  void
  htsp_dvr_entry_add(dvr_entry_t *de)
  {
@@ -1896,7 +2091,7 @@ master 547f8bfae.
    _htsp_dvr_entry_update(de, "dvrEntryAdd", NULL);
  }
  
-@@ -3903,6 +4118,11 @@
+@@ -3903,6 +4227,11 @@
  void
  htsp_dvr_entry_update(dvr_entry_t *de)
  {
@@ -1908,7 +2103,7 @@ master 547f8bfae.
    _htsp_dvr_entry_update(de, "dvrEntryUpdate", NULL);
  }
  
-@@ -3913,6 +4133,9 @@
+@@ -3913,6 +4242,9 @@
  htsp_dvr_entry_update_stats(dvr_entry_t *de)
  {
    htsp_connection_t *htsp;
@@ -1918,7 +2113,7 @@ master 547f8bfae.
    LIST_FOREACH(htsp, &htsp_async_connections, htsp_async_link) {
      if (htsp->htsp_async_mode & HTSP_ASYNC_ON){
        if (!dvr_entry_verify(de, htsp->htsp_granted_access, 1)) {
-@@ -3960,6 +4183,9 @@
+@@ -3960,6 +4292,9 @@
  void
  htsp_autorec_entry_add(dvr_autorec_entry_t *dae)
  {
@@ -1928,7 +2123,7 @@ master 547f8bfae.
    _htsp_autorec_entry_update(dae, "autorecEntryAdd", NULL);
  }
  
-@@ -3969,6 +4195,11 @@
+@@ -3969,6 +4304,11 @@
  void
  htsp_autorec_entry_update(dvr_autorec_entry_t *dae)
  {
@@ -1940,7 +2135,7 @@ master 547f8bfae.
    _htsp_autorec_entry_update(dae, "autorecEntryUpdate", NULL);
  }
  
-@@ -4014,6 +4245,9 @@
+@@ -4014,6 +4354,9 @@
  void
  htsp_timerec_entry_add(dvr_timerec_entry_t *dte)
  {
@@ -1950,7 +2145,7 @@ master 547f8bfae.
    _htsp_timerec_entry_update(dte, "timerecEntryAdd", NULL);
  }
  
-@@ -4023,6 +4257,11 @@
+@@ -4023,6 +4366,11 @@
  void
  htsp_timerec_entry_update(dvr_timerec_entry_t *dte)
  {
@@ -1962,7 +2157,7 @@ master 547f8bfae.
    _htsp_timerec_entry_update(dte, "timerecEntryUpdate", NULL);
  }
  
-@@ -4567,6 +4806,9 @@
+@@ -4567,6 +4915,9 @@
  static void
  htsp_subscription_timeshift_status(htsp_subscription_t *hs, timeshift_status_t *status)
  {
@@ -2209,7 +2404,7 @@ master 547f8bfae.
  streaming_target_t * parser_output(streaming_target_t *pad);
 --- src/plumbing/globalheaders.c.orig
 +++ src/plumbing/globalheaders.c
-@@ -328,6 +328,12 @@
+@@ -328,18 +328,34 @@
  /**
   *
   */
@@ -2222,22 +2417,32 @@ master 547f8bfae.
  static int
  headers_complete(globalheaders_t *gh)
  {
-@@ -335,10 +341,13 @@
+   streaming_start_t *ss = gh->gh_ss;
    streaming_start_component_t *ssc;
-   int64_t *qd = alloca(ss->ss_num_components * sizeof(int64_t));
+-  int64_t *qd = alloca(ss->ss_num_components * sizeof(int64_t));
++  int64_t *qd;
    int64_t qd_max = 0;
 -  int i, threshold = 0;
-+  int i, threshold = 0, roll = 0;
++  int i, ncomp, threshold = 0, roll = 0;
 +  int replay;
  
    assert(ss != NULL);
  
+-  for(i = 0; i < ss->ss_num_components; i++) {
++  /* the component count bounds the array below: name it once, so that it
++   * cannot be read as unrelated to the allocation */
++  ncomp = ss->ss_num_components;
++  if (ncomp <= 0)
++    return GH_HEADERS_WAIT;
++  qd = alloca((size_t)ncomp * sizeof(*qd));
++
 +  replay = !!(ss->ss_flags & STREAMING_START_CACHE_REPLAY);
 +
-   for(i = 0; i < ss->ss_num_components; i++) {
++  for(i = 0; i < ncomp; i++) {
      ssc = &ss->ss_components[i];
      qd[i] = gh_is_audiovideo(ssc->es_type) ?
-@@ -348,7 +357,7 @@
+               gh_queue_delay(gh, ssc->es_index) : 0;
+@@ -348,45 +364,94 @@
    }
  
    if (qd_max <= 0)
@@ -2246,7 +2451,9 @@ master 547f8bfae.
  
    threshold = qd_max > MAX_SCAN_TIME * 90;
  
-@@ -357,36 +366,85 @@
+-  for(i = 0; i < ss->ss_num_components; i++) {
++  for(i = 0; i < ncomp; i++) {
+     ssc = &ss->ss_components[i];
  
      if(!header_complete(ssc, threshold)) {
        /*
@@ -2323,7 +2530,8 @@ master 547f8bfae.
 +    return GH_HEADERS_ROLL;
 +
    if (tvhtrace_enabled()) {
-     for(i = 0; i < ss->ss_num_components; i++) {
+-    for(i = 0; i < ss->ss_num_components; i++) {
++    for(i = 0; i < ncomp; i++) {
        ssc = &ss->ss_components[i];
 -      tvhtrace(LS_GLOBALHEADERS, "stream %d %s%s%s (PID %i) complete time %"PRId64"%s",
 -               ssc->es_index, streaming_component_type2txt(ssc->es_type),
@@ -2346,7 +2554,7 @@ master 547f8bfae.
  }
  
  
-@@ -435,8 +493,28 @@
+@@ -435,8 +500,28 @@
      if(!gh_is_audiovideo(ssc->es_type))
        break;
  
@@ -3252,7 +3460,7 @@ master 547f8bfae.
                  skip_time = 0x7fffffffffffffffLL;
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
-@@ -0,0 +1,1719 @@
+@@ -0,0 +1,1728 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
@@ -3309,7 +3517,7 @@ master 547f8bfae.
 +#define SVCBUF_SEG_SIZE   (64 * 1024 * 1024)  ///< Segment file size
 +#define SVCBUF_READ_SIZE  (188 * 348)         ///< Replay chunk, whole TS packets
 +#define SVCBUF_QUEUE_MAX  (32 * 1024 * 1024)  ///< Consumer backlog to wait on
-+#define SVCBUF_STAGING_MAX (32 * 1024 * 1024)  ///< Global disk write-behind RAM
++#define SVCBUF_STAGING_DEFAULT (32 * 1024 * 1024) ///< Global disk write-behind RAM
 +
 +typedef struct svcbuf_seg {
 +  TAILQ_ENTRY(svcbuf_seg) link;
@@ -3353,9 +3561,19 @@ master 547f8bfae.
 +  TVH_THREAD_MUTEX_INITIALIZER;
 +static uint64_t svcbuf_staging_size;
 +
++/* Configured budget, or the default when unset */
++static uint64_t
++svcbuf_staging_max ( void )
++{
++  const uint64_t mb = timeshift_conf.cache_staging;
++
++  return mb ? mb * (uint64_t)1048576 : SVCBUF_STAGING_DEFAULT;
++}
++
 +static int
 +svcbuf_staging_reserve ( size_t size )
 +{
++  const uint64_t max = svcbuf_staging_max();
 +  int ok = 0;
 +
 +  if (size == 0)
@@ -3363,9 +3581,8 @@ master 547f8bfae.
 +
 +  tvh_mutex_lock(&svcbuf_staging_lock);
 +
-+  if ((uint64_t)size <= SVCBUF_STAGING_MAX &&
-+      svcbuf_staging_size <=
-+        SVCBUF_STAGING_MAX - (uint64_t)size) {
++  if ((uint64_t)size <= max &&
++      svcbuf_staging_size <= max - (uint64_t)size) {
 +    svcbuf_staging_size += size;
 +    ok = 1;
 +  }
@@ -4065,7 +4282,7 @@ master 547f8bfae.
 +      /*
 +       * For keep_ram blocks the retained RAM budget was reserved above.
 +       * Disk staging is deliberately outside that retained-cache budget
-+       * and remains bounded by the global SVCBUF_STAGING_MAX budget.
++       * and remains bounded by the configured write-behind budget.
 +       */
 +
 +      tvh_mutex_unlock(&sb->lock);
@@ -7049,7 +7266,7 @@ master 547f8bfae.
    }
 --- src/timeshift.c.orig
 +++ src/timeshift.c
-@@ -98,8 +98,11 @@
+@@ -98,8 +98,12 @@
    /* Defaults */
    memset(&timeshift_conf, 0, sizeof(timeshift_conf));
    timeshift_conf.idnode.in_class = &timeshift_conf_class;
@@ -7059,11 +7276,12 @@ master 547f8bfae.
 +  timeshift_conf.cache_keepalive            = 15;
 +  timeshift_conf.cache_keepalive_min_period = 60;
 +  timeshift_conf.cache_keepalive_max        = 4;
++  timeshift_conf.cache_staging              = 32;
 +  timeshift_conf.max_size                   = 10000 * (size_t)1048576; // 10G
  
    idclass_register(&timeshift_conf_class);
  
-@@ -311,6 +314,54 @@
+@@ -311,6 +315,66 @@
        .off    = offsetof(timeshift_conf_t, teletext),
        .opts   = PO_EXPERT,
      },
@@ -7115,12 +7333,24 @@ master 547f8bfae.
 +      .off    = offsetof(timeshift_conf_t, cache_keepalive_max),
 +      .opts   = PO_ADVANCED,
 +    },
++    {
++      .type   = PT_U32,
++      .id     = "cache_staging",
++      .name   = N_("Channel cache write-behind RAM (MB)"),
++      .desc   = N_("RAM the shared channel caches may use together to hold "
++                   "blocks on their way to storage. Raise it when the log "
++                   "reports cache gaps from a \"storage writer backlog\" on "
++                   "a busy server or slow storage. This is transient memory, "
++                   "separate from the retained \"Maximum RAM size\"."),
++      .off    = offsetof(timeshift_conf_t, cache_staging),
++      .opts   = PO_EXPERT,
++    },
      {}
    }
  };
 --- src/timeshift.h.orig
 +++ src/timeshift.h
-@@ -39,6 +39,10 @@
+@@ -39,6 +39,11 @@
    int       ram_only;
    int       ram_fit;
    int       teletext;
@@ -7128,6 +7358,7 @@ master 547f8bfae.
 +  uint32_t  cache_keepalive;
 +  uint32_t  cache_keepalive_min_period;
 +  uint32_t  cache_keepalive_max;
++  uint32_t  cache_staging;    ///< Write-behind RAM for disk cache blocks, MB
  } timeshift_conf_t;
  
  extern struct timeshift_conf timeshift_conf;
