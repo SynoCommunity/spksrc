@@ -1,7 +1,9 @@
 Keep the viewer's place in a recording the cache is feeding: the entry is
 created with the position the viewer had reached, and it is refreshed when the
-viewer leaves.  tvheadend already carries this as de_playposition and hands it
-to clients over HTSP; the branch already tracks the playhead per subscription.
+viewer leaves.  Watching live counts too -- the live edge is however far the
+programme has got.  tvheadend already carries this as de_playposition and hands
+it to clients over HTSP; the branch already tracks the playhead per
+subscription.
 
 Ours, on top of patch 400 (LiBe-net's shared channel cache).
 
