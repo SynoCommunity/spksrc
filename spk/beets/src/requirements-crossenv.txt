@@ -11,7 +11,7 @@ charset_normalizer==3.4.4
 #dbus_python            ==> python/dbus-python          for plugins: metasync
 jellyfish==1.2.1
 #lap>=0.5.12            ==> python/lap
-lxml==6.0.2
+lxml==6.1.3
 #numpy>=1.24.4          ==> python/numpy
 #pillow                 ==> python/pillow               for plugins: embedart, fetchart
 #pycairo                ==> python/pycairo

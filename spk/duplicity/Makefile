@@ -42,7 +42,9 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [lxml] -std=c11
+# Cython 3.1 atomics detection chokes GCC 4.x preprocessors; lxml runs
+# fine without them (non-atomic fallback).
+WHEELS_CFLAGS += [lxml] -std=c11 -DCYTHON_ATOMICS=0
 endif
 
 # [protobuf]
