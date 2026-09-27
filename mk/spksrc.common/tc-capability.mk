@@ -103,10 +103,9 @@ endif
 endif
 
 # ---- rustc: the rust version the toolchain pins -----------------------------
-# Custom-rust archs (qoriq/ppc853x/88f6281/x86-5.2) are pinned to the rust version their
-# overlay ships (1.82.0, the last supporting their old glibc), read from the rust consumer's
-# PKG_VERS; a toolchain still pinning TC_RUSTC itself is honored too.
-_TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)_rust-*/Makefile))
+# PKG_VERS of the rust consumer overlay.mk settled on: it narrows the arch's consumers to
+# one version and one gcc variant, so firstword just unwraps. Else a toolchain's own pin.
+_TC_CAP_RUST_MK := $(wildcard $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
 _TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
 else

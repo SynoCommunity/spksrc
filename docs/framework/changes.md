@@ -278,6 +278,20 @@ If you only read one thing, read this. The details are in the dated log below.
       some other problem. Converting those two to a linker floor would have encoded a
       cause that was never verified; they keep their arch list until someone reproduces
       the real one.
+??? note "September 23rd 2026 — A rustc floor reads the toolchain the build selects (#7500)"
+
+    - **The floor answered with the oldest rustc an architecture ships.**
+      `MIN_RUSTC_VERSION` compares against `TC_RUSTC`, which came from the first entry a
+      glob over the arch's rust consumers returned — and that sorts oldest-first. It now
+      reads `TC_OVERLAY_RUSTC`, the consumer `overlay.mk` selected, which is where
+      `spksrc.toolchain.mk` resolves `TC_RUSTC` from too.
+
+    - **Latent while an arch ships one rust consumer, wrong once it ships several.** On
+      `qoriq-6.2.4` with the gcc overlay active the build receives 1.98.1, yet every floor
+      above 1.82 refused the arch — `bat-latest` (1.87), `eza-latest`, `lsd-latest` and
+      `ms-edit` (1.85), `fd-latest` (1.90), all reported as `rustc 1.82.0 < …`. All five
+      clear it now, and all five are refused again with the overlay off, where 1.82.0
+      really is what the build gets.
 
 ??? note "September 19th 2026 — A kernel floor, for what no compiler can lift (#7468)"
 
