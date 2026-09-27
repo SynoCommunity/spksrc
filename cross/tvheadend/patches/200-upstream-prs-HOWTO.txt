@@ -10,7 +10,9 @@ patches we add on top of it follow within that hundred.
   300      tvheadend#2206, stable stream/PID mapping
   400      LiBe-net's shared per-channel cache, which supersedes the three
            patches this package carried for tvheadend#2249
-  401-403    fixes on top of it
+  401-404    fixes on top of it (401 deferred stop, 402 EPG retention bound,
+             403 write-behind budget, 404 the viewer's place in a recording
+             the cache feeds)
   500      ours, tied to no PR: tell a client its digest nonce went stale
            (30 s nonces answered with a bare 401 make a browser ask for the
            password again on every click once anonymous web access is off)
@@ -57,6 +59,8 @@ can be sent upstream or dropped on its own:
        with "Unlimited time" retention they were never released
   403  make the cache write-behind RAM configurable instead of a 32 MB
        hard-coded global budget, which drops cache payload when reached
+  404  write de_playposition while the cache feeds a recording, so a client
+       resumes where the viewer stopped instead of at the programme's start
 
 They come from branch libe-fixes in the LiBe-net clone, one commit each:
 
