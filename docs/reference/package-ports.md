@@ -98,6 +98,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Media Management"><td>8290</td><td>FlexGet</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Games"><td>8300</td><td>Stockfish</td><td>Games</td><td>Engine</td></tr>
     <tr data-category="Media Management"><td>8310</td><td>Radarr</td><td>Media Management</td><td>Web interface</td></tr>
+    <tr data-category="Storage"><td>8334</td><td>Filestash</td><td>Storage</td><td>Web interface</td></tr>
     <tr data-category="Sync"><td>8384</td><td>Syncthing</td><td>Sync</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>8418</td><td>Gitea</td><td>Development</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>8620</td><td>Forgejo</td><td>Development</td><td>Web interface</td></tr>
