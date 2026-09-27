@@ -9,31 +9,33 @@ Ours, on top of patch 400 (LiBe-net's shared channel cache).
 
 --- src/htsp_server.c.orig
 +++ src/htsp_server.c
-@@ -385,6 +385,90 @@ htsp_image(htsp_connection_t *htsp, const char *image,
+@@ -385,6 +385,95 @@ htsp_image(htsp_connection_t *htsp, const char *image,
    return ret;
  }
  
 +#if ENABLE_TIMESHIFT
 +
 +/*
-+ * Where the viewer of this subscription is, in wall clock, when it is
-+ * watching behind live.  Returns 0 when it is live, or when svcts has not
-+ * reported a position recently enough to be trusted.
++ * Where the viewer of this subscription is, in wall clock.
++ *
++ * Watching live is the common case and counts just as much: the viewer is at
++ * the live edge, which in a recording backfilled from the cache is however far
++ * the programme has got.  A position behind live is taken from what svcts
++ * reports, as long as it reported recently enough to be trusted.
 + */
 +static int
 +htsp_cache_playhead ( htsp_subscription_t *hs, time_t *when )
 +{
-+  int64_t shift_us;
++  int64_t shift_us = 0;
 +
 +  if (hs->hs_s == NULL || hs->hs_s->ths_channel == NULL)
 +    return 0;
-+  if (hs->hs_timeshift_status_mono == 0 ||
-+      mclk() - hs->hs_timeshift_status_mono > sec2mono(5))
-+    return 0;
 +
-+  shift_us = ts_rescale(hs->hs_timeshift_shift, 1000000);
-+  if (shift_us <= 0)
-+    return 0;
++  if (hs->hs_timeshift_status_mono &&
++      mclk() - hs->hs_timeshift_status_mono <= sec2mono(5))
++    shift_us = ts_rescale(hs->hs_timeshift_shift, 1000000);
++  if (shift_us < 0)
++    shift_us = 0;
 +
 +  *when = gclk() - (time_t)(shift_us / 1000000);
 +  return 1;
@@ -51,6 +53,9 @@ Ours, on top of patch 400 (LiBe-net's shared channel cache).
 + * 'only' restricts the update to one entry (just created, so not recording
 + * yet); NULL updates whatever is recording that channel around the playhead.
 + * global_lock held.
++ *
++ * A viewer who only passed through leaves a position a few seconds in, which
++ * is what "resume where I stopped" means for it as much as for a film.
 + */
 +static void
 +htsp_cache_record_position
@@ -100,7 +105,7 @@ Ours, on top of patch 400 (LiBe-net's shared channel cache).
  /**
   *
   */
-@@ -393,6 +477,11 @@ htsp_subscription_destroy(htsp_connection_t *htsp, htsp_subscription_t *hs)
+@@ -393,6 +482,11 @@ htsp_subscription_destroy(htsp_connection_t *htsp, htsp_subscription_t *hs)
  {
    th_subscription_t *ts = hs->hs_s;
  
@@ -112,7 +117,7 @@ Ours, on top of patch 400 (LiBe-net's shared channel cache).
    hs->hs_s = NULL;
    mtimer_disarm(&hs->hs_s_bytes_out_timer);
  
-@@ -2322,6 +2411,21 @@ htsp_method_addDvrEntry(htsp_connection_t *htsp, htsmsg_t *in)
+@@ -2322,6 +2416,21 @@ htsp_method_addDvrEntry(htsp_connection_t *htsp, htsmsg_t *in)
              "%s: addDvrEntry: DVR entry created, state=%d",
              htsp->htsp_logname, (int)de->de_sched_state);
  
