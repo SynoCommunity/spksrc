@@ -1,0 +1,66 @@
+name: Draft on open
+
+# Open every pull request as a Draft; the author marks it ready once CI is green.
+#
+# Not a formality -- it is what build.yml keys on:
+#   - a Draft PR's builds share one concurrency group with cancel-in-progress, so a
+#     new push cancels the run the previous push started. A non-draft PR gets a
+#     unique per-run group: nothing is cancelled and every push queues behind the
+#     last, at a full matrix build each;
+#   - a fork's own push build is skipped while its PR is a Draft, because the
+#     authoritative build already runs on the PR.
+#
+# pull_request_target, not pull_request: the token a pull_request run gets for a PR
+# from a fork is read-only, and this needs pull-requests: write. That trigger is only
+# safe because nothing here checks out or runs the PR's code -- keep it that way.
+#
+# 'opened' only: reopening a PR that was deliberately marked ready should not send it
+# back to draft.
+#
+# The PR's first build has already started by the time this runs, and its concurrency
+# group was fixed at draft=false, so the conversion takes effect from the next push on.
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  convert:
+    name: Convert to draft
+    # Nothing to do when the author already opened it as a draft.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Mark the pull request as a draft
+        # Fail-open throughout: this is a convenience, it must never fail a PR.
+        run: |
+          if gh pr ready "${PR}" --undo --repo "${REPO}"; then
+            echo "PR #${PR} converted to draft."
+          else
+            echo "::warning::Could not convert PR #${PR} to draft; left as is."
+            exit 0
+          fi
+
+      - name: Say why, so it does not look arbitrary
+        run: |
+          cat > body.md <<'EOF'
+          This pull request was set to **Draft** automatically.
+
+          Draft is what our CI keys on: while a PR is a draft a new push cancels the build
+          the previous push started, and a fork's duplicate push build is skipped. On a
+          non-draft PR nothing is cancelled and every push queues behind the last -- a full
+          matrix build costs hours of runner time, shared with everyone else waiting.
+
+          Mark it **Ready for review** once CI is green: the button, or `gh pr ready`.
+
+          See [Open It as a Draft](https://docs.synocommunity.com/contributing/pull-requests/#open-it-as-a-draft).
+          EOF
+          gh pr comment "${PR}" --repo "${REPO}" --body-file body.md \
+            || echo "::warning::Could not post the explanatory comment."

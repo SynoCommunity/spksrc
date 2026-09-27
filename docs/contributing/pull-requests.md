@@ -35,6 +35,28 @@ Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` (e.g., "Transmission"
 - `Fix bug` (no context)
 - `WIP changes` (not ready for review)
 
+### Open It as a Draft
+
+Open your pull request as a **Draft**, and mark it *Ready for review* once CI is green.
+A bot converts it for you if you forget, and says so in a comment.
+
+This is not etiquette, it is what the build workflow keys on:
+
+- while a PR is a draft, every build shares one concurrency group with
+  `cancel-in-progress`, so a new push **cancels** the run the previous push started;
+- a PR that is not a draft gets a unique group per run: nothing is cancelled, and five
+  pushes in a row queue five full matrix builds behind each other;
+- a fork's own duplicate push build is skipped while its PR is a draft.
+
+A full matrix build costs hours of runner time shared with everyone else waiting, so the
+difference between draft and not is roughly one build per push instead of all of them.
+
+Mark it ready with the button, or:
+
+```bash
+gh pr ready <number>
+```
+
 ### Description
 
 Every PR should include:
