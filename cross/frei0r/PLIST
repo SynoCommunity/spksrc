@@ -1,4 +1,5 @@
 lib:lib/frei0r-1/3dflippo.so
+lib:lib/frei0r-1/3dperspective.so
 lib:lib/frei0r-1/addition_alpha.so
 lib:lib/frei0r-1/addition.so
 lib:lib/frei0r-1/aech0r.so
@@ -25,11 +26,13 @@ lib:lib/frei0r-1/cairoaffineblend.so
 lib:lib/frei0r-1/cairoblend.so
 lib:lib/frei0r-1/cairogradient.so
 lib:lib/frei0r-1/cairoimagegrid.so
+lib:lib/frei0r-1/camerashake.so
 lib:lib/frei0r-1/cartoon.so
 lib:lib/frei0r-1/cluster.so
 lib:lib/frei0r-1/colgate.so
 lib:lib/frei0r-1/coloradj_RGB.so
 lib:lib/frei0r-1/colordistance.so
+lib:lib/frei0r-1/colorenhance.so
 lib:lib/frei0r-1/colorhalftone.so
 lib:lib/frei0r-1/colorize.so
 lib:lib/frei0r-1/color_only.so
@@ -52,6 +55,7 @@ lib:lib/frei0r-1/edgeglow.so
 lib:lib/frei0r-1/elastic_scale.so
 lib:lib/frei0r-1/emboss.so
 lib:lib/frei0r-1/equaliz0r.so
+lib:lib/frei0r-1/euclid_eraser.so
 lib:lib/frei0r-1/filmgrain.so
 lib:lib/frei0r-1/flippo.so
 lib:lib/frei0r-1/gamma.so
@@ -62,6 +66,7 @@ lib:lib/frei0r-1/grain_extract.so
 lib:lib/frei0r-1/grain_merge.so
 lib:lib/frei0r-1/G.so
 lib:lib/frei0r-1/hardlight.so
+lib:lib/frei0r-1/heatmap0r.so
 lib:lib/frei0r-1/hueshift0r.so
 lib:lib/frei0r-1/hue.so
 lib:lib/frei0r-1/IIRblur.so
@@ -80,17 +85,20 @@ lib:lib/frei0r-1/mask0mate.so
 lib:lib/frei0r-1/measure_pr0be.so
 lib:lib/frei0r-1/measure_pr0file.so
 lib:lib/frei0r-1/medians.so
+lib:lib/frei0r-1/mirr0r.so
 lib:lib/frei0r-1/multiply.so
 lib:lib/frei0r-1/ndvi.so
 lib:lib/frei0r-1/nervous.so
 lib:lib/frei0r-1/nois0r.so
 lib:lib/frei0r-1/normaliz0r.so
 lib:lib/frei0r-1/nosync0r.so
+lib:lib/frei0r-1/ntsc.so
 lib:lib/frei0r-1/onecol0r.so
 lib:lib/frei0r-1/overlay.so
 lib:lib/frei0r-1/partik0l.so
 lib:lib/frei0r-1/perspective.so
 lib:lib/frei0r-1/pixeliz0r.so
+lib:lib/frei0r-1/pixels0rt.so
 lib:lib/frei0r-1/pixs0r.so
 lib:lib/frei0r-1/plasma.so
 lib:lib/frei0r-1/posterize.so
@@ -105,6 +113,7 @@ lib:lib/frei0r-1/saturation.so
 lib:lib/frei0r-1/scanline0r.so
 lib:lib/frei0r-1/screen.so
 lib:lib/frei0r-1/select0r.so
+lib:lib/frei0r-1/shake0scillate.so
 lib:lib/frei0r-1/sharpness.so
 lib:lib/frei0r-1/sigmoidaltransfer.so
 lib:lib/frei0r-1/sleid0r_push-down.so
@@ -129,6 +138,7 @@ lib:lib/frei0r-1/softlight.so
 lib:lib/frei0r-1/sopsat.so
 lib:lib/frei0r-1/spillsupress.so
 lib:lib/frei0r-1/squareblur.so
+lib:lib/frei0r-1/squigglevision.so
 lib:lib/frei0r-1/subtract.so
 lib:lib/frei0r-1/tehroxx0r.so
 lib:lib/frei0r-1/test_pat_B.so
@@ -148,4 +158,5 @@ lib:lib/frei0r-1/uvmap.so
 lib:lib/frei0r-1/value.so
 lib:lib/frei0r-1/vertigo.so
 lib:lib/frei0r-1/vignette.so
+lib:lib/frei0r-1/water.so
 lib:lib/frei0r-1/xfade0r.so
