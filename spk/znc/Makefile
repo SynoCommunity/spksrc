@@ -1,6 +1,6 @@
 SPK_NAME = znc
 SPK_VERS = 1.10.3
-SPK_REV = 30
+SPK_REV = 31
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,8 @@ DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un 
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 DISPLAY_NAME = ZNC
 CHANGELOG  = "Update to ZNC 1.10.3<br/>"
-CHANGELOG += "Migrate to Python 3.14"
+CHANGELOG += "Migrate to Python 3.14<br/>"
+CHANGELOG += "Fix a start-up failure: the bundled boost needs libquadmath, which the package did not carry"
 
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/
