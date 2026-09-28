@@ -33,7 +33,7 @@ CONFIGURE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 
 # pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
 ifeq ($(call version_lt, $(TC_GCC), 5),1)
-ENV += CFLAGS_$(subst -,_,$(RUST_TARGET))=-std=c99
+ENV += CFLAGS_$(RUST_TARGET_LENV)=-std=c99
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

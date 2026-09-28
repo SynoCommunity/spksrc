@@ -317,6 +317,7 @@ tc_rust_vars:
 	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
+	echo RUST_TARGET_LENV := $(RUST_TARGET_LENV) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
 .PHONY: tc_autotools_vars
