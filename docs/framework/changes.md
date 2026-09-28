@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 28th 2026 — The spk PLIST is written whole or not at all, and walked once per dependency"
+??? note "September 28th 2026 — The spk PLIST is written whole or not at all, and walked once per dependency (#7516)"
 
     - **A partial `work-*/PLIST` was taken as up to date.** The file is its own make
       target, written straight through `> $@`. When the walk behind it broke off, a
@@ -136,7 +136,8 @@ If you only read one thing, read this. The details are in the dated log below.
       once per path leading to it, a full make parse each time: gstreamer's walk made
       at least 591 calls for 67 distinct dependencies (zlib alone 132 times), tens of
       minutes on a loaded machine. The spk side now hands down a stamp directory, and
-      a dependency already visited is skipped before its make is started.
+      a dependency already visited is skipped before its make is started. gstreamer's
+      PLIST, same machine and load: 3603 s before, 239 s after.
 
     - **`dep_seen` (`spksrc.common/macros.mk`) is that test**, shared with the
       dependency-tree walk, which had its own inline copy. Stamps are named as there
