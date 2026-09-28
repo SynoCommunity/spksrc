@@ -92,7 +92,7 @@ endif
 
 # Stamps of the dependencies whose cat_PLIST already ran during this walk (dep_seen,
 # spksrc.common/macros.mk), handed down to the recursive cat_PLIST of spksrc.build/plist.mk.
-CAT_PLIST_SEEN = $(WORK_DIR)/.cat_PLIST-seen
+CAT_PLIST_SEEN = $(WORK_DIR)/.PLIST
 
 # Written to $@.tmp and moved in place only once complete: the file is the target, so
 # a partial one (a cat_PLIST that failed, or died with its output pipe) would otherwise
