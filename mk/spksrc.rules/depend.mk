@@ -43,7 +43,7 @@ native-depend_msg_target:
 	@$(MSG) "Processing NATIVE dependencies of $(NAME)"
 
 # Called for 'make all-supported' prior to
-# parallalizing build for every arch targets
+# parallelizing build for every arch targets
 
 # The env -i native loops (this one and depend_target's) stay without FWRD_ARGS: host tools,
 # and the one that cares (native/rustc-1.98) sets a `?=` default a forwarded 0 would break.
