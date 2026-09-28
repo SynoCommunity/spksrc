@@ -70,7 +70,6 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CMAKE_USE_TOOLCHAIN_FILE` | 1 | Use generated toolchain file |
 | `CONFIGURE_ARGS` | | Additional CMake arguments |
 | `BUILD_DIR` | `$(WORK_DIR)/$(PKG_DIR)/build` | Out-of-tree build directory |
 | `CMAKE_BUILD_TYPE` | Release | Build type |

@@ -118,6 +118,24 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 28th 2026 — CMake builds always use the generated toolchain file (#7515)"
+
+    - **`CMAKE_USE_TOOLCHAIN_FILE` is gone**, and with it the "legacy" mode that passed
+      the cross toolchain through `-D_CMAKE_TOOLCHAIN_PREFIX` and friends. That mode
+      relied on `CC`/`CXX` reaching cmake through the environment, but those live in
+      `tc_vars.autotools.mk`, which cmake builds no longer load since `DEFAULT_ENV ?= cmake`
+      (#6877): cmake silently fell back to the host `/usr/bin/cc`. On aarch64 the link fails
+      (`libcairo.so: file in wrong format`); on x64 it succeeds with the wrong compiler
+      and nobody notices.
+
+    - **The two remaining users move over.** `cross/frei0r` (pulled in by ffmpeg and
+      gstreamer) and `cross/fish`, which already hands cargo its compilers through
+      `CC_<target>` / `CARGO_TARGET_<TARGET>_LINKER`.
+
+    - **The toolchain file now sets `CMAKE_MODULE_LINKER_FLAGS`** beside the EXE and
+      SHARED ones. A cmake `MODULE` library (a plugin: frei0r builds nothing else) was
+      linked without the staging `-L`/rpath and could not find its dependencies.
+
 ??? note "September 28th 2026 — A plist pattern is the files it stands for, not a path (#7518)"
 
     - **A package built on demand describes its libraries with a pattern.**

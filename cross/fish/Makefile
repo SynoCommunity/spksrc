@@ -30,9 +30,6 @@ CONFIGURE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 # direct builds with cargo/rust (using spksrc.cross-rust.mk) create
 # experimental static versions without data files
 
-# keep cross tools in ENV for cargo to find CC and LD of toolchain
-CMAKE_USE_TOOLCHAIN_FILE = OFF
-
 # define RUST_TARGET similar to spksrc.cross/env-rust.mk
 # REMARKS: including spksrc.cross/env-rust.mk would break the build
 ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
