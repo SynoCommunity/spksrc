@@ -94,12 +94,18 @@ _install_tclib_() { \
 }
 endef
 
+# A plist line may be a pattern -- cross/boost_1.92 describes its libraries as
+# `lib:lib/libboost_*.so.1.92.0` -- so each one is resolved inside the staging
+# directory before it is read, the way copy.mk resolves them before packing.
+# Handed to objdump as written, a pattern is a path that does not exist and the
+# files it stands for are never examined.
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
 	for tclib in $(TC_LIBS_DEFAULT); do \
 	  echo  "===> SEARCHING for $${tclib}" ; \
 	  _need_all_="" ; _seen_="" ; \
-	  for _f_ in $$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; do \
+	  _plist_=$$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; \
+	  for _f_ in $$(cd $(STAGING_DIR) && eval ls -d $$_plist_ 2>/dev/null) ; do \
 	     _b_="$(STAGING_DIR)/$${_f_}" ; \
 	     _sn_=$$(objdump -p "$$_b_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
 	     [ -n "$$_sn_" ] || continue ; \
