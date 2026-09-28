@@ -18,5 +18,7 @@ MIN_GCC_VERSION = 7.5
 CONFIGURE_ARGS  = -DCMAKE_BUILD_TYPE=Release
 CONFIGURE_ARGS += -DURIPARSER_BUILD_DOCS=OFF
 CONFIGURE_ARGS += -DURIPARSER_BUILD_TESTS=OFF
+# plugins are cmake MODULE libraries, the toolchain file only sets EXE/SHARED linker flags
+CONFIGURE_ARGS += -DCMAKE_MODULE_LINKER_FLAGS="-L$(STAGING_INSTALL_PREFIX)/lib -Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(INSTALL_PREFIX)/lib"
 
 include ../../mk/spksrc.cross-cmake.mk
