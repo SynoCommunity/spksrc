@@ -1,5 +1,5 @@
 PKG_NAME = fish
-PKG_VERS = 4.5.0
+PKG_VERS = 4.9.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG_VERS)
@@ -7,9 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# fish 4.x requires Rust 2024 edition (1.85+); ARMv5 is capped at 1.77.2 in framework
-# PPC uses SPE ABI (powerpc-unknown-linux-gnuspe) which Rust doesn't support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# Rust edition2024 required
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
