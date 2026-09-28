@@ -65,6 +65,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Media Management"><td><a href="flexget/">Flexget</a></td><td>Media Management</td><td>Multipurpose automation</td></tr>
     <tr data-category="Development"><td><a href="git/">Git</a></td><td>Development</td><td>Version control system</td></tr>
     <tr data-category="Security"><td><a href="google-authenticator/">Google Authenticator</a></td><td>Security</td><td>PAM module for two-factor authentication</td></tr>
+    <tr data-category="Media"><td><a href="gstreamer/">GStreamer</a></td><td>Media</td><td>Pipeline-based multimedia framework</td></tr>
     <tr data-category="Home Automation"><td><a href="homeassistant/">Home Assistant</a></td><td>Home Automation</td><td>Home automation platform</td></tr>
     <tr data-category="Monitoring"><td><a href="icinga/">Icinga</a></td><td>Monitoring</td><td>Icinga 2 monitoring platform</td></tr>
     <tr data-category="Media"><td><a href="imagemagick/">ImageMagick</a></td><td>Media</td><td>Image manipulation and conversion toolkit</td></tr>
