@@ -207,6 +207,7 @@ nav:
       - Beets: packages/beets.md
       - Comskip: packages/comskip.md
       - FFmpeg: packages/ffmpeg.md
+      - GStreamer: packages/gstreamer.md
       - ImageMagick: packages/imagemagick.md
     - Media Management:
       - Flexget: packages/flexget.md
