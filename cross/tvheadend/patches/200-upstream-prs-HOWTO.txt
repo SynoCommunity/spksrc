@@ -11,9 +11,6 @@ patches we add on top of it follow within that hundred.
   400      tvheadend#2249, everything it carries beyond #2206: LiBe-net's
            shared per-channel cache, our seven fixes on top, and the one-line
            SMT_SKIP_LIVE double free
-  500      ours, tied to no PR: tell a client its digest nonce went stale
-           (30 s nonces answered with a bare 401 make a browser ask for the
-           password again on every click once anonymous web access is off)
 
 This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
 
@@ -79,7 +76,8 @@ regenerated with the rest of 400, from the whole range.
 
 The patches apply in numeric order.  Once PKG_GIT_HASH
 moves past merged work, drop its patch, as the imagecache audit tool patch was once
-merged as 5ce3ff63c.
+merged as 5ce3ff63c and the digest staleness patch 500 as 5a32b04b9
+(tvheadend#2273).
 
 The text before the first "--- " line of a patch is its header (what it does,
 which PR and commit): keep it when regenerating.
