@@ -20,7 +20,7 @@ INSTALL_TARGET = nop
 POST_INSTALL_TARGET = binutils-shim
 
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(PKG_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/pre-releases
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm$(TC_VERS)
 
 include ../../mk/spksrc.native-install.mk
 
