@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 28th 2026 — CMake builds always use the generated toolchain file"
+??? note "September 28th 2026 — CMake builds always use the generated toolchain file (#7515)"
 
     - **`CMAKE_USE_TOOLCHAIN_FILE` is gone**, and with it the "legacy" mode that passed
       the cross toolchain through `-D_CMAKE_TOOLCHAIN_PREFIX` and friends. That mode
