@@ -20,11 +20,16 @@ endif
 ### be created when the shared build environment is being
 ### populated with symlinks to $(PKG_NAME)*_done
 ###
+### CAT_PLIST_SEEN (set by the spk-side walk, spksrc.spk/copy.mk) names a directory
+### of markers for the dependencies already visited: a shared dependency is walked
+### once, not once per path leading to it. Unset, every path is walked as before.
+###
 .PHONY: cat_PLIST
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
 	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../$$depend cat_PLIST ; \
+	  $(call dep_seen,$(CAT_PLIST_SEEN),$$depend) && continue ; \
+	  $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../$$depend cat_PLIST || exit 1 ; \
 	done
 	@if [ -f PLIST ] && [ -f $(WORK_DIR)/$(PKG_NAME).plist ] ; \
 	then \

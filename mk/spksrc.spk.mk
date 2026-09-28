@@ -615,6 +615,7 @@ spkclean:
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
+	       work-*/PLIST.tmp \
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
 
