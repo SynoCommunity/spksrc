@@ -19,6 +19,8 @@
 #  dedup-files : removes duplicate files while preserving order (via md5sum)
 #  merge       : merges environment variable values from input
 #
+#  dep_seen    : shell test, true when a dependency was already visited in a walk
+#
 # RUNLOG  : generic macro to call recipe execution using logging
 #
 # Notes:
@@ -36,6 +38,20 @@ version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | so
 # Append $(2) to the comma-separated list $(1), or return $(1) when there is nothing to add.
 # Reasons accumulate rather than overwrite: an arch can miss several capabilities at once.
 comma_append = $(if $(strip $(2)),$(1)$(if $(strip $(1)),$(,) )$(2),$(1))
+
+# Macro: visit each dependency once per walk
+#
+#   for depend in $(DEPENDS) ; do $(call dep_seen,$(STAMP_DIR),$$depend) && continue ; ... ; done
+#
+# Shell test for a recipe walking dependencies through sub-makes. True when $(2) was
+# already visited in the walk whose stamps live in directory $(1); otherwise stamps it and
+# is false. Each sub-make is a full parse, and a tree shares most of its nodes: without
+# it gstreamer's plist walk visited zlib 132 times, for 67 distinct dependencies.
+#
+# The stamp is the dependency path with / -> __ (cross/zlib -> cross__zlib), created with
+# mkdir so that two parallel visitors cannot both claim it. No $(1), or no such directory:
+# always false, and every path is walked as before.
+dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/dev/null ; }
 
 # Macro: locate a toolchain tool
 #

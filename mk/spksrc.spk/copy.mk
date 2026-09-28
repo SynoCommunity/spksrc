@@ -90,13 +90,26 @@ DEPENDS += kernel/syno-$(TC_ARCH)-$(TC_VERS)
 endif
 endif
 
+# Stamps of the dependencies whose cat_PLIST already ran during this walk (dep_seen,
+# spksrc.common/macros.mk), handed down to the recursive cat_PLIST of spksrc.build/plist.mk.
+CAT_PLIST_SEEN = $(WORK_DIR)/.PLIST
+
+# Written to $@.tmp and moved in place only once complete: the file is the target, so
+# a partial one (a cat_PLIST that failed, or died with its output pipe) would otherwise
+# be taken as up to date by every later run and silently drop files from the package.
+$(INSTALL_PLIST): SHELL:=/bin/bash
+$(INSTALL_PLIST): .SHELLFLAGS := -o pipefail -c
 $(INSTALL_PLIST):
+	@rm -rf $@.tmp $(CAT_PLIST_SEEN) && mkdir -p $(CAT_PLIST_SEEN)
 	@(\
 	  for depend in $(DEPENDS) ; do \
-	    $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C ../../$${depend} cat_PLIST ; \
+	    $(call dep_seen,$(CAT_PLIST_SEEN),$${depend}) && continue ; \
+	    $(MAKE) WORK_DIR=$(WORK_DIR) CAT_PLIST_SEEN=$(CAT_PLIST_SEEN) $(FWRD_ARGS) --no-print-directory -C ../../$${depend} cat_PLIST || exit 1 ; \
 	  done ; \
 	  if [ -s PLIST ] ; then \
 	    cat PLIST ; \
 	  fi \
-	) | $(PLIST_TRANSFORM) | sort -u > $@
+	) | $(PLIST_TRANSFORM) | sort -u > $@.tmp
+	@mv -f $@.tmp $@
+	@rm -rf $(CAT_PLIST_SEEN)
 

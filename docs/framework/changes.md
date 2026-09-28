@@ -118,6 +118,32 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 28th 2026 — The spk PLIST is written whole or not at all, and walked once per dependency (#7516)"
+
+    - **A partial `work-*/PLIST` was taken as up to date.** The file is its own make
+      target, written straight through `> $@`. When the walk behind it broke off, a
+      `cat_PLIST` that failed, or a build whose output pipe died (an interrupted
+      `make arch-*`, a closed terminal), the partial file stayed, and every later run
+      packaged from it: a gstreamer build then succeeded with 146 of its 851 entries,
+      a 6 MB package instead of 42 MB, or stopped at `tar: Cowardly refusing to create an
+      empty archive` when nothing had been written yet.
+
+    - **Now written to `PLIST.tmp` and moved in place only once complete**, with
+      `pipefail` and a failing `cat_PLIST` stopping the walk instead of being swallowed
+      by the loop. `make spkclean` removes a leftover `PLIST.tmp`.
+
+    - **Each dependency is walked once.** `cat_PLIST` recursed into every dependency
+      once per path leading to it, a full make parse each time: gstreamer's walk made
+      at least 591 calls for 67 distinct dependencies (zlib alone 132 times), tens of
+      minutes on a loaded machine. The spk side now hands down a stamp directory, and
+      a dependency already visited is skipped before its make is started. gstreamer's
+      PLIST, same machine and load: 3603 s before, 239 s after.
+
+    - **`dep_seen` (`spksrc.common/macros.mk`) is that test**, shared with the
+      dependency-tree walk, which had its own inline copy. Stamps are named as there
+      (`cross__zlib`) and now created with `mkdir`, so two parallel visitors cannot both
+      claim one.
+
 ??? note "September 28th 2026 — CMake builds always use the generated toolchain file (#7515)"
 
     - **`CMAKE_USE_TOOLCHAIN_FILE` is gone**, and with it the "legacy" mode that passed

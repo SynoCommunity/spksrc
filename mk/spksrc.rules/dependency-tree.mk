@@ -371,9 +371,9 @@ dependency-flat-mk: $(DEP_FLAT_TARGETS_MK)
 #  - Extracts dep path by stripping the type prefix and decoding __ -> /.
 #  - Skips the dependency if it appears in EXCLUDE_DEPENDS.
 #  - Emits "TYPE dep/path" for filtering by dependency-flat/dependency-list.
-#  - Uses a stamp file keyed on dep path to avoid re-traversing;
+#  - Uses a stamp keyed on dep path to avoid re-traversing (dep_seen, macros.mk);
 #    if already stamped, the type annotation is still emitted for this relation.
-#    Stamp file structure (empty file, presence = visited):
+#    Stamp structure (empty directory, presence = visited):
 #        $(DEP_FLAT_STAMP_DIR)/cross__openssl3
 #        $(DEP_FLAT_STAMP_DIR)/native__nasm
 #  - Recursively invokes dependency-flat-mk in the dependency directory.
@@ -392,9 +392,7 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 	   *" $$dep "*) exit 0 ;; \
 	esac; \
 	echo "$${dep_type} $${dep}"; \
-	stamp="$(DEP_FLAT_STAMP_DIR)/$$(echo $$dep | sed 's|/|__|g')"; \
-	if [ -f "$$stamp" ]; then exit 0; fi; \
-	touch "$$stamp"; \
+	$(call dep_seen,$(DEP_FLAT_STAMP_DIR),$$dep) && exit 0; \
 	DEPENDENCY_WALK=1 \
 	$(MAKE) -s --output-sync=target \
 		-C ../../$$dep \
