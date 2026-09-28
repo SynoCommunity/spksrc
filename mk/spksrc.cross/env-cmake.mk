@@ -8,12 +8,6 @@
 # Force CMake environment, bypassing default autotools settings.
 DEFAULT_ENV ?= cmake
 
-# By default use cmake toolchain
-# for cross-compiling
-ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),)
-CMAKE_USE_TOOLCHAIN_FILE = ON
-endif
-
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
   ifeq ($(strip $(GCC_DEBUG_INFO)),1)
@@ -49,24 +43,6 @@ CMAKE_INSTALL_RPATH_USE_LINK_PATH = TRUE
 # Allow building shared libraries to be manually set
 ifeq ($(or $(filter -DBUILD_SHARED_LIBS%,$(CONFIGURE_ARGS)),$(strip $(BUILD_SHARED_LIBS))),)
 BUILD_SHARED_LIBS = ON
-endif
-
-# "legacy" mode
-# Otherwise mimic autoconf cross-compiling
-# by hiding host tools and enforce using
-# target cross-compilers & tools
-ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-  CONFIGURE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
-  CONFIGURE_ARGS += -DCMAKE_SYSTEM_NAME=$(CMAKE_SYSTEM_NAME)
-  CONFIGURE_ARGS += -D_CMAKE_TOOLCHAIN_LOCATION=$(_CMAKE_TOOLCHAIN_LOCATION)
-  CONFIGURE_ARGS += -D_CMAKE_TOOLCHAIN_PREFIX=$(_CMAKE_TOOLCHAIN_PREFIX)
-  CONFIGURE_ARGS += -DCMAKE_FIND_ROOT_PATH=$(CMAKE_FIND_ROOT_PATH)
-  CONFIGURE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=$(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-  CONFIGURE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_INSTALL_RPATH)
-  CONFIGURE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=$(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-  ifneq ($(strip $(BUILD_SHARED_LIBS)),)
-    CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=$(BUILD_SHARED_LIBS)
-  endif
 endif
 
 # Use native cmake (latest stable)
@@ -158,24 +134,4 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   CMAKE_SYSTEM_PROCESSOR = x86_64
   CMAKE_ARCH = 64
-endif
-
-# "legacy" mode
-# Add additional flags to CMAKE_*_FLAGS
-ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-CONFIGURE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=$(CMAKE_SYSTEM_PROCESSOR)
-CONFIGURE_ARGS += -DCMAKE_C_FLAGS="$(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)"
-CONFIGURE_ARGS += -DCMAKE_CXX_FLAGS="$(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"
-ifeq ($(GCC_DEBUG_INFO),1)
-CONFIGURE_ARGS += -DCMAKE_C_FLAGS_DEBUG="$(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(GCC_DEBUG_FLAGS)"
-CONFIGURE_ARGS += -DCMAKE_CXX_FLAGS_DEBUG="$(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS) $(GCC_DEBUG_FLAGS)"
-endif
-
-ifneq ($(strip $(CROSS_COMPILE_ARM)),)
-CONFIGURE_ARGS += -DCROSS_COMPILE_ARM=$(CROSS_COMPILE_ARM)
-endif
-
-ifneq ($(strip $(CMAKE_ARCH)),)
-CONFIGURE_ARGS += -DARCH=$(CMAKE_ARCH)
-endif
 endif

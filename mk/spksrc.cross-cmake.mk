@@ -84,7 +84,7 @@ cmake_configure_target: cmake_generate_toolchain_file
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Optional Dependencies = $(OPTIONAL_DEPENDS)
-	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_TOOLCHAIN_FILE_PKG)]
+	@$(MSG)    - Toolchain File = $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - CMake = $(shell which cmake) [$(shell cmake --version | head -1 | awk '{print $$NF}')]

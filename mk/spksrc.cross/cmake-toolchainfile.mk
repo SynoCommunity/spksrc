@@ -11,9 +11,7 @@ CMAKE_TOOLCHAIN_FILE_WRK = $(WORK_DIR)/tc_vars.cmake
 CMAKE_TOOLCHAIN_FILE_PKG = $(BUILD_DIR)/$(CMAKE_TOOLCHAIN_FILE_NAME)
 
 
-ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 CONFIGURE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
-endif
 
 # Map DEFAULT_ENV definitions to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
@@ -84,6 +82,7 @@ ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
 	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS) $(TC_EXTRA_LDFLAGS))")'
 endif
 	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS) $(TC_EXTRA_LDFLAGS))")' ; \
+	echo 'set(CMAKE_MODULE_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_MODULE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS) $(TC_EXTRA_LDFLAGS))")' ; \
 	echo
 ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 	@echo "# build shared library" ; \
