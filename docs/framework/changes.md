@@ -118,6 +118,25 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 28th 2026 — A plist pattern is the files it stands for, not a path (#7518)"
+
+    - **A package built on demand describes its libraries with a pattern.**
+      `cross/boost_1.92/PLIST` says `lib:lib/libboost_*.so.1.92.0`, because it does not
+      know which libraries the caller asked it to build.
+      `include_toolchain_specific_libraries` handed that to `objdump` as written -- a path
+      that does not exist -- so the files it stands for were never examined, and the
+      toolchain runtime library they needed was never carried. Silently: with no file
+      seen, the loop moved on.
+
+    - **znc 1.10.3-30 is what it cost.** boost 1.92's `charconv` and `locale` link
+      `libquadmath` for `__float128`, they were the only files in the package that did,
+      and the published package exits at start-up on
+      `libquadmath.so.0: cannot open shared object file`.
+
+    - **Each entry is now resolved inside the staging directory before it is read**, the
+      way `copy.mk` resolves it before packing, so a pattern contributes the files it
+      matches and a plain path behaves exactly as before.
+
 ??? note "September 24th 2026 — The switches reach every crossing, and the spk one narrows (#7497)"
 
     - **Eight sub-make crossings still dropped `FWRD_ARGS`**, so a build-wide switch
