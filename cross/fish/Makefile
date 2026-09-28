@@ -28,40 +28,13 @@ CONFIGURE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 # fish must still be built with cmake
 # direct builds with cargo/rust (using spksrc.cross-rust.mk) create
 # experimental static versions without data files
+# The cargo target, linker and cc-rs compilers come from the framework
+# (cmake toolchain file and rust tc_vars).
 
-# define RUST_TARGET similar to spksrc.cross/env-rust.mk
-# REMARKS: including spksrc.cross/env-rust.mk would break the build
-ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
-RUST_TARGET = armv7-unknown-linux-gnueabihf
-endif
-ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
-RUST_TARGET = armv7-unknown-linux-gnueabi
-endif
-ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
-RUST_TARGET = aarch64-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
-RUST_TARGET = x86_64-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
-RUST_TARGET = i686-unknown-linux-gnu
-endif
-
-# CMake Warning at cmake/FindRust.cmake:719 (message):
-#   CMake is in cross-compiling mode, but the cargo target-triple could not be
-#   inferred.Falling back to the default host target.  Please consider manually
-#   setting `Rust_CARGO_TARGET`.
-CONFIGURE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
-
-# Export cross-compiler paths for cc-rs crate used by pcre2-sys
-# The cc-rs crate looks for CC_<target> (with underscores) to find the compiler
-ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,gcc)
-ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,g++)
-ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(call tc,ar)
 # pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
-ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=c99
-# Set cross-linker for Rust cargo builds
-ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr a-z- A-Z_)_LINKER=$(call tc,gcc)
+ifeq ($(call version_lt, $(TC_GCC), 5),1)
+ENV += CFLAGS_$(subst -,_,$(RUST_TARGET))=-std=c99
+endif
 
 include ../../mk/spksrc.cross-cmake.mk
 

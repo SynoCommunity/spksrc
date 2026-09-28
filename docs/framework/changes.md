@@ -118,6 +118,29 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 29th 2026 — CMake builds that compile Rust crates get their cross setup from the framework (#7520)"
+
+    - **cargo runs at build time, the toolchain file only at configure time.** Its
+      `set(ENV{CARGO_TARGET_<T>_LINKER} ...)` never reached the cargo that ninja starts,
+      so a cmake project building crates (Corrosion) had to rebuild the whole cross setup
+      in its Makefile: `cross/fish` carried its own arch → `RUST_TARGET` table, and a
+      comment saying `env-rust.mk` could not be included.
+
+    - **cmake builds now load the rust tc_vars** (`DEFAULT_ENV ?= cmake rust`): cargo sees
+      `CARGO_BUILD_TARGET` and `CARGO_TARGET_<T>_{LINKER,AR,RUSTFLAGS}` at build time. A
+      cmake project without Rust only gets environment variables nothing reads.
+
+    - **`tc_vars.rust.mk` also exports `CC_/CXX_/AR_<triple>`**, the names cc-rs reads for
+      a crate's build script compiling C (pcre2-sys in fish). Without them cc-rs looked for
+      a bare `x86_64-pc-linux-gnu-gcc` on the PATH. This serves `spksrc.cross-rust.mk`
+      packages as well.
+
+    - **The toolchain file sets `Rust_CARGO_TARGET`**, which Corrosion cannot infer when
+      cross-compiling and otherwise falls back to the host triple.
+
+    - `cross/fish` is down to its one package-specific need: `-std=c99` for pcre2-sys on
+      gcc < 5.
+
 ??? note "September 29th 2026 — Two exported variables were re-running their shell for every process make started (#7522)"
 
     - **Parsing a package forked 2647 shells and took 8.4 s.** 919 of them were

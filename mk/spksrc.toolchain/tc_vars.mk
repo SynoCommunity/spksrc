@@ -256,6 +256,8 @@ endif
 	@echo ; \
 	echo "# Cross target triple" ; \
 	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
+	echo "# cargo target for Corrosion (corrosion_import_crate), which cannot infer it" ; \
+	echo "set(Rust_CARGO_TARGET  \$${RUST_TARGET})" ; \
 	echo ; \
 	echo "# Rust linker and AR" ; \
 	echo "set(RUST_LINKER  \$${CMAKE_C_COMPILER})" ; \
@@ -311,6 +313,9 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
+	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
