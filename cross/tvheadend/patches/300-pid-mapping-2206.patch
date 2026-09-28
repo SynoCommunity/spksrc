@@ -3,7 +3,8 @@ teletext component indexes, pass-through recording PIDs kept stable, and the
 stream map restored after a timeshift seek.
 
 tvheadend/tvheadend#2206 (LiBe-net), commits 16dcbf9de 10a50dc7d fca5040a3,
-rebased here onto master 547f8bfae.
+rebased here onto master 547f8bfae.  Unchanged on the current base 5a32b04b9,
+which touches no file 300 or 400 patches.
 
 --- src/esstream.c.orig
 +++ src/esstream.c
