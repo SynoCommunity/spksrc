@@ -12,7 +12,7 @@ TC_EXTRA_BUILD_FLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthu
 PKG_NAME = gcc
 PKG_VERS = 8.5.0
 PKG_EXT  = txz
-PKG_REV ?= v4
+PKG_REV ?= v5
 EXTRACT_PATH = $(INSTALL_DIR)
 
 DEPENDS =
