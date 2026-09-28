@@ -38,7 +38,8 @@ Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` (e.g., "Transmission"
 ### Open It as a Draft
 
 Open your pull request as a **Draft**, and mark it *Ready for review* once CI is green.
-A bot converts it for you if you forget, and says so in a comment.
+A bot reminds you in a comment if you forget, and converts it for you where the repository
+is configured to let it.
 
 This is not etiquette, it is what the build workflow keys on:
 

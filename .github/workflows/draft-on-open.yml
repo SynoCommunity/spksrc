@@ -14,6 +14,15 @@ name: Draft on open
 # from a fork is read-only, and this needs pull-requests: write. That trigger is only
 # safe because nothing here checks out or runs the PR's code -- keep it that way.
 #
+# The conversion needs a token that is NOT the Actions one: GitHub does not expose the
+# convertPullRequestToDraft mutation to GITHUB_TOKEN, which answers "Resource not
+# accessible by integration" even with pull-requests: write granted.
+#
+# Three sources, tried in order -- a GitHub App installation token (DRAFT_APP_ID with
+# DRAFT_APP_PRIVATE_KEY), then DRAFT_PAT, then GITHUB_TOKEN. Configure none and the step
+# reports it: the comment then asks the author to draft it by hand, so nothing ever
+# claims a conversion that did not happen.
+#
 # 'opened' only: reopening a PR that was deliberately marked ready should not send it
 # back to draft.
 #
@@ -38,17 +47,35 @@ jobs:
       REPO: ${{ github.repository }}
       PR: ${{ github.event.pull_request.number }}
     steps:
+      # Skipped until the App is registered and DRAFT_APP_ID set, so the workflow keeps
+      # running unchanged in the meantime rather than failing on an empty app-id.
+      - name: Mint a token for the App, when one is configured
+        id: apptoken
+        if: vars.DRAFT_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.DRAFT_APP_ID }}
+          private-key: ${{ secrets.DRAFT_APP_PRIVATE_KEY }}
+
       - name: Mark the pull request as a draft
-        # Fail-open throughout: this is a convenience, it must never fail a PR.
+        id: convert
+        # The elevated token only here: the comments below stay signed github-actions[bot]
+        # rather than by whoever owns it, and it is used for the one call that needs it.
+        env:
+          GH_TOKEN: ${{ steps.apptoken.outputs.token || secrets.DRAFT_PAT || secrets.GITHUB_TOKEN }}
+        # Fail-open throughout: this is a convenience, it must never fail a PR. The
+        # outcome is published so the comment below can match what actually happened.
         run: |
           if gh pr ready "${PR}" --undo --repo "${REPO}"; then
             echo "PR #${PR} converted to draft."
+            echo "converted=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::Could not convert PR #${PR} to draft; left as is."
-            exit 0
+            echo "::warning::Could not convert PR #${PR} to draft; asking the author instead."
+            echo "converted=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Say why, so it does not look arbitrary
+        if: steps.convert.outputs.converted == 'true'
         run: |
           cat > body.md <<'EOF'
           This pull request was set to **Draft** automatically.
@@ -59,6 +86,23 @@ jobs:
           matrix build costs hours of runner time, shared with everyone else waiting.
 
           Mark it **Ready for review** once CI is green: the button, or `gh pr ready`.
+
+          See [Open It as a Draft](https://docs.synocommunity.com/contributing/pull-requests/#open-it-as-a-draft).
+          EOF
+          gh pr comment "${PR}" --repo "${REPO}" --body-file body.md \
+            || echo "::warning::Could not post the explanatory comment."
+
+      - name: Ask the author, since we could not do it
+        if: steps.convert.outputs.converted != 'true'
+        run: |
+          cat > body.md <<'EOF'
+          Could you mark this pull request as a **Draft** while you iterate, and *Ready for
+          review* once CI is green? The button is under the title, or `gh pr ready --undo`.
+
+          Draft is what our CI keys on: while a PR is a draft a new push cancels the build
+          the previous push started, and a fork's duplicate push build is skipped. On a
+          non-draft PR nothing is cancelled and every push queues behind the last -- a full
+          matrix build costs hours of runner time, shared with everyone else waiting.
 
           See [Open It as a Draft](https://docs.synocommunity.com/contributing/pull-requests/#open-it-as-a-draft).
           EOF
