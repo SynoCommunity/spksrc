@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 29th 2026 — A dependency walk checks the tree once and visits each dependency once"
+??? note "September 29th 2026 — A dependency walk checks the tree once and visits each dependency once (#7521)"
 
     - **The pre-check re-walked the whole subtree at every parse.** `_TREE_GATES` runs
       `dependency-unsupported` over the package's tree whenever a package is parsed with
