@@ -1,6 +1,8 @@
 TC_ARCH = ppc853x
 TC_VERS = 5.2
-TC_GCC = 4.3.7
+# override: a package passes TC_GCC= on the make line (env-default.mk), which would
+# otherwise win over this and compose an archive name that exists nowhere.
+override TC_GCC = 4.3.7
 
 PKG_NAME = rust
 PKG_VERS = 1.82.0
