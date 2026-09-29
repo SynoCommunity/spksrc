@@ -56,14 +56,23 @@ endif
 # consumed -- the sub-make's is.)
 TC_HAS_FORTRAN = $(if $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gfortran),1)
 
-# The tools a binutils overlay provides, so tc_vars.mk can take those from it when one is
-# active. A future gcc overlay gets its own TC_GCC_TOOLS list the same way.
-TC_BINUTILS_TOOLS = ld as ar nm ranlib strip objdump objcopy readelf
-
-TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
+# "<meson name>:<autotools and cmake name>:<binary>", no whitespace inside an entry so
+# a $(foreach) walks it. ldshared is a driver, not a tool: gcc plus TC_LDSHARED_ARGS.
+TOOLS = ld:LD:ld ldshared:LDSHARED:gcc cpp:CPP:cpp nm:NM:nm cc:CC:gcc as:AS:as \
+        ranlib:RANLIB:ranlib cxx:CXX:g++ ar:AR:ar strip:STRIP:strip \
+        objdump:OBJDUMP:objdump objcopy:OBJCOPY:objcopy readelf:READELF:readelf
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
-TOOLS += fc:gfortran
+TOOLS += fc:FC:gfortran
 endif
+
+# Fields of a TOOLS entry.
+tool_role = $(word 1,$(subst :, ,$(1)))
+tool_var  = $(word 2,$(subst :, ,$(1)))
+tool_bin  = $(word 3,$(subst :, ,$(1)))
+
+# What turns the ldshared gcc into a shared link, on the target side. Stripped, so
+# the flags read the same whether or not a binutils overlay contributes one.
+TC_LDSHARED_ARGS = $(strip -shared $(OVERLAY_BINUTILS_FLAG))
 
 # TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
 # for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded
