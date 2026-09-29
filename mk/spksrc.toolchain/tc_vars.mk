@@ -256,6 +256,8 @@ endif
 	@echo ; \
 	echo "# Cross target triple" ; \
 	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
+	echo "# cargo target for Corrosion (corrosion_import_crate), which cannot infer it" ; \
+	echo "set(Rust_CARGO_TARGET  \$${RUST_TARGET})" ; \
 	echo ; \
 	echo "# Rust linker and AR" ; \
 	echo "set(RUST_LINKER  \$${CMAKE_C_COMPILER})" ; \
@@ -292,6 +294,8 @@ tc_meson_native_vars:
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
+# cc-rs CC_/CXX_/AR_<rust triple>: TARGET_CC is ignored on x64 (host == target triple),
+# and underscored since dash drops hyphenated names from the environment.
 .PHONY: tc_rust_vars
 tc_rust_vars:
 	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
@@ -311,6 +315,9 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(call tc,gcc)\" ; \
+	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(call tc,g++)\" ; \
+	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 

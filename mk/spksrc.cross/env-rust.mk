@@ -75,6 +75,10 @@ endif
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
 RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
+# And as a cc-rs CC_/CXX_/AR_<triple> suffix. RUST_TARGET is already lower case, so the
+# underscores are the whole conversion -- no shell, and it is read three times.
+RUST_TARGET_LENV = $(subst -,_,$(RUST_TARGET))
+
 # Deterministic cargo output in the build logs
 ENV += CARGO_TERM_COLOR=never
 ENV += CARGO_TERM_PROGRESS_WHEN=never
