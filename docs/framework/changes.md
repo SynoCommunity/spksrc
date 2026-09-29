@@ -118,6 +118,26 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 29th 2026 — Two exported variables were re-running their shell for every process make started"
+
+    - **Parsing a package forked 2647 shells and took 8.4 s.** 919 of them were
+      `uname -m` and 848 `git log`, from two variables that are both exported and
+      recursively expanded: `SOURCE_DATE_EPOCH` (`spksrc.spk.mk`) and `PYTHONPATH`, whose
+      value reaches `uname` through `PYTHON_LIB_NATIVE` (`spksrc.python-crossenv.mk`).
+
+    - **make rebuilds the environment for every child process**, re-expanding each
+      exported recursive variable as it does. So the two ran their `$(shell)` once per
+      spawned shell, and each spawned shell made the other run again.
+
+    - **Both are now assigned immediately**: `SOURCE_DATE_EPOCH` behind an
+      `$(origin ...)` guard so it still yields to a value from the environment or the
+      command line, and `uname -m` hoisted into `HOST_ARCH`, which the generated
+      `python-cc.mk` already carried under that name.
+
+    - **Measured**: parse 8.40 s to 0.92 s, `work-*/PLIST` for mosquitto 19 s to 1 s,
+      `dependency-flat` for ffmpeg8 13 s to 6 s. The make database is otherwise
+      identical, variable for variable and rule for rule.
+
 ??? note "September 29th 2026 — Three more variables were forking on every expansion (#7524)"
 
     - **`AVAILABLE_TCVERSIONS` forked once per toolchain, every time it was read.**
