@@ -30,10 +30,6 @@ OVERLAY_GCC_BIN = $(TC_OVERLAY_GCC)/work/install/usr/local/bin
 # gcc-8.5.0 alias with no g++ beside it, which is why PKG_VERS is not the answer here.
 OVERLAY_GCC_SUFFIX = $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
 
-# The gcc-family drivers, the ones the suffix applies to. Everything else tc_vars emits
-# (ar, nm, strip, ...) is a binutils tool and belongs to the other overlay.
-TC_GCC_TOOLS = gcc g++ cpp gfortran
-
 # Provision the gcc overlay as a normal DEPENDS, symmetric with the binutils consumer.
 ifeq ($(OVERLAY_GCC_ON),1)
 DEPENDS += toolchain/$(notdir $(TC_OVERLAY_GCC))
