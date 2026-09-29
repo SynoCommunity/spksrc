@@ -23,6 +23,21 @@ include ../../mk/spksrc.kernel/depend.mk
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
+# Stamps of the dependencies already walked during this run (dep_seen, macros.mk): a
+# dependency shared by several packages is walked once, not once per path leading to it,
+# each visit being a full make parse (and its cross-stage1/2 sub-makes) even when its
+# cookies say there is nothing left to build.
+#
+# Bound to WORK_DIR rather than handed down: DEPEND_WALK carries the WORK_DIR of the make
+# that started the walk. A sub-make building into another WORK_DIR (toolchain, toolkit)
+# does not match it and starts a walk of its own, instead of skipping dependencies that
+# were only built in its caller's. The owner of the walk clears the stamps first, so an
+# interrupted or failed run never leaves one behind for the next.
+DEPEND_SEEN = $(WORK_DIR)/.DEPEND
+ifneq ($(DEPEND_WALK),$(WORK_DIR))
+DEPEND_WALK_OWNER = 1
+endif
+
 ifeq ($(strip $(PRE_DEPEND_TARGET)),)
 PRE_DEPEND_TARGET = pre_depend_target
 else
@@ -95,16 +110,20 @@ endif
 	do \
 	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
+	@$(if $(DEPEND_WALK_OWNER),rm -rf $(DEPEND_SEEN) && mkdir -p $(DEPEND_SEEN),:)
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
 	do \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) $(FWRD_ARGS) -C ../../$$depend ; \
+	  $(call dep_seen,$(DEPEND_SEEN),$$depend) && continue ; \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
 	@set -e; \
 	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) $(MAKE) $(FWRD_ARGS) -C ../../$$depend ; \
+	  $(call dep_seen,$(DEPEND_SEEN),$$depend) && continue ; \
+	  env $(ENV) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
+	@$(if $(DEPEND_WALK_OWNER),rm -rf $(DEPEND_SEEN),:)
 	
 post_depend_target: $(DEPEND_TARGET)
 

@@ -602,6 +602,7 @@ spkclean:
 	       work-*/.icon_done \
 	       work-*/.md5sum_done* \
 	       work-*/.PLIST \
+	       work-*/.DEPEND \
 	       work-*/.strip_done \
 	       work-*/.stage0-bootstrap_done \
 	       work-*/.stage1-tcvars_done \
