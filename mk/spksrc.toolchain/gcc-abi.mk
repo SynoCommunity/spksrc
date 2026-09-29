@@ -19,11 +19,12 @@
 #   * --with-cpu=marvell-f -> --with-arch=armv5te (unknown to mainline GCC)
 #   * hard-float 32-bit ARM with no fpu -> --with-fpu=neon (Synology ARM is Cortex-A9+)
 #   * powerpc SPE (-gnuspe triple)      -> --enable-obsolete (removed in GCC 9)
+#   * --enable-default-pie present      -> carried, so the overlay links as the stock one
 ###############################################################################
 
 _GCC_ABI_STOCK = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-gcc
 _GCC_ABI_RAW   = $(shell test -x $(_GCC_ABI_STOCK) && $(_GCC_ABI_STOCK) -v 2>&1 | tr ' ' '\n' | \
-                   grep -iE '^--with-(arch|cpu|tune|float|fpu)=|^--enable-e500_double$$' | sort -u)
+                   grep -iE '^--with-(arch|cpu|tune|float|fpu)=|^--enable-(e500_double|default-pie)$$' | sort -u)
 
 _GCC_ABI_ARCH  = $(filter --with-arch=%,$(_GCC_ABI_RAW))
 _GCC_ABI_CPU   = $(filter --with-cpu=%,$(_GCC_ABI_RAW))
@@ -62,4 +63,8 @@ _GCC_ABI_FPU2 = $(or $(_GCC_ABI_FPU),$(_GCC_ABI_DEF_FPU),\
                   $(if $(and $(findstring hard,$(_GCC_ABI_FLOAT2)),$(findstring arm,$(TC_TARGET))),--with-fpu=neon))
 _GCC_ABI_OBS  = $(if $(findstring gnuspe,$(TC_TARGET)),--enable-obsolete)
 
-GCC_TARGET_ABI = $(strip $(_GCC_ABI_BASE) $(_GCC_ABI_FLOAT2) $(_GCC_ABI_FPU2) $(_GCC_ABI_E500) $(_GCC_ABI_OBS))
+# Default-PIE follows the stock compiler: DSM 7.1 and SRM 1.3 turn it on, everything
+# older does not, and an overlay that disagreed would quietly change how a package links.
+_GCC_ABI_PIE  = $(filter --enable-default-pie,$(_GCC_ABI_RAW))
+
+GCC_TARGET_ABI = $(strip $(_GCC_ABI_BASE) $(_GCC_ABI_FLOAT2) $(_GCC_ABI_FPU2) $(_GCC_ABI_E500) $(_GCC_ABI_OBS) $(_GCC_ABI_PIE))
