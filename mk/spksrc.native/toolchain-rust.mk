@@ -118,7 +118,7 @@ _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # overlay-rustc.mk's _RUST_TC_ID on the package-build side.
-_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
+_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
 # are trackable in status-build.log: NAME: native-rust-<step>.

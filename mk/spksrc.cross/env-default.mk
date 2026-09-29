@@ -137,6 +137,9 @@ endif
 # be available at all build stages in
 # particular for dependencies (spksrc.depends.mk)
 ENV += TC_GCC=$(TC_GCC)
+# Beside it, because TC_GCC is the effective compiler and an overlay archive is named
+# after the vendor one -- see _RUST_TC_ID in spksrc.toolchain/overlay-rustc.mk.
+ENV += TC_GCC_VENDOR=$(TC_GCC_VENDOR)
 ENV += TC_GLIBC=$(TC_GLIBC)
 ENV += TC_KERNEL=$(TC_KERNEL)
 
