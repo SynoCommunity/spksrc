@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 29th 2026 — One overlay-aware tool lookup, shared by tc_vars and the packages"
+??? note "September 29th 2026 — One overlay-aware tool lookup, shared by tc_vars and the packages (#7523)"
 
     - **The generated cmake, meson and autotools files resolved tools on their own.**
       Three shell loops in `spksrc.toolchain/tc_vars.mk` rebuilt the toolchain bin path
