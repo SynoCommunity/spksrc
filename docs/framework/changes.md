@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 29th 2026 — Two exported variables were re-running their shell for every process make started"
+??? note "September 29th 2026 — Two exported variables were re-running their shell for every process make started (#7522)"
 
     - **Parsing a package forked 2647 shells and took 8.4 s.** 919 of them were
       `uname -m` and 848 `git log`, from two variables that are both exported and
