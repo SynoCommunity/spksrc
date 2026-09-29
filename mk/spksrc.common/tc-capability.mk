@@ -40,10 +40,14 @@ _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
 # The toolchain's own gcc / glibc / kernel, read from where it declares them --
 # statically, so a package can gate on any of them before anything is built (the
 # kernel one, for instance, for an API that appeared in a given release).
-TC_GCC      := $(shell sed -n 's/^TC_GCC *= *//p'      $(_TC_CAP_MK) 2>/dev/null)
-TC_GLIBC    := $(shell sed -n 's/^TC_GLIBC *= *//p'    $(_TC_CAP_MK) 2>/dev/null)
-TC_KERNEL   := $(shell sed -n 's/^TC_KERNEL *= *//p'   $(_TC_CAP_MK) 2>/dev/null)
-TC_BINUTILS := $(shell sed -n 's/^TC_BINUTILS *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+# Read as "KEY=value" words in one pass and split here, rather than one sed apiece
+# over the same file, on every parse the framework goes through.
+_TC_CAP_DECL := $(shell sed -n 's/^\(TC_GCC\|TC_GLIBC\|TC_KERNEL\|TC_BINUTILS\) *= *\(.*\)/\1=\2/p' $(_TC_CAP_MK) 2>/dev/null)
+_tc_cap_of    = $(patsubst $(1)=%,%,$(filter $(1)=%,$(_TC_CAP_DECL)))
+TC_GCC      := $(call _tc_cap_of,TC_GCC)
+TC_GLIBC    := $(call _tc_cap_of,TC_GLIBC)
+TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
+TC_BINUTILS := $(call _tc_cap_of,TC_BINUTILS)
 
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and

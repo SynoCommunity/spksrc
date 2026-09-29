@@ -79,7 +79,9 @@ endif
 #
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifeq ($(lastword $(subst /, ,$(INSTALL_PREFIX))),target)
-INSTALL_PREFIX_VAR = $(shell dirname $(INSTALL_PREFIX))/var
+# The sibling 'var' of the install prefix. $(dir) rather than dirname: this is read
+# per package and a fork here buys nothing over the string operation.
+INSTALL_PREFIX_VAR = $(patsubst %/,%,$(dir $(INSTALL_PREFIX)))/var
 endif
 endif
 ifeq ($(strip $(INSTALL_PREFIX_VAR)),)
