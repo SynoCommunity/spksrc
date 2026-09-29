@@ -342,8 +342,12 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 
 # SOURCE_DATE_EPOCH is the reproducible-builds.org standard name, which is why tar, gzip
 # and ImageMagick all honour it. Last commit touching the package: a revision, not a run.
-SOURCE_DATE_EPOCH ?= $(or $(shell git log -1 --format=%ct -- $(CURDIR) 2>/dev/null),\
+# Assigned immediately, and only when unset: an exported recursive variable is
+# re-expanded for every process make starts, which would run git log each time.
+ifeq ($(origin SOURCE_DATE_EPOCH),undefined)
+SOURCE_DATE_EPOCH := $(or $(shell git log -1 --format=%ct -- $(CURDIR) 2>/dev/null),\
                           $(shell date -r $(firstword $(wildcard $(CURDIR)/Makefile)) +%s 2>/dev/null))
+endif
 export SOURCE_DATE_EPOCH
 
 # --sort=name because tar otherwise takes the directory order, --mtime because it
