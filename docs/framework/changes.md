@@ -135,6 +135,10 @@ If you only read one thing, read this. The details are in the dated log below.
       a bare `x86_64-pc-linux-gnu-gcc` on the PATH. This serves `spksrc.cross-rust.mk`
       packages as well.
 
+    - **Those three paths come from `$(call tc,...)`** like every other tool since #7523,
+      so they follow an active overlay; `RUST_TARGET_LENV` is the suffix, `$(subst)` rather
+      than a `tr` per line since `RUST_TARGET` is already lower case.
+
     - **The toolchain file sets `Rust_CARGO_TARGET`**, which Corrosion cannot infer when
       cross-compiling and otherwise falls back to the host triple.
 
