@@ -118,6 +118,28 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 29th 2026 — Three more variables were forking on every expansion"
+
+    - **`AVAILABLE_TCVERSIONS` forked once per toolchain, every time it was read.**
+      `$(shell echo <arch>-<vers> | cut -f2 -d'-')` inside a `$(foreach)` over 188
+      directories, in a recursively expanded variable -- 376 forks with
+      `AVAILABLE_KERNEL_VERSIONS` beside it. `$(word 2,$(subst -, ,...))` does the same
+      split in make; no base toolchain directory carries more than one dash.
+
+    - **`INSTALL_PREFIX_VAR` ran `dirname` on a constant path**, and
+      **`tc-capability.mk` ran four `sed` over the same Makefile** for `TC_GCC`,
+      `TC_GLIBC`, `TC_KERNEL` and `TC_BINUTILS`. The first is `$(dir)`, the second one
+      pass emitting `KEY=value` and split with `$(filter)`.
+
+    - **Measured on an spk parse**, against master: 2510 forks and 8.4 s down to 459 and
+      1.1 s; stacked on #7522, 749 forks down to 244 and 1.02 s to 0.39 s. Values are
+      unchanged, and the four capability fields were compared over all 198 toolchain
+      Makefiles.
+
+    - **`:=` is not free.** `ARCHS_WITH_GENERIC_SUPPORT` was left recursive on purpose:
+      forcing it immediate costs 783 forks, because it is computed whether or not
+      anything reads it. Making a variable immediate pays only where it is actually read.
+
 ??? note "September 29th 2026 — One overlay-aware tool lookup, shared by tc_vars and the packages (#7523)"
 
     - **The generated cmake, meson and autotools files resolved tools on their own.**

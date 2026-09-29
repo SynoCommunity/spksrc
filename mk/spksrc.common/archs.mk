@@ -39,11 +39,13 @@
 # supported-arch-<consumer-dir> target for each.
 _AVAILABLE_TC_DIRS = $(sort $(notdir $(wildcard $(BASEDIR)/toolchain/syno-*)))
 AVAILABLE_TOOLCHAINS = $(subst syno-,,$(foreach d,$(_AVAILABLE_TC_DIRS),$(if $(findstring _,$(d)),,$(d))))
-AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
+# The DSM version of each '<arch>-<vers>' directory name. Split in make: a $(shell) here
+# would fork once per toolchain, and the list is read on every parse.
+AVAILABLE_TCVERSIONS := $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(word 2,$(subst -, ,$(arch)))))
 
 # Available toolchains formatted as '{ARCH}-{TC}'
 AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)/kernel/syno-*))))
-AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
+AVAILABLE_KERNEL_VERSIONS := $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(word 2,$(subst -, ,$(arch)))))
 
 ###
 
