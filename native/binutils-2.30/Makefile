@@ -142,15 +142,19 @@ binutils-pgo-train:
 	@#      its VFP and every vldr in the file.
 	@# -std is pinned because the vendor gcc spans 4.3.7 to 12.2, and the C++ half is
 	@# best-effort: gcc 4.3 has no -std=gnu++11, and training on C alone beats failing.
+	@# -fno-var-tracking-assignments when the vendor gcc takes it: the 8.5.0 Synology
+	@# ships for DSM 7.1 segfaults on train.c with that pass on, and 4.3 lacks the flag.
 	@rm -rf $(_PGO_WORK) && mkdir -p $(_PGO_WORK) && cd $(_PGO_WORK) && \
 	  want=$$($(_PGO_CC) -x c /dev/null -c -o /dev/null -### 2>&1 \
 	          | tr ' ' '\n' | grep -E '^"?/.*/as"?$$' -A40 | grep -E '^"?-m' | tr -d '"') ; \
 	  good="" ; for f in $$want ; do \
 	    $(_PGO_BIN)as $$f --version >/dev/null 2>&1 && good="$$good $$f" ; done ; \
 	  $(MSG) "*** PGO: as flags kept:$$good" ; \
-	  $(_PGO_CC)  --sysroot=$(TC_SYSROOT_DIR) -std=gnu99 -O2 -g -S -o t-o2.s $(CURDIR)/pgo/train.c && \
-	  $(_PGO_CC)  --sysroot=$(TC_SYSROOT_DIR) -std=gnu99 -O3 -g -S -o t-o3.s $(CURDIR)/pgo/train.c && \
-	  { $(_PGO_CXX) --sysroot=$(TC_SYSROOT_DIR) -std=gnu++11 -O2 -g -S -o t-cpp.s $(CURDIR)/pgo/train.cpp \
+	  vta="" ; $(_PGO_CC) -fno-var-tracking-assignments -x c /dev/null -S -o /dev/null 2>/dev/null \
+	    && vta=-fno-var-tracking-assignments ; \
+	  $(_PGO_CC)  --sysroot=$(TC_SYSROOT_DIR) -std=gnu99 -O2 -g $$vta -S -o t-o2.s $(CURDIR)/pgo/train.c && \
+	  $(_PGO_CC)  --sysroot=$(TC_SYSROOT_DIR) -std=gnu99 -O3 -g $$vta -S -o t-o3.s $(CURDIR)/pgo/train.c && \
+	  { $(_PGO_CXX) --sysroot=$(TC_SYSROOT_DIR) -std=gnu++11 -O2 -g $$vta -S -o t-cpp.s $(CURDIR)/pgo/train.cpp \
 	      2>/dev/null || rm -f t-cpp.s ; } ; \
 	  for f in *.s ; do \
 	    sed -i -E '/^[[:space:]]*\.cpu[[:space:]]/d' $$f ; \
