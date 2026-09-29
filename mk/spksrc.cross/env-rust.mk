@@ -74,8 +74,6 @@ endif
 
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
 RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
-# ... and as the <triple> suffix cc-rs reads (CC_<triple>, AR_<triple>): lower-case, - -> _.
-RUST_TARGET_LENV = $(shell echo $(RUST_TARGET) | tr 'A-Z-' 'a-z_')
 
 # Deterministic cargo output in the build logs
 ENV += CARGO_TERM_COLOR=never

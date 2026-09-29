@@ -313,11 +313,10 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
-	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
-	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += TARGET_CC=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += TARGET_CXX=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
+	echo TC_ENV += TARGET_AR=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
-	echo RUST_TARGET_LENV := $(RUST_TARGET_LENV) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
 .PHONY: tc_autotools_vars
