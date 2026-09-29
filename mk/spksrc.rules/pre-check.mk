@@ -62,12 +62,8 @@ endif
 
 # Every gate in the tree, required ones only, as `make check-<arch>-<vers>` walks it: a
 # package is as blocked by a floor it never declared. ~ carries the spaces $(shell) eats.
-#
-# Walked once per WORK_DIR: PRECHECK_TREE_DONE (exported below once the tree passed) names
-# the WORK_DIR whose whole tree was already checked. Every package built into it -- the
-# owner's own stage sub-makes, each dependency -- sits inside that tree, and re-walking its
-# subtree at every parse was most of the cost of a dependency walk. Another WORK_DIR
-# (toolchain, toolkit) checks its own.
+# Walked once per WORK_DIR: PRECHECK_TREE_DONE (exported once the tree passed) skips it for
+# every later parse into that WORK_DIR, all inside the tree already checked.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 ifneq ($(PRECHECK_TREE_DONE),$(WORK_DIR))
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
