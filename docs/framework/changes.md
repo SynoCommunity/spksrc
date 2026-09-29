@@ -118,6 +118,36 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 29th 2026 — One overlay-aware tool lookup, shared by tc_vars and the packages (#7523)"
+
+    - **The generated cmake, meson and autotools files resolved tools on their own.**
+      Three shell loops in `spksrc.toolchain/tc_vars.mk` rebuilt the toolchain bin path
+      by hand and swapped in the binutils overlay with a `case` over
+      `TC_BINUTILS_TOOLS` -- a second implementation of what `$(call tc,...)`
+      (`spksrc.common/macros.mk`) already does, and the one a package is told to use.
+
+    - **They knew nothing of a gcc overlay.** `$(call tc,...)` picks
+      `TC_OVERLAY_GCC_PATH` and appends `TC_GCC_SUFFIX`; the shell copies had neither,
+      so `CC`, `CXX`, `CMAKE_C_COMPILER` and meson's `c` would all have kept pointing at
+      the vendor gcc once a gcc overlay was switched on, silently.
+
+    - **The loops are now `$(foreach)` in make**, so each path comes from
+      `$(call tc,...)` on the target side and `$(call native,...)` on the build side.
+      `TOOLS` carries one whitespace-free entry per tool -- meson's name, the
+      autotools and cmake name, the binary -- which also retires the `sed` and `tr`
+      that parsed it, and `TC_BINUTILS_TOOLS`, whose list the macro already holds.
+
+    - **`TC_PATH` and the two `TC_OVERLAY_*_PATH` are defined where they are emitted**,
+      so the generator and the `tc_vars.mk` it writes resolve a tool the same way.
+
+    - **cargo's `AR` and `LINKER` come from the macro too.** They were the last two paths
+      built by hand, so an active binutils overlay reached `ld` and `as` but not the `ar`
+      that packs the archives cargo then links.
+
+    - Output is unchanged but for one character: the seven generated files, over all
+      198 toolchains, differ from master only in `CMAKE_SHARED_LINKER_FLAGS`, which
+      carried a trailing space whenever no binutils overlay contributed a flag.
+
 ??? note "September 29th 2026 — A dependency walk checks the tree once and visits each dependency once (#7521)"
 
     - **The pre-check re-walked the whole subtree at every parse.** `_TREE_GATES` runs

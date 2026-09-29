@@ -52,6 +52,38 @@
 # Variables
 COOKIE_PREFIX =
 
+# Where a tool lives, emitted verbatim into tc_vars.mk below so the files written here
+# and the packages reading them resolve one the same way. Recursive: the overlays follow.
+TC_PATH                   = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
+TC_OVERLAY_BINUTILS_PATH  = $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/)
+TC_OVERLAY_GCC_PATH       = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/)
+
+# The cmake variable a tool fills, given its TOOLS name; the build-host twin is the
+# same with _FOR_BUILD appended. Anything not named here is CMAKE_<name>.
+_cmake_var = $(strip \
+  $(if $(filter CC,$(1)),CMAKE_C_COMPILER,\
+  $(if $(filter CPP CXX,$(1)),CMAKE_$(1)_COMPILER,\
+  $(if $(filter LD,$(1)),CMAKE_LINKER,\
+  $(if $(filter LDSHARED,$(1)),CMAKE_SHARED_LINKER_FLAGS,\
+  $(if $(filter FC,$(1)),CMAKE_Fortran_COMPILER,CMAKE_$(1)))))))
+
+# One [binaries] line, from a TOOLS name $(1) and a tool path $(2). meson calls the C++
+# compiler cpp, wants c beside cc and fortran rather than fc, and ldshared is a driver.
+_meson_cross_entry = \
+  $(if $(filter cpp,$(1)),echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; echo "cpp = '$(call tc,g++)'" ;,\
+  $(if $(filter fc,$(1)),echo "fortran = '$(2)'" ;,\
+  $(if $(filter cc,$(1)),echo "c = '$(2)'" ; echo "cc = '$(2)'" ;,\
+  $(if $(filter ldshared,$(1)),echo "ldshared = '$(2) $(TC_LDSHARED_ARGS)'" ;,\
+  echo "$(1) = '$(2)'" ;))))
+
+# The same for the native machine file, where the tools are the host's own: no
+# overlay to honour, and the shared link takes no target flags.
+_meson_native_entry = \
+  $(if $(filter cc,$(1)),echo "c = '$(2)'" ; echo "cc = '$(2)'" ;,\
+  $(if $(filter fc,$(1)),echo "fortran = '$(2)'" ;,\
+  $(if $(filter ldshared,$(1)),echo "ldshared = '$(2) -shared'" ;,\
+  echo "$(1) = '$(2)'" ;)))
+
 # Mark tc_vars generation as completed using status cookie
 TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done
 
@@ -190,46 +222,14 @@ endif
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
 	echo
 	@echo "# define cross-compilers and tools to use" ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
-	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
-	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
-	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_LINKER $${tcbin}/$(TC_PREFIX)$${source} ; \
-	  elif [ "$${target}" = "LDSHARED" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS "$$(echo $${source} | cut -f2 -d' ') $(OVERLAY_BINUTILS_FLAG)" ; \
-	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $${tcbin}/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
-	  else \
-	    printf "set(%-25s %s)\n" CMAKE_$${target} $${tcbin}/$(TC_PREFIX)$${source} ; \
-	  fi ; \
-	done ; \
+	$(foreach t,$(TOOLS),\
+	  printf "set(%-25s %s)\n" $(call _cmake_var,$(call tool_var,$(t))) \
+	    "$(if $(filter LDSHARED,$(call tool_var,$(t))),$(TC_LDSHARED_ARGS),$(call tc,$(call tool_bin,$(t))))" ; ) \
 	echo
 	@echo "# define 'build' compilers and tools to use" ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-35s %s)\n" CMAKE_C_COMPILER_FOR_BUILD $$(which $${source}) ; \
-	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-35s %s)\n" CMAKE_$${target}_COMPILER_FOR_BUILD $$(which $${source}) ; \
-	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-35s %s)\n" CMAKE_LINKER_FOR_BUILD $$(which $${source}) ; \
-	  elif [ "$${target}" = "LDSHARED" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS_FOR_BUILD $$(echo $${source} | cut -f2 -d' ') ; \
-	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-35s %s)\n" CMAKE_Fortran_COMPILER_FOR_BUILD $$(which $${source}) ; \
-	  else \
-	    printf "set(%-35s %s)\n" CMAKE_$${target}_FOR_BUILD $$(which $${source}) ; \
-	  fi ; \
-	done ; \
+	$(foreach t,$(TOOLS),\
+	  printf "set(%-35s %s)\n" $(call _cmake_var,$(call tool_var,$(t)))_FOR_BUILD \
+	    "$(if $(filter LDSHARED,$(call tool_var,$(t))),-shared,$(call native,$(call tool_bin,$(t))))" ; ) \
 	echo
 	@echo "# where is the target environment located" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH $(CMAKE_FIND_ROOT_PATH))" ; \
@@ -278,46 +278,16 @@ tc_meson_cross_vars:
 	echo "endian = '$(MESON_HOST_ENDIAN)'"
 	@echo
 	@echo "[binaries]" ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
-	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
-	  extra="" ; case "$${target}" in ldshared) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
-	  if [ "$${target}" = "cpp" ]; then \
-	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)g++'" ; \
-	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
-	  elif [ "$${target}" = "cc" ]; then \
-	    echo "c = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
-	  else \
-	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
-	  fi ; \
-	done
+	$(foreach t,$(TOOLS),$(call _meson_cross_entry,$(call tool_role,$(t)),$(call tc,$(call tool_bin,$(t))))) \
+	true
 	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
 	echo "rust = '$(CARGO_HOME)/bin/rustc'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
 	@echo "[binaries]"
-	@for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  if [ "$${target}" = "cc" ]; then \
-	    echo "c = '$$(which $${source})'" ; \
-	    echo "$${target} = '$$(which $${source})'" ; \
-	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$$(which $${source})'" ; \
-	  elif [ "$${target}" = "ldshared" ]; then \
-	    echo "$${target} = '$$(which gcc) -shared'" ; \
-	  else \
-	    echo "$${target} = '$$(which $${source})'" ; \
-	  fi ; \
-	done
+	@$(foreach t,$(TOOLS),$(call _meson_native_entry,$(call tool_role,$(t)),$(call native,$(call tool_bin,$(t))))) \
+	true
 	@echo "g-ir-compiler = '$$(which g-ir-compiler)'" ; \
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
@@ -338,8 +308,8 @@ tc_rust_vars:
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
 	echo TC_ENV += RUST_TARGET_PATH=\"$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
@@ -348,15 +318,9 @@ tc_rust_vars:
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_ENV += SYSROOT=\"$(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
-	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
-	  extra="" ; case "$${target}" in LDSHARED) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
-	  echo TC_ENV += $${target}=\"$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
-	done ; \
+	$(foreach t,$(TOOLS),\
+	  echo TC_ENV += $(call tool_var,$(t))=\"$(call tc,$(call tool_bin,$(t)))$(if \
+	       $(filter LDSHARED,$(call tool_var,$(t))), $(TC_LDSHARED_ARGS))\" ; ) \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
 	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
@@ -397,7 +361,7 @@ tc_vars:
 	echo TC_SYSROOT := $(TC_SYSROOT) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
-	echo TC_PATH := $(TC_WORK_DIR)/$(TC_TARGET)/bin/ ; \
+	echo TC_PATH := $(TC_PATH) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS) ; \
@@ -415,8 +379,8 @@ tc_vars:
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
-	echo TC_OVERLAY_BINUTILS_PATH := $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/) ; \
-	echo TC_OVERLAY_GCC_PATH := $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/)
+	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
+	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH)
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
