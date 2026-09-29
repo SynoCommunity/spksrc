@@ -140,6 +140,10 @@ If you only read one thing, read this. The details are in the dated log below.
     - **`TC_PATH` and the two `TC_OVERLAY_*_PATH` are defined where they are emitted**,
       so the generator and the `tc_vars.mk` it writes resolve a tool the same way.
 
+    - **cargo's `AR` and `LINKER` come from the macro too.** They were the last two paths
+      built by hand, so an active binutils overlay reached `ld` and `as` but not the `ar`
+      that packs the archives cargo then links.
+
     - Output is unchanged but for one character: the seven generated files, over all
       198 toolchains, differ from master only in `CMAKE_SHARED_LINKER_FLAGS`, which
       carried a trailing space whenever no binutils overlay contributed a flag.
