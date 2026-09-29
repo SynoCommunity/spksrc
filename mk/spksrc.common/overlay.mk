@@ -230,7 +230,7 @@ OVERLAY_WARN_GCC_VERSION_MISSING      = $(call overlay_warn_version_missing,gcc,
 define OVERLAY_WARN_BINUTILS_UNMATCHED
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** OVERLAY_BINUTILS=1: every compile uses binutils $(OVERLAY_BINUTILS_VERS) as/ld" ; \
-$(MSG) "*** paired with the vendor gcc $(TC_GCC), which it is not matched to." ; \
+$(MSG) "*** paired with the vendor gcc $(TC_GCC_VENDOR), which it is not matched to." ; \
 $(MSG) "*** Set OVERLAY_GCC=1 to pair it with gcc $(OVERLAY_GCC_VERS) instead." ; \
 $(MSG) "*********************************************************************"
 endef
@@ -248,7 +248,7 @@ endef
 define OVERLAY_WARN_GCC_NO_BINUTILS
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** OVERLAY_GCC=1 for [$(_OVERLAY_TC)], but no binutils overlay is active" ; \
-$(MSG) "*** gcc $(OVERLAY_GCC_VERS) would fall back to the vendor as/ld ($(TC_GCC) era)" ; \
+$(MSG) "*** gcc $(OVERLAY_GCC_VERS) would fall back to the vendor as/ld ($(TC_GCC_VENDOR) era)" ; \
 $(MSG) "*** Overlay disabled -- provide binutils $(OVERLAY_BINUTILS_VERS) for this arch" ; \
 $(MSG) "*********************************************************************"
 endef
