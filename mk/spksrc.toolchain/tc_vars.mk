@@ -294,6 +294,12 @@ tc_meson_native_vars:
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
+# cc-rs compilers for a crate's build script compiling C: CC_<triple>, not TARGET_CC --
+# on x64 the target triple is the host's, so cc-rs reads HOST_CC and falls back to the
+# host gcc. Underscored: /bin/sh (dash), which ninja runs every command through, drops
+# from the environment any name that is not a valid shell identifier (CC_x86_64-unknown-...).
+_cc_rs_triple = $(shell echo $(RUST_TARGET) | tr 'A-Z-' 'a-z_')
+
 .PHONY: tc_rust_vars
 tc_rust_vars:
 	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
@@ -313,9 +319,9 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
-	echo TC_ENV += TARGET_CC=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += TARGET_CXX=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
-	echo TC_ENV += TARGET_AR=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CC_$(_cc_rs_triple)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CXX_$(_cc_rs_triple)=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++\" ; \
+	echo TC_ENV += AR_$(_cc_rs_triple)=\"$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)/$(TC_PREFIX)ar\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
