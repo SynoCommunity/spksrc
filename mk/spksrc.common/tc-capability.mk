@@ -48,17 +48,7 @@ _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
 # over the same file, on every parse the framework goes through.
 _TC_CAP_DECL := $(shell sed -n 's/^\(TC_GCC\|TC_GLIBC\|TC_KERNEL\|TC_BINUTILS\) *= *\(.*\)/\1=\2/p' $(_TC_CAP_MK) 2>/dev/null)
 _tc_cap_of    = $(patsubst $(1)=%,%,$(filter $(1)=%,$(_TC_CAP_DECL)))
-# TC_GCC is the compiler a build will actually use: the ACTIVE overlay's, else the
-# toolchain's own, which TC_GCC_VENDOR keeps for the callers that mean the stock one.
-# PKG_VERS of the consumer, like the rustc arm below, rather than OVERLAY_GCC_VERS: the
-# latter is the directory form (8.5) and would read as older than a vendor 8.5.0.
-TC_GCC_VENDOR := $(call _tc_cap_of,TC_GCC)
-_TC_CAP_GCC_MK := $(wildcard $(firstword $(TC_OVERLAY_GCC))/Makefile)
-ifeq ($(strip $(OVERLAY_GCC_ON)),1)
-TC_GCC        := $(or $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_GCC_MK) 2>/dev/null),$(TC_GCC_VENDOR))
-else
-TC_GCC        := $(TC_GCC_VENDOR)
-endif
+TC_GCC      := $(call _tc_cap_of,TC_GCC)
 TC_GLIBC    := $(call _tc_cap_of,TC_GLIBC)
 TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
 TC_BINUTILS := $(call _tc_cap_of,TC_BINUTILS)
@@ -96,12 +86,18 @@ endif
 endif
 endif
 
-# ---- gcc ---------------------------------------------------------------------
+# ---- gcc: the compiler a build will actually use ----------------------------
+# The overlay's version when one is ACTIVE, the toolchain's own otherwise: a floor asks
+# what the compiler can do, and an active gcc overlay changes the answer. TC_GCC itself
+# stays the stock version -- it names consumer directories and drives gcc-abi.mk, both of
+# which must keep reading the vendor compiler.
+TC_GCC_EFFECTIVE = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
+
 # Plain ifeq rather than a nested $(if): version_ge returns empty for false.
 ifneq ($(strip $(MIN_GCC_VERSION)),)
-ifneq ($(strip $(TC_GCC)),)
-ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
-TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),gcc $(TC_GCC) < $(MIN_GCC_VERSION))
+ifneq ($(strip $(TC_GCC_EFFECTIVE)),)
+ifeq ($(call version_ge,$(TC_GCC_EFFECTIVE),$(MIN_GCC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION))
 endif
 endif
 endif
