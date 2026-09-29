@@ -118,7 +118,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "September 29th 2026 — Three more variables were forking on every expansion"
+??? note "September 29th 2026 — Three more variables were forking on every expansion (#7524)"
 
     - **`AVAILABLE_TCVERSIONS` forked once per toolchain, every time it was read.**
       `$(shell echo <arch>-<vers> | cut -f2 -d'-')` inside a `$(foreach)` over 188
