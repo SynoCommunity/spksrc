@@ -118,6 +118,31 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 29th 2026 — A dependency walk checks the tree once and visits each dependency once (#7521)"
+
+    - **The pre-check re-walked the whole subtree at every parse.** `_TREE_GATES` runs
+      `dependency-unsupported` over the package's tree whenever a package is parsed with
+      `ARCH`/`TCVERSION`: its own make, then its `cross-stage1` and `cross-stage2`
+      sub-makes, for every package of the build. The owner's walk had already covered all
+      of them. On an already built gstreamer, `make depend` spent 764 make calls and 42 s on
+      that (gst-plugins-base alone visited each of its dependencies 16 times).
+
+    - **Now once per WORK_DIR.** Once the tree passed, `PRECHECK_TREE_DONE` is exported with
+      the WORK_DIR it was checked for; every later parse building into that WORK_DIR skips
+      the walk. The package's own checks (capability floors, `UNSUPPORTED_ARCHS`, DSM window)
+      still run everywhere. Same gstreamer, same load: **95 make calls, 11 s**.
+
+    - **`depend_target` visits each dependency once per run** (`dep_seen`, as the PLIST walk
+      since #7516), stamps in `$(WORK_DIR)/.DEPEND`. An already built tree gains nothing
+      there, cookies already stop the recursion; a fresh build does, where a package still
+      to build walks back into dependencies another one already built.
+
+    - **Both are bound to WORK_DIR, never handed down blindly.** `DEPEND_WALK` names the
+      WORK_DIR that owns the walk; a sub-make building into another one (toolchain, toolkit)
+      checks and walks on its own instead of trusting stamps it did not write. The owner
+      clears `.DEPEND` before walking, so a failed or interrupted run leaves nothing behind;
+      `make spkclean` removes it too.
+
 ??? note "September 28th 2026 — The spk PLIST is written whole or not at all, and walked once per dependency (#7516)"
 
     - **A partial `work-*/PLIST` was taken as up to date.** The file is its own make

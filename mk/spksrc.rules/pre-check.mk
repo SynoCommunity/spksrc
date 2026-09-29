@@ -62,10 +62,14 @@ endif
 
 # Every gate in the tree, required ones only, as `make check-<arch>-<vers>` walks it: a
 # package is as blocked by a floor it never declared. ~ carries the spaces $(shell) eats.
+# Walked once per WORK_DIR: PRECHECK_TREE_DONE (exported once the tree passed) skips it for
+# every later parse into that WORK_DIR, all inside the tree already checked.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
+ifneq ($(PRECHECK_TREE_DONE),$(WORK_DIR))
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
                    | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
+endif
 endif
 
 # What this package refuses on its own, then how much the tree adds.
@@ -76,6 +80,9 @@ _tree_why = $(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(
 ifneq ($(or $(strip $(TC_CAPABILITY_UNSUPPORTED)),$(strip $(_TREE_GATES))),)
   $(foreach _g,$(_TREE_GATES),$(info ===>  check: $(subst ~, ,$(_g))))
   $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(_own_why)$(_tree_why))
+endif
+ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
+export PRECHECK_TREE_DONE := $(WORK_DIR)
 endif
 
 # UNSUPPORTED_ARCHS says WHERE a package fails, never why, and is often added by an include
