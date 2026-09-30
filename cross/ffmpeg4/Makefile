@@ -274,8 +274,8 @@ DEPENDS += cross/openh264
 CONFIGURE_ARGS += --enable-libopenh264
 endif
 
-# Add libaom to supported ARCH
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# Add libaom to supported ARCH: its gcc and glibc floors (cross/libaom-*)
+ifeq ($(call version_ge, $(TC_GCC), 4.8)$(call version_ge, $(TC_GLIBC), 2.16),11)
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
