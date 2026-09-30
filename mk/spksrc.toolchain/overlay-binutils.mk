@@ -36,11 +36,13 @@ OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHI
 # generic clean; the consumers go through native-install.mk, so this never recurses. The last
 # message labels the base's own rm, which the generic recipe prints unlabelled right after --
 # otherwise it reads as a second pass over the last consumer.
-ifneq ($(strip $(TC_OVERLAY_RUSTC))$(strip $(TC_OVERLAY_BINUTILS)),)
+# Every rust consumer, as the toolchain provisions every one (spksrc.toolchain.mk): cleaning
+# only the selected one left the others' cached cookies, and their rustup link, never redone.
+ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED))$(strip $(TC_OVERLAY_BINUTILS)),)
 clean: clean-overlay-consumers
 .PHONY: clean-overlay-consumers
 clean-overlay-consumers:
-	@for d in $(TC_OVERLAY_RUSTC) $(TC_OVERLAY_BINUTILS) ; do \
+	@for d in $(_OVERLAY_RUSTC_ENABLED) $(TC_OVERLAY_BINUTILS) ; do \
 	  if [ -d "$$d" ] ; then $(MSG) "clean consumer $$(basename $$d)" ; $(MAKE) --no-print-directory -C "$$d" clean ; fi ; \
 	done
 	@$(MSG) "clean toolchain $(TC)"
