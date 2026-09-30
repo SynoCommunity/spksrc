@@ -11,10 +11,6 @@ DEPENDS = cross/fontconfig cross/cairo cross/glib
 DEPENDS += cross/fribidi
 DEPENDS += cross/harfbuzz
 
-# harfbuzz
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
-
 HOMEPAGE = https://pango.gnome.org/
 COMMENT  = Pango is a library for layout and rendering of text, with an emphasis on internationalization.
 LICENSE  = GPLv2

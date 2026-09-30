@@ -7,9 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/cairo cross/glib cross/pango cross/gdk-pixbuf cross/libxml2
 
-# pango
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
+# Cargo.toml says rust-version 1.92.0 and meson.build msrv 1.92.0.
+MIN_RUSTC_VERSION = 1.92
 
 HOMEPAGE = https://wiki.gnome.org/Projects/LibRsvg
 COMMENT  = A library to render SVG images to Cairo surfaces.
