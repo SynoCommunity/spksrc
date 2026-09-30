@@ -25,7 +25,9 @@ VIDEODRV_DEPENDS  = cross/libva
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# DSM 7, as the libVPL note below already says: this whole block needs an intel stack
+# that declares DSM >= 7, and gcc > 5 only stood for it while 6.2.4 shipped gcc 4.9.3.
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
 
 # Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
@@ -45,7 +47,7 @@ VIDEODRV_DEPENDS += cross/shaderc
 #      Jellyfin requires QSV provided by libmfx
 VIDEODRV_DEPENDS += cross/intel-libvpl
 
-# endif TC_GCC > 5
+# endif DSM >= 7
 endif
 
 # endif x64
