@@ -368,8 +368,9 @@ CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
-# Enable OpenCL and Vulkan acceleration
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# Enable OpenCL and Vulkan acceleration: the videodriver meta ships ocl-icd, the Vulkan
+# loader and shaderc from DSM 7 (videodriver-depends.mk), not on a gcc
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
 #CONFIGURE_ARGS += --enable-libglslang <<-- Uses older API
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan

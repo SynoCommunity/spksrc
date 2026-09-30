@@ -32,9 +32,21 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+# ARMv5, ARMv7L and PPC reach this version through the gcc overlay: same handling as 3.8.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
+endif
+
+# ARMv7L (hi3535) is soft-float: arm_neon.h refuses the NEON intrinsics there
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
 CONFIGURE_ARGS += -DENABLE_NEON=OFF
+endif
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=ppc
+# avoid error: AltiVec and SPE instructions cannot coexist
+CONFIGURE_ARGS += -DENABLE_VSX=0
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

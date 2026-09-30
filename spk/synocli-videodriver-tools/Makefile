@@ -39,8 +39,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS  = cross/libva-utils
 SPK_COMMANDS  = bin/vainfo
 
-# OpenCL / Vulkan / GPU tools require the newer Intel stack (DSM 7.1+, GCC > 5)
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# OpenCL / Vulkan / GPU tools require the newer Intel stack the videodriver meta ships
+# from DSM 7 (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
 
 # OpenCL
 DEPENDS += cross/clinfo

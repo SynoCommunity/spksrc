@@ -108,10 +108,11 @@ CONFIGURE_ARGS += --enable-vaapi
 
 # qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0
 DEPENDS += cross/intel-mediasdk
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# intel-libvpl comes with the videodriver meta from DSM 7 (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
 DEPENDS += cross/intel-libvpl
 CONFIGURE_ARGS += --enable-qsv
-endif  # TC_GCC > 5
+endif  # DSM >= 7
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
