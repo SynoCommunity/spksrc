@@ -91,12 +91,6 @@ FWRD_ARGS = $(foreach v,$(sort $(FWRD_VARS)),$(v)='$($(v))')
 # with belongs to its own work dir, so a meta recomputes it rather than inherit its caller's.
 FWRD_ARGS_SPK = $(foreach v,$(sort $(FWRD_VARS_SPK)),$(v)='$($(v))')
 
-# One asks for debug symbols, the other strips them. env-default.mk lets the first win by
-# if/else, while cmake, ninja and install test the second on its own and still strip.
-ifneq ($(and $(filter 1,$(strip $(GCC_DEBUG_INFO))),$(filter 1,$(strip $(GCC_NO_DEBUG_INFO)))),)
-$(error GCC_DEBUG_INFO and GCC_NO_DEBUG_INFO are mutually exclusive -- set one or neither)
-endif
-
 # Setup minimal toolchain environment variables -- AFTER overlay.mk and FWRD_ARGS above,
 # so the tc_vars.mk stage0 writes already carries this build's switches.
 include $(BASEDIR)/mk/spksrc.common/stage0.mk

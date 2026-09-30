@@ -67,11 +67,6 @@ CONFIGURE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 CONFIGURE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
 
 # -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
-
-# -----------------------------------------------------------------------------
 # Fix warnings-as-errors for stricter compilers (DSM >= 7.2 with GCC 12+)
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.common.mk

@@ -24,9 +24,6 @@ LICENSE  = MIT
 
 CMAKE_USE_DESTDIR = 0
 
-# Limit compile/link-time storage space (and faster build-time)
-GCC_NO_DEBUG_INFO = 1
-
 include ../../mk/spksrc.cross-cmake.mk
 
 # intel-media-driver specific args
@@ -34,9 +31,6 @@ include ../../mk/spksrc.cross-cmake.mk
 CONFIGURE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CONFIGURE_ARGS += -Wno-dev
-
-# Reduce build-time binary size
-GCC_NO_DEBUG_INFO = 1
 
 # Deactivate unecessary GPU generations (only Gen8/Gen9 needed)
 #CONFIGURE_ARGS += -DGEN8=OFF

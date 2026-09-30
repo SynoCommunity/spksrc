@@ -62,11 +62,6 @@ CONFIGURE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 CONFIGURE_ARGS += -DAPPLY_PATCHES='OFF'
 
 # -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
-
-# -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk
