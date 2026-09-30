@@ -67,11 +67,6 @@ CONFIGURE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CONFIGURE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 
 # -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
-
-# -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk

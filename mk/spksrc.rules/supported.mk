@@ -62,7 +62,7 @@ pre-build-native:
 
 # Per-package, so out of FWRD_VARS, which crosses into other packages. Passed only when
 # set: an empty argument would override the child's own assignment.
-DBG_ARGS = $(strip $(foreach v,GCC_DEBUG_INFO GCC_NO_DEBUG_INFO,$(if $(strip $($(v))),$(v)='$($(v))')))
+DBG_ARGS = $(if $(strip $(GCC_DEBUG_INFO)),GCC_DEBUG_INFO='$(GCC_DEBUG_INFO)')
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) $(DBG_ARGS) arch-$*
