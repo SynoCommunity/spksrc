@@ -31,7 +31,7 @@ fi
 # for every DSM version, and a query parameter is.
 path=$(printf '%s' "${QUERY_STRING:-}" | tr '&' '\n' | sed -n 's/^p=//p' | head -n 1)
 case "$path" in
-    status|settings|address|address/proxy|whoami) ;;
+    status|settings|address|address/proxy|check-account|run|whoami) ;;
     *) fail "unknown endpoint" ;;
 esac
 

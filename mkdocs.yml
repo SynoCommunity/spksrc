@@ -196,6 +196,7 @@ nav:
     - Downloads:
       - Aria2: packages/aria2.md
       - Deluge: packages/deluge.md
+      - DSM mini: packages/dsm-mini.md
       - ruTorrent: packages/rutorrent.md
       - Transmission: packages/transmission.md
     - Home Automation:
