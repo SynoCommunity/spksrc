@@ -32,15 +32,22 @@ ifeq ($(call version_ge, $(TCVERSION), 7),1)
 # Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
 
-# OpenCL
+# OpenCL. ocl-icd is the loader and has no floor of its own; the compiler and the
+# runtime behind it declare REQUIRED_MIN_DSM 7.1, and pulling them on 7.0 fails the
+# tree -- with llvm-140, intel-vc-intrinsics and the SPIRV translator they bring.
+VIDEODRV_DEPENDS += cross/ocl-icd
+ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
 VIDEODRV_DEPENDS += cross/intel-graphics-compiler
 VIDEODRV_DEPENDS += cross/intel-compute-runtime
-VIDEODRV_DEPENDS += cross/ocl-icd
+endif
 
-# Vulkan
-VIDEODRV_DEPENDS += cross/mesa
+# Vulkan. mesa needs the SPIRV-LLVM translator, which declares DSM 7.1, so it cannot
+# come along on 7.0 -- the loader and shaderc have no such floor and can.
 VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
 VIDEODRV_DEPENDS += cross/shaderc
+ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
+VIDEODRV_DEPENDS += cross/mesa
+endif
 
 # Enable Intel libVPL only on DSM 7
 # -->> can not use libmfx and libvpl together in ffmpeg
