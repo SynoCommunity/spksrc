@@ -6,7 +6,7 @@
 ###############################################################################
 
 # Force meson environment, bypassing default autotools settings.
-DEFAULT_ENV ?= meson
+DEFAULT_ENV ?= meson rust
 
 # Set default base meson directory
 # Exceptionnally it is under a sub-directory (ex: zstd)
