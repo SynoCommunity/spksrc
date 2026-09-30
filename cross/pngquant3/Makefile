@@ -26,6 +26,13 @@ ifeq ($(call version_lt, $(TC_GCC), 5),1)
 ADDITIONAL_CFLAGS = -O3 -std=c99
 endif
 
+# Shadow host libpng-config with scripts/libpng-config: Debian/Ubuntu's
+# prints its "--libdir disabled" error to stdout, which libpng-sys
+# trusts as a -L path (it checks spawn success, not exit status).
+# The stub fails every probe the way an absent binary does, sending the
+# build down its normal pkg-config/static fallback on every host.
+ENV += PATH=$(BASEDIR)/cross/pngquant3/scripts:$(PATH)
+
 # Enforce specific crate versions
 POST_EXTRACT_TARGET = pngquant_post_extract
 CRATE_VERSION_LIBZSYS = 1.1.25

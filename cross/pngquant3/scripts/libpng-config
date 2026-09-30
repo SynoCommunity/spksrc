@@ -1,0 +1,10 @@
+#!/bin/sh
+# Shadow the host libpng-config: Debian/Ubuntu's prints its
+# "--libdir option is disabled" error to stdout with a nonzero exit,
+# and libpng-sys trusts spawn-success plus UTF-8 validity (not the
+# exit status), so the error text becomes a -L path and the link fails.
+# This stub fails every probe the way an absent binary does (non-UTF8
+# stdout is rejected by from_utf8), sending the build down its normal
+# pkg-config/static fallback — identical behaviour on every host.
+printf '\377'
+exit 1
