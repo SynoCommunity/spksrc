@@ -286,7 +286,9 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# The m2m API, not the compiler: Linux grew V4L2_CAP_VIDEO_M2M in 3.3, and the 3.2
+# toolchains ship headers without it -- configure then fails outright.
+ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 

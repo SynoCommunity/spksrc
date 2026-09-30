@@ -12,6 +12,9 @@ LICENSE  = BSD-3-Clause-Clear license
 
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
+# Its cmake turns a SIMD target on whether or not the toolchain can build it: the x86
+# path makes gcc 8.5 ICE on PowerPC, and arm_neon.h refuses a soft-float ARM ABI.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
