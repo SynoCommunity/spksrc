@@ -5,11 +5,10 @@
 # archs when VIDEODRV_PACKAGE is set.
 ###############################################################################
 
-# spk/synocli-videodriver declares REQUIRED_MIN_DSM = 6; ask for the same here.
-# x64_ARCHS contains the 5.2 archs (x86, x64) too, so the arch test alone made every
-# consumer -- ffmpeg6 among them -- pull the meta in at spk-stage1 on DSM 5.2, where
-# building it can only stop at "DSM Toolchain 5.2 is lower than 6".
-IS_VIDEODRV_SUPPORTED := $(if $(call version_ge,$(TCVERSION),6),$(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)))
+# spk/synocli-videodriver's MIN_KERNEL_VERSION, asked the same here: x64_ARCHS contains
+# the 5.2 archs (x86, x64) too, whose 3.2 kernel predates the i915 render nodes libva
+# needs, so the arch test alone would pull the meta in where it can only be refused.
+IS_VIDEODRV_SUPPORTED := $(if $(call version_ge,$(TC_KERNEL),3.10),$(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)))
 
 # Same answer as an unsupported arch when the meta is left out: no META_DEPENDS, no
 # spk/synocli-videodriver in BUILD_DEPENDS, no tools package in SPK_DEPENDS.

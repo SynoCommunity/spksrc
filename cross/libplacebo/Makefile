@@ -10,6 +10,9 @@ HOMEPAGE = https://libplacebo.org
 COMMENT  = libplacebo is, in a nutshell, the core rendering algorithms and ideas of mpv rewritten as an independent library.
 LICENSE  = LGPL-2.1 license
 
+# Needs gcc >= 12: C++20 <version> header
+MIN_GCC_VERSION = 12
+
 DEPENDS += cross/mesa
 DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools

@@ -25,36 +25,34 @@ VIDEODRV_DEPENDS  = cross/libva
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-# DSM 7, as the libVPL note below already says: this whole block needs an intel stack
-# that declares DSM >= 7, and gcc > 5 only stood for it while 6.2.4 shipped gcc 4.9.3.
-ifeq ($(call version_ge, $(TCVERSION), 7),1)
+# Each set where the packages behind it build, by their own MIN_GCC_VERSION.
+# media-driver-latest and level-zero need C++14 (gcc 5).
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 
 # Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
 
-# OpenCL. ocl-icd is the loader and has no floor of its own; the compiler and the
-# runtime behind it declare REQUIRED_MIN_DSM 7.1, and pulling them on 7.0 fails the
-# tree -- with llvm-140, intel-vc-intrinsics and the SPIRV translator they bring.
-VIDEODRV_DEPENDS += cross/ocl-icd
-ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
-VIDEODRV_DEPENDS += cross/intel-graphics-compiler
-VIDEODRV_DEPENDS += cross/intel-compute-runtime
-endif
-
-# Vulkan. mesa needs the SPIRV-LLVM translator, which declares DSM 7.1, so it cannot
-# come along on 7.0 -- the loader and shaderc have no such floor and can.
-VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
-VIDEODRV_DEPENDS += cross/shaderc
-ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
-VIDEODRV_DEPENDS += cross/mesa
-endif
-
-# Enable Intel libVPL only on DSM 7
+# Intel libVPL
 # -->> can not use libmfx and libvpl together in ffmpeg
 #      Jellyfin requires QSV provided by libmfx
 VIDEODRV_DEPENDS += cross/intel-libvpl
 
-# endif DSM >= 7
+endif
+
+# OpenCL and Vulkan: the OpenCL headers, IGC, compute-runtime, shaderc and mesa need
+# C++17 (gcc 7.5). The Vulkan loader has no floor of its own but is of no use without them.
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+
+# OpenCL
+VIDEODRV_DEPENDS += cross/ocl-icd
+VIDEODRV_DEPENDS += cross/intel-graphics-compiler
+VIDEODRV_DEPENDS += cross/intel-compute-runtime
+
+# Vulkan
+VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
+VIDEODRV_DEPENDS += cross/shaderc
+VIDEODRV_DEPENDS += cross/mesa
+
 endif
 
 # endif x64

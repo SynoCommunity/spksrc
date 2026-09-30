@@ -16,4 +16,11 @@ CONFIGURE_ARGS = -Ddriverdir=$(INSTALL_PREFIX)/lib
 
 ADDITIONAL_CFLAGS = -Os
 
+include ../../mk/spksrc.common.mk
+
+# C99 loop declarations: gcc < 5 defaults to gnu89
+ifeq ($(call version_lt,$(TC_GCC),5),1)
+CONFIGURE_ARGS += -Dc_std=gnu99
+endif
+
 include ../../mk/spksrc.cross-meson.mk

@@ -13,7 +13,8 @@ PKG_DIR = media-driver-$(PKG_NAME)-$(PKG_VERS)
 #PKG_DIR = media-driver-$(PKG_GIT_HASH)
 
 DEPENDS = cross/intel-gmmlib
-REQUIRED_MIN_DSM = 7
+# Needs gcc >= 5: C++14 as gcc 4.9 does not implement it (aggregate/member initializers)
+MIN_GCC_VERSION = 5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # https://en.wikipedia.org/wiki/Tick%E2%80%93tock_model

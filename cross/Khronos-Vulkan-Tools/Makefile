@@ -10,6 +10,9 @@ HOMEPAGE = https://github.com/KhronosGroup/Vulkan-Tools
 COMMENT = Vulkan tools and utilities that can assist development by enabling developers to verify their applications correct use of the Vulkan API.
 LICENSE = Apache-2.0
 
+# Needs gcc >= 7.5: vulkaninfo requires C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
+
 DEPENDS  = cross/Khronos-Vulkan-Headers
 
 CONFIGURE_ARGS  = -DBUILD_CUBE='OFF'
