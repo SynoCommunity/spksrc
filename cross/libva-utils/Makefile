@@ -5,7 +5,8 @@ OPTIONAL_DEPENDS += cross/libva-utils-2.17
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# Same generation as the libva it goes with (cross/libva)
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 DEPENDS = cross/libva-utils-latest
 else
 DEPENDS = cross/libva-utils-2.17
