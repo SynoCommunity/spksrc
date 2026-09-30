@@ -292,7 +292,8 @@ ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 
 # libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
 # meta; asking for them where it does not exist stops configure at "libmfx not found".
@@ -316,7 +317,7 @@ CONFIGURE_ARGS += --enable-vulkan
 endif
 
 endif # ifneq VIDEODRV_ON
-endif # ifeq TCVERSION >= 6
+endif # ifeq TC_KERNEL >= 3.10
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

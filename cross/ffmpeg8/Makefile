@@ -338,7 +338,8 @@ ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 
 # libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
 # meta; asking for them where it does not exist stops configure at "libmfx not found".
@@ -349,12 +350,8 @@ CONFIGURE_ARGS += --enable-vaapi
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
 #   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
-ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
-endif
 
 # Enable OpenCL and Vulkan acceleration: where the videodriver meta ships ocl-icd, the
 # Vulkan loader and shaderc -- gcc 7.5, their C++17 floor (videodriver-depends.mk)
@@ -372,7 +369,7 @@ CONFIGURE_ARGS += --enable-libplacebo
 endif
 
 endif # ifneq VIDEODRV_ON
-endif # ifeq TCVERSION >= 6
+endif # ifeq TC_KERNEL >= 3.10
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

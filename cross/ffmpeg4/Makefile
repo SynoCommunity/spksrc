@@ -349,7 +349,8 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 # The m2m API, not the compiler: Linux grew V4L2_CAP_VIDEO_M2M in 3.3, and the 3.2
 # toolchains ship headers without it -- configure then fails outright.
 ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
@@ -377,7 +378,7 @@ CONFIGURE_ARGS += --enable-vulkan
 endif
 
 endif # ifneq VIDEODRV_ON
-endif # ifeq TCVERSION >= 6
+endif # ifeq TC_KERNEL >= 3.10
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk
