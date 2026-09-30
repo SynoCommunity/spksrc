@@ -7,7 +7,6 @@ PKG_DIST_SITE = https://github.com/intel/libvpl-tools/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/intel-mediasdk cross/intel-libvpl
-REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 HOMEPAGE = https://intel.github.io/libvpl/latest/index.html

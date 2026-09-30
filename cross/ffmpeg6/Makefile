@@ -126,7 +126,9 @@ CONFIGURE_ARGS += --enable-libfribidi
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# MIN_GLIBC_VERSION on highway, which libjxl requires, so gate on it here too rather
+# than fail the tree where the C library is older.
+ifeq ($(call version_ge, $(TC_GCC), 7.5)$(call version_ge, $(TC_GLIBC), 2.12),11)
 DEPENDS += cross/libjxl
 CONFIGURE_ARGS += --enable-libjxl
 endif
@@ -278,11 +280,14 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# The m2m API, not the compiler: Linux grew V4L2_CAP_VIDEO_M2M in 3.3, and the 3.2
+# toolchains ship headers without it -- configure then fails outright.
+ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 
 # libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
 # meta; asking for them where it does not exist stops configure at "libmfx not found".
@@ -296,8 +301,9 @@ CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
-# Enable OpenCL and Vulkan acceleration
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# Enable OpenCL and Vulkan acceleration: where the videodriver meta ships ocl-icd, the
+# Vulkan loader and shaderc -- gcc 7.5, their C++17 floor (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 #CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
 CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
@@ -311,7 +317,7 @@ CONFIGURE_ARGS += --enable-libplacebo
 endif
 
 endif # ifneq VIDEODRV_ON
-endif # ifeq TCVERSION >= 6
+endif # ifeq TC_KERNEL >= 3.10
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

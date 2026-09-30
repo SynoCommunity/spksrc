@@ -13,6 +13,9 @@ HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 LICENSE  = GPLv3
 
+# cccam.c calls be64toh, an <endian.h> macro glibc grew in 2.9: no compiler supplies it.
+MIN_GLIBC_VERSION = 2.9
+
 # Its own sources redefine typedefs, which only C11 allows -- gcc from 4.6, where 4.3.7
 # stops at "redefinition of typedef 'streaming_start_t'". Nothing above that: the ffmpeg
 # floor is ffmpeg's, and the meta below picks the version an arch can build.
@@ -99,10 +102,11 @@ CONFIGURE_ARGS += --enable-vaapi
 
 # qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0
 DEPENDS += cross/intel-mediasdk
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# intel-libvpl comes with the videodriver meta from gcc 5 (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 DEPENDS += cross/intel-libvpl
 CONFIGURE_ARGS += --enable-qsv
-endif  # TC_GCC > 5
+endif  # TC_GCC >= 5
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON

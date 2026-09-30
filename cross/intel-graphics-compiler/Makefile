@@ -10,7 +10,8 @@ HOMEPAGE = https://github.com/oneapi-src/level-zero
 COMMENT  = This project is part of the larger oneAPI project and contains copies of the Level Zero Specification API C/C++ header files, Level Zero Loader, Level Zero Validation Layer and Level Zero Tracing Layer
 LICENSE  = MIT
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # -----------------------------------------------------------------------------

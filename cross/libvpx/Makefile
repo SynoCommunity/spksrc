@@ -7,8 +7,9 @@ MIN_GCC_VERSION = 4.6
 
 include ../../mk/spksrc.common.mk
 
-# GCC >= 7.5 (DSM >= 7.0)
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# DSM >= 7.0, as the gcc floor it replaces already meant: 1.16 wants more than a modern
+# compiler -- its configure refuses the 5.2 and 6.2.4 toolchains outright.
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
 DEPENDS = cross/libvpx-latest
 else
 DEPENDS = cross/libvpx-1.14

@@ -7,7 +7,8 @@ HOMEPAGE = https://llvm.org/
 COMMENT  = Collection of modular and reusable compiler and toolchain technologies.
 LICENSE  = Apache-2.0 with LLVM-exception
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 5.1, as LLVM 14 checks itself (CheckCompilerVersion.cmake)
+MIN_GCC_VERSION = 5.1
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 DOWNLOAD_TARGET = nop
 CHECKSUM_TARGET = nop
