@@ -9,8 +9,8 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPLv2
 
-# Needs gcc >= 4.6, which the published 88f6281 build (4.6.4) shows. HDR10+ wants more
-# than 4.8 and is left out below that (see ENABLE_HDR10_PLUS), not the whole encoder.
+# Needs gcc >= 4.6: the full 8+10+12-bit encoder builds on 88f6281's 4.6.4. Only HDR10+
+# wants 4.8, and is left out below that (ENABLE_HDR10_PLUS below), not the encoder.
 MIN_GCC_VERSION = 4.6
 
 PRE_CONFIGURE_TARGET = x265_pre_configure
@@ -63,8 +63,8 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
 
-# gcc version above 4.8 required to support hdr10plus
-ifeq ($(call version_le, $(TC_GCC), 4.8),1)
+# HDR10+ needs gcc >= 4.8: x265's CMakeLists refuses it on VERSION_LESS 4.8
+ifeq ($(call version_lt, $(TC_GCC), 4.8),1)
 PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
 else
 CONFIGURE_ARGS += -DENABLE_HDR10_PLUS=ON
