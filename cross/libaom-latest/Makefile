@@ -13,6 +13,8 @@ LICENSE  = Royalty-free
 
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
+# C11 static_assert in assert.h and sys/auxv.h (arm cpu detection) came with glibc 2.16
+MIN_GLIBC_VERSION = 2.16
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
@@ -32,9 +34,21 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+# ARMv5, ARMv7L and PPC reach this version through the gcc overlay: same handling as 3.8.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
+endif
+
+# ARMv7L (hi3535) is soft-float: arm_neon.h refuses the NEON intrinsics there
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
 CONFIGURE_ARGS += -DENABLE_NEON=OFF
+endif
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=ppc
+# avoid error: AltiVec and SPE instructions cannot coexist
+CONFIGURE_ARGS += -DENABLE_VSX=0
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

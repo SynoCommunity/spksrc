@@ -11,7 +11,6 @@ STARTABLE = no
 HOMEPAGE = https://github.com/intel/compute-runtime
 LICENSE  = MIT license
 
-REQUIRED_MIN_DSM = 6
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 SERVICE_USER = auto
@@ -31,6 +30,11 @@ CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu
 # The Intel media stack drives i915 ioctls the running kernel either has or has not;
 # DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
 MIN_KERNEL_VERSION = 3.10
+
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
 
 include ../../mk/spksrc.common.mk
 

@@ -13,9 +13,6 @@ HOMEPAGE = https://github.com/intel/gmmlib
 COMMENT  = Intel Graphics Memory Management Library provides device specific and buffer management for the Intel Graphics Compute Runtime for OpenCL and the Intel Media Driver for VAAPI.
 LICENSE  = MIT
 
-# Limit compile/link-time storage space (and faster build-time)
-GCC_NO_DEBUG_INFO = 1
-
 CONFIGURE_ARGS += -DRUN_TEST_SUITE=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

@@ -11,7 +11,8 @@ HOMEPAGE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator
 COMMENT  = Tool and library for translation between LLVM IR and SPIR-V
 LICENSE  = Apache-2.0 with LLVM-exception
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 5: C++14, which gcc 4.9 does not fully implement
+MIN_GCC_VERSION = 5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # -----------------------------------------------------------------------------

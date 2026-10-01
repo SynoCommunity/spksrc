@@ -137,6 +137,9 @@ endif
 # be available at all build stages in
 # particular for dependencies (spksrc.depends.mk)
 ENV += TC_GCC=$(TC_GCC)
+# Beside it, because TC_GCC is the effective compiler and an overlay archive is named
+# after the vendor one -- see _RUST_TC_ID in spksrc.toolchain/overlay-rustc.mk.
+ENV += TC_GCC_VENDOR=$(TC_GCC_VENDOR)
 ENV += TC_GLIBC=$(TC_GLIBC)
 ENV += TC_KERNEL=$(TC_KERNEL)
 
@@ -149,7 +152,6 @@ ENV += TC_KERNEL=$(TC_KERNEL)
 #
 # Supported modes:
 #   - GCC_DEBUG_INFO=1      : full debug builds
-#   - GCC_NO_DEBUG_INFO=1   : size-optimized, stripped builds
 #
 # Architecture-specific adjustments are applied where required.
 # ---------------------------------------------------------------------------
@@ -188,19 +190,4 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
   ADDITIONAL_RUSTFLAGS := -Cdebuginfo=2 -Copt-level=0
 
-# gcc:
-#  -g0 deactivates debug information generation
-#  -Os enable some optimizations while avoiding those that increases space
-#  -flto enable optimization at link time (Link Time Optimization)
-#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
-# ld:
-#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
-#  -w omits the DWARF symbol table removing debugging information
-#  -s strips the symbol table and debug information from the binary
-else ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
-  GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
-  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-  ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
 endif

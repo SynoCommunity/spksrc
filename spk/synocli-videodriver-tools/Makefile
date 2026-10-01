@@ -11,10 +11,8 @@ STARTABLE = no
 HOMEPAGE = https://gitlab.freedesktop.org/drm/igt-gpu-tools
 LICENSE  = MIT license
 
-# VA-API tools (vainfo) work wherever synocli-videodriver provides VA-API,
-# i.e. down to DSM 6.2.4; the OpenCL/Vulkan/igt tools need the newer Intel
-# stack (DSM 7.1+) and are gated below.
-REQUIRED_MIN_DSM = 6.2.4
+# VA-API tools (vainfo) work wherever synocli-videodriver provides VA-API (its kernel
+# floor); the OpenCL/Vulkan/igt tools need the newer stack and are gated below.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 SERVICE_USER = auto
@@ -26,6 +24,11 @@ VIDEODRV_PACKAGE = synocli-videodriver
 CHANGELOG  = "1. Initial release: diagnostic and monitoring tools split out of synocli-videodriver.<br/>"
 CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+."
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -34,8 +37,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS  = cross/libva-utils
 SPK_COMMANDS  = bin/vainfo
 
-# OpenCL / Vulkan / GPU tools require the newer Intel stack (DSM 7.1+, GCC > 5)
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# OpenCL / Vulkan / VPL tools require the newer stack the videodriver meta ships from
+# gcc 7.5 (videodriver-depends.mk); clinfo and vulkaninfo are C++17 themselves
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 
 # OpenCL
 DEPENDS += cross/clinfo
@@ -45,15 +49,18 @@ SPK_COMMANDS += bin/clinfo
 DEPENDS += cross/Khronos-Vulkan-Tools
 SPK_COMMANDS += bin/vulkaninfo
 
-# Intel GPU Tools (igt)
-DEPENDS += cross/intel-gpu-tools
-SPK_COMMANDS += bin/lsgpu
-SPK_COMMANDS += bin/intel_gpu_top
-
 # Intel Video Processing Library (Intel VPL) tools
 DEPENDS += cross/intel-libvpl-tools
 SPK_COMMANDS += bin/vpl-inspect
 
+endif
+
+# Intel GPU Tools (igt): libudev 219 must match the udev the system runs, DSM 7's --
+# a platform fact, not a compiler one (DSM 6 runs udev 204).
+ifeq ($(call version_ge, $(TCVERSION), 7),1)
+DEPENDS += cross/intel-gpu-tools
+SPK_COMMANDS += bin/lsgpu
+SPK_COMMANDS += bin/intel_gpu_top
 endif
 
 endif

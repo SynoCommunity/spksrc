@@ -81,7 +81,8 @@ ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 
 # Unconditional and ahead of pre-check, so a refused arch still leaves one behind. The
-# overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
+# overlay switches reach the sub-make through overlay.mk's export, which is included
+# before this file; the two named below are belt and braces, not the mechanism.
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
   $(shell mkdir -p $(WORK_DIR))
@@ -89,7 +90,22 @@ ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
 endif
 
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
+#
+# The file pins the overlay selection this work dir was generated with, and is
+# authoritative once read. Snapshot what the switches ask for FIRST: flipping
+# OVERLAY_GCC on an existing work dir would otherwise keep building against the old
+# toolchain, silently, and only surface as a link error much later.
+_TCV_ASKED_GCC   := $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC))
+_TCV_ASKED_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC))
 -include $(WORK_DIR)/tc_vars.mk
+
+ifneq ($(and $(wildcard $(WORK_DIR)/tc_vars.mk),\
+             $(filter-out $(strip $(_TCV_ASKED_GCC))|$(strip $(_TCV_ASKED_RUSTC)),\
+                          $(strip $(TC_OVERLAY_GCC))|$(strip $(TC_OVERLAY_RUSTC)))),)
+$(error $(WORK_DIR)/tc_vars.mk was generated for a different overlay selection -- \
+gcc [$(notdir $(TC_OVERLAY_GCC))] rustc [$(notdir $(TC_OVERLAY_RUSTC))], now asked \
+gcc [$(notdir $(_TCV_ASKED_GCC))] rustc [$(notdir $(_TCV_ASKED_RUSTC))]. Run `make clean` here first)
+endif
 
 # Keyed on the extracted $(TC_TARGET), the toolchain no longer generating a file to
 # look for. The cookie traces who paid for it; it guards nothing.

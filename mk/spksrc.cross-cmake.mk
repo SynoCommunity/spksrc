@@ -64,12 +64,6 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
 
-# post-install
-ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
-ifeq ($(strip $(POST_INSTALL_TARGET)),)
-POST_INSTALL_TARGET = cmake_post_install_target
-endif
-endif
 endif
 
 ###
@@ -111,14 +105,6 @@ ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
 else
 	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(BUILD_DIR) $(INSTALL_ARGS)
 endif
-
-.PHONY: cmake_post_install_target
-
-# default post-install: clean
-# only called when GCC_NO_DEBUG_INFO=1
-cmake_post_install_target:
-	@$(MSG) - CMake post-install \(clean\)
-	$(RUN) cmake --build $(BUILD_DIR) --target clean
 
 ###
 

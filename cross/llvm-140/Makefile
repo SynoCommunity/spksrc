@@ -7,7 +7,8 @@ HOMEPAGE = https://llvm.org/
 COMMENT  = Collection of modular and reusable compiler and toolchain technologies.
 LICENSE  = Apache-2.0 with LLVM-exception
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 5.1, as LLVM 14 checks itself (CheckCompilerVersion.cmake)
+MIN_GCC_VERSION = 5.1
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 DOWNLOAD_TARGET = nop
 CHECKSUM_TARGET = nop
@@ -77,11 +78,6 @@ ADDITIONAL_CXXFLAGS += -Wno-pedantic
 ADDITIONAL_CXXFLAGS += -Wno-switch
 ADDITIONAL_CXXFLAGS += -Wno-unused-function
 ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
-
-# -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

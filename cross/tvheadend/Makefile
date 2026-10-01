@@ -18,6 +18,15 @@ LICENSE  = GPLv3
 # floor is ffmpeg's, and the meta below picks the version an arch can build.
 MIN_GCC_VERSION = 4.6
 
+# cccam.c calls be64toh, an <endian.h> macro glibc grew in 2.9. No compiler supplies
+# it, so the overlay cannot lift this one -- ppc853x-5.2 ships 2.8.
+MIN_GLIBC_VERSION = 2.9
+
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
+# `?=` here in turn stands down for a command line or an environment saying otherwise.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = cross/ffmpeg4
@@ -99,10 +108,11 @@ CONFIGURE_ARGS += --enable-vaapi
 
 # qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0
 DEPENDS += cross/intel-mediasdk
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# intel-libvpl comes with the videodriver meta from gcc 5 (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 DEPENDS += cross/intel-libvpl
 CONFIGURE_ARGS += --enable-qsv
-endif  # TC_GCC > 5
+endif  # TC_GCC >= 5
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON

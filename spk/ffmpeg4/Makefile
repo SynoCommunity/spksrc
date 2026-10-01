@@ -28,6 +28,10 @@ POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
 SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
+# One compiler and one libstdc++ ABI across the whole ffmpeg chain, tvheadend included.
+# Set before spksrc.common.mk, so overlay.mk's own `?=` stands down.
+OVERLAY_GCC ?= 1
+
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
