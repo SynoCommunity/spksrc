@@ -347,9 +347,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 # The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
 ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
-# The m2m API, not the compiler: Linux grew V4L2_CAP_VIDEO_M2M in 3.3, and the 3.2
-# toolchains ship headers without it -- configure then fails outright.
-ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
+# The m2m API, not the compiler: configure tests V4L2_BUF_FLAG_LAST, which Linux grew in
+# 4.2. The 3.x toolchains (x64-6.2.4: 3.10) ship headers without it and configure fails.
+ifeq ($(call version_ge, $(TC_KERNEL), 4.2),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
