@@ -59,7 +59,7 @@ seerr_install:
 		fs.writeFileSync(p,JSON.stringify(j,null,2));"
 
 	# ------------------------------------------------------------
-	# 2. Install deps + build (pnpm-only phase)
+	# 2. Install deps + build
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile
 	$(RUN) COMMIT_TAG=$(PKG_VERS) pnpm build
@@ -124,7 +124,7 @@ seerr_install:
 		node_modules/.pnpm/@swc+core-linux-x64-musl@*/ \
 		node_modules/.pnpm/@img+sharp-libvips-linuxmusl-x64@*/ \
 		node_modules/.pnpm/@img+sharp-linuxmusl-x64@*/ \
-		node_modules/.pnpm/@unicode+unicode-17.0.0@*/
+		node_modules/.pnpm/@unicode+unicode-*@*/
 
 	# Remove build-only @babel packages from .pnpm store
 	# (keep only runtime packages needed by email-templates chain)
@@ -142,32 +142,34 @@ seerr_install:
 			}\
 		}"
 
-	# For cross-arch builds:
-	# 1. Remove native binaries for the wrong architecture
-	# 2. Install native binaries for the target architecture
-	# Versions are resolved from pnpm-lock.yaml so upstream bumps don't require Makefile changes
+	# Remove binaries for the wrong architecture.
+	# Both variants are already in the .pnpm store (dual-arch install above)
+	# and dependents link their own copy, so no install step is needed here.
+	# NOTE: do not invoke pnpm past this point - without the packageManager pin
+	# and supportedArchitectures it re-resolves with host defaults and restores
+	# everything pruned above.
 	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "arm64" ]; then \
 		rm -rf node_modules/.pnpm/@next+swc-linux-x64*/ \
 			node_modules/.pnpm/@swc+core-linux-x64*/ \
 			node_modules/.pnpm/@img+sharp-linux-x64*/ \
 			node_modules/.pnpm/@img+sharp-libvips-linux-x64*/ \
 			node_modules/.pnpm/@unrs+resolver-binding-linux-x64*/; \
-		sed -i "s/engine-strict=.*/engine-strict=false/" .npmrc; \
-		NEXT_SWC_VER=$$(grep -o "@next/swc-linux-arm64-gnu@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
-		SHARP_LIBVIPS_VER=$$(grep -o "@img/sharp-libvips-linux-arm64@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
-		SHARP_VER=$$(grep -o "@img/sharp-linux-arm64@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
-		SWC_CORE_VER=$$(grep -o "@swc/core-linux-arm64-gnu@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
-		pnpm add @next/swc-linux-arm64-gnu@$${NEXT_SWC_VER}; \
-		pnpm add @img/sharp-libvips-linux-arm64@$${SHARP_LIBVIPS_VER}; \
-		pnpm add @img/sharp-linux-arm64@$${SHARP_VER}; \
-		pnpm add @swc/core-linux-arm64-gnu@$${SWC_CORE_VER}; \
-		sed -i "s/engine-strict=.*/engine-strict=true/" .npmrc; \
+		for p in "@next+swc-linux-arm64-gnu@" "@swc+core-linux-arm64-gnu@" \
+			"@img+sharp-linux-arm64@" "@img+sharp-libvips-linux-arm64@"; do \
+			ls -d node_modules/.pnpm/$${p}* >/dev/null || \
+				{ echo "missing $${p}* in .pnpm store - dual-arch install incomplete" >&2; exit 1; }; \
+		done; \
 	elif [ "$(NODE_ARCH)" = "x64" ]; then \
 		rm -rf node_modules/.pnpm/@next+swc-linux-arm64*/ \
 			node_modules/.pnpm/@swc+core-linux-arm64*/ \
 			node_modules/.pnpm/@img+sharp-linux-arm64*/ \
 			node_modules/.pnpm/@img+sharp-libvips-linux-arm64*/ \
 			node_modules/.pnpm/@unrs+resolver-binding-linux-arm64*/; \
+		for p in "@next+swc-linux-x64-gnu@" "@swc+core-linux-x64-gnu@" \
+			"@img+sharp-linux-x64@" "@img+sharp-libvips-linux-x64@"; do \
+			ls -d node_modules/.pnpm/$${p}* >/dev/null || \
+				{ echo "missing $${p}* in .pnpm store - dual-arch install incomplete" >&2; exit 1; }; \
+		done; \
 	fi'
 
 	# Remove dangling top-level symlinks (dev packages whose .pnpm entries were pruned)
