@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.4.1
+PKG_VERS = 3.5.0
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -17,7 +17,7 @@ INSTALL_TARGET = seerr_install
 # ------------------------------------------------------------
 # Build environment
 # ------------------------------------------------------------
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV += HUSKY=0
@@ -70,20 +70,10 @@ seerr_install:
 	# sqlite3 - download prebuilt napi binary
 	$(RUN) sh -c 'cd node_modules/sqlite3 && npx prebuild-install -r napi --platform linux --arch $(NODE_ARCH)'
 
-	# bcrypt v6.0.0 bundles prebuilts in prebuilds/ dir
-	# Keep only the target architecture prebuild
-	$(RUN) rm -rf \
-		node_modules/bcrypt/prebuilds/darwin-arm64 \
-		node_modules/bcrypt/prebuilds/darwin-x64 \
-		node_modules/bcrypt/prebuilds/linux-arm \
-		node_modules/bcrypt/prebuilds/win32-arm64 \
-		node_modules/bcrypt/prebuilds/win32-x64 \
-		node_modules/bcrypt/lib
-	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "x64" ]; then \
-		rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
-	else \
-		rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
-	fi'
+	# bcrypt bundles prebuilts in prebuilds/ dir
+	# Keep only the target architecture prebuild (linux-x64 or linux-arm64)
+	$(RUN) find node_modules/bcrypt/prebuilds -mindepth 1 -maxdepth 1 ! -name "linux-$(NODE_ARCH)" -exec rm -rf {} +
+	$(RUN) rm -rf node_modules/bcrypt/lib
 
 	# ------------------------------------------------------------
 	# 4. Remove pnpm-only metadata
@@ -155,18 +145,23 @@ seerr_install:
 	# For cross-arch builds:
 	# 1. Remove native binaries for the wrong architecture
 	# 2. Install native binaries for the target architecture
+	# Versions are resolved from pnpm-lock.yaml so upstream bumps don't require Makefile changes
 	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "arm64" ]; then \
 		rm -rf node_modules/.pnpm/@next+swc-linux-x64*/ \
 			node_modules/.pnpm/@swc+core-linux-x64*/ \
 			node_modules/.pnpm/@img+sharp-linux-x64*/ \
 			node_modules/.pnpm/@img+sharp-libvips-linux-x64*/ \
 			node_modules/.pnpm/@unrs+resolver-binding-linux-x64*/; \
-		sed -i "s/engine-strict=true/engine-strict=false/" .npmrc; \
-		pnpm add @next/swc-linux-arm64-gnu@16.2.6 2>/dev/null; \
-		pnpm add @img/sharp-libvips-linux-arm64@1.2.4 2>/dev/null; \
-		pnpm add @img/sharp-linux-arm64@0.34.5 2>/dev/null; \
-		pnpm add @swc/core-linux-arm64-gnu@1.6.5 2>/dev/null; \
-		sed -i "s/engine-strict=false/engine-strict=true/" .npmrc; \
+		sed -i "s/engine-strict=.*/engine-strict=false/" .npmrc; \
+		NEXT_SWC_VER=$$(grep -o "@next/swc-linux-arm64-gnu@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
+		SHARP_LIBVIPS_VER=$$(grep -o "@img/sharp-libvips-linux-arm64@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
+		SHARP_VER=$$(grep -o "@img/sharp-linux-arm64@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
+		SWC_CORE_VER=$$(grep -o "@swc/core-linux-arm64-gnu@[0-9.]*" pnpm-lock.yaml | head -1 | cut -d@ -f3); \
+		pnpm add @next/swc-linux-arm64-gnu@$${NEXT_SWC_VER}; \
+		pnpm add @img/sharp-libvips-linux-arm64@$${SHARP_LIBVIPS_VER}; \
+		pnpm add @img/sharp-linux-arm64@$${SHARP_VER}; \
+		pnpm add @swc/core-linux-arm64-gnu@$${SWC_CORE_VER}; \
+		sed -i "s/engine-strict=.*/engine-strict=true/" .npmrc; \
 	elif [ "$(NODE_ARCH)" = "x64" ]; then \
 		rm -rf node_modules/.pnpm/@next+swc-linux-arm64*/ \
 			node_modules/.pnpm/@swc+core-linux-arm64*/ \
@@ -233,7 +228,7 @@ seerr_install:
 		-name 'example' -o -name 'examples' \) -exec rm -rf {} + 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 8. Version tag
+	# 7. Version tag
 	# ------------------------------------------------------------
 	$(RUN) node -e "\
 		require('fs').writeFileSync(\
@@ -242,7 +237,7 @@ seerr_install:
 		)"
 
 	# ------------------------------------------------------------
-	# 9. Install into staging (Seerr runtime layout)
+	# 8. Install into staging (Seerr runtime layout)
 	# ------------------------------------------------------------
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/seerr
 
@@ -257,7 +252,7 @@ seerr_install:
 	cp $(WORK_DIR)/$(PKG_DIR)/committag.json     $(STAGING_INSTALL_PREFIX)/share/seerr/
 
 	# ------------------------------------------------------------
-	# 10. Generate PLIST
+	# 9. Generate PLIST
 	# ------------------------------------------------------------
 	( cd $(STAGING_INSTALL_PREFIX) && \
 		find share/seerr -type f -o -type l | sort ) \
