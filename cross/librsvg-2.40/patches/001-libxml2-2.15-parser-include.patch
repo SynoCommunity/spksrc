@@ -1,0 +1,15 @@
+# libxml2 2.15 turned SAX.h into a deprecated empty stub, so the
+# parser types (xmlParserCtxtPtr et al.) are no longer declared.
+# Include parser.h instead, which declares them.
+#
+--- rsvg-private.h.orig	2026-10-01 02:28:54.645581139 +0000
++++ rsvg-private.h	2026-10-01 02:29:05.561245386 +0000
+@@ -31,7 +31,7 @@
+ 
+ #include "rsvg.h"
+ 
+-#include <libxml/SAX.h>
++#include <libxml/parser.h>
+ #include <libxml/xmlmemory.h>
+ #include <pango/pango.h>
+ #include <glib.h>

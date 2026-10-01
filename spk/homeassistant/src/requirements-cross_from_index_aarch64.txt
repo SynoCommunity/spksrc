@@ -38,7 +38,7 @@ ijson==3.5.1
 isal==1.8.0
 jiter==0.16.0
 kasa_crypt==1.1.0
-lxml==6.1.1
+lxml==6.1.3
 markupsafe==3.0.3
 msgpack==1.2.1
 multidict==6.7.1

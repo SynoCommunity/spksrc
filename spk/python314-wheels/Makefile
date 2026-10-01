@@ -88,11 +88,11 @@ endif
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
+WHEELS += lxml==6.1.3
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [lxml] -std=c11
-WHEELS += lxml==5.4.0
-else
-WHEELS += lxml==6.0.2
+# Cython 3.1 atomics detection chokes GCC 4.x preprocessors; lxml runs
+# fine without them (non-atomic fallback).
+WHEELS_CFLAGS += [lxml] -std=c11 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
