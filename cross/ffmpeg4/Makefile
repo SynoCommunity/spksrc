@@ -229,7 +229,8 @@ DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 endif
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# x265's own floor (cross/x265)
+ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 endif

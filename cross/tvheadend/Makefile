@@ -100,12 +100,13 @@ ifeq ($(call version_ge,$(TC_KERNEL),3.10),1)
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 
-# qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0
+# qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0: mediasdk alone is
+# enough, which is what the published x64-6.2.4 build (gcc 4.9) links.
 DEPENDS += cross/intel-mediasdk
+CONFIGURE_ARGS += --enable-qsv
 # intel-libvpl comes with the videodriver meta from gcc 5 (videodriver-depends.mk)
 ifeq ($(call version_ge, $(TC_GCC), 5),1)
 DEPENDS += cross/intel-libvpl
-CONFIGURE_ARGS += --enable-qsv
 endif  # TC_GCC >= 5
 endif  # kernel >= 3.10
 endif  # x64
@@ -123,9 +124,9 @@ CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 
-# x265 needs gcc >= 4.8. Disabled explicitly below that: it defaults to enabled AND
-# static upstream, so omitting the pair keeps it and asks for a bundled build.
-ifeq ($(call version_ge,$(TC_GCC),4.8),1)
+# x265 needs gcc >= 4.6 (cross/x265). Disabled explicitly below that: it defaults to
+# enabled AND static upstream, so omitting the pair keeps it and asks for a bundled build.
+ifeq ($(call version_ge,$(TC_GCC),4.6),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 else
