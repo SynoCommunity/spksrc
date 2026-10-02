@@ -53,6 +53,26 @@ comma_append = $(if $(strip $(2)),$(1)$(if $(strip $(1)),$(,) )$(2),$(1))
 # always false, and every path is walked as before.
 dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/dev/null ; }
 
+# Macro: a dependency the build takes when it can, with the switches that come with it
+#
+#   $(call depend,cross/vvenc,--enable-libvvenc)
+#   $(call depend,cross/x265,--enable-libx265,--disable-libx265)
+#   $(call depend,cross/intel-mediasdk,nop)
+#   $(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
+#   $(call depend,cross/flac)
+#
+# With a second argument -- switches, or nop for none -- the dependency is optional: it is
+# declared in OPTIONAL_DEPENDS, and spksrc.rules/odepend.mk adds it to DEPENDS with $(2)
+# only where its own tree supports the arch, else passes $(3). The condition lives in the
+# dependency's floors, not in a copy here. Space-separated packages go together; | lists
+# alternatives, the first supported wins. Without a second argument it is plain DEPENDS.
+depend  = $(if $(strip $(2)),$(call _odepend,$(1),$(2),$(3)),$(eval DEPENDS += $(1)))
+_odepend = $(eval _ODEP_N := $(words $(_ODEP_LIST) x))$(eval _ODEP_LIST += $(_ODEP_N))\
+           $(eval _ODEP_$(_ODEP_N)_PKGS := $(1))\
+           $(eval _ODEP_$(_ODEP_N)_ON := $(filter-out nop,$(2)))\
+           $(eval _ODEP_$(_ODEP_N)_OFF := $(filter-out nop,$(3)))\
+           $(eval OPTIONAL_DEPENDS += $(subst |, ,$(1)))
+
 # Macro: locate a toolchain tool
 #
 #   $(call tc,gcc)   $(call tc,ar)   $(call tc,g++)

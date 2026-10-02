@@ -32,6 +32,8 @@ ifneq ($(REQUIRE_KERNEL),)
 $(error cross-virtual cannot be used when REQUIRE_KERNEL is set)
 endif
 
+include ../../mk/spksrc.rules/odepend.mk
+
 # Arch/version gating, the common cross environment, then resolve DEPENDS.
 include ../../mk/spksrc.rules/pre-check.mk
 include ../../mk/spksrc.cross/env-default.mk

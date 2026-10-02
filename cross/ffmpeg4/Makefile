@@ -71,26 +71,6 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-OPTIONAL_DEPENDS  = cross/chromaprint-fftw
-OPTIONAL_DEPENDS += cross/dav1d
-OPTIONAL_DEPENDS += cross/frei0r
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libass
-OPTIONAL_DEPENDS += cross/librabbitmq
-OPTIONAL_DEPENDS += cross/librist
-OPTIONAL_DEPENDS += cross/libvmaf_1.5
-OPTIONAL_DEPENDS += cross/libvmaf_2.3
-OPTIONAL_DEPENDS += cross/libvpx
-OPTIONAL_DEPENDS += cross/libzimg
-OPTIONAL_DEPENDS += cross/openh264
-OPTIONAL_DEPENDS += cross/rubberband
-OPTIONAL_DEPENDS += cross/shine
-OPTIONAL_DEPENDS += cross/snappy
-OPTIONAL_DEPENDS += cross/svt-av1
-OPTIONAL_DEPENDS += cross/svt-hevc
-OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
-
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --x86asmexe=nasm
@@ -107,23 +87,14 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/chromaprint-fftw
-CONFIGURE_ARGS += --enable-chromaprint
-endif
+$(call depend,cross/chromaprint-fftw,--enable-chromaprint)
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+$(call depend,cross/frei0r,--enable-frei0r)
 
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
-endif
+$(call depend,cross/libass,--enable-libass)
 
 DEPENDS += cross/libbluray
 CONFIGURE_ARGS += --enable-libbluray
@@ -131,10 +102,7 @@ CONFIGURE_ARGS += --enable-libbluray
 DEPENDS += cross/libcaca
 CONFIGURE_ARGS += --enable-libcaca
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/dav1d
-CONFIGURE_ARGS += --enable-libdav1d
-endif
+$(call depend,cross/dav1d,--enable-libdav1d)
 
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
@@ -164,30 +132,15 @@ CONFIGURE_ARGS += --enable-libopenjpeg
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --enable-libopus
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/librabbitmq
-CONFIGURE_ARGS += --enable-librabbitmq
-endif
+$(call depend,cross/librabbitmq,--enable-librabbitmq)
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/librist
-CONFIGURE_ARGS += --enable-librist
-endif
+$(call depend,cross/librist,--enable-librist)
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/rubberband
-CONFIGURE_ARGS += --enable-librubberband
-endif
+$(call depend,cross/rubberband,--enable-librubberband)
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
-endif
+$(call depend,cross/shine,--enable-libshine)
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/snappy
-CONFIGURE_ARGS += --enable-libsnappy
-endif
+$(call depend,cross/snappy,--enable-libsnappy)
 
 DEPENDS += cross/soxr
 CONFIGURE_ARGS += --enable-libsoxr
@@ -205,44 +158,25 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/libvmaf_2.3
-CONFIGURE_ARGS += --enable-libvmaf
-else ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libvmaf_1.5
-CONFIGURE_ARGS += --enable-libvmaf
-endif
+$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
-ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --enable-libvpx
-endif
+$(call depend,cross/libvpx,--enable-libvpx)
 
 DEPENDS += cross/libwebp
 CONFIGURE_ARGS += --enable-libwebp
 
-ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
-DEPENDS += cross/x264
-CONFIGURE_ARGS += --enable-libx264
-endif
+$(call depend,cross/x264,--enable-libx264)
 
-# x265's own floor (cross/x265)
-ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
-DEPENDS += cross/x265
-CONFIGURE_ARGS += --enable-libx265
-endif
+$(call depend,cross/x265,--enable-libx265)
 
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
 CONFIGURE_ARGS += --enable-demuxer=dash
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libzimg
-CONFIGURE_ARGS += --enable-libzimg
-endif
+$(call depend,cross/libzimg,--enable-libzimg)
 
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
@@ -266,36 +200,17 @@ CONFIGURE_ARGS += --enable-nonfree
 ## ARCH SPECIFIC
 ##
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
+$(call depend,cross/openh264,--enable-libopenh264)
 
-# Add libaom to supported ARCH: its gcc and glibc floors (cross/libaom-*)
-ifeq ($(call version_ge, $(TC_GCC), 4.8)$(call version_ge, $(TC_GLIBC), 2.16),11)
-DEPENDS += cross/libaom
-CONFIGURE_ARGS += --enable-libaom
-endif
+$(call depend,cross/libaom,--enable-libaom)
 
-# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
-# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
-# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
-endif
+# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
 # Add SVT-HEVC codec to x64
 # Patch for support from:
 # https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-DEPENDS += cross/svt-hevc
-CONFIGURE_ARGS += --enable-libsvthevc
-endif
-endif
+$(call depend,cross/svt-hevc,--enable-libsvthevc)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm

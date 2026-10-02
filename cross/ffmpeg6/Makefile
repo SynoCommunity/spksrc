@@ -60,14 +60,9 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-OPTIONAL_DEPENDS  = cross/frei0r
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libjxl
-OPTIONAL_DEPENDS += cross/libplacebo
-OPTIONAL_DEPENDS += cross/libvmaf
-OPTIONAL_DEPENDS += cross/openh264
-OPTIONAL_DEPENDS += cross/rubberband
-OPTIONAL_DEPENDS += cross/svt-av1
+# Named only inside the videodriver block, which a parse without ARCH never enters:
+# declared here so dependency-list-spk still fetches it.
+OPTIONAL_DEPENDS = cross/libplacebo
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -88,10 +83,7 @@ DEPENDS = cross/cairo
 DEPENDS += cross/chromaprint-fftw
 CONFIGURE_ARGS += --enable-chromaprint
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+$(call depend,cross/frei0r,--enable-frei0r)
 
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
@@ -126,12 +118,7 @@ CONFIGURE_ARGS += --enable-libfribidi
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-# MIN_GLIBC_VERSION on highway, which libjxl requires, so gate on it here too rather
-# than fail the tree where the C library is older.
-ifeq ($(call version_ge, $(TC_GCC), 7.5)$(call version_ge, $(TC_GLIBC), 2.12),11)
-DEPENDS += cross/libjxl
-CONFIGURE_ARGS += --enable-libjxl
-endif
+$(call depend,cross/libjxl,--enable-libjxl)
 
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb
@@ -149,10 +136,7 @@ CONFIGURE_ARGS += --enable-librabbitmq
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/rubberband
-CONFIGURE_ARGS += --enable-librubberband
-endif
+$(call depend,cross/rubberband,--enable-librubberband)
 
 DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
@@ -176,10 +160,7 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/libvmaf
-CONFIGURE_ARGS += --enable-libvmaf
-endif
+$(call depend,cross/libvmaf,--enable-libvmaf)
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
@@ -225,24 +206,12 @@ CONFIGURE_ARGS += --enable-nonfree
 ## ARCH SPECIFIC
 ##
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
+$(call depend,cross/openh264,--enable-libopenh264)
 
-# Add libaom to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libaom
-CONFIGURE_ARGS += --enable-libaom
-endif
+$(call depend,cross/libaom,--enable-libaom)
 
-# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
-# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
-# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
+# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
@@ -310,11 +279,7 @@ CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
 
-# Requires GCC >= 12 (C++20 <version> header support)
-ifeq ($(call version_ge, $(TC_GCC), 12),1)
-DEPENDS += cross/libplacebo
-CONFIGURE_ARGS += --enable-libplacebo
-endif
+$(call depend,cross/libplacebo,--enable-libplacebo)
 
 endif # ifneq VIDEODRV_ON
 endif # ifeq TC_KERNEL >= 3.10

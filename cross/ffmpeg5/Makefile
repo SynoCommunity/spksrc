@@ -60,14 +60,6 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-OPTIONAL_DEPENDS  = cross/frei0r
-OPTIONAL_DEPENDS += cross/openh264
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libvmaf
-OPTIONAL_DEPENDS += cross/rubberband
-OPTIONAL_DEPENDS += cross/svt-av1
-OPTIONAL_DEPENDS += cross/svt-hevc
-
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --x86asmexe=nasm
@@ -87,10 +79,7 @@ DEPENDS = cross/cairo
 DEPENDS += cross/chromaprint-fftw
 CONFIGURE_ARGS += --enable-chromaprint
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+$(call depend,cross/frei0r,--enable-frei0r)
 
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
@@ -141,10 +130,7 @@ CONFIGURE_ARGS += --enable-librabbitmq
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/rubberband
-CONFIGURE_ARGS += --enable-librubberband
-endif
+$(call depend,cross/rubberband,--enable-librubberband)
 
 DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
@@ -168,10 +154,7 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/libvmaf
-CONFIGURE_ARGS += --enable-libvmaf
-endif
+$(call depend,cross/libvmaf,--enable-libvmaf)
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
@@ -217,32 +200,17 @@ CONFIGURE_ARGS += --enable-nonfree
 ## ARCH SPECIFIC
 ##
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
+$(call depend,cross/openh264,--enable-libopenh264)
 
-# Add libaom to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libaom
-CONFIGURE_ARGS += --enable-libaom
-endif
+$(call depend,cross/libaom,--enable-libaom)
 
-# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
-# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
-# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
+# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
 # Add SVT-HEVC codec to x64
 # Patch for support from:
 # https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-hevc
-CONFIGURE_ARGS += --enable-libsvthevc
-endif
+$(call depend,cross/svt-hevc,--enable-libsvthevc)
 
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
