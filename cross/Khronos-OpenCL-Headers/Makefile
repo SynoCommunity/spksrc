@@ -12,6 +12,9 @@ HOMEPAGE = https://github.com/KhronosGroup/SPIRV-Headers
 COMMENT = Machine-readable files for the SPIR-V Registry
 LICENSE = Copyright (c) 2015-2024 The Khronos Group Inc.
 
+# Needs gcc >= 7.5: its CMake tests require C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
+
 POST_EXTRACT_TARGET = SPIRV-Headers_post_extract_target
 
 include ../../mk/spksrc.cross-cmake.mk

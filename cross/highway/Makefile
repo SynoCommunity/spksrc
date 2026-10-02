@@ -9,6 +9,9 @@ DEPENDS =
 
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
+# hwy/contrib/thread_pool calls pthread_setname_np, which glibc grew in 2.12; DSM 5.2's
+# 2.8 has no such symbol and the assert around it fails to compile.
+MIN_GLIBC_VERSION = 2.12
 
 HOMEPAGE = https://google.github.io/highway/
 COMMENT  = Performance-portable, length-agnostic SIMD with runtime dispatch.

@@ -10,7 +10,8 @@ HOMEPAGE = https://github.com/intel/vc-intrinsics
 COMMENT = Contains a set of new intrinsics on top of core LLVM IR instructions that represent SIMD semantics of a program targeting GPU.
 LICENSE = MIT
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 BUILD_DEPENDS += cross/llvm-project-140.src

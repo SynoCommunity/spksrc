@@ -25,27 +25,34 @@ VIDEODRV_DEPENDS  = cross/libva
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# Each set where the packages behind it build, by their own MIN_GCC_VERSION.
+# media-driver-latest and level-zero need C++14 (gcc 5).
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 
 # Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
 
-# OpenCL
-VIDEODRV_DEPENDS += cross/intel-graphics-compiler
-VIDEODRV_DEPENDS += cross/intel-compute-runtime
-VIDEODRV_DEPENDS += cross/ocl-icd
-
-# Vulkan
-VIDEODRV_DEPENDS += cross/mesa
-VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
-VIDEODRV_DEPENDS += cross/shaderc
-
-# Enable Intel libVPL only on DSM 7
+# Intel libVPL
 # -->> can not use libmfx and libvpl together in ffmpeg
 #      Jellyfin requires QSV provided by libmfx
 VIDEODRV_DEPENDS += cross/intel-libvpl
 
-# endif TC_GCC > 5
+endif
+
+# OpenCL and Vulkan: the OpenCL headers, IGC, compute-runtime, shaderc and mesa need
+# C++17 (gcc 7.5). The Vulkan loader has no floor of its own but is of no use without them.
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+
+# OpenCL
+VIDEODRV_DEPENDS += cross/ocl-icd
+VIDEODRV_DEPENDS += cross/intel-graphics-compiler
+VIDEODRV_DEPENDS += cross/intel-compute-runtime
+
+# Vulkan
+VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
+VIDEODRV_DEPENDS += cross/shaderc
+VIDEODRV_DEPENDS += cross/mesa
+
 endif
 
 # endif x64

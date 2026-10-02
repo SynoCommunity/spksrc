@@ -229,7 +229,8 @@ DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 endif
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# x265's own floor (cross/x265)
+ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 endif
@@ -270,8 +271,8 @@ DEPENDS += cross/openh264
 CONFIGURE_ARGS += --enable-libopenh264
 endif
 
-# Add libaom to supported ARCH
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# Add libaom to supported ARCH: its gcc and glibc floors (cross/libaom-*)
+ifeq ($(call version_ge, $(TC_GCC), 4.8)$(call version_ge, $(TC_GLIBC), 2.16),11)
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
@@ -345,8 +346,11 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-ifeq ($(call version_ge, $(TCVERSION), 6),1)
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
+# The m2m API, not the compiler: configure tests V4L2_BUF_FLAG_LAST, which Linux grew in
+# 4.2. The 3.x toolchains (x64-6.2.4: 3.10) ship headers without it and configure fails.
+ifeq ($(call version_ge, $(TC_KERNEL), 4.2),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
@@ -362,15 +366,16 @@ CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
-# Enable OpenCL and Vulkan acceleration
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# Enable OpenCL and Vulkan acceleration: where the videodriver meta ships ocl-icd, the
+# Vulkan loader and shaderc -- gcc 7.5, their C++17 floor (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 #CONFIGURE_ARGS += --enable-libglslang <<-- Uses older API
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
 
 endif # ifneq VIDEODRV_ON
-endif # ifeq TCVERSION >= 6
+endif # ifeq TC_KERNEL >= 3.10
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

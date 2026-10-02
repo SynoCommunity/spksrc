@@ -19,7 +19,8 @@ HOMEPAGE = https://github.com/intel/opencl-clang
 COMMENT  = opencl-clang is a thin wrapper library around clang. The library has OpenCL-oriented API and is capable to compile OpenCL C kernels to SPIR-V modules.
 LICENSE  = Apache License v2.0 with LLVM Exceptions
 
-REQUIRED_MIN_DSM = 7
+# Needs gcc >= 5: C++14, which gcc 4.9 does not fully implement
+MIN_GCC_VERSION = 5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # -----------------------------------------------------------------------------
@@ -59,11 +60,6 @@ CONFIGURE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 
 # [intel-opencl-clang-140]
 CONFIGURE_ARGS += -DAPPLY_PATCHES='OFF'
-
-# -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

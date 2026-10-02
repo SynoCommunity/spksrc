@@ -10,6 +10,9 @@ HOMEPAGE = https://github.com/KhronosGroup/glslang
 COMMENT = An OpenGL GLSL and OpenGL|ES GLSL (ESSL) front-end for reference validation and translation of GLSL/ESSL into an internal abstract syntax tree (AST).
 LICENSE = Copyright (c) 2015-2024 The Khronos Group Inc.
 
+# Needs gcc >= 7.5: C++17 with std::filesystem (in libstdc++fs until gcc 9, linked below)
+MIN_GCC_VERSION = 7.5
+
 DEPENDS = cross/Khronos-SPIRV-Tools
 
 CONFIGURE_ARGS  = -DENABLE_OPT='OFF'

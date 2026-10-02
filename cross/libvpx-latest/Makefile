@@ -27,6 +27,12 @@ CONFIGURE_ARGS += --disable-multithread
 
 include ../../mk/spksrc.common.mk
 
+# No arm/ppc SIMD target fits ARMv5 or the e500 PowerPC: without an explicit target,
+# configure falls back to the build host's (x86_64) and hands its flags to the cross gcc.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --target=generic-gnu
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
 CONFIGURE_ARGS += --disable-neon

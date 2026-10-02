@@ -24,7 +24,8 @@ HOMEPAGE = https://github.com/intel/compute-runtime
 COMMENT = The Intel(R) Graphics Compute Runtime for oneAPI Level Zero and OpenCL(TM) Driver is an open source project providing compute API support (Level Zero, OpenCL) for Intel graphics hardware architectures (HD Graphics, Xe).
 LICENSE = MIT license
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # -----------------------------------------------------------------------------
@@ -65,11 +66,6 @@ CONFIGURE_ARGS += -DNEO_CURRENT_PLATFORMS_SUPPORT='OFF'
 # [OpenCL/GL-Headers]
 CONFIGURE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CONFIGURE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
-
-# -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

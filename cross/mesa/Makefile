@@ -17,6 +17,9 @@ HOMEPAGE = https://mesa3d.org/
 COMMENT  = Open source implementations of OpenGL, OpenGL ES, Vulkan, OpenCL, and more.
 LICENSE  = MIT
 
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
+
 # -----------------------------------------------------------------------------
 # LLVM
 # -----------------------------------------------------------------------------

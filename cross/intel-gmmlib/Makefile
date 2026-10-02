@@ -5,7 +5,10 @@ OPTIONAL_DEPENDS += cross/intel-gmmlib-22.3
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# The current Intel generation wherever media-driver-latest builds (MIN_GCC_VERSION 5):
+# gmmlib and mediasdk follow it, keeping the 22.x set for the older compilers. libva is
+# one version for both: newer libva loads drivers built for an older VA-API.
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
 DEPENDS = cross/intel-gmmlib-latest
 else
 DEPENDS = cross/intel-gmmlib-22.3

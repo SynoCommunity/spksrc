@@ -10,7 +10,8 @@ HOMEPAGE = https://github.com/oneapi-src/level-zero
 COMMENT  = This project is part of the larger oneAPI project and contains copies of the Level Zero Specification API C/C++ header files, Level Zero Loader, Level Zero Validation Layer and Level Zero Tracing Layer
 LICENSE  = MIT
 
-REQUIRED_MIN_DSM = 7.1
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 # -----------------------------------------------------------------------------
@@ -64,11 +65,6 @@ CONFIGURE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 # For native build-time tools to link against LLVM libraries
 # 'CMCLTranslatorTool', 'elf_packager', 'vcb', 'libBiFManager.so', etc.
 CONFIGURE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
-
-# -----------------------------------------------------------------------------
-# Reduce build-time binary size
-# -----------------------------------------------------------------------------
-GCC_NO_DEBUG_INFO = 1
 
 # -----------------------------------------------------------------------------
 # Fix warnings-as-errors for stricter compilers (DSM >= 7.2 with GCC 12+)

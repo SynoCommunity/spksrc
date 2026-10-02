@@ -15,6 +15,8 @@ LICENSE  = Royalty-free
 
 # Needs gcc >= 4.8: does not configure under gcc 4.7.3.
 MIN_GCC_VERSION = 4.8
+# C11 static_assert in assert.h and sys/auxv.h (arm cpu detection) came with glibc 2.16
+MIN_GLIBC_VERSION = 2.16
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
