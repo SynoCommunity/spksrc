@@ -143,12 +143,15 @@ If you only read one thing, read this. The details are in the dated log below.
       computes verdicts, so the pre-check and `make check` walk the required tree only, and
       every walk gets its own stamp directory.
 
-    - **ffmpeg4 to ffmpeg8 and tvheadend** use it for every gated library: frei0r, libjxl
-      (highway's glibc floor comes with its tree), liblc3, rubberband, libvmaf, vvenc (its
-      `UNSUPPORTED_ARCHS`), openh264, libaom, svt-av1, svt-hevc, libplacebo, x265... Where a
-      condition lived only in ffmpeg, it moved into the library: `MIN_GCC_VERSION` 7.5 in
-      libvmaf_2.3, 4.8 in libvmaf_1.5 and librabbitmq. Kept as `ifeq`: tvheadend's ffmpeg
-      choice (paired with `spk/tvheadend`) and what lives in the videodriver block.
+    - **ffmpeg4 to ffmpeg8 and tvheadend** use it for every library that comes with a
+      switch, gated or not: a library that one day stops supporting an arch then drops out
+      of the build with its switch, instead of refusing the whole package. The gates go:
+      libjxl (highway's glibc floor comes with its tree), vvenc (its `UNSUPPORTED_ARCHS`),
+      libplacebo, liblc3, openh264, libaom, svt-av1, svt-hevc, x265... Where a condition
+      lived only in ffmpeg, it moved into the library: `MIN_GCC_VERSION` 7.5 in libvmaf_2.3,
+      4.8 in libvmaf_1.5 and librabbitmq. Still plain `DEPENDS`: what has no switch (cairo,
+      flac, pngquant -- whose place first in the list matters). Still `ifeq`: tvheadend's
+      ffmpeg choice (paired with `spk/tvheadend`) and the videodriver blocks.
 
     - **What changed in the builds**: libaom joins ffmpeg5-8 on armv7 and qoriq (the arch
       list was ffmpeg's alone; ffmpeg4 already builds it there), and shine joins ffmpeg4 on
