@@ -3,10 +3,10 @@ SPK_VERS = 20260918
 SPK_REV = 14
 SPK_ICON = src/sickchill.png
 
-PYTHON_PACKAGE = python314
+PYTHON_PACKAGE = python312
 
-# greenlet needs C++20, i.e. gcc >= 8
-MIN_GCC_VERSION = 8
+# legacy archs (88f6281, hi3535) have gcc < 4.9 and cannot build the wheel set
+MIN_GCC_VERSION = 4.9
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -14,7 +14,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. Update to 2026.9.18. <br/>2. Migrate to Python 3.14."
+CHANGELOG = "1. Update to 2026.9.18."
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
@@ -40,14 +40,43 @@ include ../../mk/spksrc.common.mk
 DEPENDS += python/sickchill
 
 # [cryptography]
+# 48.0.1 needs rustc >= 1.83; qoriq pins rust 1.82, so it uses 46.0.7 there.
 DEPENDS += cross/openssl3
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += cryptography==46.0.7
+else
+WHEELS += cryptography==48.0.1
+endif
 
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [greenlet]
+# 3.5.x needs C++20 (gcc >= 8); older toolchains build 3.0.x instead.
+# Upstream requires >= 3.5.5, relaxed by python/sickchill patch.
+ifeq ($(call version_ge, $(TC_GCC), 8.0),1)
+WHEELS += greenlet==3.5.6
+else
+WHEELS += greenlet==3.0.3
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
+endif
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+# Cython 3.1 atomics detection chokes GCC 4.x preprocessors; lxml runs
+# fine without them (non-atomic fallback).
+WHEELS_CFLAGS += [lxml] -std=c11 -DCYTHON_ATOMICS=0
+endif
+
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS += msgpack==1.0.5
+else
+WHEELS += msgpack==1.2.3
+endif
 
 include ../../mk/spksrc.spk-meta.mk
 

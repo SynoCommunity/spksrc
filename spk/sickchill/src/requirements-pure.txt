@@ -1,6 +1,6 @@
 # Assembled manually from sickchill's pyproject.toml: sickchill is not on PyPI
 # (last release 2024.3.1). Once it is released again, regenerate with:
-#   ./generate_requirements.sh sickchill==<version> 314
+#   ./generate_requirements.sh sickchill==<version> 312
 # Note: sickchill itself is built as a wheel by python/sickchill and is not
 # listed here.
 # Note: imdbpie declares a vestigial boto>=2.49.0 requirement that is never
@@ -16,7 +16,7 @@ bencode.py==4.1.0
 boto==2.49.0
 botocore==1.43.106
 cachecontrol==0.14.4
-#certifi==2026.7.22                   ==> python314
+#certifi==2026.7.22                   ==> python312
 click==8.5.0
 click_option_group==0.5.9
 configobj==5.0.9
@@ -24,10 +24,10 @@ decorator==5.3.1
 defusedxml==0.7.1
 deluge_client==1.10.2
 diskcache==5.6.3
-#distlib==0.4.3                       ==> python314 (virtualenv dependency)
+#distlib==0.4.3                       ==> python312 (virtualenv dependency)
 dogpile_cache==1.5.0
 enzyme==0.5.2
-#filelock==4.0.8                      ==> python314 (virtualenv dependency)
+#filelock==4.0.8                      ==> python312 (virtualenv dependency)
 future==1.0.0
 gntp==1.0.3
 guessit==4.4.0
@@ -46,8 +46,8 @@ markdown2==2.5.5
 new_rtorrent_python==1.0.1a0
 oauthlib==4.0.0
 packaging==26.3
-#pip==25.0.1                          ==> python314
-#platformdirs==4.12.2                 ==> python314 (virtualenv dependency)
+#pip==25.0.1                          ==> python312
+#platformdirs==4.12.2                 ==> python312 (virtualenv dependency)
 profilehooks==1.13.0
 putio_py==8.8.0
 pycparser==3.0
@@ -70,7 +70,7 @@ rebulk==6.0.1
 requests==2.34.2
 requests_oauthlib==2.0.0
 send2trash==2.1.0
-#six==1.17.0                          ==> python314
+#six==1.17.0                          ==> python312
 soupsieve==2.10
 srt==3.5.3
 stevedore==5.9.1
@@ -87,7 +87,7 @@ tzlocal==5.4.4
 Unidecode==1.4.0
 urllib3==2.8.0
 validators==0.35.0
-#virtualenv==21.14.2                  ==> python314
+#virtualenv==21.14.2                  ==> python312
 webencodings==0.6.1
 win_inet_pton==1.1.0
 xmltodict==1.0.4
