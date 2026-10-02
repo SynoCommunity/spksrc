@@ -9,7 +9,7 @@ patches we add on top of it follow within that hundred.
   200      tvheadend#2160, imagecache fetch rework
   300      tvheadend#2206, stable stream/PID mapping
   400      tvheadend#2249, everything it carries beyond #2206: LiBe-net's
-           shared per-channel cache, our seven fixes on top, and the one-line
+           shared per-channel cache, our nine fixes on top, and the one-line
            SMT_SKIP_LIVE double free
 
 This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
@@ -21,7 +21,7 @@ dropping 300 with it.
 
 300 and 400 are the same branch in two pieces: 300 is #2206 and 400 is
 everything th0ma7/tvheadend record-from-buffer adds on top of it (commits 4 to
-16, head 0d0c91ac8).  One commit of LiBe-net's original branch
+18, rebased onto the package base as 6f3d1593a..41e452f44).  One commit of LiBe-net's original branch
 (dvr_event_updated() use after free) is already upstream as c28ad9e3e and must
 stay dropped -- `git rebase` drops it on its own.
 
@@ -46,9 +46,13 @@ Then 300 is `git diff --no-prefix ${PKG_GIT_HASH} <last #2206 commit>` and 400
 is what follows it -- but 400 must be regenerated against the tree the earlier
 patches produce (see below): his headers_complete() rewrite in
 src/plumbing/globalheaders.c lands on lines patch 100 re-indents.  Resolve that
-one with a three-way merge (`git merge-file`, his side wins).  It leaves one
-conflict to settle by hand, around the `qd[i] <= 0` / `threshold` branch: keep
-his side whole, the difference is that patch 100 rewrote the same lines.
+one with a three-way merge (`git merge-file`).  It leaves two conflicts to
+settle by hand, and "his side wins" is wrong for both: patch 100 deliberately
+changes this file too.  Keep patch 100's choices -- the longer MAX_SCAN_TIME /
+MAX_NOPKT_TIME its lookahead needs, and gh_first_video_pts -- and take only the
+branch logic from #2249.  Check afterwards that the patched tree still has
+`MAX_SCAN_TIME 10000` and `MAX_NOPKT_TIME 7500`: taking his side whole silently
+reverts them.
 
 The fixes of ours inside 400, each its own commit in the PR:
 
@@ -65,6 +69,10 @@ The fixes of ours inside 400, each its own commit in the PR:
   - give headers_complete() a named component count, so the array alloca()
     sizes and the loops that index it come from one value
   - rebuild epg_broadcast_set_genre()'s list instead of unlinking from it
+  - let a cache replay wait for a stream across a bounded number of scan
+    windows, instead of declaring it absent after the first
+  - start a client's clock at the shared cache rather than at its own first
+    packet, so history older than the subscription is not at a negative time
 
 The last three answer SonarCloud on the PR.  The genre one is the same commit
 #2160 carries: it arrives here with 400, which is the range it is in, and 200
