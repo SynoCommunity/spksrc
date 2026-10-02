@@ -33,6 +33,79 @@ ADDITIONAL_CFLAGS += -std=gnu99
 endif
 ```
 
+## Dependencies
+
+`$(call depend,...)` declares a dependency the build takes **where it can**, with the
+configure switches that come with it. It does not replace `DEPENDS` and
+`OPTIONAL_DEPENDS`: it removes the conditions a package like ffmpeg had to copy, word for
+word, from each of its dependencies.
+
+| Call | Effect |
+|------|--------|
+| `$(call depend,cross/x)` | `DEPENDS += cross/x` — required, as before |
+| `$(call depend,cross/x,<switches>)` | optional: in `DEPENDS` with the switches where the tree of `cross/x` supports the build |
+| `$(call depend,cross/x,<switches>,<else>)` | and `<else>` where it does not |
+| `$(call depend,cross/x,nop)` | optional, with no switch |
+
+```makefile
+# required: a plain DEPENDS
+$(call depend,cross/flac)
+
+# taken where vvenc's own floors (gcc 7.5, its archs) are met, left out elsewhere
+$(call depend,cross/vvenc,--enable-libvvenc)
+
+# enabled by default upstream: turned off by name where x265 cannot be built
+$(call depend,cross/x265,--enable-libx265,--disable-libx265)
+
+# no switch: the build finds it on its own
+$(call depend,cross/intel-mediasdk,nop)
+
+# alternatives, the first supported wins
+$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
+
+# several packages that go together: all or none
+$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
+```
+
+Instead of
+
+```makefile
+OPTIONAL_DEPENDS += cross/vvenc
+...
+ifeq ($(call version_ge,$(TC_GCC),7.5),1)
+DEPENDS += cross/vvenc
+CONFIGURE_ARGS += --enable-libvvenc
+endif
+```
+
+where the `ifeq` repeats `MIN_GCC_VERSION = 7.5` from `cross/vvenc/Makefile`, and must be
+kept in step with it by hand.
+
+### How it decides
+
+The verdict is the one [`make check`](../developer-guide/packaging/makefile-variables.md#architecture-support)
+gives: the dependency and its required tree pass every gate (`MIN_GCC_VERSION`,
+`MIN_GLIBC_VERSION`, `MIN_KERNEL_VERSION`, `REQUIRE_64BIT`, `UNSUPPORTED_ARCHS`, …) of
+the build's `ARCH`-`TCVERSION`. So the condition **belongs to the dependency**: a floor
+missing there is a floor to add there, not a condition to put back in the caller.
+
+- Computed once per `WORK_DIR`, the candidates in parallel, and kept in
+  `work-<arch>-<vers>/odepend-<package>.mk`. After changing a dependency's floors,
+  `make clean` (or `spkclean`) to recompute.
+- The optional dependency is always declared in `OPTIONAL_DEPENDS`, so
+  `make dependency-list-spk` (no `ARCH`) still fetches its sources.
+- A dependency walk (the pre-check, `make check`) never computes verdicts: it walks the
+  required tree only, and an unsupported optional dependency never refuses the build.
+- `make check` reports the outcome: `optional in use` / `optional unused`.
+
+!!! warning "A call inside an `ifeq` is not seen without an ARCH"
+    A `$(call depend,...)` inside a block that a parse without `ARCH` does not enter (the
+    videodriver block of ffmpeg, say) cannot declare its package: name it in
+    `OPTIONAL_DEPENDS` yourself.
+
+The switches go to `CONFIGURE_ARGS`, the one variable autotools, CMake and Meson builds all
+read.
+
 ## Toolchain tools
 
 `$(call tc,<tool>)` is the absolute path of a cross tool. Use it instead of assembling

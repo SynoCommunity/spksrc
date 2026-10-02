@@ -104,6 +104,8 @@ include ../../mk/spksrc.common.mk
 
 #####
 
+include ../../mk/spksrc.rules/odepend.mk
+
 include ../../mk/spksrc.rules/pre-check.mk
 
 include ../../mk/spksrc.cross/env-default.mk

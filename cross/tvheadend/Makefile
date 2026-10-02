@@ -30,7 +30,6 @@ OPTIONAL_DEPENDS += cross/intel-mediasdk
 OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
@@ -124,14 +123,9 @@ CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 
-# x265 needs gcc >= 4.6 (cross/x265). Disabled explicitly below that: it defaults to
-# enabled AND static upstream, so omitting the pair keeps it and asks for a bundled build.
-ifeq ($(call version_ge,$(TC_GCC),4.6),1)
-DEPENDS += cross/x265
-CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
-else
-CONFIGURE_ARGS += --disable-libx265
-endif
+# x265 is disabled explicitly where it cannot be built: it defaults to enabled AND static
+# upstream, so omitting the pair keeps it and asks for a bundled build.
+$(call depend,cross/x265,--disable-libx265_static --enable-libx265,--disable-libx265)
 
 # Enable building of new UI
 BUILD_DEPENDS = native/nodejs_22

@@ -143,6 +143,7 @@ release and point `PKG_DIST_MIRRORS` at it.
 | `DEPENDS` | Cross packages to build/include |
 | `BUILD_DEPENDS` | Packages needed only for building |
 | `NATIVE_DEPENDS` | Native tools needed for building |
+| `OPTIONAL_DEPENDS` | Dependencies some architectures pull and others do not |
 
 ```makefile
 # Include these in the SPK
@@ -150,6 +151,14 @@ DEPENDS = cross/curl cross/openssl3
 
 # Only needed during build
 BUILD_DEPENDS = native/cmake
+```
+
+A feature that comes with its own dependency is best declared with
+[`$(call depend,...)`](../../reference/macros.md#dependencies): the dependency is taken,
+with its switch, wherever its own floors are met — no condition to copy from it.
+
+```makefile
+$(call depend,cross/vvenc,--enable-libvvenc)
 ```
 
 ### SPK Dependencies

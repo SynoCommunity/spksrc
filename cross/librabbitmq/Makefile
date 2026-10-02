@@ -8,7 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3
 
-# The floor ffmpeg4 gates it on, declared where it belongs.
 MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://github.com/alanxz/rabbitmq-c
