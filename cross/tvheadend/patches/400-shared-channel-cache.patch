@@ -2,21 +2,26 @@ Shared per-channel cache of raw MPEG-TS and what it makes possible: recording
 from the cache (a recording started late begins at the programme's start), HTSP
 timeshift through that same cache, recording a programme still held in it,
 RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
-channel change, a DVR-driven cache warmup, seven fixes of ours on top, and the
+channel change, a DVR-driven cache warmup, nine fixes of ours on top, and the
 one-line SMT_SKIP_LIVE double free in the classic timeshift reader.
 
 tvheadend/tvheadend#2249, everything it carries beyond #2206 (patch 300):
-commits 4 to 16 of th0ma7/tvheadend branch record-from-buffer, head 0d0c91ac8.
+commits 4 to 18 of th0ma7/tvheadend branch record-from-buffer, rebased onto
+the package base as 6f3d1593a..41e452f44.
 
-The last three of those fixes answer SonarCloud on the PR: a null dereference
-in dvr_entry_watched_timer_arm(), an alloca() the analyser cannot bound in
-headers_complete(), and the genre-list use after free.  That last one is the
-same commit #2160 carries, so it arrives here with 400 rather than 200 -- it is
-in 400's range, and 200 keeps applying either way.
+The last two of those fixes answer a report from a Kodi user: a client tuning a
+channel whose shared cache already held another viewer's history was given a
+clock starting at its own first packet, so that history sat at a negative time
+-- advertised as seekable, then delivered as negative timestamps, which a
+player cannot order (frozen picture, sound limping on).  The client's zero now
+starts at the cache instead.  It still begins playing live, with the history
+announced behind it.
 
 Regenerated against the tree the earlier patches produce -- LiBe-net's
 headers_complete() rewrite lands on lines patch 100 re-indents, resolved with a
-three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
+three-way merge.  Patch 100's own choices in that file are kept (the longer
+MAX_SCAN_TIME/MAX_NOPKT_TIME its lookahead needs, and gh_first_video_pts);
+only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 --- docs/class/timeshift.md.orig
 +++ docs/class/timeshift.md
 @@ -10,6 +10,27 @@
@@ -2404,7 +2409,28 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
  streaming_target_t * parser_output(streaming_target_t *pad);
 --- src/plumbing/globalheaders.c.orig
 +++ src/plumbing/globalheaders.c
-@@ -328,18 +328,34 @@
+@@ -29,12 +29,20 @@
+   int gh_passthru;
+   // pts of the first picture sent downstream
+   int64_t gh_first_video_pts;
++
++  /* Bounded scan windows already spent waiting for codec metadata on a
++   * cache replay START; see headers_complete() */
++  int gh_replay_rolls;
++
+ } globalheaders_t;
+ 
+ // note: there up to 2.5 sec diffs in some sources!
+ // NOTE: lookahead is introducing a delay that should be accounted here. 100 frames can be as long as 4 sec.
+ #define MAX_SCAN_TIME   10000 // in ms
+ #define MAX_NOPKT_TIME  7500  // in ms
++/* Scan windows a cache replay may spend before a stream is declared absent
++ * after all, so a stream which really is gone cannot stall the start */
++#define MAX_REPLAY_ROLLS 4
+ 
+ /**
+  *
+@@ -328,18 +336,35 @@
  /**
   *
   */
@@ -2423,7 +2449,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +  int64_t *qd;
    int64_t qd_max = 0;
 -  int i, threshold = 0;
-+  int i, ncomp, threshold = 0, roll = 0;
++  int i, ncomp, threshold = 0, roll = 0, rolls_left;
 +  int replay;
  
    assert(ss != NULL);
@@ -2437,12 +2463,13 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +  qd = alloca((size_t)ncomp * sizeof(*qd));
 +
 +  replay = !!(ss->ss_flags & STREAMING_START_CACHE_REPLAY);
++  rolls_left = replay && gh->gh_replay_rolls < MAX_REPLAY_ROLLS;
 +
 +  for(i = 0; i < ncomp; i++) {
      ssc = &ss->ss_components[i];
      qd[i] = gh_is_audiovideo(ssc->es_type) ?
                gh_queue_delay(gh, ssc->es_index) : 0;
-@@ -348,45 +364,94 @@
+@@ -348,45 +373,106 @@
    }
  
    if (qd_max <= 0)
@@ -2472,6 +2499,18 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 -             ssc->es_lang[0] ? " " : "", ssc->es_lang, ssc->es_pid,
 -             threshold, qd[i], qd_max);
 +      if(qd[i] <= 0 && qd_max > (MAX_NOPKT_TIME * 90)) {
++        if(rolls_left) {
++          /*
++           * A parser started cold at a random point in cached MPEG-TS can
++           * take longer than this window to emit the first packet of a
++           * stream.  Absent packets are then not evidence of an absent
++           * stream, so ask for another bounded window instead.
++           */
++          ssc->ssc_disabled = 0;
++          roll = 1;
++          continue;
++        }
++
 +        ssc->ssc_disabled = 1;
 +
 +        tvhdebug(LS_GLOBALHEADERS,
@@ -2486,7 +2525,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +
 +      } else if(threshold) {
 +
-+        if(replay) {
++        if(rolls_left) {
 +          /*
 +           * Random access into cached MPEG-TS may begin between codec
 +           * header repetitions.  The stream is demonstrably present, so
@@ -2554,7 +2593,15 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
  }
  
  
-@@ -435,8 +500,28 @@
+@@ -396,6 +482,7 @@
+ static void
+ gh_start(globalheaders_t *gh, streaming_message_t *sm)
+ {
++  gh->gh_replay_rolls = 0;
+   gh->gh_ss = streaming_start_copy(sm->sm_data);
+   streaming_msg_free(sm);
+ }
+@@ -435,8 +522,29 @@
      if(!gh_is_audiovideo(ssc->es_type))
        break;
  
@@ -2567,6 +2614,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +        break;
 +
 +      if(h == GH_HEADERS_ROLL) {
++        gh->gh_replay_rolls++;
 +        /*
 +         * Keep gh_ss: apply_header() has already accumulated any codec
 +         * metadata found in this window.  Only packet payload references
@@ -2575,8 +2623,8 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +         */
 +        tvhdebug(LS_GLOBALHEADERS,
 +                 "gh cache replay: codec headers incomplete after %d ms, "
-+                 "continuing scan",
-+                 MAX_SCAN_TIME);
++                 "continuing scan (window %d/%d)",
++                 MAX_SCAN_TIME, gh->gh_replay_rolls, MAX_REPLAY_ROLLS);
 +
 +        pktref_clear_queue(&gh->gh_holdq);
 +        break;
@@ -2595,7 +2643,41 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
  #include "input/mpegts/iptv/iptv_private.h"
  #endif
  #include "dvr/dvr.h"
-@@ -818,6 +819,16 @@
+@@ -773,8 +774,31 @@
+     if (!prch->prch_ts_delta)
+       goto deliver;
+     th_pkt_t *pkt = sm->sm_data;
+-    if (prch->prch_ts_delta == PTS_UNSET)
+-      prch->prch_ts_delta = MAX(0, pkt->pkt_dts - 10000);
++    if (prch->prch_ts_delta == PTS_UNSET) {
++      /*
++       * Tuning a channel whose shared cache already holds history: put the
++       * client's zero at the start of that cache rather than at its own
++       * first packet, so the whole cache is reachable on a positive
++       * timestamp.  Left at zero, the oldest seekable point reported to the
++       * client is negative, and seeking there delivered negative DTS --
++       * which a player cannot order (frozen picture, audio limping on).
++       */
++      int64_t shift = 0;
++#if ENABLE_TIMESHIFT
++      if (prch->prch_svcts)
++        shift = svcts_cache_depth(prch->prch_svcts);
++#endif
++      if (!shift && !prch->prch_ts_rebase) {
++        /* nothing to correct: keep the shared clock, and the packet as it is */
++        prch->prch_ts_delta = 0;
++        goto deliver;
++      }
++      prch->prch_ts_delta =
++        (prch->prch_ts_rebase ? MAX(0, pkt->pkt_dts - 10000) : 0) - shift;
++      /* zero means "no correction", so step off it when one is wanted */
++      if (prch->prch_ts_delta == 0)
++        prch->prch_ts_delta = -1;
++    }
+     /*
+      * time correction here
+      */
+@@ -818,6 +842,16 @@
    }
    for (prch = LIST_FIRST(&prsh->prsh_chains); prch; prch = next) {
      next = LIST_NEXT(prch, prch_sharer_link);
@@ -2612,7 +2694,24 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
      if (prch == prsh->prsh_master) {
        if (sm->sm_type == SMT_START) {
          if (prsh->prsh_start_msg)
-@@ -1173,6 +1184,10 @@
+@@ -954,7 +988,15 @@
+ {
+   prch->prch_post_share = dst;
+   tvh_mutex_lock(&prsh->prsh_queue_mutex);
+-  prch->prch_ts_delta = LIST_EMPTY(&prsh->prsh_chains) ? 0 : PTS_UNSET;
++  /* A late joiner needs a zero of its own; a chain with a shared channel
++   * cache needs one computed from the cache depth.  Both are decided on the
++   * first packet, when that depth is known. */
++  prch->prch_ts_rebase = !LIST_EMPTY(&prsh->prsh_chains);
++  prch->prch_ts_delta = prch->prch_ts_rebase
++#if ENABLE_TIMESHIFT
++                        || prch->prch_svcts
++#endif
++                        ? PTS_UNSET : 0;
+   LIST_INSERT_HEAD(&prsh->prsh_chains, prch, prch_sharer_link);
+   prch->prch_sharer = prsh;
+   if (!prsh->prsh_master)
+@@ -1173,6 +1215,10 @@
      timeshift_destroy(prch->prch_timeshift);
      prch->prch_timeshift = NULL;
    }
@@ -2623,7 +2722,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
  #endif
    if (prch->prch_gh) {
      globalheaders_destroy(prch->prch_gh);
-@@ -1237,7 +1252,10 @@
+@@ -1237,7 +1283,10 @@
    prch->prch_share = prsh->prsh_tsfix;
  
  #if ENABLE_TIMESHIFT
@@ -2637,7 +2736,15 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
  
 --- src/profile.h.orig
 +++ src/profile.h
-@@ -96,6 +96,7 @@
+@@ -83,6 +83,7 @@
+   void                     *prch_id;
+ 
+   int64_t                   prch_ts_delta;
++  int                       prch_ts_rebase;  /* late joiner: own zero */
+ 
+   int                       prch_flags;
+   int                       prch_stop;
+@@ -96,6 +97,7 @@
    struct streaming_target  *prch_tsfix;
  #if ENABLE_TIMESHIFT
    struct streaming_target  *prch_timeshift;
@@ -5259,7 +5366,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1780 @@
+@@ -0,0 +1,1796 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -7004,6 +7111,22 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +  free(st);
 +}
 +
++/* Depth (90 kHz) the shared cache already holds, 0 if there is none.
++ * The client's time base is shifted forward by this much, so cache older
++ * than the subscription still lands on a positive timestamp. */
++int64_t
++svcts_cache_depth ( streaming_target_t *pad )
++{
++  svcts_t *st = (svcts_t *)pad;
++  int64_t oldest, newest, depth = 0;
++
++  tvh_mutex_lock(&st->lock);
++  if (st->sb && svcbuf_span(st->sb, &oldest, &newest) && newest > oldest)
++    depth = ts_rescale_inv(newest - oldest, 1000000);
++  tvh_mutex_unlock(&st->lock);
++  return depth;
++}
++
 +void
 +svcts_attach ( streaming_target_t *pad, service_t *t )
 +{
@@ -7042,7 +7165,7 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +}
 --- src/timeshift/timeshift_svcts.h.orig
 +++ src/timeshift/timeshift_svcts.h
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,42 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -7078,6 +7201,9 @@ three-way merge, his side winning.  See 200-upstream-prs-HOWTO.txt.
 +
 +/* The client's subscription linked to / unlinked from a service
 + * (s_stream_mutex held) */
++/* Depth (90 kHz) of the shared cache behind this target, 0 if none */
++int64_t svcts_cache_depth ( streaming_target_t *pad );
++
 +void svcts_attach ( streaming_target_t *pad, struct service *t );
 +void svcts_detach ( streaming_target_t *pad );
 +
