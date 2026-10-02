@@ -40,16 +40,14 @@
        - uses: actions/upload-artifact@v4
 --- Containerfile.debian.orig
 +++ Containerfile.debian
-@@ -64,9 +64,7 @@ RUN apt-get update --yes && apt-get install --yes \
+@@ -64,7 +64,6 @@ RUN apt-get update --yes && apt-get install --yes \
                  --enable-hdhomerun_client \
                  --enable-kqueue \
                  --enable-libav \
 -                --enable-nvenc \
                  --enable-pngquant \
--                --enable-qsv \
+                 --enable-qsv \
                  --enable-vue_cache \
-                 --disable-vue_build \
-                 --python=python3 \
 --- Makefile.orig
 +++ Makefile
 @@ -535,20 +535,35 @@ endif
@@ -315,7 +313,7 @@
 +        "description": "WEBTV codec VP8",
 +        "name": "webtv-vp8",
 +        "codec_name": "libvpx",
-+        "height": 384,
++        "height": 360,
          "deadline": 1,
          "crf": 28,
          "cpu-used": 8
@@ -328,7 +326,7 @@
 +        "description": "WEBTV codec VP8 VAAPI",
 +        "name": "webtv-vp8-vaapi",
 +        "codec_name": "vp8_vaapi",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -341,7 +339,7 @@
 +        "description": "WEBTV codec VP9",
 +        "name": "webtv-vp9",
 +        "codec_name": "libvpx-vp9",
-+        "height": 384,
++        "height": 360,
 +        "deadline": 1,
 +        "crf": 28,
 +        "cpu-used": 8
@@ -350,7 +348,7 @@
 +        "description": "WEBTV codec VP9 VAAPI",
 +        "name": "webtv-vp9-vaapi",
 +        "codec_name": "vp9_vaapi",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -360,7 +358,7 @@
 +        "description": "WEBTV codec H264",
 +        "name": "webtv-h264",
 +        "codec_name": "libx264",
-+        "height": 384,
++        "height": 360,
 +        "preset": "faster",
 +        "tune": "zerolatency"
 +    },
@@ -368,7 +366,7 @@
 +        "description": "WEBTV codec H264 QSV",
 +        "name": "webtv-h264-qsv",
 +        "codec_name": "h264_qsv",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -378,7 +376,7 @@
 +        "description": "WEBTV codec H264 VAAPI",
 +        "name": "webtv-h264-vaapi",
 +        "codec_name": "h264_vaapi",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -388,7 +386,7 @@
 +        "description": "WEBTV codec HEVC",
 +        "name": "webtv-hevc",
 +        "codec_name": "libx265",
-+        "height": 384,
++        "height": 360,
 +        "preset": "ultrafast",
 +        "tune": "fastdecode"
 +    },
@@ -396,7 +394,7 @@
 +        "description": "WEBTV codec HEVC QSV",
 +        "name": "webtv-hevc-qsv",
 +        "codec_name": "hevc_qsv",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -406,7 +404,7 @@
 +        "description": "WEBTV codec HEVC VAAPI",
 +        "name": "webtv-hevc-vaapi",
 +        "codec_name": "hevc_vaapi",
-+        "height": 384,
++        "height": 360,
 +        "bit_rate": 1500,
 +        "max_bit_rate": 2000,
 +        "hwaccel": true,
@@ -9898,7 +9896,7 @@
 \ No newline at end of file
 --- src/transcoding/transcode/hwaccels/qsv.c.orig
 +++ src/transcoding/transcode/hwaccels/qsv.c
-@@ -0,0 +1,428 @@
+@@ -0,0 +1,440 @@
 +/*
 + *  tvheadend - Transcoding
 + *
@@ -10032,8 +10030,20 @@
 +
 +static int qsv_get_scale_filter(AVCodecContext *iavctx, int height, char *filter, size_t filter_len)
 +{
-+    // NOTE: vpp_qsv does not accept -2 (but -1 does the same thing)
-+    if (str_snprintf(filter, filter_len, "w=-1:h=%d:scale_mode=2", height)){
++    const TVHContext *ctx = iavctx->opaque;
++    const int width = ((TVHVideoCodecProfile *)ctx->profile)->size.num;
++
++    // NOTE: vpp_qsv does not accept -2, and -1 rounds to the nearest width,
++    // which can be odd: 1280x720 scaled to h=384 gives 683.  An odd width
++    // has no 4:2:0 chroma plane and has been seen to hang the media engine
++    // (i915 "Hang on vcs0" while encoding hevc_qsv).  The profile already
++    // holds the even width the encoder is configured with, so ask vpp_qsv
++    // for exactly that; -1 stays the fallback when it is unknown.
++    if (width > 0) {
++        if (str_snprintf(filter, filter_len, "w=%d:h=%d:scale_mode=2", width, height)) {
++            return -1;
++        }
++    } else if (str_snprintf(filter, filter_len, "w=-1:h=%d:scale_mode=2", height)) {
 +        return -1;
 +    }
 +    return 0;
@@ -11334,7 +11344,7 @@
      if (!icodec && !(icodec = avcodec_find_decoder(icodec_id))) {
          tvh_stream_log(self, LOG_ERR, "failed to find decoder for '%s'",
                         streaming_component_type2txt(ssc->es_type));
-@@ -141,10 +170,49 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
+@@ -141,10 +170,60 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
                                               icodec, ocodec, ssc->ssc_gh))) {
          return -1;
      }
@@ -11350,6 +11360,17 @@
 +        // Deliberately outside the hwaccel guard below -- a software-only
 +        // build needs this just as much.
 +        memcpy(&self->context->es_info, ssc, sizeof(elementary_info_t));
++        // The component handed downstream describes the *encoded* stream, so
++        // give it the geometry the filters will produce.  Left at the source
++        // geometry, the muxer writes that into the container: a WebM VP8 track
++        // announcing 1920x1080 while its frames are 640x360.  It goes unnoticed
++        // on H264/HEVC/VP9, whose bitstreams carry the size and let a player
++        // correct the container, but VP8 has no such parser in the way.
++        const TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)profile;
++        if (vp->size.num > 0 && vp->size.den > 0) {
++            ssc->es_width  = vp->size.num;
++            ssc->es_height = vp->size.den;
++        }
 +#if ENABLE_MMAL | ENABLE_V4L2M2M | ENABLE_NVENC | ENABLE_VAAPI | ENABLE_QSV
 +        // record decoder hw accel (to be used later on, for filter selection)
 +        self->context->iavhwdevtype = avhwdevtype;

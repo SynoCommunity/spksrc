@@ -2,20 +2,23 @@ Shared per-channel cache of raw MPEG-TS and what it makes possible: recording
 from the cache (a recording started late begins at the programme's start), HTSP
 timeshift through that same cache, recording a programme still held in it,
 RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
-channel change, a DVR-driven cache warmup, nine fixes of ours on top, and the
-one-line SMT_SKIP_LIVE double free in the classic timeshift reader.
+channel change, a DVR-driven cache warmup, and nine fixes of ours on top.
 
 tvheadend/tvheadend#2249, everything it carries beyond #2206 (patch 300):
-commits 4 to 18 of th0ma7/tvheadend branch record-from-buffer, rebased onto
-the package base as 6f3d1593a..41e452f44.
+commits 4 to 17 of th0ma7/tvheadend branch record-from-buffer, rebased onto
+the package base as f643210c5..6c0ff95ee.
 
-The last two of those fixes answer a report from a Kodi user: a client tuning a
-channel whose shared cache already held another viewer's history was given a
-clock starting at its own first packet, so that history sat at a negative time
--- advertised as seekable, then delivered as negative timestamps, which a
-player cannot order (frozen picture, sound limping on).  The client's zero now
-starts at the cache instead.  It still begins playing live, with the history
-announced behind it.
+The SMT_SKIP_LIVE double free this used to carry is gone: upstream took it as
+1d267d17e, written with braces where ours set sm = NULL in place.
+
+The last two fixes answer a report from a Kodi user: a client tuning a channel
+whose shared cache already held another viewer's history was given a clock
+starting at its own first packet, so that history sat at a negative time --
+advertised as seekable, then delivered as negative timestamps, which a player
+cannot order (frozen picture, sound limping on).  The client's zero now starts
+at the cache; it still begins playing live, with the history announced behind
+it.  The other bounds the scan windows a cache replay may spend before
+declaring a stream absent.
 
 Regenerated against the tree the earlier patches produce -- LiBe-net's
 headers_complete() rewrite lands on lines patch 100 re-indents, resolved with a
@@ -3546,25 +3549,21 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    tsf->time     = mono2sec(start_time) / TIMESHIFT_FILE_PERIOD;
    tsf->last     = start_time;
    tsf->wfd      = -1;
-@@ -297,7 +425,7 @@
+@@ -295,10 +423,12 @@
+       }
+     }
  
-     /* Check size */
-     if (!timeshift_conf.unlimited_size &&
--        atomic_pre_add_u64(&timeshift_conf.total_size, 0) >= timeshift_conf.max_size) {
-+        timeshift_size_used() >= timeshift_conf.max_size) {
+-    /* Check size (RAM only buffers are limited by the RAM checks below) */
++    /* Check size (RAM only buffers are limited by the RAM checks below).
++     * Read the total through timeshift_size_used(), so the check agrees
++     * with the reserve/release accounting the shared cache shares. */
+     while (!ts->full && !timeshift_conf.ram_only &&
+            !timeshift_conf.unlimited_size &&
+-           atomic_pre_add_u64(&timeshift_total_size, 0) >= timeshift_conf.max_size) {
++           timeshift_size_used() >= timeshift_conf.max_size) {
  
-       /* Remove the last file (if we can) */
-       if (tsf_hd && !tsf_hd->refcount) {
---- src/timeshift/timeshift_reader.c.orig
-+++ src/timeshift/timeshift_reader.c
-@@ -740,6 +740,7 @@
-                 /* Release */
-                 if (sm)
-                   streaming_msg_free(sm);
-+                sm = NULL;
- 
-                 /* Find end */
-                 skip_time = 0x7fffffffffffffffLL;
+       /* Remove the oldest file (if we can), but never the current one,
+          its start message is copied to the new file below */
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
 @@ -0,0 +1,1728 @@
@@ -7476,7 +7475,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  };
 --- src/timeshift.h.orig
 +++ src/timeshift.h
-@@ -39,6 +39,11 @@
+@@ -38,6 +38,11 @@
    int       ram_only;
    int       ram_fit;
    int       teletext;

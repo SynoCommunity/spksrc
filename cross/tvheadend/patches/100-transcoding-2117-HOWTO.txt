@@ -10,14 +10,17 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master 5a32b04b9 (Sep 27th 2026).  100 is still the diff
-547f8bfae..a2ec9c209 -- uknunknown's dev_transcoding_2026 head d68b98abb
-rebased onto 547f8bfae (earlier 601ba8246 on 13cd6820b, 400658886 on
-5ce3ff63c) -- and applies unchanged, nothing since touching a file it
-patches.  His own branch still sits on fc13bd6db, so that rebase is done
-here; regenerate whenever either head moves.  He moved to 55d7a6570 on Sep
-26th: a rebase only, its diff identical to d68b98abb's bar one
-Containerfile.debian line, so 100 was left alone.  It conflicts every time in Containerfile.debian, always the same
+Package base: master bc5e863a4 (Sep 29th 2026).  100 is the diff
+bc5e863a4..8dad33a74 -- uknunknown's dev_transcoding_2026 head f4a501933
+rebased onto it (earlier d68b98abb on 547f8bfae, 601ba8246 on 13cd6820b,
+400658886 on 5ce3ff63c).  His own branch sits on fc13bd6db, so that rebase
+is done here; regenerate whenever either head moves, and note that he
+force-pushes -- a plain `git fetch` is then rejected as non-fast-forward.
+
+He took three of our fixes into f4a501933, comments included: the even QSV
+scaler width, 360 as the default profile height, and the output geometry
+handed to the muxer.  Patches 101, 102 and 104 are therefore dropped, and
+only 103 (the stuck-encoder watchdog) is still carried on top.  It conflicts every time in Containerfile.debian, always the same
 way: upstream has --enable-vue_cache/--disable-vue_build where his commit
 drops --enable-nvenc/--enable-qsv, and both are kept.
 
