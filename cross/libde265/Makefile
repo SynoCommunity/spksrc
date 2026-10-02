@@ -7,8 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# A compiler with support for C++11 language features is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# A compiler with support for C++11 language features is required
+# (verified: fails on GCC <= 4.6.4, builds green on 4.7.3).
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = http://www.libde265.org/
 COMMENT  = Open h.265 video codec implementation. 

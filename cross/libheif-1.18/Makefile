@@ -16,8 +16,9 @@ DEPENDS += cross/gdk-pixbuf
 # frozen fallback line for pre-8.5 toolchains (no upstream maintenance
 # branch exists for it); selected by cross/libheif, never bumped
 
-# ARMv5 and OLD_PPC_ARCHS fail on cross/libde265
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.8: defaulted base + override destructors rejected
+# on 4.7.3 (verified); green on 4.9.3. Subsumes the libde265 floor.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = http://www.libheif.org
 COMMENT  = libheif is a ISO/IEC 23008-12:2017 HEIF file format decoder and encoder.

@@ -4,8 +4,8 @@ OPTIONAL_DEPENDS  = cross/libheif-latest
 OPTIONAL_DEPENDS += cross/libheif-1.20
 OPTIONAL_DEPENDS += cross/libheif-1.18
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
+# Compiler floors live on the tiers (GCC >= 10 latest, >= 8.5 1.20,
+# >= 4.8 1.18, >= 4.7 libde265); archs below all floors skip here.
 include ../../mk/spksrc.common.mk
 
 # support for C++20 incl. defaulted comparisons (GCC 10+);
