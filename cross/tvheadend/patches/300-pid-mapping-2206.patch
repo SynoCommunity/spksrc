@@ -2,9 +2,8 @@ Stable MPEG-TS stream and PID mapping across source PID changes: unique
 teletext component indexes, pass-through recording PIDs kept stable, and the
 stream map restored after a timeshift seek.
 
-tvheadend/tvheadend#2206 (LiBe-net), commits 16dcbf9de 10a50dc7d fca5040a3,
-rebased here onto master 547f8bfae.  Unchanged on the current base 5a32b04b9,
-which touches no file 300 or 400 patches.
+tvheadend/tvheadend#2206 (LiBe-net), commits 87b1212e3 0e0f9ce7e f643210c5,
+rebased here onto the package base.
 
 --- src/esstream.c.orig
 +++ src/esstream.c
@@ -801,7 +800,7 @@ which touches no file 300 or 400 patches.
    streaming_message_t *sm = NULL, *ctrl = NULL;
    streaming_skip_t *skip = NULL;
    tvhpoll_t *pd;
-@@ -806,7 +875,8 @@ void *timeshift_reader ( void *p )
+@@ -808,7 +877,8 @@ void *timeshift_reader ( void *p )
        }
  
        /* Find packet */
@@ -811,7 +810,7 @@ which touches no file 300 or 400 patches.
          tvh_mutex_unlock(&ts->state_mutex);
          break;
        }
-@@ -829,6 +899,10 @@ void *timeshift_reader ( void *p )
+@@ -831,6 +901,10 @@ void *timeshift_reader ( void *p )
          tvhdebug(LS_TIMESHIFT, "ts %d skip failed (%d)", ts->id, sm ? sm->sm_type : -1);
        }
        streaming_target_deliver2(ts->output, ctrl);
