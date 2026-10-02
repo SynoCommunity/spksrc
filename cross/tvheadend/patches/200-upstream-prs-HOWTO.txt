@@ -3,14 +3,15 @@ patches we add on top of it follow within that hundred.
 
   000-004  the package's own patches
   100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
-  101-104    fixes on top of it: even QSV scaler width, 360 as the default
-             profile height, a watchdog for a stuck encoder, and the output
-             geometry handed to the muxer
+  103        the one fix of ours still on top of it: a watchdog for a stuck
+             encoder.  101, 102 and 104 are gone, uknunknown having taken the
+             even QSV scaler width, 360 as the default profile height and the
+             output geometry into his branch.  103 keeps its number so the
+             upstream discussion still refers to the same patch.
   200      tvheadend#2160, imagecache fetch rework
   300      tvheadend#2206, stable stream/PID mapping
   400      tvheadend#2249, everything it carries beyond #2206: LiBe-net's
-           shared per-channel cache, our nine fixes on top, and the one-line
-           SMT_SKIP_LIVE double free
+           shared per-channel cache and our nine fixes on top
 
 This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
 
@@ -21,7 +22,9 @@ dropping 300 with it.
 
 300 and 400 are the same branch in two pieces: 300 is #2206 and 400 is
 everything th0ma7/tvheadend record-from-buffer adds on top of it (commits 4 to
-18, rebased onto the package base as 6f3d1593a..41e452f44).  One commit of LiBe-net's original branch
+17, rebased onto the package base as f643210c5..6c0ff95ee).  The SMT_SKIP_LIVE
+double free that used to be commit 4 is gone, taken upstream as 1d267d17e.
+One commit of LiBe-net's original branch
 (dvr_event_updated() use after free) is already upstream as c28ad9e3e and must
 stay dropped -- `git rebase` drops it on its own.
 
@@ -73,6 +76,11 @@ The fixes of ours inside 400, each its own commit in the PR:
     windows, instead of declaring it absent after the first
   - start a client's clock at the shared cache rather than at its own first
     packet, so history older than the subscription is not at a negative time
+
+Rebasing the series onto a newer base can find a fix of ours already upstream;
+`git rebase` then conflicts on it.  Check whether the upstream commit is the
+same change before resolving -- 1d267d17e was ours, written with braces where
+ours set sm = NULL in place -- and `git rebase --skip` it when it is.
 
 The last three answer SonarCloud on the PR.  The genre one is the same commit
 #2160 carries: it arrives here with 400, which is the range it is in, and 200
