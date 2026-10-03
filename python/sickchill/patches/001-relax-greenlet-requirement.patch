@@ -1,0 +1,11 @@
+--- pyproject.toml
++++ pyproject.toml
+@@ -44,7 +44,7 @@
+     "deluge-client>=1.10.2",
+     "enzyme>=0.5.2,<0.6.0",
+     "gntp>=1.0.3",
+-    "greenlet>=3.5.5",
++    "greenlet>=1",
+     "guessit>=4.4.0",
+     "html5lib>=1.1",
+     "ifaddr>=0.2.0,<0.3.0",
