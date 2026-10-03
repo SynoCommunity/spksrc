@@ -12,7 +12,6 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
 # The floor ffmpeg4 gates it on, declared where it belongs.
 MIN_GCC_VERSION = 4.8
-REQUIRED_MIN_SRM = 1.3
 
 MESON_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
