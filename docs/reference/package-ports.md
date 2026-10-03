@@ -104,6 +104,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Media Management"><td>8686</td><td>Lidarr</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8787</td><td>Readarr</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8822</td><td>Ombi</td><td>Media Management</td><td>Web interface</td></tr>
+    <tr data-category="Network"><td>8880</td><td>Caddy</td><td>Network</td><td>Web Server</td></tr>
     <tr data-category="Media Management"><td>8899</td><td>SickRage</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8989</td><td>Sonarr</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Storage"><td>9001</td><td>MinIO</td><td>Storage</td><td>Web interface</td></tr>
