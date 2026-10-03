@@ -42,6 +42,12 @@ If you only read one thing, read this. The details are in the dated log below.
     instead of stopping at the first. See
     [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
 
+- **Take a dependency where it can be built, without copying its conditions.**
+  `$(call depend,cross/vvenc,--enable-libvvenc)` adds vvenc and its switch wherever vvenc's
+  own floors are met, and leaves both out elsewhere; `$(call depend,cross/x)` is a plain
+  `DEPENDS`. A package like ffmpeg no longer repeats, in an `ifeq` per library, the floors
+  each library already declares. See [Macros](../reference/macros.md#dependencies).
+
 - **Ask the toolchain for a tool.** `$(call tc,gcc)`, `$(call tc,ar)` — the absolute
   path of a cross tool, following whichever overlay provides it. Never write
   `$(TC_PATH)$(TC_PREFIX)gcc`: it silently resolves to the vendor compiler as soon as an
@@ -117,6 +123,41 @@ If you only read one thing, read this. The details are in the dated log below.
   shows which are active for your arch.
 
 ---
+
+??? note "October 2nd 2026 — An optional dependency follows its own floors, not a copy of them (#7525)"
+
+    - **ffmpeg repeated every library's floor.** `ifeq ($(call version_ge,$(TC_GCC),7.5),1)`
+      around `DEPENDS += cross/vvenc` and its `--enable-libvvenc`, the same 7.5 that
+      `cross/vvenc` declares, then the package again in an `OPTIONAL_DEPENDS` list -- five
+      places to keep in step, in each of ffmpeg4 to ffmpeg8. A floor raised in the library
+      and not in ffmpeg failed the whole build instead of dropping one feature.
+
+    - **`$(call depend,<pkgs>,<switches>[,<else>])`** (`spksrc.common/macros.mk`) declares
+      the dependency optional, and `spksrc.rules/odepend.mk` adds it to `DEPENDS` with its
+      switches where `dependency-unsupported` finds its tree clear for the build, passing
+      `<else>` where not. `nop` stands for no switch, `|` separates alternatives (first
+      supported wins). With one argument it is a plain `DEPENDS`.
+
+    - **Computed once per work directory**, the candidates in parallel, into
+      `odepend-<package>.mk`; later parses include that file. A dependency walk never
+      computes verdicts, so the pre-check and `make check` walk the required tree only, and
+      every walk gets its own stamp directory.
+
+    - **ffmpeg4 to ffmpeg8 and tvheadend** use it for every library that comes with a
+      switch, gated or not: a library that one day stops supporting an arch then drops out
+      of the build with its switch, instead of refusing the whole package. The gates go:
+      libjxl (highway's glibc floor comes with its tree), vvenc (its `UNSUPPORTED_ARCHS`),
+      libplacebo, liblc3, openh264, libaom, svt-av1, svt-hevc, x265... Where a condition
+      lived only in ffmpeg, it moved into the library: `MIN_GCC_VERSION` 7.5 in libvmaf_2.3,
+      4.8 in libvmaf_1.5 and librabbitmq. Still plain `DEPENDS`: what has no switch (cairo,
+      flac, pngquant -- whose place first in the list matters). Still `ifeq`: tvheadend's
+      ffmpeg choice (paired with `spk/tvheadend`) and the videodriver blocks.
+
+    - **What changed in the builds**: libaom joins ffmpeg5-8 on armv7 and qoriq (the arch
+      list was ffmpeg's alone; ffmpeg4 already builds it there), and shine joins ffmpeg4 on
+      88f6281 and x86-5.2 (shine declares gcc 4.6, ffmpeg4 asked 4.8; built on 4.6.4).
+
+    - **`make check` reports the outcome**: `optional in use` / `optional unused`.
 
 ??? note "September 29th 2026 — CMake builds that compile Rust crates get their cross setup from the framework (#7520)"
 

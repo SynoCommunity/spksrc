@@ -8,6 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3
 
+# The floor ffmpeg4 gated it on.
+MIN_GCC_VERSION = 4.8
+
 HOMEPAGE = https://github.com/alanxz/rabbitmq-c
 COMMENT  = This is a C-language AMQP client library for use with v2.0+ of the RabbitMQ broker.
 LICENSE  = MIT

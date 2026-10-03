@@ -106,6 +106,8 @@ DEFAULT_ENV = none
 
 #####
 
+include ../../mk/spksrc.rules/odepend.mk
+
 include ../../mk/spksrc.rules/pre-check.mk
 
 # Even though this makefile doesn't cross compile,

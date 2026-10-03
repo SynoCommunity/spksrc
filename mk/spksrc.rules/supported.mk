@@ -82,6 +82,10 @@ _gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr
 # Required is the walk an arch context already defines; optional is what a second walk adds
 # when OPTIONAL_DEPENDS are followed too. A set difference, not a label carried down the
 # walk: a package under both a required and an optional parent is required.
+#
+# Then which of this package's own OPTIONAL_DEPENDS this arch ended up with: those that
+# reached DEPENDS are in use, the rest are not. Read from the two variables, so it costs
+# no third walk -- and it says out loud what a conditional dependency decided.
 .PHONY: check
 check: SHELL:=/bin/bash
 check:  ## Report the capability gates ARCH/TCVERSION fails (see also check-<arch>-<vers>)
@@ -95,6 +99,9 @@ check:  ## Report the capability gates ARCH/TCVERSION fails (see also check-<arc
 	   [ -z "$$req" ] || { echo "       required" ; echo "$$req" | $(_gate_fmt) ; } ; \
 	   [ -z "$$opt" ] || { echo "       optional" ; echo "$$opt" | $(_gate_fmt) ; } ; \
 	fi
+	@$(if $(strip $(OPTIONAL_DEPENDS)),\
+	   printf "       optional in use : %s\n" "$(or $(sort $(filter $(OPTIONAL_DEPENDS),$(DEPENDS))),-)" ; \
+	   printf "       optional unused : %s\n" "$(or $(sort $(filter-out $(DEPENDS),$(OPTIONAL_DEPENDS))),-)" ,:)
 
 # The goal-shaped form, for symmetry with arch-<arch>-<vers>. Carries the pair in the goal
 # rather than in variables, so the parse it runs under has no ARCH to be refused for.

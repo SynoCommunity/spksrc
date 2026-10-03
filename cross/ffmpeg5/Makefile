@@ -60,14 +60,6 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-OPTIONAL_DEPENDS  = cross/frei0r
-OPTIONAL_DEPENDS += cross/openh264
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libvmaf
-OPTIONAL_DEPENDS += cross/rubberband
-OPTIONAL_DEPENDS += cross/svt-av1
-OPTIONAL_DEPENDS += cross/svt-hevc
-
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --x86asmexe=nasm
@@ -84,122 +76,78 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
-DEPENDS += cross/chromaprint-fftw
-CONFIGURE_ARGS += --enable-chromaprint
+$(call depend,cross/chromaprint-fftw,--enable-chromaprint)
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+$(call depend,cross/frei0r,--enable-frei0r)
 
-DEPENDS += cross/gnutls
-CONFIGURE_ARGS += --enable-gnutls
+$(call depend,cross/gnutls,--enable-gnutls)
 
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
+$(call depend,cross/libass,--enable-libass)
 
-DEPENDS += cross/libbluray
-CONFIGURE_ARGS += --enable-libbluray
+$(call depend,cross/libbluray,--enable-libbluray)
 
-DEPENDS += cross/libcaca
-CONFIGURE_ARGS += --enable-libcaca
+$(call depend,cross/libcaca,--enable-libcaca)
 
-DEPENDS += cross/dav1d
-CONFIGURE_ARGS += --enable-libdav1d
+$(call depend,cross/dav1d,--enable-libdav1d)
 
-DEPENDS += cross/codec2
-CONFIGURE_ARGS += --enable-libcodec2
+$(call depend,cross/codec2,--enable-libcodec2)
 
-DEPENDS += cross/libdc1394
-CONFIGURE_ARGS += --enable-libdc1394
+$(call depend,cross/libdc1394,--enable-libdc1394)
 
-DEPENDS += cross/fontconfig
-CONFIGURE_ARGS += --enable-libfontconfig
+$(call depend,cross/fontconfig,--enable-libfontconfig)
 
-DEPENDS += cross/freetype
-CONFIGURE_ARGS += --enable-libfreetype
+$(call depend,cross/freetype,--enable-libfreetype)
 
-DEPENDS += cross/fribidi
-CONFIGURE_ARGS += --enable-libfribidi
+$(call depend,cross/fribidi,--enable-libfribidi)
 
-DEPENDS += cross/lame
-CONFIGURE_ARGS += --enable-libmp3lame
+$(call depend,cross/lame,--enable-libmp3lame)
 
-DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb
-CONFIGURE_ARGS += --enable-libopencore-amrwb
+$(call depend,cross/opencore-amr,--enable-libopencore-amrnb --enable-libopencore-amrwb)
 
-DEPENDS += cross/openjpeg
-CONFIGURE_ARGS += --enable-libopenjpeg
+$(call depend,cross/openjpeg,--enable-libopenjpeg)
 
-DEPENDS += cross/opus
-CONFIGURE_ARGS += --enable-libopus
+$(call depend,cross/opus,--enable-libopus)
 
-DEPENDS += cross/librabbitmq
-CONFIGURE_ARGS += --enable-librabbitmq
+$(call depend,cross/librabbitmq,--enable-librabbitmq)
 
-DEPENDS += cross/librist
-CONFIGURE_ARGS += --enable-librist
+$(call depend,cross/librist,--enable-librist)
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/rubberband
-CONFIGURE_ARGS += --enable-librubberband
-endif
+$(call depend,cross/rubberband,--enable-librubberband)
 
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
+$(call depend,cross/shine,--enable-libshine)
 
-DEPENDS += cross/snappy
-CONFIGURE_ARGS += --enable-libsnappy
+$(call depend,cross/snappy,--enable-libsnappy)
 
-DEPENDS += cross/soxr
-CONFIGURE_ARGS += --enable-libsoxr
+$(call depend,cross/soxr,--enable-libsoxr)
 
-DEPENDS += cross/speex
-CONFIGURE_ARGS += --enable-libspeex
+$(call depend,cross/speex,--enable-libspeex)
 
-DEPENDS += cross/libsrt
-CONFIGURE_ARGS += --enable-libsrt
+$(call depend,cross/libsrt,--enable-libsrt)
 
 DEPENDS += cross/flac
-DEPENDS += cross/libtheora
-CONFIGURE_ARGS += --enable-libtheora
+$(call depend,cross/libtheora,--enable-libtheora)
 
-DEPENDS += cross/twolame
-CONFIGURE_ARGS += --enable-libtwolame
+$(call depend,cross/twolame,--enable-libtwolame)
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/libvmaf
-CONFIGURE_ARGS += --enable-libvmaf
-endif
+$(call depend,cross/libvmaf,--enable-libvmaf)
 
-DEPENDS += cross/libvorbis
-CONFIGURE_ARGS += --enable-libvorbis
+$(call depend,cross/libvorbis,--enable-libvorbis)
 
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --enable-libvpx
+$(call depend,cross/libvpx,--enable-libvpx)
 
-DEPENDS += cross/libwebp
-CONFIGURE_ARGS += --enable-libwebp
+$(call depend,cross/libwebp,--enable-libwebp)
 
-DEPENDS += cross/x264
-CONFIGURE_ARGS += --enable-libx264
+$(call depend,cross/x264,--enable-libx264)
 
-DEPENDS += cross/x265
-CONFIGURE_ARGS += --enable-libx265
+$(call depend,cross/x265,--enable-libx265)
 
-DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-libxml2
-CONFIGURE_ARGS += --enable-demuxer=dash
+$(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
 
-DEPENDS += cross/libzimg
-CONFIGURE_ARGS += --enable-libzimg
+$(call depend,cross/libzimg,--enable-libzimg)
 
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
+$(call depend,cross/libzmq,--enable-libzmq)
 
-DEPENDS += cross/zvbi
-CONFIGURE_ARGS += --enable-libzvbi
+$(call depend,cross/zvbi,--enable-libzvbi)
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -209,40 +157,23 @@ CONFIGURE_ARGS += --enable-libzvbi
 # It was classified as free by Fedora after a review by the legal department at Red Hat.
 # See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
 #
-DEPENDS += cross/fdk-aac
-CONFIGURE_ARGS += --enable-libfdk-aac
-CONFIGURE_ARGS += --enable-nonfree
+$(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 
 ##
 ## ARCH SPECIFIC
 ##
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
+$(call depend,cross/openh264,--enable-libopenh264)
 
-# Add libaom to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libaom
-CONFIGURE_ARGS += --enable-libaom
-endif
+$(call depend,cross/libaom,--enable-libaom)
 
-# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
-# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
-# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
+# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
 # Add SVT-HEVC codec to x64
 # Patch for support from:
 # https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-hevc
-CONFIGURE_ARGS += --enable-libsvthevc
-endif
+$(call depend,cross/svt-hevc,--enable-libsvthevc)
 
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))

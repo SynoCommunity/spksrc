@@ -30,7 +30,6 @@ OPTIONAL_DEPENDS += cross/intel-mediasdk
 OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
@@ -62,16 +61,14 @@ DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
-DEPENDS += cross/dbus
-CONFIGURE_ARGS += --enable-dbus_1
+$(call depend,cross/dbus,--enable-dbus_1)
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
 #    - include/dbus-1.0/ (public) must precede
 #    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
 ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
 ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
 
-DEPENDS += cross/fdk-aac
-CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
+$(call depend,cross/fdk-aac,--disable-libfdkaac_static --enable-libfdkaac)
 
 # ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
 # Keep in step with spk/tvheadend, which picks its FFMPEG_PACKAGE the same way.
@@ -82,14 +79,11 @@ DEPENDS += cross/ffmpeg8
 endif
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
-DEPENDS += cross/libdvbcsa cross/dvb-apps
-CONFIGURE_ARGS += --enable-dvbcsa
+$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
 
-DEPENDS += cross/libhdhomerun
-CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
+$(call depend,cross/libhdhomerun,--disable-hdhomerun_static --enable-hdhomerun_client)
 
-DEPENDS += cross/libtheora
-CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
+$(call depend,cross/libtheora,--disable-libtheora_static --enable-libtheora)
 
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -112,26 +106,17 @@ endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
 
-DEPENDS += cross/libvorbis
-CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
+$(call depend,cross/libvorbis,--disable-libvorbis_static --enable-libvorbis)
 
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
+$(call depend,cross/libvpx,--disable-libvpx_static --enable-libvpx)
 
-DEPENDS += cross/opus
-CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
+$(call depend,cross/opus,--disable-libopus_static --enable-libopus)
 
-DEPENDS += cross/x264
-CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
+$(call depend,cross/x264,--disable-libx264_static --enable-libx264)
 
-# x265 needs gcc >= 4.6 (cross/x265). Disabled explicitly below that: it defaults to
-# enabled AND static upstream, so omitting the pair keeps it and asks for a bundled build.
-ifeq ($(call version_ge,$(TC_GCC),4.6),1)
-DEPENDS += cross/x265
-CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
-else
-CONFIGURE_ARGS += --disable-libx265
-endif
+# x265 is disabled explicitly where it cannot be built: it defaults to enabled AND static
+# upstream, so omitting the pair keeps it and asks for a bundled build.
+$(call depend,cross/x265,--disable-libx265_static --enable-libx265,--disable-libx265)
 
 # Enable building of new UI
 BUILD_DEPENDS = native/nodejs_22
