@@ -1,6 +1,6 @@
 SPK_NAME = dantami-repo-sync
-SPK_VERS = 1.6.1
-SPK_REV = 1
+SPK_VERS = 1.6.2
+SPK_REV = 2
 SPK_ICON = src/dantami-repo-sync.png
 DEPENDS = cross/dantami-repo-sync
 REQUIRED_MIN_DSM = 7.1
@@ -14,7 +14,7 @@ DESCRIPTION_KRN = GitHub와 Gitea 저장소를 웹 대시보드에서 연결하�
 HOMEPAGE = https://github.com/momopanda123/dantami-repo-sync
 HELPURL = https://github.com/momopanda123/dantami-repo-sync#readme
 LICENSE = MIT
-CHANGELOG = "Initial SynoCommunity package for Dantami Repo Sync 1.6.1."
+CHANGELOG = "Initial SynoCommunity package for Dantami Repo Sync 1.6.2."
 BETA = 1
 STARTABLE = yes
 SERVICE_USER = auto
