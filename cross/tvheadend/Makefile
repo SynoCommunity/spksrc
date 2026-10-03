@@ -2,8 +2,8 @@ PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
 # no official release since v4.2.8 (Jan 12, 2019)
-# git hash from Aug 7th 2026
-PKG_GIT_HASH = ddb984f4c17f4a26fd34f3e1b24e3323f9641b75
+# git hash from Sep 29th 2026
+PKG_GIT_HASH = bc5e863a40c91a29171455ce6614e95a3f9228d4
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -39,7 +39,6 @@ POST_INSTALL_TARGET = tvheadend_post_install
 # Options that answer to no dependency of their own
 CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
-CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 
 # WARNING: pngquant fails when built after cross/zlib (i.e. cross/libpng), so it stays the
@@ -156,3 +155,9 @@ tvheadend_post_install:
 	# Enforce python3
 	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tmdb.py
 	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tvdb.py
+	# Imagecache audit tool (support/, tvheadend#2129): a developer tool that
+	# tvheadend's own build does not install.  Ship it with the package's config
+	# dir substituted as its last-resort fallback -- it normally finds the config
+	# dir from the running tvheadend process.
+	@$(RUN) sed 's|@TVHEADEND_LOCALSTATEDIR@|$(INSTALL_PREFIX_VAR)|' support/tv_imagecache_audit.py > $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_imagecache_audit.py
+	@$(RUN) chmod 0755 $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_imagecache_audit.py
