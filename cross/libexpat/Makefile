@@ -16,8 +16,8 @@ CONFIGURE_ARGS  = -DEXPAT_BUILD_TESTS=OFF
 CONFIGURE_ARGS += -DEXPAT_BUILD_EXAMPLES=OFF
 CONFIGURE_ARGS += -DEXPAT_BUILD_TOOLS=OFF
 CONFIGURE_ARGS += -DEXPAT_SHARED_LIBS=ON
-
-# TODO check "getrandom" syscall availability for each arch/DSM version
-ADDITIONAL_CFLAGS += -DXML_POOR_ENTROPY
+# /dev/urandom exists on all DSM versions: real entropy for the hash
+# secret where getrandom/getentropy are missing, not the weak fallback
+CONFIGURE_ARGS += -DEXPAT_DEV_URANDOM=ON
 
 include ../../mk/spksrc.cross-cmake.mk
