@@ -1,0 +1,19 @@
+# O_CLOEXEC is hidden behind __USE_GNU in eglibc <= 2.8, so the
+# _POSIX_C_SOURCE define above does not expose it on GCC 4.3 era
+# toolchains. Fall back to 0: the fd is opened, read and closed with
+# no exec in between, so close-on-exec is irrelevant here.
+#
+--- lib/random_dev_urandom.c.orig	2026-10-03 13:30:00.000000000 +0000
++++ lib/random_dev_urandom.c	2026-10-03 13:30:00.000000000 +0000
+@@ -43,6 +43,10 @@
+ #include <fcntl.h>  // open
+ #include <unistd.h> // close
+ 
++#ifndef O_CLOEXEC
++#  define O_CLOEXEC 0
++#endif
++
+ /* Extract entropy from /dev/urandom */
+ bool
+ writeRandomBytes_dev_urandom(void *target, size_t count) {
+
