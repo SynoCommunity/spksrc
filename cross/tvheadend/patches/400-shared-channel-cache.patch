@@ -2,23 +2,33 @@ Shared per-channel cache of raw MPEG-TS and what it makes possible: recording
 from the cache (a recording started late begins at the programme's start), HTSP
 timeshift through that same cache, recording a programme still held in it,
 RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
-channel change, a DVR-driven cache warmup, and nine fixes of ours on top.
+channel change, a DVR-driven cache warmup, and our fixes on top.
 
 tvheadend/tvheadend#2249, everything it carries beyond #2206 (patch 300):
-commits 4 to 17 of th0ma7/tvheadend branch record-from-buffer, rebased onto
-the package base as f643210c5..6c0ff95ee.
+commits 4 to 28 of th0ma7/tvheadend branch record-from-buffer, rebased onto
+the package base as f643210c5..b66d3da3e.
 
-The SMT_SKIP_LIVE double free this used to carry is gone: upstream took it as
-1d267d17e, written with braces where ours set sm = NULL in place.
+Beyond what 400 held before, this snapshot carries the answers to a user
+report and to two review passes:
 
-The last two fixes answer a report from a Kodi user: a client tuning a channel
-whose shared cache already held another viewer's history was given a clock
-starting at its own first packet, so that history sat at a negative time --
-advertised as seekable, then delivered as negative timestamps, which a player
-cannot order (frozen picture, sound limping on).  The client's zero now starts
-at the cache; it still begins playing live, with the history announced behind
-it.  The other bounds the scan windows a cache replay may spend before
-declaring a stream absent.
+  - a client is no longer offered the part of the cache that predates its own
+    subscription.  It was reported as the oldest seekable point and then
+    served as negative timestamps, which a player cannot order -- a frozen
+    picture with sound, until playback reached the moment the viewer tuned in.
+    Putting the client's clock at the cache instead fixed that and shifted
+    Kodi's guide by the cache depth, because pvr.hts anchors stream position
+    zero at the first packet it receives; that attempt is reverted here and
+    the range is clamped instead.
+  - a retrospective recording can no longer be started a second time while it
+    is already running, which is a candidate for the duplicate recording seen
+    on the bench; a cache-owned recording now ends on the gate's stop whatever
+    the last error was, instead of leaving its thread waiting and its tuner
+    held; the cache holds a reference to the service it caches; the replay
+    gate's state is no longer read while another thread may be writing it.
+  - the play position is written only against a recording that has a file to
+    measure from, and only on one this connection may write.
+  - a null title no longer reaches the recorder's start trace, which older GCC
+    rejects under -Werror=format-overflow=.
 
 Regenerated against the tree the earlier patches produce -- LiBe-net's
 headers_complete() rewrite lands on lines patch 100 re-indents, resolved with a
@@ -27,7 +37,7 @@ MAX_SCAN_TIME/MAX_NOPKT_TIME its lookahead needs, and gh_first_video_pts);
 only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 --- docs/class/timeshift.md.orig
 +++ docs/class/timeshift.md
-@@ -10,6 +10,27 @@
+@@ -10,6 +10,35 @@
  
  ---
  
@@ -41,14 +51,22 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +the moment it was requested. It works with every stream profile.
 +
 +The cache holds the channel's stream as received, in the *Storage path*
-+(or in RAM with *RAM only*, bounded by *Maximum RAM size*), and is removed
-+once nothing watches or records the channel any more.
++(or in RAM with *RAM only*, bounded by *Maximum RAM size*). It is removed
++once nothing watches or records the channel any more -- unless *Keep tuned
++channels* still holds it, or a *Timeshift cache only* DVR entry is warming
++it up, either of which keeps the channel tuned and its cache alive with no
++viewer and no recording.
 +
 +HTSP clients (Kodi) pausing, rewinding or skipping through live TV then use
 +that same cache instead of writing a buffer of their own: one cache per
 +channel, however many clients and recordings share it. A client paused
 +for longer than the cache holds goes on, when it resumes, from a little
 +after the oldest data still there.
++
++A client can rewind only as far back as the moment it tuned the channel,
++even when the cache holds more because another viewer tuned it earlier or
++*Keep tuned channels* held it. A recording is not limited that way: it
++still starts at the programme's start, as far back as the cache reaches.
 +
 +---
 +
@@ -557,7 +575,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      return 0;
  
    /* Entry already have artwork? So nothing to do */
-@@ -854,11 +871,25 @@
+@@ -854,11 +871,37 @@
    if (dvr_in_init)
      return;
  
@@ -568,7 +586,19 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    dvr_entry_trace_time2(de, "start", start, "stop", stop, "set timer");
  
 +#if ENABLE_TIMESHIFT
++  /*
++   * de_cache_retro stays set for the whole replay and the entry's stop is in
++   * the past by definition, so without a state check every dvr_entry_set_timer()
++   * reaching here while the replay runs -- a web UI edit, an EPG update --
++   * starts the recording a second time.  dvr_rec_subscribe() asserts de_s is
++   * NULL; a release build gets a second subscription and a second DVR thread
++   * for one entry, which is what a completed recording replaying its cache
++   * again looks like.
++   */
 +  if (de->de_cache_retro &&
++      de->de_sched_state != DVR_RECORDING &&
++      de->de_sched_state != DVR_COMPLETED &&
++      de->de_sched_state != DVR_MISSED_TIME &&
 +      now >= stop &&
 +      !de->de_dont_reschedule &&
 +      de->de_channel &&
@@ -584,7 +614,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    if (now >= stop || de->de_dont_reschedule) {
  
      /* EPG thinks that the program is running */
-@@ -1069,6 +1100,55 @@
+@@ -1069,6 +1112,55 @@
  
    idnode_load(&de->de_id, conf);
  
@@ -640,7 +670,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    /* Time the node was created. */
    if (!htsmsg_get_s64(conf, "create", &create)) {
        de->de_create = create;
-@@ -1123,7 +1203,7 @@
+@@ -1123,7 +1215,7 @@
     * Note: this check has to be done _after_ insert in to de_global_link
     * otherwise the destroy will abort.
     */
@@ -649,7 +679,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        tvhtrace(LS_DVR, "Entry was duplicate for %s \"%s\" on \"%s\" start time %"PRId64", "
            "scheduled for recording by \"%s\"",
            idnode_uuid_as_str(&de->de_id, ubuf),
-@@ -1152,6 +1232,7 @@
+@@ -1152,6 +1244,7 @@
        }
    }
  
@@ -657,7 +687,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    if (!clone)
      dvr_entry_set_timer(de);
  
-@@ -1379,11 +1460,24 @@
+@@ -1379,11 +1472,24 @@
    htsmsg_destroy(conf);
  
    if (n) {
@@ -686,7 +716,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      } else {
        dvr_entry_set_timer(n);
      }
-@@ -1408,7 +1502,7 @@
+@@ -1408,7 +1514,7 @@
    uint32_t warm;
    htsmsg_t *conf;
  
@@ -695,7 +725,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      return 0;
    rerecord = dvr_entry_get_rerecord_errors(de);
    if (rerecord == 0)
-@@ -1736,6 +1830,9 @@
+@@ -1736,6 +1842,9 @@
   */
  static dvr_entry_t *_dvr_duplicate_event(dvr_entry_t *de)
  {
@@ -705,7 +735,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    static _dvr_duplicate_fcn_t fcns[] = {
      [DVR_AUTOREC_RECORD_UNIQUE]                    = _dvr_duplicate_unique_match,
      [DVR_AUTOREC_RECORD_DIFFERENT_EPISODE_NUMBER]  = _dvr_duplicate_epnum,
-@@ -1811,7 +1908,7 @@
+@@ -1811,7 +1920,7 @@
  
    if (record < DVR_AUTOREC_LRECORD_DIFFERENT_EPISODE_NUMBER || record == DVR_AUTOREC_RECORD_UNIQUE) {
      LIST_FOREACH(de2, &dvrentries, de_global_link) {
@@ -714,7 +744,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
          continue;
  
        // check for valid states
-@@ -1844,7 +1941,7 @@
+@@ -1844,7 +1953,7 @@
      }
    } else {
      LIST_FOREACH(de2, &de->de_autorec->dae_spawns, de_autorec_link) {
@@ -723,7 +753,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
          continue;
  
        // check for valid states
-@@ -2301,8 +2398,8 @@
+@@ -2301,8 +2410,8 @@
  dvr_entry_watched_timer_arm(dvr_entry_t* de)
  {
    if (!de || !de->de_watched ||
@@ -734,7 +764,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      return;
  
    char t1buf[32];
-@@ -2461,6 +2558,19 @@
+@@ -2461,6 +2570,19 @@
    }
  
    if (!dvr_entry_is_editable(de)) {
@@ -754,7 +784,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      if (stop > 0) {
        if (stop < gclk())
          stop = gclk();
-@@ -2529,6 +2639,19 @@
+@@ -2529,6 +2651,19 @@
    if (e) {
      start = e->start;
      stop  = e->stop;
@@ -774,7 +804,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    }
    if (start && (start != de->de_start)) {
      de->de_start = start;
-@@ -2730,11 +2853,43 @@
+@@ -2730,11 +2865,43 @@
                            channel_get_name(ch, channel_blank_name));
  
      /* Ignore - already in progress */
@@ -819,7 +849,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
        dvr_entry_assign_broadcast(de, NULL);
        dvr_entry_destroy(de, 1);
-@@ -2797,7 +2952,11 @@
+@@ -2797,7 +2964,11 @@
    while (de != NULL) {
      de_next = LIST_NEXT(de, de_bcast_link);
      assert(de->de_bcast == e);
@@ -832,7 +862,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        _dvr_entry_update(de, -1, NULL, e, NULL, NULL, NULL, NULL, NULL,
                          NULL, 0, 0, 0, 0, DVR_PRIO_NOTSET, 0, 0, -1, -1, 0, NULL, NULL);
      de = de_next;
-@@ -2836,6 +2995,16 @@
+@@ -2836,6 +3007,16 @@
             channel_get_name(e->channel, channel_blank_name),
             running);
    LIST_FOREACH(de, &e->channel->ch_dvrs, de_channel_link) {
@@ -849,7 +879,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      if (running == EPG_RUNNING_NOW && de->de_dvb_eid == e->dvb_eid) {
        if (de->de_running_pause) {
          tvhdebug(LS_DVR, "dvr entry %s event %s on %s - EPG unpause",
-@@ -3092,12 +3261,197 @@
+@@ -3092,12 +3273,197 @@
  /**
   *
   */
@@ -1047,7 +1077,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    if (!clone)
      dvr_rec_unsubscribe(de);
  
-@@ -3171,6 +3525,39 @@
+@@ -3171,6 +3537,39 @@
                          "rstart", de->de_running_start,
                          "rstop", de->de_running_stop,
                          "stop recording timer called");
@@ -1087,7 +1117,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    /* EPG thinks that the program is running */
    if (de->de_segment_stop_extra) {
      const time_t stop = dvr_entry_get_stop_time(de);
-@@ -3188,6 +3575,31 @@
+@@ -3188,6 +3587,31 @@
  
  
  
@@ -1119,7 +1149,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   *
   */
-@@ -3207,6 +3619,34 @@
+@@ -3207,6 +3631,34 @@
    tvhinfo(LS_DVR, "\"%s\" on \"%s\" recorder starting",
  	  lang_str_get(de->de_title, NULL), DVR_CH_NAME(de));
  
@@ -1154,7 +1184,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    /*
     * The running flag is updated only on the event change. When the DVR
     * entry is added too late, the running timers might not be updated.
-@@ -3237,6 +3677,13 @@
+@@ -3237,6 +3689,13 @@
    de->de_segment_stop_extra = 0;
    stop = dvr_entry_get_stop_time(de);
  
@@ -1168,7 +1198,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    dvr_entry_trace_time2(de, "original stop", de->de_stop, "stop", stop, "stop timer set");
  
    gtimer_arm_absn(&de->de_timer, dvr_timer_stop_recording, de, stop);
-@@ -3257,7 +3704,7 @@
+@@ -3257,7 +3716,7 @@
    }
  
    // if duplicate, then delete it now, don't record!
@@ -1177,7 +1207,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      dvr_entry_cancel_delete(de, 1);
      return;
    }
-@@ -3502,6 +3949,15 @@
+@@ -3502,6 +3961,15 @@
    return dvr_entry_class_time_set(de, &de->de_start_extra, *(time_t *)v);
  }
  
@@ -1193,7 +1223,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  static int
  dvr_entry_class_stop_set(void *o, const void *_v)
  {
-@@ -4532,6 +4988,19 @@
+@@ -4532,6 +5000,19 @@
        .desc     = N_("Enable/disable the entry."),
        .off      = offsetof(dvr_entry_t, de_enabled),
      },
@@ -1346,7 +1376,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    int epg_running = 0, old_epg_running, epg_pause = 0;
    int commercial = COMMERCIAL_UNKNOWN;
    int running_disabled;
-@@ -1741,7 +1777,9 @@
+@@ -1741,10 +1777,13 @@
      return NULL;
    comm_skip = de->de_config->dvr_skip_commercials;
    postproc  = de->de_config->dvr_postproc ? strdup(de->de_config->dvr_postproc) : NULL;
@@ -1356,8 +1386,35 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +    dvr_entry_get_epg_running(de) <= 0;
    real_start = dvr_entry_get_start_time(de, 0);
    tvhtrace(LS_DVR, "%s - recoding thread started for \"%s\"",
-            idnode_uuid_as_str(&de->de_id, ubuf), lang_str_get(de->de_title, NULL));
-@@ -1964,17 +2002,36 @@
+-           idnode_uuid_as_str(&de->de_id, ubuf), lang_str_get(de->de_title, NULL));
++           idnode_uuid_as_str(&de->de_id, ubuf),
++           lang_str_get(de->de_title, NULL) ?: "");
+   if (!running_disabled && de->de_bcast) {
+     now = gclk();
+     switch (de->de_bcast->running) {
+@@ -1954,8 +1993,19 @@
+ 
+         goto fin;
+ 
+-      } else if (de->de_last_error != sm->sm_code) {
+-	 // Error during recording
++      } else if (de->de_last_error != sm->sm_code ||
++                 de->de_cache_retro || de->de_cache_full) {
++	 /*
++	  * Error during recording.
++	  *
++	  * A cache-owned recording ends on this STOP and on nothing else:
++	  * dvr_entry_start_recording() arms no stop timer for it.  The gate
++	  * can report a code SMT_SERVICE_STATUS has already set, and then
++	  * de_last_error matches and every branch here is skipped -- while
++	  * the gate, now GATE_DONE, drops whatever follows.  The thread would
++	  * wait for a message that cannot come, the entry stay DVR_RECORDING
++	  * and the subscription keep its tuner.
++	  */
+ 
+ 	dvr_rec_set_state(de, DVR_RS_ERROR, sm->sm_code);
+ 	tvherror(LS_DVR, "Recording stopped: \"%s\": %s",
+@@ -1964,17 +2014,36 @@
  
  fin:
          streaming_queue_clear(&backlog);
@@ -1663,7 +1720,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  } htsp_subscription_t;
  
  
-@@ -376,6 +385,95 @@
+@@ -376,6 +385,102 @@
    return ret;
  }
  
@@ -1713,11 +1770,11 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 + */
 +static void
 +htsp_cache_record_position
-+  ( htsp_connection_t *htsp, htsp_subscription_t *hs, dvr_entry_t *only )
++  ( htsp_connection_t *htsp, htsp_subscription_t *hs )
 +{
 +  dvr_entry_t *de;
 +  channel_t *ch;
-+  time_t when, start, file_start, file_stop;
++  time_t when, file_start, file_stop;
 +  int filecount;
 +  uint32_t pos;
 +
@@ -1728,22 +1785,29 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  ch = hs->hs_s->ths_channel;
 +
 +  LIST_FOREACH(de, &ch->ch_dvrs, de_channel_link) {
-+    if (only && de != only)
++    if (de->de_sched_state != DVR_RECORDING)
 +      continue;
-+    if (!only && de->de_sched_state != DVR_RECORDING)
++    /* Watching the channel says nothing about who owns what is being
++     * recorded on it: the position is this connection's to write only on an
++     * entry it may write */
++    if (dvr_entry_verify(de, htsp->htsp_granted_access, 0))
 +      continue;
-+    start = dvr_entry_get_start_time(de, 0);
-+    if (when < start || when > dvr_entry_get_stop_time(de))
++    if (when < dvr_entry_get_start_time(de, 0) ||
++        when > dvr_entry_get_stop_time(de))
 +      continue;
 +    /*
 +     * The position counts from the start of the file, and a backfilled
-+     * recording begins where the cache reached, which is the scheduled
-+     * start only when the cache went back that far.
++     * recording begins where the cache reached, which is the scheduled start
++     * only when the cache went back that far.  So measure against the file and
++     * write nothing without one: falling back to the scheduled start -- which
++     * can include pre-recording padding the file will never hold -- overshoots
++     * by however much the cache could not supply, and the client then resumes
++     * past the end of what was recorded.
 +     */
-+    if (!dvr_get_files_details(de, &file_start, &file_stop, &filecount) &&
-+        filecount == 1 && file_start > 0 && file_start <= when)
-+      start = file_start;
-+    pos = when - start;
++    if (dvr_get_files_details(de, &file_start, &file_stop, &filecount) ||
++        filecount != 1 || file_start <= 0 || file_start > when)
++      continue;
++    pos = when - file_start;
 +    if (de->de_playposition == pos)
 +      continue;
 +    de->de_playposition = pos;
@@ -1759,19 +1823,19 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   *
   */
-@@ -384,6 +482,11 @@
+@@ -384,6 +489,11 @@
  {
    th_subscription_t *ts = hs->hs_s;
  
 +#if ENABLE_TIMESHIFT
 +  /* the viewer is leaving: keep its place in whatever it was recording */
-+  htsp_cache_record_position(htsp, hs, NULL);
++  htsp_cache_record_position(htsp, hs);
 +#endif
 +
    hs->hs_s = NULL;
    mtimer_disarm(&hs->hs_s_bytes_out_timer);
  
-@@ -1445,6 +1548,8 @@
+@@ -1445,6 +1555,8 @@
      LIST_FOREACH(de, &e->channel->ch_dvrs, de_channel_link) {
        if (de->de_bcast != e)
          continue;
@@ -1780,7 +1844,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        if (dvr_entry_verify(de, htsp->htsp_granted_access, 1))
          continue;
        htsmsg_add_u32(out, "dvrId", idnode_get_short_uuid(&de->de_id));
-@@ -1721,17 +1826,20 @@
+@@ -1721,17 +1833,20 @@
  
    /* Send all autorecs */
    TAILQ_FOREACH(dae, &autorec_entries, dae_link)
@@ -1804,7 +1868,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        htsp_send_message(htsp, htsp_build_dvrentry(htsp, de, "dvrEntryAdd", htsp->htsp_language, 0), NULL);
  
    /* Send EPG updates */
-@@ -1997,7 +2105,7 @@
+@@ -1997,7 +2112,7 @@
    l = htsmsg_create_list();
  
    LIST_FOREACH(cfg, &dvrconfigs, config_link)
@@ -1813,7 +1877,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        uuid = idnode_uuid_as_str(&cfg->dvr_id, ubuf);
        if (htsp->htsp_granted_access->aa_dvrcfgs) {
          HTSMSG_FOREACH(f, htsp->htsp_granted_access->aa_dvrcfgs) {
-@@ -2023,6 +2131,134 @@
+@@ -2023,6 +2138,134 @@
    return out;
  }
  
@@ -1948,7 +2012,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   * add a Dvrentry
   */
-@@ -2039,19 +2275,60 @@
+@@ -2039,19 +2282,60 @@
    int64_t start, stop;
    uint32_t u32;
    channel_t *ch = NULL;
@@ -1987,16 +2051,16 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +      tvhwarn(LS_HTSP,
 +              "%s: addDvrEntry: EPG eventId %u no longer exists",
 +              htsp->htsp_logname, eventid);
-   }
- 
++  }
++
 +#if ENABLE_TIMESHIFT
 +  if (e) {
 +    e = htsp_cache_record_target(htsp, e, &cache_full);
 +    if (e)
 +      ch = e->channel;
-+  }
+   }
 +#endif
-+
+ 
    /* Check access */
 -  if (!htsp_user_access_channel(htsp, ch))
 -    return htsp_error(htsp, N_("User does not have access"));
@@ -2017,7 +2081,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
    /* Options */
    conf = htsmsg_create_map();
-@@ -2111,11 +2388,50 @@
+@@ -2111,11 +2395,43 @@
        htsmsg_add_u32(conf, "age_rating", u32);
    }
  
@@ -2050,20 +2114,13 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +            "%s: addDvrEntry: DVR entry created, state=%d",
 +            htsp->htsp_logname, (int)de->de_sched_state);
 +
-+#if ENABLE_TIMESHIFT
 +  /*
-+   * Recording what is being watched from the cache: start the entry with the
-+   * viewer's place in it, so a client resumes there instead of at the start.
++   * Recording what is being watched from the cache records the viewer's place
++   * in it, so a client resumes there instead of at the programme's start.  It
++   * is written when the viewer leaves, in htsp_subscription_destroy(): the
++   * position is measured against the recording's file, and there is none yet
++   * at the moment the entry is created here.
 +   */
-+  if (de != NULL) {
-+    htsp_subscription_t *hs;
-+    LIST_FOREACH(hs, &htsp->htsp_subscriptions, hs_link)
-+      if (hs->hs_s && hs->hs_s->ths_channel == de->de_channel) {
-+        htsp_cache_record_position(htsp, hs, de);
-+        break;
-+      }
-+  }
-+#endif
 +
    dvr_status = de != NULL ? de->de_sched_state : DVR_NOSTATE;
  
@@ -2646,41 +2703,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  #include "input/mpegts/iptv/iptv_private.h"
  #endif
  #include "dvr/dvr.h"
-@@ -773,8 +774,31 @@
-     if (!prch->prch_ts_delta)
-       goto deliver;
-     th_pkt_t *pkt = sm->sm_data;
--    if (prch->prch_ts_delta == PTS_UNSET)
--      prch->prch_ts_delta = MAX(0, pkt->pkt_dts - 10000);
-+    if (prch->prch_ts_delta == PTS_UNSET) {
-+      /*
-+       * Tuning a channel whose shared cache already holds history: put the
-+       * client's zero at the start of that cache rather than at its own
-+       * first packet, so the whole cache is reachable on a positive
-+       * timestamp.  Left at zero, the oldest seekable point reported to the
-+       * client is negative, and seeking there delivered negative DTS --
-+       * which a player cannot order (frozen picture, audio limping on).
-+       */
-+      int64_t shift = 0;
-+#if ENABLE_TIMESHIFT
-+      if (prch->prch_svcts)
-+        shift = svcts_cache_depth(prch->prch_svcts);
-+#endif
-+      if (!shift && !prch->prch_ts_rebase) {
-+        /* nothing to correct: keep the shared clock, and the packet as it is */
-+        prch->prch_ts_delta = 0;
-+        goto deliver;
-+      }
-+      prch->prch_ts_delta =
-+        (prch->prch_ts_rebase ? MAX(0, pkt->pkt_dts - 10000) : 0) - shift;
-+      /* zero means "no correction", so step off it when one is wanted */
-+      if (prch->prch_ts_delta == 0)
-+        prch->prch_ts_delta = -1;
-+    }
-     /*
-      * time correction here
-      */
-@@ -818,6 +842,16 @@
+@@ -818,6 +819,16 @@
    }
    for (prch = LIST_FIRST(&prsh->prsh_chains); prch; prch = next) {
      next = LIST_NEXT(prch, prch_sharer_link);
@@ -2697,24 +2720,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      if (prch == prsh->prsh_master) {
        if (sm->sm_type == SMT_START) {
          if (prsh->prsh_start_msg)
-@@ -954,7 +988,15 @@
- {
-   prch->prch_post_share = dst;
-   tvh_mutex_lock(&prsh->prsh_queue_mutex);
--  prch->prch_ts_delta = LIST_EMPTY(&prsh->prsh_chains) ? 0 : PTS_UNSET;
-+  /* A late joiner needs a zero of its own; a chain with a shared channel
-+   * cache needs one computed from the cache depth.  Both are decided on the
-+   * first packet, when that depth is known. */
-+  prch->prch_ts_rebase = !LIST_EMPTY(&prsh->prsh_chains);
-+  prch->prch_ts_delta = prch->prch_ts_rebase
-+#if ENABLE_TIMESHIFT
-+                        || prch->prch_svcts
-+#endif
-+                        ? PTS_UNSET : 0;
-   LIST_INSERT_HEAD(&prsh->prsh_chains, prch, prch_sharer_link);
-   prch->prch_sharer = prsh;
-   if (!prsh->prsh_master)
-@@ -1173,6 +1215,10 @@
+@@ -1173,6 +1184,10 @@
      timeshift_destroy(prch->prch_timeshift);
      prch->prch_timeshift = NULL;
    }
@@ -2725,7 +2731,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  #endif
    if (prch->prch_gh) {
      globalheaders_destroy(prch->prch_gh);
-@@ -1237,7 +1283,10 @@
+@@ -1237,7 +1252,10 @@
    prch->prch_share = prsh->prsh_tsfix;
  
  #if ENABLE_TIMESHIFT
@@ -2739,15 +2745,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
 --- src/profile.h.orig
 +++ src/profile.h
-@@ -83,6 +83,7 @@
-   void                     *prch_id;
- 
-   int64_t                   prch_ts_delta;
-+  int                       prch_ts_rebase;  /* late joiner: own zero */
- 
-   int                       prch_flags;
-   int                       prch_stop;
-@@ -96,6 +97,7 @@
+@@ -96,6 +96,7 @@
    struct streaming_target  *prch_tsfix;
  #if ENABLE_TIMESHIFT
    struct streaming_target  *prch_timeshift;
@@ -3566,7 +3564,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
           its start message is copied to the new file below */
 --- src/timeshift/timeshift_svcbuf.c.orig
 +++ src/timeshift/timeshift_svcbuf.c
-@@ -0,0 +1,1728 @@
+@@ -0,0 +1,1739 @@
 +/*
 + *  TV headend - Timeshift - channel cache, raw MPEG-TS of a running service
 + *  Copyright (C) 2026 Vincent Fortier
@@ -3726,7 +3724,11 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  time_t               from;
 +  time_t               to;      ///< Historical end; 0 means catch up to live
 +  int                  all;     ///< Begin at oldest available block
-+  int                  state;   ///< Changed under s_stream_mutex
++  volatile int         state;   ///< Owned by s_stream_mutex; the replay
++                                ///< thread reads it under sb->lock as a
++                                ///< hint and re-checks under that mutex
++                                ///< before acting, so those reads go
++                                ///< through atomic_get()
 +  int                 *replaying; ///< Mirrors state == GATE_REPLAY
 +  time_t              *replay_start; ///< Set to where the replay begins
 +  streaming_queue_t   *sq;      ///< Consumer queue to pace on, or NULL
@@ -3983,7 +3985,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  int n = 0;
 +
 +  LIST_FOREACH(g, &sb->gates, link) {
-+    if (g->state == GATE_REPLAY && g->blk != NULL) {
++    if (atomic_get(&g->state) == GATE_REPLAY && g->blk != NULL) {
 +      g->no_space = 1;
 +      n++;
 +    }
@@ -4449,6 +4451,8 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  }
 +  tvh_cond_destroy(&sb->cond);
 +  tvh_mutex_destroy(&sb->lock);
++  if (sb->service)
++    service_unref(sb->service);
 +  free(sb);
 +}
 +
@@ -4466,6 +4470,10 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +    return;
 +
 +  sb = calloc(1, sizeof(*sb));
++  /* The cache outlives the service stopping -- a reader or a keepalive can
++   * still hold it -- and its threads dereference sb->service for the stream
++   * mutex and the name, so hold the service for as long as the cache lives */
++  service_ref(t);
 +  sb->service  = t;
 +  sb->refcount = 1;
 +  sb->id       = svcbuf_index++;
@@ -4518,7 +4526,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +static void
 +svcbuf_gate_set_state ( svcbuf_gate_t *g, int state )
 +{
-+  g->state = state;
++  atomic_set(&g->state, state);
 +  *g->replaying = state == GATE_REPLAY;
 +}
 +
@@ -4608,7 +4616,8 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +
 +  tvh_mutex_lock(&sb->lock);
 +
-+  while (g->state == GATE_REPLAY) {
++  /* A hint only: every action below re-checks under s_stream_mutex */
++  while (atomic_get(&g->state) == GATE_REPLAY) {
 +    if (g->no_space) {
 +      tvh_mutex_unlock(&sb->lock);
 +      tvh_mutex_lock(&t->s_stream_mutex);
@@ -4801,7 +4810,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +    tvh_mutex_unlock(&t->s_stream_mutex);
 +  }
 +
-+  if (!live && g->state == GATE_REPLAY) {
++  if (!live && atomic_get(&g->state) == GATE_REPLAY) {
 +    tvh_mutex_unlock(&sb->lock);
 +    tvh_mutex_lock(&t->s_stream_mutex);
 +
@@ -5365,7 +5374,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1796 @@
+@@ -0,0 +1,1794 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -5716,7 +5725,19 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  }
 +}
 +
-+/* Oldest time (us, client base) the client may go back to, 0 if none */
++/* Oldest time (us, client base) the client may go back to, 0 if none.
++ *
++ * The cache can reach further back than this subscription has existed, when
++ * another viewer tuned the channel first or the keepalive held it.  That part
++ * of it sits before the client's own zero, and a client's clock has no way to
++ * express it: never offer it.  Reported as the oldest seekable point it was
++ * answered with negative timestamps, which a player cannot order -- a frozen
++ * picture with sound, until playback reached the moment the viewer tuned in.
++ *
++ * Recording from the cache is not affected: the DVR replays it on a time base
++ * of its own, which is what lets a recording still start at the programme's
++ * start.
++ */
 +static int64_t
 +svcts_oldest ( svcts_t *st )
 +{
@@ -5727,6 +5748,8 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  t = st->live_time - (st->live_mono - oldest) + SVCTS_PREROLL;
 +  if (st->max_time && t < st->live_time - st->max_time)
 +    t = st->live_time - st->max_time;
++  if (t < 0)
++    t = 0;
 +  return MIN(t, st->live_time);
 +}
 +
@@ -7110,22 +7133,6 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  free(st);
 +}
 +
-+/* Depth (90 kHz) the shared cache already holds, 0 if there is none.
-+ * The client's time base is shifted forward by this much, so cache older
-+ * than the subscription still lands on a positive timestamp. */
-+int64_t
-+svcts_cache_depth ( streaming_target_t *pad )
-+{
-+  svcts_t *st = (svcts_t *)pad;
-+  int64_t oldest, newest, depth = 0;
-+
-+  tvh_mutex_lock(&st->lock);
-+  if (st->sb && svcbuf_span(st->sb, &oldest, &newest) && newest > oldest)
-+    depth = ts_rescale_inv(newest - oldest, 1000000);
-+  tvh_mutex_unlock(&st->lock);
-+  return depth;
-+}
-+
 +void
 +svcts_attach ( streaming_target_t *pad, service_t *t )
 +{
@@ -7164,7 +7171,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +}
 --- src/timeshift/timeshift_svcts.h.orig
 +++ src/timeshift/timeshift_svcts.h
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,39 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -7200,9 +7207,6 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +
 +/* The client's subscription linked to / unlinked from a service
 + * (s_stream_mutex held) */
-+/* Depth (90 kHz) of the shared cache behind this target, 0 if none */
-+int64_t svcts_cache_depth ( streaming_target_t *pad );
-+
 +void svcts_attach ( streaming_target_t *pad, struct service *t );
 +void svcts_detach ( streaming_target_t *pad );
 +
