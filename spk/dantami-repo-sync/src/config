@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "com.synocommunity.packages.dantami-repo-sync": {
+      "type": "url",
+      "icon": "images/dantami-repo-sync-{0}.png",
+      "title": "Dantami Repo Sync",
+      "desc": "GitHub and Gitea repository synchronization",
+      "url": "/webman/3rdparty/dantami-repo-sync/index.cgi",
+      "allUsers": true
+    }
+  }
+}
