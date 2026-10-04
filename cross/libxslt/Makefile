@@ -1,5 +1,5 @@
 PKG_NAME = libxslt
-PKG_VERS = 1.1.42
+PKG_VERS = 1.1.45
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.gnome.org/sources/libxslt/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
