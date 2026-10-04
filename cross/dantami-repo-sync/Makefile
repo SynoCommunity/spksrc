@@ -1,5 +1,5 @@
 PKG_NAME = dantami-repo-sync
-PKG_VERS = 1.6.2
+PKG_VERS = 1.6.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/momopanda123/$(PKG_NAME)/archive/refs/tags

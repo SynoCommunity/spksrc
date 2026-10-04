@@ -1,2 +1,2 @@
 #!/bin/sh
-exec /var/packages/dantami-repo-sync/target/bin/repo-sync
+exec /var/packages/DantamiRepoSync/target/bin/repo-sync

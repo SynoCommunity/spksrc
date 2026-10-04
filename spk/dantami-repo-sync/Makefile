@@ -1,6 +1,6 @@
-SPK_NAME = dantami-repo-sync
-SPK_VERS = 1.6.2
-SPK_REV = 2
+SPK_NAME = DantamiRepoSync
+SPK_VERS = 1.6.3
+SPK_REV = 3
 SPK_ICON = src/dantami-repo-sync.png
 DEPENDS = cross/dantami-repo-sync
 REQUIRED_MIN_DSM = 7.1
@@ -14,16 +14,14 @@ DESCRIPTION_KRN = GitHub와 Gitea 저장소를 웹 대시보드에서 연결하�
 HOMEPAGE = https://github.com/momopanda123/dantami-repo-sync
 HELPURL = https://github.com/momopanda123/dantami-repo-sync#readme
 LICENSE = MIT
-CHANGELOG = "Initial SynoCommunity package for Dantami Repo Sync 1.6.2."
-BETA = 1
+CHANGELOG = "Address review feedback: retain upstream identity, use generic service lifecycle and initialize accounts only on installation."
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SSS_SCRIPT = src/start-stop-status
 WIZARDS_DIR = src/wizard
 DSM_UI_DIR = ui
 DSM_UI_CONFIG = src/config
-DSM_APP_NAME = com.synocommunity.packages.dantami-repo-sync
+DSM_APP_NAME = local.DantamiRepoSync.Application
 POST_STRIP_TARGET = dantami_extra_install
 
 include ../../mk/spksrc.spk.mk
