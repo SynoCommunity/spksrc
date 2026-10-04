@@ -7,7 +7,7 @@ SPK_ICON = src/duplicity.png
 # /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 SPK_DEPENDS = "gnupg>=2.1.6"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -63,4 +63,11 @@ DEPENDS += cross/libyaml
 #   - To be built last
 DEPENDS += python/duplicity
 
+POST_SERVICE_TARGET = duplicity_extra_install
+
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: duplicity_extra_install
+duplicity_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
