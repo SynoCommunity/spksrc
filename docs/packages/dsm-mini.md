@@ -180,7 +180,7 @@ The status at the top of the DSM mini window is the first place to look. The det
 
 ## Changelog
 
-### Version 1.0.14-1
+### Version 1.0.15-1
 
 - Initial release.
 

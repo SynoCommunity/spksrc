@@ -1,5 +1,5 @@
 PKG_NAME = dsm-mini
-PKG_VERS = 1.0.14
+PKG_VERS = 1.0.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/alexlnos/dsm-mini/archive/refs/tags
