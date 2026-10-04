@@ -1,6 +1,6 @@
 SPK_NAME = beszel-hub
 SPK_VERS = 0.21.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/beszel.png
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
