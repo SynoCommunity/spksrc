@@ -20,7 +20,11 @@ CONFIGURE_ARGS += --without-jinterface
 CONFIGURE_ARGS += --without-odbc
 CONFIGURE_ARGS += --enable-dynamic-ssl-lib
 CONFIGURE_ARGS += --prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)
-CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
+
+# via environment (not CONFIGURE_ARGS): otp_build funnels args through
+# the unquoted $CONFIG_FLAGS string, which splits spaced values and
+# breaks erts/configure; env_to_config_flags escapes them correctly
+ENV += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.native-cc.mk
 
