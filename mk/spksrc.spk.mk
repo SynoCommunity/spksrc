@@ -232,7 +232,7 @@ ifneq ($(strip $(SUPPORTURL)),)
 	@echo support_url=\"$(SUPPORTURL)\" >> $@
 endif
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
-	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@
+	@echo 'install_dep_services="$(subst ",,$(INSTALL_DEP_SERVICES))"' >> $@
 endif
 ifneq ($(strip $(START_DEP_SERVICES)),)
 	@echo start_dep_services=\"$(START_DEP_SERVICES)\" >> $@
@@ -292,7 +292,7 @@ ifneq ($(strip $(CHANGELOG)),)
 	@echo changelog=\"$(CHANGELOG)\" >> $@
 endif
 ifneq ($(strip $(SPK_DEPENDS)),)
-	@echo install_dep_packages=\"$(SPK_DEPENDS)\" >> $@
+	@echo 'install_dep_packages="$(subst ",,$(SPK_DEPENDS))"' >> $@
 endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@

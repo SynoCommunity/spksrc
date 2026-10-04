@@ -17,10 +17,9 @@ include ../../mk/spksrc.spk-meta/meta.mk
 EXCLUDED_NAME = bzip2 xz zlib
 
 # Operator used to pin the meta package version in install_dep_packages.
-# Backslash-escaped: the INFO recipe echoes SPK_DEPENDS unquoted at shell
-# level (the surrounding \" are literal characters), so a bare > would
-# redirect. One escaping level only — this value stays within make.
-META_DEP_OP ?= \>\=
+# Plain >= : the INFO recipe single-quotes the value, so no shell
+# escaping is needed (or wanted -- DSM parses the raw operator).
+META_DEP_OP ?= >=
 
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
