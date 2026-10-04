@@ -11,7 +11,7 @@ MAINTAINER = hgy59
 DESCRIPTION = "Simple, lightweight server monitoring. This package provides the Beszel Hub only."
 
 DISPLAY_NAME = Beszel Hub
-CHANGELOG = "Update beszel-hub to v0.20.0."
+CHANGELOG = "Update beszel-hub to v0.21.0."
 
 HOMEPAGE = https://beszel.dev/
 LICENSE  = MIT
