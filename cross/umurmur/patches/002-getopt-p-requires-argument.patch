@@ -1,0 +1,17 @@
+# -p lost its getopt argument marker when -r was added in 0.5.0
+# ("dhprt:" instead of "dhp:rt:"), so -p no longer takes a filename:
+# pidfile stays NULL and no PID file is ever written, while the
+# daemon otherwise runs fine. Upstream issue: silent status-check
+# failures (no pidfile) with a healthy daemon.
+#
+--- src/main.c.orig
++++ src/main.c
+@@ -282,7 +282,7 @@
+ 
+ 	/* Arguments */
+ #ifdef POSIX_PRIORITY_SCHEDULING
+-	while ((c = getopt(argc, argv, "dhprt:A:a:B:b:c:")) != EOF) {
++	while ((c = getopt(argc, argv, "dhp:rt:A:a:B:b:c:")) != EOF) {
+ #else
+ 	while ((c = getopt(argc, argv, "dhpt:A:a:B:b:c:")) != EOF) {
+ #endif
