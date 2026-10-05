@@ -109,7 +109,6 @@ $(call depend,cross/libdc1394,--enable-libdc1394)
 $(call depend,cross/librabbitmq,--enable-librabbitmq)
 $(call depend,cross/librist,--enable-librist)
 $(call depend,cross/libsrt,--enable-libsrt)
-$(call depend,cross/libvmaf,--enable-libvmaf)
 $(call depend,cross/libvorbis,--enable-libvorbis)
 $(call depend,cross/libvpx,--enable-libvpx)
 $(call depend,cross/libwebp,--enable-libwebp)
@@ -131,6 +130,13 @@ $(call depend,cross/twolame,--enable-libtwolame)
 $(call depend,cross/x264,--enable-libx264)
 $(call depend,cross/x265,--enable-libx265)
 $(call depend,cross/zvbi,--enable-libzvbi)
+
+# ffmpeg4 does not support libvmaf >= 3.x
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+  $(call depend,cross/libvmaf_2.3,--enable-libvmaf)
+else ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+  $(call depend,cross/libvmaf_1.5,--enable-libvmaf)
+endif
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
