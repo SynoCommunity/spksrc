@@ -1,13 +1,13 @@
 SPK_NAME = duplicity
-SPK_VERS = 3.0.5.1
-SPK_REV = 13
+SPK_VERS = 3.2.1
+SPK_REV = 14
 SPK_ICON = src/duplicity.png
 
 # protobuf: missing atomics support 
 # /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 SPK_DEPENDS = "gnupg>=2.1.6"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -17,7 +17,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v3.0.5.1."
+CHANGELOG = "1. Update duplicity to v3.2.1 and duply to v2.5.6. <br/>2. Migrate to Python 3.14."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
@@ -63,4 +63,11 @@ DEPENDS += cross/libyaml
 #   - To be built last
 DEPENDS += python/duplicity
 
+POST_SERVICE_TARGET = duplicity_extra_install
+
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: duplicity_extra_install
+duplicity_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
