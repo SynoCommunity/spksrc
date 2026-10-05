@@ -12,6 +12,11 @@ PKG_DIR = media-driver-$(PKG_NAME)-$(PKG_VERS)
 #PKG_DIR = media-driver-$(PKG_GIT_HASH)
 
 DEPENDS = cross/intel-gmmlib
+
+# The Intel media stack drives i915 ioctls the running kernel either has or has not;
+# DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
+MIN_KERNEL_VERSION = 3.10
+
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 HOMEPAGE = https://github.com/intel/media-driver

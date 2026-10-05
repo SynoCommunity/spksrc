@@ -6,6 +6,14 @@ PKG_DIST_SITE = https://github.com/Intel-Media-SDK/MediaSDK/archive
 PKG_DIR = MediaSDK-$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/intel-media-driver
+
+# Needs gcc >= 5: C++14 as gcc 4.9 does not implement it (aggregate/member initializers)
+MIN_GCC_VERSION = 5
+
+# The Intel media stack drives i915 ioctls the running kernel either has or has not;
+# DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
+MIN_KERNEL_VERSION = 3.10
+
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 HOMEPAGE = http://mediasdk.intel.com

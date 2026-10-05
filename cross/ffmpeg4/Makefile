@@ -132,11 +132,7 @@ $(call depend,cross/x265,--enable-libx265)
 $(call depend,cross/zvbi,--enable-libzvbi)
 
 # ffmpeg4 does not support libvmaf >= 3.x
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-  $(call depend,cross/libvmaf_2.3,--enable-libvmaf)
-else ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-  $(call depend,cross/libvmaf_1.5,--enable-libvmaf)
-endif
+$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
