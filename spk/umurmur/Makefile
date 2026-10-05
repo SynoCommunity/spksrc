@@ -10,7 +10,7 @@ DESCRIPTION = uMurmur is a minimalistic VoIP server based on the open source sof
 DESCRIPTION_FRE = uMurmur est un serveur minimaliste de voix sur IP basé sur le logiciel libre Mumble. Il rend possible la communication entre plusieurs interlocuteurs de manière simultanée. Sa faible latence le rend particulièrement adapté aux communications pendant les parties de jeux en réseau. Le client Mumble est téléchargeable à l\'adresse https://dl.mumble.info/stable/ \(Windows, Mac, Linux et iOS\).
 DESCRIPTION_SPN = uMurmur es un servidor VoIP minimalista basado en el software de codigo abierto Mumble. Permite comunicaciones simultáneas entre múltiples usuarios. Su baja latencia lo hace especialmente adecuado para comunicarse durante un juego en linea. El cliente Mumble está disponible en https://dl.mumble.info/stable/ \(Windows, Mac, Linux and iOS\).
 DISPLAY_NAME = uMurmur
-CHANGELOG = "1. Update uMurmur to v0.5.1."
+CHANGELOG = "1. Update uMurmur to v0.5.1 and mbedtls to v4.1.1."
 
 STARTABLE = yes
 SERVICE_USER = auto
