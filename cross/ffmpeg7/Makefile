@@ -86,88 +86,51 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
+##
+## Optional Dependencies
+##
+
 $(call depend,cross/chromaprint-fftw,--enable-chromaprint)
-
 $(call depend,cross/codec2,--enable-libcodec2)
-
 $(call depend,cross/dav1d,--enable-libdav1d)
-
 $(call depend,cross/flac cross/libtheora,--enable-libtheora)
-
 $(call depend,cross/fontconfig,--enable-libfontconfig)
-
 $(call depend,cross/freetype,--enable-libfreetype)
-
 $(call depend,cross/frei0r,--enable-frei0r)
-
 $(call depend,cross/fribidi,--enable-libfribidi)
-
 $(call depend,cross/gnutls,--enable-gnutls)
-
 $(call depend,cross/lame,--enable-libmp3lame)
-
 $(call depend,cross/libaom,--enable-libaom)
-
 $(call depend,cross/libass,--enable-libass)
-
 $(call depend,cross/libbluray,--enable-libbluray)
-
 $(call depend,cross/libcaca,--enable-libcaca)
-
 $(call depend,cross/libdc1394,--enable-libdc1394)
-
 $(call depend,cross/libjxl,--enable-libjxl)
-
 $(call depend,cross/liblc3,--enable-liblc3)
-
 $(call depend,cross/librabbitmq,--enable-librabbitmq)
-
 $(call depend,cross/librist,--enable-librist)
-
 $(call depend,cross/libsrt,--enable-libsrt)
-
 $(call depend,cross/libvmaf,--enable-libvmaf)
-
 $(call depend,cross/libvorbis,--enable-libvorbis)
-
 $(call depend,cross/libvpx,--enable-libvpx)
-
 $(call depend,cross/libwebp,--enable-libwebp)
-
 $(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
-
 $(call depend,cross/libzimg,--enable-libzimg)
-
 $(call depend,cross/libzmq,--enable-libzmq)
-
 $(call depend,cross/opencore-amr,--enable-libopencore-amrnb --enable-libopencore-amrwb)
-
 $(call depend,cross/openh264,--enable-libopenh264)
-
 $(call depend,cross/openjpeg,--enable-libopenjpeg)
-
 $(call depend,cross/opus,--enable-libopus)
-
 $(call depend,cross/rubberband,--enable-librubberband)
-
 $(call depend,cross/shine,--enable-libshine)
-
 $(call depend,cross/snappy,--enable-libsnappy)
-
 $(call depend,cross/soxr,--enable-libsoxr)
-
 $(call depend,cross/speex,--enable-libspeex)
-
 $(call depend,cross/svt-av1,--enable-libsvtav1)
-
 $(call depend,cross/twolame,--enable-libtwolame)
-
 $(call depend,cross/vvenc,--enable-libvvenc)
-
 $(call depend,cross/x264,--enable-libx264)
-
 $(call depend,cross/x265,--enable-libx265)
-
 $(call depend,cross/zvbi,--enable-libzvbi)
 
 #
