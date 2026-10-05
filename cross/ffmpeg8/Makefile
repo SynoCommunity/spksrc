@@ -26,13 +26,7 @@ CONFIGURE_ARGS += --ar=$(call tc,ar)
 CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
-
-# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
-# toolchains ship no such header. Was disabled for qoriq by name.
-ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
-CONFIGURE_ARGS += --disable-indev=v4l2
-endif
-CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
+CONFIGURE_ARGS += --pkg-config=$(call native,pkg-config)
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --enable-shared
@@ -52,6 +46,12 @@ else
   ifeq ($(findstring $(ARCH), $(i686_ARCHS)),)
     CONFIGURE_ARGS += --enable-lto
   endif
+endif
+
+# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
+# toolchains ship no such header. Was disabled for qoriq by name.
+ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
+CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
@@ -88,9 +88,25 @@ DEPENDS = cross/cairo
 
 $(call depend,cross/chromaprint-fftw,--enable-chromaprint)
 
+$(call depend,cross/codec2,--enable-libcodec2)
+
+$(call depend,cross/dav1d,--enable-libdav1d)
+
+$(call depend,cross/flac cross/libtheora,--enable-libtheora)
+
+$(call depend,cross/fontconfig,--enable-libfontconfig)
+
+$(call depend,cross/freetype,--enable-libfreetype)
+
 $(call depend,cross/frei0r,--enable-frei0r)
 
+$(call depend,cross/fribidi,--enable-libfribidi)
+
 $(call depend,cross/gnutls,--enable-gnutls)
+
+$(call depend,cross/lame,--enable-libmp3lame)
+
+$(call depend,cross/libaom,--enable-libaom)
 
 $(call depend,cross/libass,--enable-libass)
 
@@ -98,33 +114,39 @@ $(call depend,cross/libbluray,--enable-libbluray)
 
 $(call depend,cross/libcaca,--enable-libcaca)
 
-$(call depend,cross/dav1d,--enable-libdav1d)
-
-$(call depend,cross/codec2,--enable-libcodec2)
-
 $(call depend,cross/libdc1394,--enable-libdc1394)
-
-$(call depend,cross/fontconfig,--enable-libfontconfig)
-
-$(call depend,cross/freetype,--enable-libfreetype)
-
-$(call depend,cross/fribidi,--enable-libfribidi)
-
-$(call depend,cross/lame,--enable-libmp3lame)
 
 $(call depend,cross/libjxl,--enable-libjxl)
 
 $(call depend,cross/liblc3,--enable-liblc3)
 
+$(call depend,cross/librabbitmq,--enable-librabbitmq)
+
+$(call depend,cross/librist,--enable-librist)
+
+$(call depend,cross/libsrt,--enable-libsrt)
+
+$(call depend,cross/libvmaf,--enable-libvmaf)
+
+$(call depend,cross/libvorbis,--enable-libvorbis)
+
+$(call depend,cross/libvpx,--enable-libvpx)
+
+$(call depend,cross/libwebp,--enable-libwebp)
+
+$(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
+
+$(call depend,cross/libzimg,--enable-libzimg)
+
+$(call depend,cross/libzmq,--enable-libzmq)
+
 $(call depend,cross/opencore-amr,--enable-libopencore-amrnb --enable-libopencore-amrwb)
+
+$(call depend,cross/openh264,--enable-libopenh264)
 
 $(call depend,cross/openjpeg,--enable-libopenjpeg)
 
 $(call depend,cross/opus,--enable-libopus)
-
-$(call depend,cross/librabbitmq,--enable-librabbitmq)
-
-$(call depend,cross/librist,--enable-librist)
 
 $(call depend,cross/rubberband,--enable-librubberband)
 
@@ -136,32 +158,15 @@ $(call depend,cross/soxr,--enable-libsoxr)
 
 $(call depend,cross/speex,--enable-libspeex)
 
-$(call depend,cross/libsrt,--enable-libsrt)
-
-DEPENDS += cross/flac
-$(call depend,cross/libtheora,--enable-libtheora)
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
 $(call depend,cross/twolame,--enable-libtwolame)
 
-$(call depend,cross/libvmaf,--enable-libvmaf)
-
-$(call depend,cross/libvorbis,--enable-libvorbis)
-
 $(call depend,cross/vvenc,--enable-libvvenc)
-
-$(call depend,cross/libvpx,--enable-libvpx)
-
-$(call depend,cross/libwebp,--enable-libwebp)
 
 $(call depend,cross/x264,--enable-libx264)
 
 $(call depend,cross/x265,--enable-libx265)
-
-$(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
-
-$(call depend,cross/libzimg,--enable-libzimg)
-
-$(call depend,cross/libzmq,--enable-libzmq)
 
 $(call depend,cross/zvbi,--enable-libzvbi)
 
@@ -179,14 +184,7 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ## ARCH SPECIFIC
 ##
 
-$(call depend,cross/openh264,--enable-libopenh264)
-
-$(call depend,cross/libaom,--enable-libaom)
-
-# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
-$(call depend,cross/svt-av1,--enable-libsvtav1)
-
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
@@ -207,8 +205,7 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
-# and only qoriq was ever listed.
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2

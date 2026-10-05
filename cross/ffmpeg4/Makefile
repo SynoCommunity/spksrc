@@ -23,7 +23,7 @@ CONFIGURE_ARGS += --ar=$(call tc,ar)
 CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
-CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
+CONFIGURE_ARGS += --pkg-config=$(call native,pkg-config)
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --enable-shared
@@ -89,9 +89,25 @@ DEPENDS = cross/cairo
 
 $(call depend,cross/chromaprint-fftw,--enable-chromaprint)
 
+$(call depend,cross/codec2,--enable-libcodec2)
+
+$(call depend,cross/dav1d,--enable-libdav1d)
+
+$(call depend,cross/flac cross/libtheora,--enable-libtheora)
+
+$(call depend,cross/fontconfig,--enable-libfontconfig)
+
+$(call depend,cross/freetype,--enable-libfreetype)
+
 $(call depend,cross/frei0r,--enable-frei0r)
 
+$(call depend,cross/fribidi,--enable-libfribidi)
+
 $(call depend,cross/gnutls,--enable-gnutls)
+
+$(call depend,cross/lame,--enable-libmp3lame)
+
+$(call depend,cross/libaom,--enable-libaom)
 
 $(call depend,cross/libass,--enable-libass)
 
@@ -99,29 +115,35 @@ $(call depend,cross/libbluray,--enable-libbluray)
 
 $(call depend,cross/libcaca,--enable-libcaca)
 
-$(call depend,cross/dav1d,--enable-libdav1d)
-
-$(call depend,cross/codec2,--enable-libcodec2)
-
 $(call depend,cross/libdc1394,--enable-libdc1394)
-
-$(call depend,cross/fontconfig,--enable-libfontconfig)
-
-$(call depend,cross/freetype,--enable-libfreetype)
-
-$(call depend,cross/fribidi,--enable-libfribidi)
-
-$(call depend,cross/lame,--enable-libmp3lame)
-
-$(call depend,cross/opencore-amr,--enable-libopencore-amrnb --enable-libopencore-amrwb)
-
-$(call depend,cross/openjpeg,--enable-libopenjpeg)
-
-$(call depend,cross/opus,--enable-libopus)
 
 $(call depend,cross/librabbitmq,--enable-librabbitmq)
 
 $(call depend,cross/librist,--enable-librist)
+
+$(call depend,cross/libsrt,--enable-libsrt)
+
+$(call depend,cross/libvmaf,--enable-libvmaf)
+
+$(call depend,cross/libvorbis,--enable-libvorbis)
+
+$(call depend,cross/libvpx,--enable-libvpx)
+
+$(call depend,cross/libwebp,--enable-libwebp)
+
+$(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
+
+$(call depend,cross/libzimg,--enable-libzimg)
+
+$(call depend,cross/libzmq,--enable-libzmq)
+
+$(call depend,cross/opencore-amr,--enable-libopencore-amrnb --enable-libopencore-amrwb)
+
+$(call depend,cross/openh264,--enable-libopenh264)
+
+$(call depend,cross/openjpeg,--enable-libopenjpeg)
+
+$(call depend,cross/opus,--enable-libopus)
 
 $(call depend,cross/rubberband,--enable-librubberband)
 
@@ -133,30 +155,17 @@ $(call depend,cross/soxr,--enable-libsoxr)
 
 $(call depend,cross/speex,--enable-libspeex)
 
-$(call depend,cross/libsrt,--enable-libsrt)
+$(call depend,cross/svt-av1,--enable-libsvtav1)
 
-DEPENDS += cross/flac
-$(call depend,cross/libtheora,--enable-libtheora)
+# Add SVT-HEVC codec to x64
+# Patch for support from: https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
+$(call depend,cross/svt-hevc,--enable-libsvthevc)
 
 $(call depend,cross/twolame,--enable-libtwolame)
-
-$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
-
-$(call depend,cross/libvorbis,--enable-libvorbis)
-
-$(call depend,cross/libvpx,--enable-libvpx)
-
-$(call depend,cross/libwebp,--enable-libwebp)
 
 $(call depend,cross/x264,--enable-libx264)
 
 $(call depend,cross/x265,--enable-libx265)
-
-$(call depend,cross/libxml2,--enable-libxml2 --enable-demuxer=dash)
-
-$(call depend,cross/libzimg,--enable-libzimg)
-
-$(call depend,cross/libzmq,--enable-libzmq)
 
 $(call depend,cross/zvbi,--enable-libzvbi)
 
@@ -173,18 +182,6 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ##
 ## ARCH SPECIFIC
 ##
-
-$(call depend,cross/openh264,--enable-libopenh264)
-
-$(call depend,cross/libaom,--enable-libaom)
-
-# SVT-AV1 is 64-bit only: its configure refuses 32-bit, and it declares REQUIRE_64BIT.
-$(call depend,cross/svt-av1,--enable-libsvtav1)
-
-# Add SVT-HEVC codec to x64
-# Patch for support from:
-# https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
-$(call depend,cross/svt-hevc,--enable-libsvthevc)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
@@ -215,14 +212,12 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
-# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548,
-# and neither core has AltiVec. The e500 branch stood for "not qoriq", an era not a core.
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --disable-altivec
-# libatomic arrived with gcc 4.8; ppc853x's 4.3.7 ships none, and asking for it there
-# fails the link outright.
+# ppc853x's gcc-4.3.7 does not ship libatomic
 ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 CONFIGURE_ARGS += --extra-libs=-latomic
 endif
@@ -235,13 +230,15 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
-ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
+
 # The m2m API, not the compiler: configure tests V4L2_BUF_FLAG_LAST, which Linux grew in
 # 4.2. The 3.x toolchains (x64-6.2.4: 3.10) ship headers without it and configure fails.
 ifeq ($(call version_ge, $(TC_KERNEL), 4.2),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# The videodriver meta's own floor: its kernel (spksrc.spk-meta/videodriver.mk)
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 
 # libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
 # meta; asking for them where it does not exist stops configure at "libmfx not found".
