@@ -23,14 +23,6 @@ MIN_GCC_VERSION = 4.6
 
 include ../../mk/spksrc.common.mk
 
-OPTIONAL_DEPENDS  = cross/ffmpeg4
-OPTIONAL_DEPENDS += cross/ffmpeg8
-OPTIONAL_DEPENDS += cross/intel-libvpl
-OPTIONAL_DEPENDS += cross/intel-mediasdk
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libvpx
-OPTIONAL_DEPENDS += cross/x264
-
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
@@ -43,8 +35,7 @@ CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 
 # WARNING: pngquant fails when built after cross/zlib (i.e. cross/libpng), so it stays the
 # first dependency named -- ahead of the alphabetical order everything below follows.
-DEPENDS  = cross/pngquant
-CONFIGURE_ARGS += --enable-pngquant
+$(call depend,cross/pngquant,--enable-pngquant)
 
 # Dependencies with no option of their own: found by probe, or pulled in by another
 DEPENDS += cross/fontconfig
@@ -54,12 +45,19 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/pcre2
 DEPENDS += cross/uriparser
 
-# Each remaining dependency beside what it answers for. Declared outright rather than
-# behind "no FFMPEG_PACKAGE work dir": a meta has already built the media libraries and
-# symlinks its status cookies here, so each is a no-op, not a second build.
 DEPENDS += cross/curl
-# curl build needs additional configuration for gnutls and libssh2
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
+
+###
+### Optional dependencies with specific options
+###
+
+OPTIONAL_DEPENDS  = cross/ffmpeg4
+OPTIONAL_DEPENDS += cross/ffmpeg8
+OPTIONAL_DEPENDS += cross/intel-libvpl
+OPTIONAL_DEPENDS += cross/intel-mediasdk
+OPTIONAL_DEPENDS += cross/libva
+OPTIONAL_DEPENDS += cross/libvpx
 
 $(call depend,cross/dbus,--enable-dbus_1)
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
@@ -69,6 +67,14 @@ ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL
 ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
 
 $(call depend,cross/fdk-aac,--disable-libfdkaac_static --enable-libfdkaac)
+$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
+$(call depend,cross/libhdhomerun,--disable-hdhomerun_static --enable-hdhomerun_client)
+$(call depend,cross/libtheora,--disable-libtheora_static --enable-libtheora)
+$(call depend,cross/libvorbis,--disable-libvorbis_static --enable-libvorbis)
+$(call depend,cross/libvpx,--disable-libvpx_static --enable-libvpx)
+$(call depend,cross/opus,--disable-libopus_static --enable-libopus)
+$(call depend,cross/x264,--disable-libx264_static --enable-libx264)
+$(call depend,cross/x265,--disable-libx265_static --enable-libx265,--disable-libx265)
 
 # ffmpeg8 needs gcc >= 4.9, ffmpeg4 declares none
 # Keep in step with spk/tvheadend, which picks its FFMPEG_PACKAGE the same way.
@@ -78,12 +84,6 @@ else
 DEPENDS += cross/ffmpeg8
 endif
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
-
-$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
-
-$(call depend,cross/libhdhomerun,--disable-hdhomerun_static --enable-hdhomerun_client)
-
-$(call depend,cross/libtheora,--disable-libtheora_static --enable-libtheora)
 
 ifneq ($(VIDEODRV_ON),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -105,18 +105,6 @@ endif  # TC_GCC >= 5
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
-
-$(call depend,cross/libvorbis,--disable-libvorbis_static --enable-libvorbis)
-
-$(call depend,cross/libvpx,--disable-libvpx_static --enable-libvpx)
-
-$(call depend,cross/opus,--disable-libopus_static --enable-libopus)
-
-$(call depend,cross/x264,--disable-libx264_static --enable-libx264)
-
-# x265 is disabled explicitly where it cannot be built: it defaults to enabled AND static
-# upstream, so omitting the pair keeps it and asks for a bundled build.
-$(call depend,cross/x265,--disable-libx265_static --enable-libx265,--disable-libx265)
 
 # Enable building of new UI
 BUILD_DEPENDS = native/nodejs_22
