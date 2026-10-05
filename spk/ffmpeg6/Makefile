@@ -9,8 +9,6 @@ CHANGELOG += "2. Internal build options now follow toolchain capabilities"
 DEPENDS = cross/ffmpeg6
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# Needs C11 and working atomics -- gcc 4.9 or newer
-
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
 DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://docs.synocommunity.com/packages/ffmpeg/
