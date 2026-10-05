@@ -33,6 +33,13 @@ USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk-meta.mk
 
+# argon2-cffi-bindings enables SSE2 by default and its cmake detection
+# misses the cross target (x86-only -msse2 breaks non-x86 builds);
+# force the portable implementation off-x86 (supported upstream knob)
+ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
+ENV += ARGON2_CFFI_USE_SSE2=0
+endif
+
 .PHONY: octoprint_extra_install
 octoprint_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.octoprint
