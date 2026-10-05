@@ -419,20 +419,6 @@ Index: FFmpeg/libavfilter/vf_scale_d3d11.c
      outlink->w = s->width;
      outlink->h = s->height;
  
-@@ -353,13 +714,6 @@ static int scale_d3d11_config_props(AVFi
-         return AVERROR(EINVAL);
-     }
- 
--    ///< Propagate hw_frames_ctx to output
--    outl->hw_frames_ctx = av_buffer_ref(inl->hw_frames_ctx);
--    if (!outl->hw_frames_ctx) {
--        av_log(ctx, AV_LOG_ERROR, "Failed to propagate hw_frames_ctx to output\n");
--        return AVERROR(ENOMEM);
--    }
--
-     ///< Initialize filter's hardware device context
-     if (!s->hw_device_ctx) {
-         AVHWFramesContext *in_frames_ctx = (AVHWFramesContext *)inl->hw_frames_ctx->data;
 @@ -382,6 +736,29 @@ static int scale_d3d11_config_props(AVFi
          return AVERROR(EINVAL);
      }
@@ -507,9 +493,9 @@ Index: FFmpeg/libavfilter/vf_scale_d3d11.c
 +    }
 +
 +    av_buffer_unref(&outl->hw_frames_ctx);
+     ///< Propagate hw_frames_ctx to output
      outl->hw_frames_ctx = av_buffer_ref(s->hw_frames_ctx_out);
      if (!outl->hw_frames_ctx)
-         return AVERROR(ENOMEM);
 @@ -424,6 +828,8 @@ static av_cold void scale_d3d11_uninit(A
      ///< Release D3D11 resources
      release_d3d11_resources(s);

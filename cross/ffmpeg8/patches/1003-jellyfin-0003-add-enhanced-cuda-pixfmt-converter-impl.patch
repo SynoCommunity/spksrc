@@ -1,3 +1,33 @@
+Index: FFmpeg/doc/filters.texi
+===================================================================
+--- doc/filters.texi
++++ doc/filters.texi
+@@ -27324,12 +27324,6 @@ frame-consumer that exhausts the limited
+ If set to 1, frames are passed through as-is if they match the desired output
+ parameters. This is the default behaviour.
+ 
+-@item use_filters
+-If set to 1, filter with a generic weight LUT instead of using fixed-function
+-shader kernels. May be faster or slower depending on the hardware. A value
+-of @code{auto} (the default) enables this automatically when required for
+-correct anti-aliasing when downscaling.
+-
+ @item param
+ Algorithm-Specific parameter.
+ 
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -473,7 +473,7 @@ OBJS-$(CONFIG_SAB_FILTER)
+ OBJS-$(CONFIG_SCALE_FILTER)                  += vf_scale.o scale_eval.o framesync.o
+ OBJS-$(CONFIG_SCALE_D3D11_FILTER)            += vf_scale_d3d11.o scale_eval.o
+ OBJS-$(CONFIG_SCALE_D3D12_FILTER)            += vf_scale_d3d12.o scale_eval.o
+-OBJS-$(CONFIG_SCALE_CUDA_FILTER)             += vf_scale_cuda.o scale_eval.o scale_filters.o \
++OBJS-$(CONFIG_SCALE_CUDA_FILTER)             += vf_scale_cuda.o scale_eval.o \
+                                                 vf_scale_cuda.ptx.o cuda/load_helper.o
+ OBJS-$(CONFIG_SCALE_NPP_FILTER)              += vf_scale_npp.o scale_eval.o
+ OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
 Index: FFmpeg/libavfilter/cuda/vector_helpers.cuh
 ===================================================================
 --- libavfilter/cuda/vector_helpers.cuh
@@ -307,29 +337,124 @@ Index: FFmpeg/libavfilter/dither_matrix.h
 +};
 +
 +#endif /* AVFILTER_DITHER_MATRIX_H */
+Index: FFmpeg/libavfilter/scale_filters.c
+===================================================================
+--- libavfilter/scale_filters.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/*
+- * This file is part of FFmpeg.
+- *
+- * FFmpeg is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2.1 of the License, or (at your option) any later version.
+- *
+- * FFmpeg is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with FFmpeg; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+- */
+-
+-#include "libswscale/filters.c"
 Index: FFmpeg/libavfilter/vf_scale_cuda.c
 ===================================================================
 --- libavfilter/vf_scale_cuda.c
 +++ libavfilter/vf_scale_cuda.c
-@@ -23,6 +23,7 @@
+@@ -22,21 +22,18 @@
+ 
  #include <float.h>
  #include <stdio.h>
+-#include <string.h>
  
 +#include "libavutil/avassert.h"
  #include "libavutil/common.h"
  #include "libavutil/hwcontext.h"
  #include "libavutil/hwcontext_cuda_internal.h"
-@@ -32,6 +33,7 @@
+ #include "libavutil/cuda_check.h"
+ #include "libavutil/internal.h"
+-#include "libavutil/mem.h"
+ #include "libavutil/opt.h"
  #include "libavutil/pixdesc.h"
+-#include "libavutil/refstruct.h"
+-
+-#include "libswscale/filters.h"
  
  #include "avfilter.h"
 +#include "dither_matrix.h"
  #include "filters.h"
  #include "scale_eval.h"
  #include "video.h"
-@@ -121,6 +123,9 @@ typedef struct CUDAScaleContext {
+@@ -56,15 +53,11 @@ static const struct format_entry support
+     {AV_PIX_FMT_YUV420P10,"planar10"},
+     {AV_PIX_FMT_YUV422P10,"planar10"},
+     {AV_PIX_FMT_YUV444P10,"planar10"},
+-    {AV_PIX_FMT_YUV444P10MSB,"planar16"},
+-    {AV_PIX_FMT_YUV444P12MSB,"planar16"},
+     {AV_PIX_FMT_YUV444P16,"planar16"},
+     {AV_PIX_FMT_NV12,     "semiplanar8"},
+     {AV_PIX_FMT_NV16,     "semiplanar8"},
+     {AV_PIX_FMT_P010,     "semiplanar10"},
+     {AV_PIX_FMT_P210,     "semiplanar10"},
+-    {AV_PIX_FMT_P012,     "semiplanar16"},
+-    {AV_PIX_FMT_P212,     "semiplanar16"},
+     {AV_PIX_FMT_P016,     "semiplanar16"},
+     {AV_PIX_FMT_P216,     "semiplanar16"},
+     {AV_PIX_FMT_0RGB32,   "bgr0"},
+@@ -90,30 +83,6 @@ enum {
+     INTERP_ALGO_COUNT
+ };
+ 
+-enum {
+-    FILTER_OUT,
+-    FILTER_TMP,
+-    FILTER_NB,
+-};
+-
+-typedef struct CUDAScaleFilter {
+-    CUdeviceptr weights; ///< float[dst_size][filter_size]
+-    CUdeviceptr offsets; ///< int[dst_size]
+-    int filter_size;
+-    int dst_size;
+-} CUDAScaleFilter;
+-
+-typedef struct CUDATex {
+-    CUtexObject tex[4];
+-    CUdeviceptr data[4];
+-    int         linesize[4];
+-    int         width, height;
+-    int         log2_chroma_w, log2_chroma_h;
+-    int         crop_left, crop_top, crop_width, crop_height;
+-    int         color_range;
+-    int         external_data;
+-} CUDATex;
+-
+ typedef struct CUDAScaleContext {
+     const AVClass *class;
+ 
+@@ -145,20 +114,18 @@ typedef struct CUDAScaleContext {
+ 
+     CUcontext   cu_ctx;
+     CUmodule    cu_module;
+-    CUfunction  cu_func[FILTER_NB];
+-    CUfunction  cu_func_uv[FILTER_NB];
++    CUfunction  cu_func;
++    CUfunction  cu_func_uv;
+     CUstream    cu_stream;
+ 
+     int interp_algo;
+     int interp_use_linear;
      int interp_as_integer;
  
+-    CUDAScaleFilter filters[FILTER_NB];
+-    CUDAScaleFilter filters_uv[FILTER_NB];
+-    CUDATex inter_tex;
+-    int use_filters; /* -1 for auto */
+-
      float param;
 +
 +    CUdeviceptr dither_buffer;
@@ -337,18 +462,43 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
  } CUDAScaleContext;
  
  static av_cold int cudascale_init(AVFilterContext *ctx)
-@@ -142,13 +147,23 @@ static av_cold void cudascale_uninit(AVF
+@@ -176,27 +143,6 @@ static av_cold int cudascale_init(AVFilt
+     return 0;
+ }
+ 
+-static void filter_uninit(CudaFunctions *cu, CUDAScaleFilter *filter)
+-{
+-    if (filter->weights)
+-        cu->cuMemFree(filter->weights);
+-    if (filter->offsets)
+-        cu->cuMemFree(filter->offsets);
+-    memset(filter, 0, sizeof(*filter));
+-}
+-
+-static void cuda_tex_uninit(CudaFunctions *cu, CUDATex *t)
+-{
+-    for (int i = 0; i < FF_ARRAY_ELEMS(t->tex); i++) {
+-        if (t->tex[i])
+-            cu->cuTexObjectDestroy(t->tex[i]);
+-        if (t->data[i] && !t->external_data)
+-            cu->cuMemFree(t->data[i]);
+-    }
+-
+-    memset(t, 0, sizeof(*t));
+-}
+-
+ static av_cold void cudascale_uninit(AVFilterContext *ctx)
  {
      CUDAScaleContext *s = ctx->priv;
- 
--    if (s->hwctx && s->cu_module) {
-+    if (s->hwctx) {
-         CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+@@ -206,18 +152,18 @@ static av_cold void cudascale_uninit(AVF
          CUcontext dummy;
  
          CHECK_CU(cu->cuCtxPushCurrent(s->hwctx->cuda_ctx));
--        CHECK_CU(cu->cuModuleUnload(s->cu_module));
--        s->cu_module = NULL;
+-
+-        cuda_tex_uninit(cu, &s->inter_tex);
+-        for (int i = 0; i < FF_ARRAY_ELEMS(s->filters); i++) {
+-            filter_uninit(cu, &s->filters[i]);
+-            filter_uninit(cu, &s->filters_uv[i]);
 +        if (s->dither_tex) {
 +            CHECK_CU(cu->cuTexObjectDestroy(s->dither_tex));
 +            s->dither_tex = 0;
@@ -356,15 +506,101 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
 +        if (s->dither_buffer) {
 +            CHECK_CU(cu->cuMemFree(s->dither_buffer));
 +            s->dither_buffer = 0;
-+        }
-+        if (s->cu_module) {
-+            CHECK_CU(cu->cuModuleUnload(s->cu_module));
-+            s->cu_module = NULL;
-+        }
+         }
+-
+         if (s->cu_module) {
+             CHECK_CU(cu->cuModuleUnload(s->cu_module));
+             s->cu_module = NULL;
+         }
+-
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
      }
  
-@@ -294,6 +309,67 @@ static av_cold int init_processing_chain
+@@ -263,69 +209,6 @@ fail:
+     return ret;
+ }
+ 
+-static av_cold int inter_buf_init(AVFilterContext *ctx, int out_width, int in_height)
+-{
+-    CUDAScaleContext *s = ctx->priv;
+-    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+-    int ret = 0;
+-
+-    cuda_tex_uninit(cu, &s->inter_tex);
+-    s->inter_tex = (CUDATex) {
+-        .width          = out_width,
+-        .height         = in_height,
+-        .crop_width     = out_width,
+-        .crop_height    = in_height,
+-        .log2_chroma_w  = s->out_desc->log2_chroma_w,
+-        .log2_chroma_h  = s->in_desc->log2_chroma_h,
+-    };
+-
+-    for (int i = 0; i < s->in_planes; i++) {
+-        const int is_chroma = i == 1 || i == 2;
+-        const int sub_x   = is_chroma ? s->inter_tex.log2_chroma_w : 0;
+-        const int sub_y   = is_chroma ? s->inter_tex.log2_chroma_h : 0;
+-        const int plane_w = AV_CEIL_RSHIFT(out_width, sub_x);
+-        const int plane_h = AV_CEIL_RSHIFT(in_height, sub_y);
+-        const int sizeof_pixel = (s->in_plane_depths[i] <= 8 ? 1 : 2) *
+-                                  s->in_plane_channels[i];
+-
+-        size_t pitch;
+-        ret = CHECK_CU(cu->cuMemAllocPitch(&s->inter_tex.data[i], &pitch,
+-                                           (size_t) plane_w * sizeof_pixel,
+-                                           plane_h, 16));
+-        if (ret < 0)
+-            goto fail;
+-        s->inter_tex.linesize[i] = pitch;
+-
+-        CUDA_TEXTURE_DESC tex_desc = {
+-            /* inter tex is always read as float */
+-            .filterMode = CU_TR_FILTER_MODE_POINT,
+-        };
+-
+-        CUDA_RESOURCE_DESC res_desc = {
+-            .resType = CU_RESOURCE_TYPE_PITCH2D,
+-            .res.pitch2D.format = s->in_plane_depths[i] <= 8 ?
+-                                  CU_AD_FORMAT_UNSIGNED_INT8 :
+-                                  CU_AD_FORMAT_UNSIGNED_INT16,
+-            .res.pitch2D.numChannels  = s->in_plane_channels[i],
+-            .res.pitch2D.devPtr       = s->inter_tex.data[i],
+-            .res.pitch2D.pitchInBytes = pitch,
+-            .res.pitch2D.width        = plane_w,
+-            .res.pitch2D.height       = plane_h,
+-        };
+-
+-        ret = CHECK_CU(cu->cuTexObjectCreate(&s->inter_tex.tex[i], &res_desc,
+-                                             &tex_desc, NULL));
+-        if (ret < 0)
+-            goto fail;
+-    }
+-
+-    return 0;
+-
+-fail:
+-    cuda_tex_uninit(cu, &s->inter_tex);
+-    return ret;
+-}
+-
+ static int format_is_supported(enum AVPixelFormat fmt)
+ {
+     for (int i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++)
+@@ -417,13 +300,6 @@ static av_cold int init_processing_chain
+         if (in_width == out_width && in_height == out_height &&
+             in_format == out_format && s->interp_algo == INTERP_ALGO_DEFAULT)
+             s->interp_algo = INTERP_ALGO_NEAREST;
+-
+-        if (s->interp_algo == INTERP_ALGO_NEAREST) {
+-            s->use_filters = 0;
+-        } else if (s->use_filters < 0 && (out_width < in_width || out_height < in_height))
+-            s->use_filters = 1; /* downscaling; needed for anti-aliasing */
+-        else if (s->use_filters < 0)
+-            s->use_filters = 0;
+     }
+ 
+     outl->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
+@@ -433,6 +309,67 @@ static av_cold int init_processing_chain
      return 0;
  }
  
@@ -432,7 +668,261 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
  static av_cold int cudascale_load_functions(AVFilterContext *ctx)
  {
      CUDAScaleContext *s = ctx->priv;
-@@ -409,6 +485,11 @@ static av_cold int cudascale_config_prop
+@@ -449,40 +386,31 @@ static av_cold int cudascale_load_functi
+     extern const unsigned char ff_vf_scale_cuda_ptx_data[];
+     extern const unsigned int ff_vf_scale_cuda_ptx_len;
+ 
+-    if (s->use_filters) {
+-        /* Final pass is always vertical unless not vertically scaling */
+-        AVFilterLink  *inlink = ctx->inputs[0];
+-        AVFilterLink *outlink = ctx->outputs[0];
+-        function_infix = inlink->h == outlink->h ? "Generic_h" : "Generic_v";
++    switch(s->interp_algo) {
++    case INTERP_ALGO_NEAREST:
++        function_infix = "Nearest";
++        s->interp_use_linear = 0;
++        s->interp_as_integer = 1;
++        break;
++    case INTERP_ALGO_BILINEAR:
++        function_infix = "Bilinear";
++        s->interp_use_linear = 1;
++        s->interp_as_integer = 1;
++        break;
++    case INTERP_ALGO_DEFAULT:
++    case INTERP_ALGO_BICUBIC:
++        function_infix = "Bicubic";
+         s->interp_use_linear = 0;
+         s->interp_as_integer = 0;
+-    } else {
+-        switch(s->interp_algo) {
+-        case INTERP_ALGO_NEAREST:
+-            function_infix = "Nearest";
+-            s->interp_use_linear = 0;
+-            s->interp_as_integer = 1;
+-            break;
+-        case INTERP_ALGO_BILINEAR:
+-            function_infix = "Bilinear";
+-            s->interp_use_linear = 1;
+-            s->interp_as_integer = 1;
+-            break;
+-        case INTERP_ALGO_DEFAULT:
+-        case INTERP_ALGO_BICUBIC:
+-            function_infix = "Bicubic";
+-            s->interp_use_linear = 0;
+-            s->interp_as_integer = 0;
+-            break;
+-        case INTERP_ALGO_LANCZOS:
+-            function_infix = "Lanczos";
+-            s->interp_use_linear = 0;
+-            s->interp_as_integer = 0;
+-            break;
+-        default:
+-            av_log(ctx, AV_LOG_ERROR, "Unknown interpolation algorithm\n");
+-            return AVERROR_BUG;
+-        }
++        break;
++    case INTERP_ALGO_LANCZOS:
++        function_infix = "Lanczos";
++        s->interp_use_linear = 0;
++        s->interp_as_integer = 0;
++        break;
++    default:
++        av_log(ctx, AV_LOG_ERROR, "Unknown interpolation algorithm\n");
++        return AVERROR_BUG;
+     }
+ 
+     ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
+@@ -495,7 +423,7 @@ static av_cold int cudascale_load_functi
+         goto fail;
+ 
+     snprintf(buf, sizeof(buf), "Subsample_%s_%s_%s", function_infix, in_fmt_name, out_fmt_name);
+-    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func[FILTER_OUT], s->cu_module, buf));
++    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func, s->cu_module, buf));
+     if (ret < 0) {
+         av_log(ctx, AV_LOG_FATAL, "Unsupported conversion: %s -> %s\n", in_fmt_name, out_fmt_name);
+         ret = AVERROR(ENOSYS);
+@@ -504,179 +432,17 @@ static av_cold int cudascale_load_functi
+     av_log(ctx, AV_LOG_DEBUG, "Luma filter: %s (%s -> %s)\n", buf, av_get_pix_fmt_name(s->in_fmt), av_get_pix_fmt_name(s->out_fmt));
+ 
+     snprintf(buf, sizeof(buf), "Subsample_%s_%s_%s_uv", function_infix, in_fmt_name, out_fmt_name);
+-    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uv[FILTER_OUT], s->cu_module, buf));
++    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uv, s->cu_module, buf));
+     if (ret < 0)
+         goto fail;
+     av_log(ctx, AV_LOG_DEBUG, "Chroma filter: %s (%s -> %s)\n", buf, av_get_pix_fmt_name(s->in_fmt), av_get_pix_fmt_name(s->out_fmt));
+ 
+-    if (s->use_filters) {
+-        /* Intermediate pass is always horizontal */
+-        snprintf(buf, sizeof(buf), "Subsample_Generic_h_%s_%s", in_fmt_name, in_fmt_name);
+-        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func[FILTER_TMP], s->cu_module, buf));
+-        if (ret < 0)
+-            goto fail;
+-
+-        snprintf(buf, sizeof(buf), "Subsample_Generic_h_%s_%s_uv", in_fmt_name, in_fmt_name);
+-        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uv[FILTER_TMP], s->cu_module, buf));
+-        if (ret < 0)
+-            goto fail;
+-    }
+-
+ fail:
+     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+ 
+     return ret;
+ }
+ 
+-static av_cold int cudascale_filter_init(AVFilterContext *ctx,
+-                                         CUDAScaleFilter *f,
+-                                         int src_size, int dst_size,
+-                                         double virtual_size)
+-{
+-    CUDAScaleContext *s = ctx->priv;
+-    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+-
+-    SwsFilterParams params = {
+-        .scaler_params = { SWS_PARAM_DEFAULT, SWS_PARAM_DEFAULT },
+-        .src_size      = src_size,
+-        .dst_size      = dst_size,
+-        .virtual_size  = virtual_size,
+-    };
+-
+-    switch (s->interp_algo) {
+-    case INTERP_ALGO_NEAREST:  return 0; /* no weights needed */
+-    case INTERP_ALGO_BILINEAR: params.scaler = SWS_SCALE_BILINEAR; break;
+-    case INTERP_ALGO_LANCZOS:  params.scaler = SWS_SCALE_LANCZOS;  break;
+-    case INTERP_ALGO_DEFAULT:
+-    case INTERP_ALGO_BICUBIC:
+-        params.scaler = SWS_SCALE_BICUBIC;
+-        params.scaler_params[0] = params.scaler_params[1] = 0.0;
+-        if (s->param != SCALE_CUDA_PARAM_DEFAULT)
+-            params.scaler_params[1] = s->param;
+-        break;
+-    }
+-
+-    SwsFilterWeights *weights = NULL;
+-    int ret = ff_sws_filter_generate(ctx, &params, &weights);
+-    if (ret < 0) {
+-        if (ret == AVERROR(ENOTSUP)) {
+-            av_log(ctx, AV_LOG_ERROR, "Filter size exceeds the maximum "
+-                   "currently supported by the CUDA scaler (%d).\n",
+-                   SWS_FILTER_SIZE_MAX);
+-        }
+-        return ret;
+-    }
+-
+-    float *tmp = av_malloc_array(weights->num_weights, sizeof(*tmp));
+-    if (!tmp) {
+-        ret = AVERROR(ENOMEM);
+-        goto fail;
+-    }
+-    for (size_t i = 0; i < weights->num_weights; i++)
+-        tmp[i] = weights->weights[i] / (float) SWS_FILTER_SCALE;
+-
+-    f->filter_size = weights->filter_size;
+-    f->dst_size    = dst_size;
+-
+-    const size_t weights_size = weights->num_weights * sizeof(*tmp);
+-    ret = CHECK_CU(cu->cuMemAlloc(&f->weights, weights_size));
+-    if (ret < 0)
+-        goto fail;
+-    ret = CHECK_CU(cu->cuMemcpyHtoD(f->weights, tmp, weights_size));
+-    if (ret < 0)
+-        goto fail;
+-
+-    const size_t offsets_size = dst_size * sizeof(*weights->offsets);
+-    ret = CHECK_CU(cu->cuMemAlloc(&f->offsets, offsets_size));
+-    if (ret < 0)
+-        goto fail;
+-    ret = CHECK_CU(cu->cuMemcpyHtoD(f->offsets, weights->offsets, offsets_size));
+-    if (ret < 0)
+-        goto fail;
+-
+-    av_log(ctx, AV_LOG_VERBOSE, "  using %d tap '%s' filter: %d -> %d\n",
+-           f->filter_size, weights->name, src_size, dst_size);
+-
+-    ret = 0;
+-
+-fail:
+-    av_free(tmp);
+-    av_refstruct_unref(&weights);
+-    return ret;
+-}
+-
+-static av_cold int cudascale_setup_filters(AVFilterContext *ctx)
+-{
+-    CUDAScaleContext *s = ctx->priv;
+-    AVFilterLink  *inlink = ctx->inputs[0];
+-    AVFilterLink *outlink = ctx->outputs[0];
+-    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+-    CUcontext dummy;
+-    int ret;
+-
+-    const int in_sub_x  = s->in_desc->log2_chroma_w;
+-    const int in_sub_y  = s->in_desc->log2_chroma_h;
+-    const int out_sub_x = s->out_desc->log2_chroma_w;
+-    const int out_sub_y = s->out_desc->log2_chroma_h;
+-
+-    ret = CHECK_CU(cu->cuCtxPushCurrent(s->hwctx->cuda_ctx));
+-    if (ret < 0)
+-        return ret;
+-
+-    int pass_x = -1, pass_y = -1;
+-    if (inlink->w != outlink->w && inlink->h != outlink->h) {
+-        /* Always perform the horizontal scaling pass first */
+-        pass_x = FILTER_TMP;
+-        pass_y = FILTER_OUT;
+-    } else if (inlink->w != outlink->w) {
+-        pass_x = FILTER_OUT;
+-    } else if (inlink->h != outlink->h) {
+-        pass_y = FILTER_OUT;
+-    }
+-
+-    if (pass_x >= 0) {
+-        ret = cudascale_filter_init(ctx, &s->filters[pass_x],
+-                                    inlink->w, outlink->w, 0.0);
+-        if (ret < 0)
+-            goto fail;
+-        if (s->in_planes > 1) {
+-            const int src_size = AV_CEIL_RSHIFT(inlink->w,  in_sub_x);
+-            const int dst_size = AV_CEIL_RSHIFT(outlink->w, out_sub_x);
+-            const double virtual_size = (double) outlink->w / (1 << out_sub_x);
+-            ret = cudascale_filter_init(ctx, &s->filters_uv[pass_x],
+-                                        src_size, dst_size, virtual_size);
+-            if (ret < 0)
+-                goto fail;
+-        }
+-    }
+-
+-    if (pass_y >= 0) {
+-        ret = cudascale_filter_init(ctx, &s->filters[pass_y],
+-                                    inlink->h, outlink->h, 0.0);
+-        if (ret < 0)
+-            goto fail;
+-        if (s->in_planes > 1) {
+-            const int src_size = AV_CEIL_RSHIFT(inlink->h,  in_sub_y);
+-            const int dst_size = AV_CEIL_RSHIFT(outlink->h, out_sub_y);
+-            const double virtual_size = (double) outlink->h / (1 << out_sub_y);
+-            ret = cudascale_filter_init(ctx, &s->filters_uv[pass_y],
+-                                        src_size, dst_size, virtual_size);
+-            if (ret < 0)
+-                goto fail;
+-        }
+-    }
+-
+-    ret = inter_buf_init(ctx, outlink->w, inlink->h);
+-    if (ret < 0)
+-        goto fail;
+-
+-    ret = 0;
+-
+-fail:
+-    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+-    return ret;
+-}
+-
+ static av_cold int cudascale_config_props(AVFilterLink *outlink)
+ {
+     AVFilterContext *ctx = outlink->src;
+@@ -719,6 +485,11 @@ static av_cold int cudascale_config_prop
      s->hwctx = device_hwctx;
      s->cu_stream = s->hwctx->stream;
  
@@ -444,34 +934,327 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
      if (s->reset_sar)
          outlink->sample_aspect_ratio = (AVRational){1, 1};
      else if (inlink->sample_aspect_ratio.num) {
-@@ -457,7 +538,10 @@ static int call_resize_kernel(AVFilterCo
-         .src_width = src_width,
+@@ -734,12 +505,6 @@ static av_cold int cudascale_config_prop
+            outlink->w, outlink->h, av_get_pix_fmt_name(s->out_fmt),
+            s->passthrough ? " (passthrough)" : "");
+ 
+-    if (s->use_filters) {
+-        ret = cudascale_setup_filters(ctx);
+-        if (ret < 0)
+-            return ret;
+-    }
+-
+     ret = cudascale_load_functions(ctx);
+     if (ret < 0)
+         return ret;
+@@ -750,75 +515,9 @@ fail:
+     return ret;
+ }
+ 
+-/* if depths/channels are NULL, only maps pointers without creating textures */
+-static int cuda_tex_map_frame(AVFilterContext *ctx, const AVFrame *frame,
+-                              const int depths[4], const int channels[4],
+-                              CUDATex *tex)
+-{
+-    CUDAScaleContext *s = ctx->priv;
+-    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+-
+-    const AVHWFramesContext *fctx = (const AVHWFramesContext*)frame->hw_frames_ctx->data;
+-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fctx->sw_format);
+-    const int planes = av_pix_fmt_count_planes(fctx->sw_format);
+-
+-    *tex = (CUDATex) {
+-        .width       = frame->width,
+-        .height      = frame->height,
+-        .crop_left   = frame->crop_left,
+-        .crop_top    = frame->crop_top,
+-        .crop_width  = (frame->width  - frame->crop_right)  - frame->crop_left,
+-        .crop_height = (frame->height - frame->crop_bottom) - frame->crop_top,
+-        .color_range = frame->color_range,
+-        .log2_chroma_w = desc->log2_chroma_w,
+-        .log2_chroma_h = desc->log2_chroma_h,
+-        .external_data = 1,
+-    };
+-
+-    for (int i = 0; i < planes; i++) {
+-        tex->data[i]     = (CUdeviceptr)frame->data[i];
+-        tex->linesize[i] = frame->linesize[i];
+-        if (!depths || !channels)
+-            continue;
+-
+-        CUDA_TEXTURE_DESC tex_desc = {
+-            .filterMode = s->interp_use_linear ?
+-                          CU_TR_FILTER_MODE_LINEAR :
+-                          CU_TR_FILTER_MODE_POINT,
+-            .flags = s->interp_as_integer ? CU_TRSF_READ_AS_INTEGER : 0,
+-        };
+-
+-        const int is_chroma = i == 1 || i == 2;
+-        const int sub_x = is_chroma ? desc->log2_chroma_w : 0;
+-        const int sub_y = is_chroma ? desc->log2_chroma_h : 0;
+-        CUDA_RESOURCE_DESC res_desc = {
+-            .resType = CU_RESOURCE_TYPE_PITCH2D,
+-            .res.pitch2D.format = depths[i] <= 8 ?
+-                                  CU_AD_FORMAT_UNSIGNED_INT8 :
+-                                  CU_AD_FORMAT_UNSIGNED_INT16,
+-            .res.pitch2D.numChannels = channels[i],
+-            .res.pitch2D.pitchInBytes = tex->linesize[i],
+-            .res.pitch2D.devPtr = tex->data[i],
+-            .res.pitch2D.width  = AV_CEIL_RSHIFT(frame->width,  sub_x),
+-            .res.pitch2D.height = AV_CEIL_RSHIFT(frame->height, sub_y),
+-        };
+-
+-        int ret = CHECK_CU(cu->cuTexObjectCreate(&tex->tex[i], &res_desc, &tex_desc, NULL));
+-        if (ret < 0) {
+-            cuda_tex_uninit(cu, tex);
+-            return ret;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+ static int call_resize_kernel(AVFilterContext *ctx, CUfunction func,
+-                              const CUtexObject src_tex[4],
+-                              int src_left, int src_top, int src_width, int src_height,
+-                              const CUdeviceptr out_data[4],
+-                              int dst_width, int dst_height, int dst_pitch, int mpeg_range,
+-                              const CUDAScaleFilter *filter)
++                              CUtexObject src_tex[4], int src_left, int src_top, int src_width, int src_height,
++                              AVFrame *out_frame, int dst_width, int dst_height, int dst_pitch, int mpeg_range)
+ {
+     CUDAScaleContext *s = ctx->priv;
+     CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+@@ -826,10 +525,10 @@ static int call_resize_kernel(AVFilterCo
+     CUDAScaleKernelParams params = {
+         .src_tex = {src_tex[0], src_tex[1], src_tex[2], src_tex[3]},
+         .dst = {
+-            out_data[0],
+-            out_data[1],
+-            out_data[2],
+-            out_data[3]
++            (CUdeviceptr)out_frame->data[0],
++            (CUdeviceptr)out_frame->data[1],
++            (CUdeviceptr)out_frame->data[2],
++            (CUdeviceptr)out_frame->data[3]
+         },
+         .dst_width = dst_width,
+         .dst_height = dst_height,
+@@ -840,14 +539,11 @@ static int call_resize_kernel(AVFilterCo
          .src_height = src_height,
          .param = s->param,
--        .mpeg_range = mpeg_range
-+        .mpeg_range = mpeg_range,
+         .mpeg_range = mpeg_range,
 +        .dither_tex = s->dither_tex,
 +        .dither_size = (float)ff_fruit_dither_size,
 +        .dither_quantization = (float)((1 << s->out_desc->comp[0].depth) - 1)
      };
  
+-    if (filter) {
+-        params.weights = filter->weights;
+-        params.offsets = filter->offsets;
+-        params.filter_size = filter->filter_size;
+-    }
+-
      void *args[] = { &params };
-@@ -487,6 +571,7 @@ static int scalecuda_resize(AVFilterCont
  
-     for (i = 0; i < s->in_planes; i++) {
-         CUDA_TEXTURE_DESC tex_desc = {
+     return CHECK_CU(cu->cuLaunchKernel(func,
+@@ -855,79 +551,103 @@ static int call_resize_kernel(AVFilterCo
+                                        BLOCKX, BLOCKY, 1, 0, s->cu_stream, args, NULL));
+ }
+ 
+-static int scalecuda_resize(AVFilterContext *ctx, int pass,
+-                            const CUDATex *out, const CUDATex *in)
++static int scalecuda_resize(AVFilterContext *ctx,
++                            AVFrame *out, AVFrame *in)
+ {
+     CUDAScaleContext *s = ctx->priv;
++    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
++    CUcontext dummy, cuda_ctx = s->hwctx->cuda_ctx;
++    int i, ret;
+     int mpeg_range = in->color_range != AVCOL_RANGE_JPEG;
+-    int ret;
+ 
+-    int out_planes = s->out_planes;
+-    if (pass == FILTER_TMP)
+-        out_planes = s->in_planes;
++    CUtexObject tex[4] = { 0, 0, 0, 0 };
+ 
+-    // scale primary plane(s). Usually Y (and A), or single plane of RGB frames.
+-    ret = call_resize_kernel(ctx, s->cu_func[pass],
+-                             in->tex, in->crop_left, in->crop_top,
+-                             in->crop_width, in->crop_height,
+-                             out->data, out->width, out->height,
+-                             out->linesize[0], mpeg_range,
+-                             &s->filters[pass]);
++    int crop_width = (in->width - in->crop_right) - in->crop_left;
++    int crop_height = (in->height - in->crop_bottom) - in->crop_top;
++
++    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
+     if (ret < 0)
+         return ret;
+ 
+-    if (out_planes > 1) {
++    for (i = 0; i < s->in_planes; i++) {
++        CUDA_TEXTURE_DESC tex_desc = {
 +            .addressMode = { CU_TR_ADDRESS_MODE_CLAMP },
-             .filterMode = s->interp_use_linear ?
-                           CU_TR_FILTER_MODE_LINEAR :
-                           CU_TR_FILTER_MODE_POINT,
++            .filterMode = s->interp_use_linear ?
++                          CU_TR_FILTER_MODE_LINEAR :
++                          CU_TR_FILTER_MODE_POINT,
++            .flags = s->interp_as_integer ? CU_TRSF_READ_AS_INTEGER : 0,
++        };
++
++        CUDA_RESOURCE_DESC res_desc = {
++            .resType = CU_RESOURCE_TYPE_PITCH2D,
++            .res.pitch2D.format = s->in_plane_depths[i] <= 8 ?
++                                  CU_AD_FORMAT_UNSIGNED_INT8 :
++                                  CU_AD_FORMAT_UNSIGNED_INT16,
++            .res.pitch2D.numChannels = s->in_plane_channels[i],
++            .res.pitch2D.pitchInBytes = in->linesize[i],
++            .res.pitch2D.devPtr = (CUdeviceptr)in->data[i],
++        };
++
++        if (i == 1 || i == 2) {
++            res_desc.res.pitch2D.width = AV_CEIL_RSHIFT(in->width, s->in_desc->log2_chroma_w);
++            res_desc.res.pitch2D.height = AV_CEIL_RSHIFT(in->height, s->in_desc->log2_chroma_h);
++        } else {
++            res_desc.res.pitch2D.width = in->width;
++            res_desc.res.pitch2D.height = in->height;
++        }
++
++        ret = CHECK_CU(cu->cuTexObjectCreate(&tex[i], &res_desc, &tex_desc, NULL));
++        if (ret < 0)
++            goto exit;
++    }
++
++    // scale primary plane(s). Usually Y (and A), or single plane of RGB frames.
++    ret = call_resize_kernel(ctx, s->cu_func,
++                             tex, in->crop_left, in->crop_top, crop_width, crop_height,
++                             out, out->width, out->height, out->linesize[0], mpeg_range);
++    if (ret < 0)
++        goto exit;
++
++    if (s->out_planes > 1) {
+         // scale UV plane. Scale function sets both U and V plane, or singular interleaved plane.
+-        ret = call_resize_kernel(ctx, s->cu_func_uv[pass], in->tex,
+-                                 AV_CEIL_RSHIFT(in->crop_left, in->log2_chroma_w),
+-                                 AV_CEIL_RSHIFT(in->crop_top, in->log2_chroma_h),
+-                                 AV_CEIL_RSHIFT(in->crop_width, in->log2_chroma_w),
+-                                 AV_CEIL_RSHIFT(in->crop_height, in->log2_chroma_h),
+-                                 out->data,
+-                                 AV_CEIL_RSHIFT(out->width, out->log2_chroma_w),
+-                                 AV_CEIL_RSHIFT(out->height, out->log2_chroma_h),
+-                                 out->linesize[1], mpeg_range,
+-                                 &s->filters_uv[pass]);
++        ret = call_resize_kernel(ctx, s->cu_func_uv, tex,
++                                 AV_CEIL_RSHIFT(in->crop_left, s->in_desc->log2_chroma_w),
++                                 AV_CEIL_RSHIFT(in->crop_top, s->in_desc->log2_chroma_h),
++                                 AV_CEIL_RSHIFT(crop_width, s->in_desc->log2_chroma_w),
++                                 AV_CEIL_RSHIFT(crop_height, s->in_desc->log2_chroma_h),
++                                 out,
++                                 AV_CEIL_RSHIFT(out->width, s->out_desc->log2_chroma_w),
++                                 AV_CEIL_RSHIFT(out->height, s->out_desc->log2_chroma_h),
++                                 out->linesize[1], mpeg_range);
+         if (ret < 0)
+-            return ret;
++            goto exit;
+     }
+ 
+-    return 0;
++exit:
++    for (i = 0; i < s->in_planes; i++)
++        if (tex[i])
++            CHECK_CU(cu->cuTexObjectDestroy(tex[i]));
++
++    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++
++    return ret;
+ }
+ 
+ static int cudascale_scale(AVFilterContext *ctx, AVFrame *out, AVFrame *in)
+ {
+     CUDAScaleContext *s = ctx->priv;
+-    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+     AVFilterLink *outlink = ctx->outputs[0];
+-    int ret = 0;
+-
+-    CUDATex in_tex = {0}, out_tex = {0};
+-    ret = cuda_tex_map_frame(ctx, in, s->in_plane_depths, s->in_plane_channels, &in_tex);
+-    if (ret < 0)
+-        goto fail;
+-
+-    ret = cuda_tex_map_frame(ctx, s->frame, NULL, NULL, &out_tex);
+-    if (ret < 0)
+-        goto fail;
+-
+-    const CUDATex *src = &in_tex;
+-    if (s->use_filters) {
+-        /* Handle first pass separately */
+-        s->inter_tex.color_range = in->color_range;
+-        ret = scalecuda_resize(ctx, FILTER_TMP, &s->inter_tex, src);
+-        if (ret < 0)
+-            goto fail;
+-        src = &s->inter_tex;
+-    }
++    AVFrame *src = in;
++    int ret;
+ 
+-    ret = scalecuda_resize(ctx, FILTER_OUT, &out_tex, src);
++    ret = scalecuda_resize(ctx, s->frame, src);
+     if (ret < 0)
+-        goto fail;
++        return ret;
+ 
+-    ret = av_hwframe_get_buffer(s->frame->hw_frames_ctx, s->tmp_frame, 0);
++    src = s->frame;
++    ret = av_hwframe_get_buffer(src->hw_frames_ctx, s->tmp_frame, 0);
+     if (ret < 0)
+-        goto fail;
++        return ret;
+ 
+     av_frame_move_ref(out, s->frame);
+     av_frame_move_ref(s->frame, s->tmp_frame);
+@@ -937,17 +657,14 @@ static int cudascale_scale(AVFilterConte
+ 
+     ret = av_frame_copy_props(out, in);
+     if (ret < 0)
+-        goto fail;
++        return ret;
+ 
+     if (out->width != in->width || out->height != in->height) {
+         av_frame_side_data_remove_by_props(&out->side_data, &out->nb_side_data,
+                                            AV_SIDE_DATA_PROP_SIZE_DEPENDENT);
+     }
+ 
+-fail:
+-    cuda_tex_uninit(cu, &in_tex);
+-    cuda_tex_uninit(cu, &out_tex);
+-    return ret;
++    return 0;
+ }
+ 
+ static int cudascale_filter_frame(AVFilterLink *link, AVFrame *in)
+@@ -1018,8 +735,6 @@ static const AVOption options[] = {
+         { "lanczos",  "lanczos",  0, AV_OPT_TYPE_CONST, { .i64 = INTERP_ALGO_LANCZOS  }, 0, 0, FLAGS, .unit = "interp_algo" },
+     { "format", "Output video pixel format", OFFSET(format), AV_OPT_TYPE_PIXEL_FMT, { .i64 = AV_PIX_FMT_NONE }, INT_MIN, INT_MAX, .flags=FLAGS },
+     { "passthrough", "Do not process frames at all if parameters match", OFFSET(passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
+-    { "use_filters", "Use generic filters instead of fixed function kernels", OFFSET(use_filters), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, FLAGS, .unit = "use_filters" },
+-        { "auto",    NULL,  0, AV_OPT_TYPE_CONST, {.i64 = -1}, 0, 0, FLAGS, .unit = "use_filters" },
+     { "param", "Algorithm-Specific parameter", OFFSET(param), AV_OPT_TYPE_FLOAT, { .dbl = SCALE_CUDA_PARAM_DEFAULT }, -FLT_MAX, FLT_MAX, FLAGS },
+     { "force_original_aspect_ratio", "decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, SCALE_FORCE_OAR_NB-1, FLAGS, .unit = "force_oar" },
+         { "disable",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = SCALE_FORCE_OAR_DISABLE  }, 0, 0, FLAGS, .unit = "force_oar" },
 Index: FFmpeg/libavfilter/vf_scale_cuda.cu
 ===================================================================
 --- libavfilter/vf_scale_cuda.cu
 +++ libavfilter/vf_scale_cuda.cu
-@@ -30,6 +30,19 @@ using subsample_function_t = T (*)(cudaT
+@@ -28,9 +28,20 @@ using subsample_function_t = T (*)(cudaT
+                                    int dst_width, int dst_height,
+                                    int src_left, int src_top,
                                     int src_width, int src_height,
-                                    int bit_depth, float param);
- 
+-                                   int bit_depth, float param,
+-                                   const float *weights, const int *offsets,
+-                                   int filter_size);
++                                   int bit_depth, float param);
++
 +// --- DITHERING ---
 +
 +static inline __device__ float get_dithered_y(float y, float d, float dither_size, float dither_quantization, float factor)
@@ -484,22 +1267,29 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
 +    float dither_size_recip = 1.0f / dither_size;
 +    return tex2D<float>(dither_tex, (float)x * dither_size_recip, (float)y * dither_size_recip);
 +}
-+
+ 
  // --- CONVERSION LOGIC ---
  
- static const ushort mask_10bit = 0xFFC0;
-@@ -90,7 +103,9 @@ static inline __device__ ushort conv_16t
-     __device__ static inline void N(cudaTextureObject_t src_tex[4], T *dst[4], int xo, int yo, \
+@@ -93,15 +104,15 @@ static inline __device__ ushort conv_16t
                                      int dst_width, int dst_height, int dst_pitch,              \
                                      int src_left, int src_top, int src_width, int src_height,  \
--                                    float param, int mpeg_range)
-+                                    float param, int mpeg_range,                               \
+                                     float param, int mpeg_range,                               \
+-                                    const float *weights, const int *offsets, int filter_size)
 +                                    cudaTextureObject_t dither_tex,                            \
 +                                    float dither_size, float dither_quantization)
  
  #define SUB_F(m, plane) \
      subsample_func_##m(src_tex[plane], xo, yo, \
-@@ -248,7 +263,10 @@ struct Convert_planar10_planar8
+                        dst_width, dst_height,  \
+                        src_left, src_top,      \
+                        src_width, src_height,  \
+-                       in_bit_depth, param,    \
+-                       weights, offsets, filter_size)
++                       in_bit_depth, param)
+ 
+ // FFmpeg passes pitch in bytes, CUDA uses potentially larger types
+ #define FIXED_PITCH \
+@@ -252,7 +263,10 @@ struct Convert_planar10_planar8
  
      DEF_F(Convert, out_T)
      {
@@ -511,7 +1301,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -308,7 +326,10 @@ struct Convert_planar10_semiplanar8
+@@ -312,7 +326,10 @@ struct Convert_planar10_semiplanar8
  
      DEF_F(Convert, out_T)
      {
@@ -523,7 +1313,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -376,7 +397,10 @@ struct Convert_planar16_planar8
+@@ -380,7 +397,10 @@ struct Convert_planar16_planar8
  
      DEF_F(Convert, out_T)
      {
@@ -535,7 +1325,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -396,7 +420,10 @@ struct Convert_planar16_planar10
+@@ -400,7 +420,10 @@ struct Convert_planar16_planar10
  
      DEF_F(Convert, out_T)
      {
@@ -547,7 +1337,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -436,7 +463,10 @@ struct Convert_planar16_semiplanar8
+@@ -440,7 +463,10 @@ struct Convert_planar16_semiplanar8
  
      DEF_F(Convert, out_T)
      {
@@ -559,7 +1349,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -458,7 +488,10 @@ struct Convert_planar16_semiplanar10
+@@ -462,7 +488,10 @@ struct Convert_planar16_semiplanar10
  
      DEF_F(Convert, out_T)
      {
@@ -571,7 +1361,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -634,7 +667,10 @@ struct Convert_semiplanar10_planar8
+@@ -638,7 +667,10 @@ struct Convert_semiplanar10_planar8
  
      DEF_F(Convert, out_T)
      {
@@ -583,7 +1373,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -697,7 +733,10 @@ struct Convert_semiplanar10_semiplanar8
+@@ -701,7 +733,10 @@ struct Convert_semiplanar10_semiplanar8
  
      DEF_F(Convert, out_T)
      {
@@ -595,7 +1385,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -765,7 +804,10 @@ struct Convert_semiplanar16_planar8
+@@ -769,7 +804,10 @@ struct Convert_semiplanar16_planar8
  
      DEF_F(Convert, out_T)
      {
@@ -607,7 +1397,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -786,7 +828,10 @@ struct Convert_semiplanar16_planar10
+@@ -790,7 +828,10 @@ struct Convert_semiplanar16_planar10
  
      DEF_F(Convert, out_T)
      {
@@ -619,7 +1409,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -828,7 +873,10 @@ struct Convert_semiplanar16_semiplanar8
+@@ -832,7 +873,10 @@ struct Convert_semiplanar16_semiplanar8
  
      DEF_F(Convert, out_T)
      {
@@ -631,7 +1421,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -851,7 +899,10 @@ struct Convert_semiplanar16_semiplanar10
+@@ -855,7 +899,10 @@ struct Convert_semiplanar16_semiplanar10
  
      DEF_F(Convert, out_T)
      {
@@ -643,7 +1433,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -1045,6 +1096,9 @@ typedef float4 (*coeffs_function_t)(floa
+@@ -1049,6 +1096,9 @@ typedef float4 (*coeffs_function_t)(floa
  
  __device__ static inline float4 lanczos_coeffs(float x, float param)
  {
@@ -653,7 +1443,40 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      const float pi = 3.141592654f;
  
      float4 res = make_float4(
-@@ -1162,12 +1216,15 @@ __device__ static inline T Subsample_Bic
+@@ -1099,9 +1149,7 @@ __device__ static inline T Subsample_Nea
+                                              int dst_width, int dst_height,
+                                              int src_left, int src_top,
+                                              int src_width, int src_height,
+-                                             int bit_depth, float param,
+-                                             const float *weights, const int *offsets,
+-                                             int filter_size)
++                                             int bit_depth, float param)
+ {
+     float hscale = (float)src_width / (float)dst_width;
+     float vscale = (float)src_height / (float)dst_height;
+@@ -1117,9 +1165,7 @@ __device__ static inline T Subsample_Bil
+                                               int dst_width, int dst_height,
+                                               int src_left, int src_top,
+                                               int src_width, int src_height,
+-                                              int bit_depth, float param,
+-                                              const float *weights, const int *offsets,
+-                                              int filter_size)
++                                              int bit_depth, float param)
+ {
+     float hscale = (float)src_width / (float)dst_width;
+     float vscale = (float)src_height / (float)dst_height;
+@@ -1151,9 +1197,7 @@ __device__ static inline T Subsample_Bic
+                                              int dst_width, int dst_height,
+                                              int src_left, int src_top,
+                                              int src_width, int src_height,
+-                                             int bit_depth, float param,
+-                                             const float *weights, const int *offsets,
+-                                             int filter_size)
++                                             int bit_depth, float param)
+ {
+     float hscale = (float)src_width / (float)dst_width;
+     float vscale = (float)src_height / (float)dst_height;
+@@ -1172,54 +1216,20 @@ __device__ static inline T Subsample_Bic
  #define PIX(x, y) tex2D<floatT>(tex, (x), (y))
  
      return from_floatN<T, floatT>(
@@ -675,28 +1498,162 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      );
  
  #undef PIX
-@@ -1194,7 +1251,8 @@ __device__ static inline T Subsample_Bic
-         params.dst_width, params.dst_height, params.dst_pitch, \
+ }
+ 
+-enum ScaleDir {
+-    SCALE_DIR_X,
+-    SCALE_DIR_Y,
+-};
+-
+-template<typename T, int dir>
+-__device__ static inline T Subsample_Generic(cudaTextureObject_t tex,
+-                                             int xo, int yo,
+-                                             int dst_width, int dst_height,
+-                                             int src_left, int src_top,
+-                                             int src_width, int src_height,
+-                                             int bit_depth, float param,
+-                                             const float *weights, const int *offsets,
+-                                             int filter_size)
+-{
+-    const float factor = bit_depth > 8 ? 0xFFFF : 0xFF;
+-
+-    floatT sum;
+-    vec_set_scalar(sum, 0.0f);
+-
+-    if (dir == SCALE_DIR_X) {
+-        const float *row = &weights[xo * filter_size];
+-        const float x = 0.5f + src_left + offsets[xo];
+-        const float y = 0.5f + src_top  + yo;
+-        for (int i = 0; i < filter_size; i++)
+-            sum += tex2D<floatT>(tex, x + i, y) * row[i];
+-    } else {
+-        const float *col = &weights[yo * filter_size];
+-        const float x = 0.5f + src_left + xo;
+-        const float y = 0.5f + src_top  + offsets[yo];
+-        for (int i = 0; i < filter_size; i++)
+-            sum += tex2D<floatT>(tex, x, y + i) * col[i];
+-    }
+-
+-    return from_floatN<T, floatT>(sum * factor);
+-}
+-
+ /// --- FUNCTION EXPORTS ---
+ 
+ #define KERNEL_ARGS(T) CUDAScaleKernelParams params
+@@ -1242,9 +1252,7 @@ __device__ static inline T Subsample_Gen
          params.src_left, params.src_top,                \
          params.src_width, params.src_height,            \
--        params.param, params.mpeg_range);
-+        params.param, params.mpeg_range,                \
+         params.param, params.mpeg_range,                \
+-        (const float*) params.weights,                  \
+-        (const int*) params.offsets,                    \
+-        params.filter_size);
 +        params.dither_tex, params.dither_size, params.dither_quantization);
  
  extern "C" {
  
+@@ -1407,46 +1415,4 @@ LANCZOS_KERNELS_RGB(rgb0)
+ LANCZOS_KERNELS_RGB(bgr0)
+ LANCZOS_KERNELS_RGB(rgba)
+ LANCZOS_KERNELS_RGB(bgra)
+-
+-#define GENERIC_KERNEL(D, DIR, C, S) \
+-    __global__ void Subsample_Generic_##D##_##C##S(                     \
+-        KERNEL_ARGS(Convert_##C::out_T##S))                             \
+-    {                                                                   \
+-        SUBSAMPLE((Convert_##C::Convert##S<                             \
+-                       Subsample_Generic<Convert_##C::in_T, DIR>,       \
+-                       Subsample_Generic<Convert_##C::in_T_uv, DIR> >), \
+-                  Convert_##C::out_T##S) \
+-    }
+-
+-#define GENERIC_KERNEL_RAW(C) \
+-    GENERIC_KERNEL(h, SCALE_DIR_X, C,)      \
+-    GENERIC_KERNEL(h, SCALE_DIR_X, C,_uv)   \
+-    GENERIC_KERNEL(v, SCALE_DIR_Y, C,)      \
+-    GENERIC_KERNEL(v, SCALE_DIR_Y, C,_uv)
+-
+-#define GENERIC_KERNELS(C) \
+-    GENERIC_KERNEL_RAW(planar8_ ## C)       \
+-    GENERIC_KERNEL_RAW(planar10_ ## C)      \
+-    GENERIC_KERNEL_RAW(planar16_ ## C)      \
+-    GENERIC_KERNEL_RAW(semiplanar8_ ## C)   \
+-    GENERIC_KERNEL_RAW(semiplanar10_ ## C)  \
+-    GENERIC_KERNEL_RAW(semiplanar16_ ## C)
+-
+-#define GENERIC_KERNELS_RGB(C) \
+-    GENERIC_KERNEL_RAW(rgb0_ ## C)  \
+-    GENERIC_KERNEL_RAW(bgr0_ ## C)  \
+-    GENERIC_KERNEL_RAW(rgba_ ## C)  \
+-    GENERIC_KERNEL_RAW(bgra_ ## C)
+-
+-GENERIC_KERNELS(planar8)
+-GENERIC_KERNELS(planar10)
+-GENERIC_KERNELS(planar16)
+-GENERIC_KERNELS(semiplanar8)
+-GENERIC_KERNELS(semiplanar10)
+-GENERIC_KERNELS(semiplanar16)
+-
+-GENERIC_KERNELS_RGB(rgb0)
+-GENERIC_KERNELS_RGB(bgr0)
+-GENERIC_KERNELS_RGB(rgba)
+-GENERIC_KERNELS_RGB(bgra)
+ }
 Index: FFmpeg/libavfilter/vf_scale_cuda.h
 ===================================================================
 --- libavfilter/vf_scale_cuda.h
 +++ libavfilter/vf_scale_cuda.h
-@@ -45,6 +45,10 @@ typedef struct {
-     int src_height;
+@@ -46,10 +46,9 @@ typedef struct {
      float param;
      int mpeg_range;
-+
+ 
+-    /* Weights for the generic filter kernel */
+-    CUdeviceptr weights;
+-    CUdeviceptr offsets;
+-    int filter_size;
 +    CUtexObject dither_tex;
 +    float dither_size;
 +    float dither_quantization;
  } CUDAScaleKernelParams;
  
  #endif
+Index: FFmpeg/libavfilter/vf_thumbnail_cuda.c
+===================================================================
+--- libavfilter/vf_thumbnail_cuda.c
++++ libavfilter/vf_thumbnail_cuda.c
+@@ -44,10 +44,7 @@ static const enum AVPixelFormat supporte
+     AV_PIX_FMT_YUV420P,
+     AV_PIX_FMT_YUV444P,
+     AV_PIX_FMT_P010,
+-    AV_PIX_FMT_P012,
+     AV_PIX_FMT_P016,
+-    AV_PIX_FMT_YUV444P10MSB,
+-    AV_PIX_FMT_YUV444P12MSB,
+     AV_PIX_FMT_YUV444P16,
+ };
+ 
+@@ -229,15 +226,12 @@ static int thumbnail(AVFilterContext *ct
+             histogram + 512, in->data[2], in->width, in->height, in->linesize[2], 1);
+         break;
+     case AV_PIX_FMT_P010LE:
+-    case AV_PIX_FMT_P012LE:
+     case AV_PIX_FMT_P016LE:
+         thumbnail_kernel(ctx, s->cu_func_ushort, 1,
+             histogram, in->data[0], in->width, in->height, in->linesize[0], 2);
+         thumbnail_kernel(ctx, s->cu_func_ushort2, 2,
+             histogram + 256, in->data[1], in->width / 2, in->height / 2, in->linesize[1], 2);
+         break;
+-    case AV_PIX_FMT_YUV444P10MSB:
+-    case AV_PIX_FMT_YUV444P12MSB:
+     case AV_PIX_FMT_YUV444P16:
+         thumbnail_kernel(ctx, s->cu_func_ushort2, 1,
+             histogram, in->data[0], in->width, in->height, in->linesize[0], 2);
+@@ -290,8 +284,7 @@ static int filter_frame(AVFilterLink *in
+         return ret;
+ 
+     if (hw_frames_ctx->sw_format == AV_PIX_FMT_NV12 || hw_frames_ctx->sw_format == AV_PIX_FMT_YUV420P ||
+-        hw_frames_ctx->sw_format == AV_PIX_FMT_P010LE || hw_frames_ctx->sw_format == AV_PIX_FMT_P012LE ||
+-        hw_frames_ctx->sw_format == AV_PIX_FMT_P016LE)
++        hw_frames_ctx->sw_format == AV_PIX_FMT_P010LE || hw_frames_ctx->sw_format == AV_PIX_FMT_P016LE)
+     {
+         int i;
+         for (i = 256; i < HIST_SIZE; i++)
