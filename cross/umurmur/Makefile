@@ -1,5 +1,5 @@
 PKG_NAME = umurmur
-PKG_VERS = 0.4.1
+PKG_VERS = 0.5.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/umurmur/umurmur/archive
