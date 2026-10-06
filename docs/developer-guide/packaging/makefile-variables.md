@@ -209,8 +209,9 @@ asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same 
 - **Verdicts are computed once per work directory**, all candidates in parallel, and kept in
   `work-<arch>-<vers>/odepend-<package>.mk`. After changing a dependency's floors,
   `make spkclean` (or `clean`) recomputes them.
-- **A resolved optional dependency comes after every `DEPENDS`.** Keep a package whose build
-  order matters in `DEPENDS`.
+- **The order is the order of the Makefile.** Each call leaves a placeholder in `DEPENDS`
+  and `CONFIGURE_ARGS` where it stands, which the outcome replaces -- the package and its
+  switches, the `<else>` switches, or nothing -- exactly as an `ifeq` at that line would.
 - **Dependency walks** (pre-check, `make check`, `dependency-flat` under an arch) do not
   compute optional verdicts: they reuse the file a build wrote, or leave optional
   dependencies out -- the required tree stays the required tree. **Required alternatives**
@@ -223,8 +224,12 @@ asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same 
 
 - **Include `spksrc.common.mk` before the first `$(call depend,...)`.** The macro is defined
   there; called earlier, it expands to nothing, silently. Virtual packages need it too.
-- **Never reset `OPTIONAL_DEPENDS` with `=` after a call**: it wipes what the calls
-  declared. Use `+=`, or put the `=` first.
+- **Never reset `DEPENDS`, `CONFIGURE_ARGS` or `OPTIONAL_DEPENDS` with `=` after a call**:
+  it wipes what the calls declared, placeholders included. Use `+=`, or put the `=` first.
+- **Known limitation: do not test the content of `DEPENDS` or `CONFIGURE_ARGS` while
+  parsing**, after a call (`ifneq ($(filter cross/x,$(DEPENDS)),)`): until `odepend.mk` has
+  run, they hold the placeholder, not the package. Where a Makefile must decide on that,
+  use a classic `ifeq` on the condition itself.
 - **A call inside an `ifeq` that a no-`ARCH` parse does not enter** (`VIDEODRV_ON`, an arch
   test) cannot declare its package: name it in `OPTIONAL_DEPENDS` yourself.
 - **Keep `ifeq` for conditions that belong to the consumer**, not to the dependency: a

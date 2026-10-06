@@ -71,13 +71,18 @@ dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/d
 # Without a second argument it is required: plain DEPENDS, or with | the first supported
 # alternative -- the last one when none is, so the refusal names it. That is what a
 # virtual package is.
+#
+# The call leaves a placeholder word (_odep_<n>_) in DEPENDS and CONFIGURE_ARGS, which
+# odepend.mk replaces once the verdicts are in: the outcome keeps the place of the call,
+# as an ifeq at that line would.
 depend  = $(if $(strip $(2)),$(call _odepend,$(1),$(2),$(3)),$(if $(findstring |,$(1)),$(call _odepend,$(1),,,1),$(eval DEPENDS += $(1))))
 _odepend = $(eval _ODEP_N := $(words $(_ODEP_LIST) x))$(eval _ODEP_LIST += $(_ODEP_N))\
            $(eval _ODEP_$(_ODEP_N)_PKGS := $(1))\
            $(eval _ODEP_$(_ODEP_N)_ON := $(filter-out nop,$(2)))\
            $(eval _ODEP_$(_ODEP_N)_OFF := $(filter-out nop,$(3)))\
            $(eval _ODEP_$(_ODEP_N)_REQ := $(4))\
-           $(eval OPTIONAL_DEPENDS += $(subst |, ,$(1)))
+           $(eval OPTIONAL_DEPENDS += $(subst |, ,$(1)))\
+           $(eval DEPENDS += _odep_$(_ODEP_N)_)$(eval CONFIGURE_ARGS += _odep_$(_ODEP_N)_)
 
 # Macro: locate a toolchain tool
 #

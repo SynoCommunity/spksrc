@@ -161,6 +161,11 @@ If you only read one thing, read this. The details are in the dated log below.
       first version whose tree supports the build, else the last, which then refuses it --
       a virtual package in one line. Resolved in dependency walks too.
 
+    - **The order is the Makefile's**: each call leaves a placeholder in `DEPENDS` and
+      `CONFIGURE_ARGS` where it stands, and the outcome takes its place -- as an `ifeq` at
+      that line would. A package that must be built first (tvheadend's pngquant) can use
+      the macro too.
+
     - **`make check` reports the outcome**: `optional in use` / `optional unused`.
 
     - **Documented**: [How DEPENDS and OPTIONAL_DEPENDS are processed](../developer-guide/packaging/makefile-variables.md#how-depends-and-optional_depends-are-processed).

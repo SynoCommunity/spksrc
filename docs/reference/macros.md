@@ -79,8 +79,10 @@ How the framework processes both lists, in a build, a walk and without an `ARCH`
 !!! warning "Include `spksrc.common.mk` before the first call"
     The macro is defined there; called earlier it expands to nothing, silently.
 
-!!! note "A resolved optional dependency comes after every `DEPENDS`"
-    Where build order matters (a package that must be built first), keep it in `DEPENDS`.
+!!! note "The outcome keeps the place of the call"
+    `DEPENDS` and `CONFIGURE_ARGS` come out in the order the Makefile lists them, as with
+    an `ifeq` at that line. Until resolution, though, they hold a placeholder: do not test
+    their content while parsing.
 
 Instead of
 

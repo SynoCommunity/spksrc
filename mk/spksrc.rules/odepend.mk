@@ -20,7 +20,9 @@
 # alternatives below it in turn, down a tree without cycles. With no ARCH nothing is
 # resolved, and OPTIONAL_DEPENDS alone carries them to dependency-list-spk.
 #
-# Included before pre-check.mk, so DEPENDS is complete before any rule reads it.
+# Included before pre-check.mk, so DEPENDS is complete before any rule reads it. Each
+# outcome takes the place its call left in DEPENDS and CONFIGURE_ARGS, so the order is the
+# order of the Makefile.
 ###############################################################################
 
 ifneq ($(strip $(_ODEP_LIST)),)
@@ -56,12 +58,26 @@ _odep_take = $(strip $(foreach g,$(1),$(call _odep_pick,$(g))))
 # Required: the first supported alternative, else the last, which the walk then refuses.
 _odep_must = $(strip $(foreach g,$(1),$(or $(call _odep_pick,$(g)),$(lastword $(subst |, ,$(g))))))
 
+# What each call resolves to: _ODEP_<n>_DEP for DEPENDS, _ODEP_<n>_ARG for CONFIGURE_ARGS.
 $(foreach n,$(_ODEP_LIST),\
   $(if $(_ODEP_$(n)_REQ),\
-    $(eval DEPENDS += $(call _odep_must,$(_ODEP_$(n)_PKGS))),\
+    $(eval _ODEP_$(n)_DEP := $(call _odep_must,$(_ODEP_$(n)_PKGS))),\
   $(if $(filter $(words $(_ODEP_$(n)_PKGS)),$(words $(call _odep_take,$(_ODEP_$(n)_PKGS)))),\
-    $(eval DEPENDS += $(call _odep_take,$(_ODEP_$(n)_PKGS)))$(eval CONFIGURE_ARGS += $(_ODEP_$(n)_ON)),\
-    $(if $(strip $(_ODEP_$(n)_OFF)),$(eval CONFIGURE_ARGS += $(_ODEP_$(n)_OFF))))))
+    $(eval _ODEP_$(n)_DEP := $(call _odep_take,$(_ODEP_$(n)_PKGS)))$(eval _ODEP_$(n)_ARG := $(_ODEP_$(n)_ON)),\
+    $(eval _ODEP_$(n)_ARG := $(_ODEP_$(n)_OFF)))))
 
 endif
+
+# Each call left _odep_<n>_ where it stood; put its outcome there, or nothing (no ARCH, or
+# an optional dependency a walk does not resolve). Done in every case, so no placeholder
+# ever reaches a recipe or a walk. On the unexpanded text, reassigned recursively: a
+# $(VAR) in CONFIGURE_ARGS still expands when read, after the includes that define it.
+_ODEP_RAW_DEPENDS        := $(value DEPENDS)
+_ODEP_RAW_CONFIGURE_ARGS := $(value CONFIGURE_ARGS)
+$(foreach n,$(_ODEP_LIST),\
+  $(eval _ODEP_RAW_DEPENDS        := $$(subst _odep_$(n)_,$$(_ODEP_$(n)_DEP),$$(_ODEP_RAW_DEPENDS)))\
+  $(eval _ODEP_RAW_CONFIGURE_ARGS := $$(subst _odep_$(n)_,$$(_ODEP_$(n)_ARG),$$(_ODEP_RAW_CONFIGURE_ARGS))))
+$(eval DEPENDS = $(_ODEP_RAW_DEPENDS))
+$(eval CONFIGURE_ARGS = $(_ODEP_RAW_CONFIGURE_ARGS))
+
 endif
