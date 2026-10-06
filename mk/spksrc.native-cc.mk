@@ -31,7 +31,7 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.native/env-default.mk
 
-include ../../mk/spksrc.rules/depend.mk
+include ../../mk/spksrc.rules/dependencies.mk
 
 include ../../mk/spksrc.rules/status.mk
 
@@ -71,7 +71,7 @@ include ../../mk/spksrc.rules.mk
 .PHONY: nativeclean
 nativeclean:
 	rm -f $(DOWNLOAD_COOKIE) $(CHECKSUM_COOKIE) $(EXTRACT_COOKIE) $(PATCH_COOKIE) \
-	      $(DEPEND_COOKIE) $(CONFIGURE_COOKIE) $(COMPILE_COOKIE) $(INSTALL_COOKIE) \
+	      $(DEPENDENCIES_COOKIE) $(CONFIGURE_COOKIE) $(COMPILE_COOKIE) $(INSTALL_COOKIE) \
 	      $(STATUS_COOKIE) $(ARCHIVE_COOKIE)
 
 ### Optional archive packaging (build-archive); no-op unless ARCHIVE is set

@@ -63,7 +63,7 @@ dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/d
 #   $(call depend,cross/libaom-latest|cross/libaom-3.8)
 #
 # With a second argument -- switches, or nop for none -- the dependency is optional: it is
-# declared in OPTIONAL_DEPENDS, and spksrc.rules/odepend.mk adds it to DEPENDS with $(2)
+# declared in OPTIONAL_DEPENDS, and spksrc.rules/depend.mk adds it to DEPENDS with $(2)
 # only where its own tree supports the arch, else passes $(3). The condition lives in the
 # dependency's floors, not in a copy here. Space-separated packages go together (all or
 # none); | lists alternatives, the first supported wins.
@@ -73,7 +73,7 @@ dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/d
 # virtual package is.
 #
 # The call leaves a placeholder word (_odep_<n>_) in DEPENDS and CONFIGURE_ARGS, which
-# odepend.mk replaces once the verdicts are in: the outcome keeps the place of the call,
+# depend.mk replaces once the verdicts are in: the outcome keeps the place of the call,
 # as an ifeq at that line would.
 depend  = $(if $(strip $(2)),$(call _odepend,$(1),$(2),$(3)),$(if $(findstring |,$(1)),$(call _odepend,$(1),,,1),$(eval DEPENDS += $(1))))
 _odepend = $(eval _ODEP_N := $(words $(_ODEP_LIST) x))$(eval _ODEP_LIST += $(_ODEP_N))\

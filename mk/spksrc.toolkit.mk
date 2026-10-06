@@ -117,7 +117,7 @@ endif
 
 #####
 
-include ../../mk/spksrc.rules/depend.mk
+include ../../mk/spksrc.rules/dependencies.mk
 
 include ../../mk/spksrc.toolkit/tk-base.mk
 include ../../mk/spksrc.toolkit/tk-flags.mk

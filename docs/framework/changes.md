@@ -133,13 +133,13 @@ If you only read one thing, read this. The details are in the dated log below.
       and not in ffmpeg failed the whole build instead of dropping one feature.
 
     - **`$(call depend,<pkgs>,<switches>[,<else>])`** (`spksrc.common/macros.mk`) declares
-      the dependency optional, and `spksrc.rules/odepend.mk` adds it to `DEPENDS` with its
+      the dependency optional, and `spksrc.rules/depend.mk` adds it to `DEPENDS` with its
       switches where `dependency-unsupported` finds its tree clear for the build, passing
       `<else>` where not. `nop` stands for no switch, `|` separates alternatives (first
       supported wins). With one argument it is a plain `DEPENDS`.
 
     - **Computed once per work directory**, the candidates in parallel, into
-      `odepend-<package>.mk`; later parses include that file. A dependency walk never
+      `depend-<package>.mk`; later parses include that file. A dependency walk never
       computes verdicts, so the pre-check and `make check` walk the required tree only, and
       every walk gets its own stamp directory.
 

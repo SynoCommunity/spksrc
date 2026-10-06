@@ -735,7 +735,7 @@ jobs:
           # Patterns to collect files specific at spk creation time
           SPK_PATTERNS=(
             ".copy_done"
-            ".depend_done"
+            ".dependencies_done"
             ".icon_done"
             ".strip_done"
             ".stage0-tcvars_done"

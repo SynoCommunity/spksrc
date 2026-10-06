@@ -155,7 +155,7 @@ endif
 
 #####
 
-include ../../mk/spksrc.rules/depend.mk
+include ../../mk/spksrc.rules/dependencies.mk
 
 include ../../mk/spksrc.toolchain/tc-base.mk
 include ../../mk/spksrc.toolchain/tc-flags.mk

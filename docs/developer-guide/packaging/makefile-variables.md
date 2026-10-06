@@ -172,7 +172,7 @@ The two lists are read in different ways depending on what make is asked to do.
 | `make check-<arch>-<vers>` | listed as **required** | walked too, listed as **optional**; never a refusal |
 | No `ARCH` (`make dependency-list-spk`, `dependency-flat`, `dependency-tree`) | walked | **walked like `DEPENDS`** |
 
-**Building.** `depend_target` (`spksrc.rules/depend.mk`) runs `native/` dependencies
+**Building.** `depend_target` (`spksrc.rules/dependencies.mk`) runs `native/` dependencies
 first, then every `cross/` entry of `BUILD_DEPENDS` and `DEPENDS`, one after the other, in
 the order the list ends up with, each as a full make in its own directory staging into the
 caller's `WORK_DIR`. A dependency reached by several paths is built once per run. Where one
@@ -202,12 +202,12 @@ a dependency the build can do without must not sit in `DEPENDS` unconditionally.
 
 [`$(call depend,...)`](../../reference/macros.md#dependencies) fills both lists for you.
 Its optional form declares the packages in `OPTIONAL_DEPENDS` and registers them;
-`spksrc.rules/odepend.mk`, included by the entry points just **before** the pre-check, then
+`spksrc.rules/depend.mk`, included by the entry points just **before** the pre-check, then
 asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same verdict as
 `make check`) and appends the supported ones to `DEPENDS`, with their switches. So:
 
 - **Verdicts are computed once per work directory**, all candidates in parallel, and kept in
-  `work-<arch>-<vers>/odepend-<package>.mk`. After changing a dependency's floors,
+  `work-<arch>-<vers>/depend-<package>.mk`. After changing a dependency's floors,
   `make spkclean` (or `clean`) recomputes them.
 - **The order is the order of the Makefile.** Each call leaves a placeholder in `DEPENDS`
   and `CONFIGURE_ARGS` where it stands, which the outcome replaces -- the package and its
@@ -227,7 +227,7 @@ asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same 
 - **Never reset `DEPENDS`, `CONFIGURE_ARGS` or `OPTIONAL_DEPENDS` with `=` after a call**:
   it wipes what the calls declared, placeholders included. Use `+=`, or put the `=` first.
 - **Known limitation: do not test the content of `DEPENDS` or `CONFIGURE_ARGS` while
-  parsing**, after a call (`ifneq ($(filter cross/x,$(DEPENDS)),)`): until `odepend.mk` has
+  parsing**, after a call (`ifneq ($(filter cross/x,$(DEPENDS)),)`): until `spksrc.rules/depend.mk` has
   run, they hold the placeholder, not the package. Where a Makefile must decide on that,
   use a classic `ifeq` on the condition itself.
 - **A call inside an `ifeq` that a no-`ARCH` parse does not enter** (`VIDEODRV_ON`, an arch

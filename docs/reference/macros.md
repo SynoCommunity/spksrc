@@ -173,7 +173,7 @@ the build's `ARCH`-`TCVERSION`. So the condition **belongs to the dependency**: 
 missing there is a floor to add there, not a condition to put back in the caller.
 
 - Computed once per `WORK_DIR`, the candidates in parallel, and kept in
-  `work-<arch>-<vers>/odepend-<package>.mk`. After changing a dependency's floors,
+  `work-<arch>-<vers>/depend-<package>.mk`. After changing a dependency's floors,
   `make clean` (or `spkclean`) to recompute.
 - The optional dependency is always declared in `OPTIONAL_DEPENDS`, so
   `make dependency-list-spk` (no `ARCH`) still fetches its sources.
