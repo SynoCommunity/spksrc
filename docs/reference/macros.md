@@ -40,44 +40,110 @@ configure switches that come with it. It does not replace `DEPENDS` and
 `OPTIONAL_DEPENDS`: it removes the conditions a package like ffmpeg had to copy, word for
 word, from each of its dependencies.
 
+The first argument is a list of packages, read two ways:
+
+- **AND** -- packages separated by spaces, `cross/a cross/b ... cross/z`: the call holds
+  when **every** one of them supports the build.
+- **OR** -- alternatives separated by `|`, `cross/a|cross/b|...|cross/z`: the call holds
+  with the **first** one that supports the build.
+
+The two combine: `cross/a|cross/b cross/c` is "a or b, and c".
+
 | Call | Effect |
 |------|--------|
-| `$(call depend,cross/x)` | `DEPENDS += cross/x` — required, as before |
-| `$(call depend,cross/x,<switches>)` | optional: in `DEPENDS` with the switches where the tree of `cross/x` supports the build |
-| `$(call depend,cross/x,<switches>,<else>)` | and `<else>` where it does not |
-| `$(call depend,cross/x,nop)` | optional, with no switch |
-| `$(call depend,cross/a\|cross/b)` | required alternatives: the first whose tree supports the build, else the last, which then refuses it -- a virtual package |
+| `$(call depend,cross/x)` | `DEPENDS += cross/x` -- required, as before |
+| `$(call depend,cross/a cross/b ... cross/z)` | required, all of them -- a plain `DEPENDS` too |
+| `$(call depend,cross/a\|cross/b\|...\|cross/z)` | required alternatives: the first whose tree supports the build, else the last, which then refuses it -- a virtual package |
+| `$(call depend,<list>,<if-switches>)` | optional: where the list holds, its packages go to `DEPENDS` and `<if-switches>` to `CONFIGURE_ARGS`; elsewhere nothing |
+| `$(call depend,<list>,<if-switches>,<else-switches>)` | the same, and `<else-switches>` where the list does not hold |
+| `$(call depend,<list>,nop)` | optional, with no switch |
+
+`<list>` is any of the AND/OR forms above: one package, `cross/a cross/b ... cross/z`
+(all must pass, else `<else-switches>`), `cross/a|cross/b|...|cross/z` (the first that
+passes, else `<else-switches>`).
 
 ```makefile
-# required: a plain DEPENDS
-$(call depend,cross/flac)
+include ../../mk/spksrc.common.mk
 
-# taken where vvenc's own floors (gcc 7.5, its archs) are met, left out elsewhere
+# required: a plain DEPENDS
+$(call depend,cross/cairo)
+
+# one package, if-switches: taken where vvenc's own floors (gcc 7.5, its archs) are met
 $(call depend,cross/vvenc,--enable-libvvenc)
 
-# enabled by default upstream: turned off by name where x265 cannot be built
+# one package, if- and else-switches: enabled by default upstream, so turned off by name
+# where x265 cannot be built
 $(call depend,cross/x265,--enable-libx265,--disable-libx265)
 
 # no switch: the build finds it on its own
 $(call depend,cross/intel-mediasdk,nop)
 
-# alternatives, the first supported wins
+# AND: flac and libtheora together, or neither
+$(call depend,cross/flac cross/libtheora,--enable-libtheora)
+
+# AND with an else: dvbcsa needs both libraries
+$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa,--disable-dvbcsa)
+
+# OR: the first supported version
 $(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
 
-# several packages that go together: all or none
-$(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
+# OR with an else
+$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf,--disable-libvmaf)
 
-# a virtual package: one of the versions is required
+include ../../mk/spksrc.cross-cc.mk
+```
+
+!!! warning "Include `spksrc.common.mk` before the first call"
+    The macro is defined there; called earlier it expands to nothing, silently.
+
+### A virtual package
+
+The required OR form, with no switch, is a whole virtual package: one of the versions is
+required, the first one the architecture supports.
+
+```makefile
+PKG_NAME = libaom-virtual
+
 include ../../mk/spksrc.common.mk
+
 $(call depend,cross/libaom-latest|cross/libaom-3.8)
+
 include ../../mk/spksrc.cross-virtual.mk
+```
+
+`make ARCH=x64 TCVERSION=6.2.4 check` -- the first version needs gcc 7.5, the second is
+picked:
+
+```
+===>  libaom-virtual: x64-6.2.4 check: 0 failed, 1 more behind an optional dependency
+       optional
+         cross/libaom-latest        gcc 4.9.3 < 7.5
+       optional in use : cross/libaom-3.8
+       optional unused : cross/libaom-latest
+```
+
+`make check-x64-7.1` -- the first version is supported:
+
+```
+===>  libaom-virtual: x64-7.1 check: OK
+       optional in use : cross/libaom-latest
+       optional unused : cross/libaom-3.8
+```
+
+`make check-x86-5.2` -- neither is: the last one is kept, and refuses the build by name:
+
+```
+===>  libaom-virtual: x86-5.2 check: 1 failed, 1 more behind an optional dependency
+       required
+         cross/libaom-3.8           gcc 4.7.3 < 4.8
+       optional
+         cross/libaom-latest        gcc 4.7.3 < 7.5
+       optional in use : cross/libaom-3.8
+       optional unused : cross/libaom-latest
 ```
 
 How the framework processes both lists, in a build, a walk and without an `ARCH`:
 [How DEPENDS and OPTIONAL_DEPENDS are processed](../developer-guide/packaging/makefile-variables.md#how-depends-and-optional_depends-are-processed).
-
-!!! warning "Include `spksrc.common.mk` before the first call"
-    The macro is defined there; called earlier it expands to nothing, silently.
 
 !!! note "The outcome keeps the place of the call"
     `DEPENDS` and `CONFIGURE_ARGS` come out in the order the Makefile lists them, as with
@@ -111,8 +177,9 @@ missing there is a floor to add there, not a condition to put back in the caller
   `make clean` (or `spkclean`) to recompute.
 - The optional dependency is always declared in `OPTIONAL_DEPENDS`, so
   `make dependency-list-spk` (no `ARCH`) still fetches its sources.
-- A dependency walk (the pre-check, `make check`) never computes verdicts: it walks the
-  required tree only, and an unsupported optional dependency never refuses the build.
+- A dependency walk (the pre-check, `make check`) computes verdicts only for required
+  alternatives: it walks the required tree, and an unsupported optional dependency never
+  refuses the build.
 - `make check` reports the outcome: `optional in use` / `optional unused`.
 
 !!! warning "A call inside an `ifeq` is not seen without an ARCH"
