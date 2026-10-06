@@ -73,6 +73,9 @@ $(call depend,cross/libaom-latest|cross/libaom-3.8)
 include ../../mk/spksrc.cross-virtual.mk
 ```
 
+How the framework processes both lists, in a build, a walk and without an `ARCH`:
+[How DEPENDS and OPTIONAL_DEPENDS are processed](../developer-guide/packaging/makefile-variables.md#how-depends-and-optional_depends-are-processed).
+
 !!! warning "Include `spksrc.common.mk` before the first call"
     The macro is defined there; called earlier it expands to nothing, silently.
 

@@ -157,7 +157,13 @@ If you only read one thing, read this. The details are in the dated log below.
       list was ffmpeg's alone; ffmpeg4 already builds it there), and shine joins ffmpeg4 on
       88f6281 and x86-5.2 (shine declares gcc 4.6, ffmpeg4 asked 4.8; built on 4.6.4).
 
+    - **Required alternatives**: `$(call depend,cross/a|cross/b)` with no switch picks the
+      first version whose tree supports the build, else the last, which then refuses it --
+      a virtual package in one line. Resolved in dependency walks too.
+
     - **`make check` reports the outcome**: `optional in use` / `optional unused`.
+
+    - **Documented**: [How DEPENDS and OPTIONAL_DEPENDS are processed](../developer-guide/packaging/makefile-variables.md#how-depends-and-optional_depends-are-processed).
 
 ??? note "September 29th 2026 — CMake builds that compile Rust crates get their cross setup from the framework (#7520)"
 

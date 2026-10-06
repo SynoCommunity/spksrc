@@ -161,6 +161,77 @@ with its switch, wherever its own floors are met — no condition to copy from i
 $(call depend,cross/vvenc,--enable-libvvenc)
 ```
 
+### How DEPENDS and OPTIONAL_DEPENDS are processed
+
+The two lists are read in different ways depending on what make is asked to do.
+
+| Context | `DEPENDS` | `OPTIONAL_DEPENDS` |
+|---------|-----------|--------------------|
+| Build (`make arch-<arch>-<vers>`, `make ARCH=… TCVERSION=…`) | built, in list order | **not built** -- only what also reached `DEPENDS` is |
+| Pre-check, before any build | its whole tree checked against the arch's capability gates; any refusal stops the build | ignored |
+| `make check-<arch>-<vers>` | listed as **required** | walked too, listed as **optional**; never a refusal |
+| No `ARCH` (`make dependency-list-spk`, `dependency-flat`, `dependency-tree`) | walked | **walked like `DEPENDS`** |
+
+**Building.** `depend_target` (`spksrc.rules/depend.mk`) runs `native/` dependencies
+first, then every `cross/` entry of `BUILD_DEPENDS` and `DEPENDS`, one after the other, in
+the order the list ends up with, each as a full make in its own directory staging into the
+caller's `WORK_DIR`. A dependency reached by several paths is built once per run. Where one
+package must be built before another (tvheadend's pngquant before zlib), the order of
+`DEPENDS` is what guarantees it.
+
+**Without an `ARCH`** every condition a Makefile tests is false or empty (`TC_GCC` is
+unset), so `DEPENDS` alone would miss whatever an architecture adds. That is why
+`OPTIONAL_DEPENDS` exists: it names everything **some** architecture may pull, and the
+no-`ARCH` walks follow it. The CI pre-downloads sources from `make dependency-list-spk`,
+which runs exactly there -- a dependency named only under a condition, and not in
+`OPTIONAL_DEPENDS`, is never fetched into the distrib cache.
+
+**Under an `ARCH`**, `OPTIONAL_DEPENDS` is a declaration, not a build list: an entry is
+built only when it also reached `DEPENDS`. `WALK_OPTIONAL_DEPENDS=1` makes a walk follow it
+anyway, for reporting -- the **optional** section of `make check` -- and changes nothing
+about what gets built. `make check` also says which of the package's own optional
+dependencies this arch ended up with (`optional in use` / `optional unused`).
+
+**Capability gates.** The pre-check walks the required tree (`DEPENDS`, recursively) and
+refuses the arch if any package in it fails a floor (`MIN_GCC_VERSION`,
+`MIN_GLIBC_VERSION`, `MIN_KERNEL_VERSION`, `REQUIRE_64BIT`, `UNSUPPORTED_ARCHS`, …), naming
+every one. An optional dependency's floor never refuses the package -- which is exactly why
+a dependency the build can do without must not sit in `DEPENDS` unconditionally.
+
+#### `$(call depend,...)`: resolved before the pre-check
+
+[`$(call depend,...)`](../../reference/macros.md#dependencies) fills both lists for you.
+Its optional form declares the packages in `OPTIONAL_DEPENDS` and registers them;
+`spksrc.rules/odepend.mk`, included by the entry points just **before** the pre-check, then
+asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same verdict as
+`make check`) and appends the supported ones to `DEPENDS`, with their switches. So:
+
+- **Verdicts are computed once per work directory**, all candidates in parallel, and kept in
+  `work-<arch>-<vers>/odepend-<package>.mk`. After changing a dependency's floors,
+  `make spkclean` (or `clean`) recomputes them.
+- **A resolved optional dependency comes after every `DEPENDS`.** Keep a package whose build
+  order matters in `DEPENDS`.
+- **Dependency walks** (pre-check, `make check`, `dependency-flat` under an arch) do not
+  compute optional verdicts: they reuse the file a build wrote, or leave optional
+  dependencies out -- the required tree stays the required tree. **Required alternatives**
+  (`cross/a|cross/b` with no switch, a virtual package) are resolved in walks too, since the
+  tree must hold the version that is picked.
+- **With no `ARCH`** nothing is resolved; the `OPTIONAL_DEPENDS` declaration carries every
+  candidate to `dependency-list-spk`.
+
+#### Writing it
+
+- **Include `spksrc.common.mk` before the first `$(call depend,...)`.** The macro is defined
+  there; called earlier, it expands to nothing, silently. Virtual packages need it too.
+- **Never reset `OPTIONAL_DEPENDS` with `=` after a call**: it wipes what the calls
+  declared. Use `+=`, or put the `=` first.
+- **A call inside an `ifeq` that a no-`ARCH` parse does not enter** (`VIDEODRV_ON`, an arch
+  test) cannot declare its package: name it in `OPTIONAL_DEPENDS` yourself.
+- **Keep `ifeq` for conditions that belong to the consumer**, not to the dependency: a
+  videodriver option, a choice paired with the `spk/` (tvheadend's ffmpeg4 or ffmpeg8).
+  A condition that merely repeats a dependency's floor goes away: declare the floor in the
+  dependency and use `$(call depend,...)`.
+
 ### SPK Dependencies
 
 | Variable | Description |
@@ -371,11 +442,11 @@ raise the floor on the package *and* its `cross/` to match. Do **not** push that
 floor onto a shared `cross/` library, though — a library keeps the minimum *it*
 needs, so other packages built against it at a lower floor stay buildable.
 
-**Gate an optional dependency instead of raising the floor.** When a dependency is
-optional, do not lift the whole package's floor for it. Guard it with an `ifeq` (on
-the arch, or a capability group) and keep the configure options that use it inside
-the same block, so the dependency and its flags turn on together — the way optional
-ffmpeg-backed features are wired.
+**Make an optional dependency optional instead of raising the floor.** When a
+dependency is optional, do not lift the whole package's floor for it. Declare it with
+`$(call depend,cross/x,--enable-x)`: it is taken, with its configure option, wherever its
+own floors are met, and dropped elsewhere -- the way ffmpeg's codecs are wired. See
+[How DEPENDS and OPTIONAL_DEPENDS are processed](#how-depends-and-optional_depends-are-processed).
 
 ### Exclude architectures explicitly
 
