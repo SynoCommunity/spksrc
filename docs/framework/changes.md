@@ -168,6 +168,10 @@ If you only read one thing, read this. The details are in the dated log below.
 
     - **`make check` reports the outcome**: `optional in use` / `optional unused`.
 
+    - **Renamed to match the macro**: `spksrc.rules/depend.mk` resolves the calls; what
+      builds `DEPENDS` is now `spksrc.rules/dependency.mk` (with `spksrc.kernel/dependency.mk`),
+      its cookie `.dependency_done` (was `.depend_done`). Targets and hooks keep their names.
+
     - **Documented**: [How DEPENDS and OPTIONAL_DEPENDS are processed](../developer-guide/packaging/makefile-variables.md#how-depends-and-optional_depends-are-processed).
 
 ??? note "September 29th 2026 — CMake builds that compile Rust crates get their cross setup from the framework (#7520)"

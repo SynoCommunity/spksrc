@@ -172,7 +172,7 @@ The two lists are read in different ways depending on what make is asked to do.
 | `make check-<arch>-<vers>` | listed as **required** | walked too, listed as **optional**; never a refusal |
 | No `ARCH` (`make dependency-list-spk`, `dependency-flat`, `dependency-tree`) | walked | **walked like `DEPENDS`** |
 
-**Building.** `depend_target` (`spksrc.rules/dependencies.mk`) runs `native/` dependencies
+**Building.** `depend_target` (`spksrc.rules/dependency.mk`) runs `native/` dependencies
 first, then every `cross/` entry of `BUILD_DEPENDS` and `DEPENDS`, one after the other, in
 the order the list ends up with, each as a full make in its own directory staging into the
 caller's `WORK_DIR`. A dependency reached by several paths is built once per run. Where one

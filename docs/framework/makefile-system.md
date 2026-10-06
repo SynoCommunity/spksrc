@@ -18,7 +18,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.rules.mk` | Rules entry point (`clean`, `smart-clean`, `changelog`, `rustup`); aggregates `dependency-tree.mk` + `generate-digests.mk` |
-| `spksrc.rules/dependencies.mk` | Dependency resolution and build |
+| `spksrc.rules/dependency.mk` | Dependency resolution and build |
 | `spksrc.rules/dependency-tree.mk` | Dependency graph |
 | `spksrc.rules/generate-digests.mk` | Digests generation |
 | `spksrc.rules/pre-check.mk` | Pre-build validation |

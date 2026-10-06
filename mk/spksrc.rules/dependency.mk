@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.rules/dependencies.mk
+# spksrc.rules/dependency.mk
 #
 # Build all dependencies listed in DEPENDS.
 #
@@ -19,9 +19,9 @@
 ###############################################################################
 
 ### For managing kernel modules dependent builds
-include ../../mk/spksrc.kernel/dependencies.mk
+include ../../mk/spksrc.kernel/dependency.mk
 
-DEPENDENCIES_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)dependencies_done
+DEPENDENCY_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)dependency_done
 
 # Stamps of the dependencies already walked during this run (dep_seen, macros.mk): a
 # dependency shared by several packages is walked once, not once per path leading to it,
@@ -128,10 +128,10 @@ endif
 post_depend_target: $(DEPEND_TARGET)
 
 	
-ifeq ($(wildcard $(DEPENDENCIES_COOKIE)),)
-depend: $(DEPENDENCIES_COOKIE)
+ifeq ($(wildcard $(DEPENDENCY_COOKIE)),)
+depend: $(DEPENDENCY_COOKIE)
 
-$(DEPENDENCIES_COOKIE): $(POST_DEPEND_TARGET)
+$(DEPENDENCY_COOKIE): $(POST_DEPEND_TARGET)
 	$(create_target_dir)
 	@touch -f $@
 else

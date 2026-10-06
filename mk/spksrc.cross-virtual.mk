@@ -37,7 +37,7 @@ include ../../mk/spksrc.rules/depend.mk
 # Arch/version gating, the common cross environment, then resolve DEPENDS.
 include ../../mk/spksrc.rules/pre-check.mk
 include ../../mk/spksrc.cross/env-default.mk
-include ../../mk/spksrc.rules/dependencies.mk
+include ../../mk/spksrc.rules/dependency.mk
 
 # A virtual package has no source, so there is nothing to `make install`: the
 # real files are staged by the dependencies. Skip the install step (nop) and

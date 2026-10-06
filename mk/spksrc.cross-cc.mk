@@ -110,7 +110,7 @@ include ../../mk/spksrc.rules/pre-check.mk
 
 include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.rules/dependencies.mk
+include ../../mk/spksrc.rules/dependency.mk
 
 include ../../mk/spksrc.rules/status.mk
 

@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.kernel/dependencies.mk
+# spksrc.kernel/dependency.mk
 #
 # Kernel module dependency manager for spksrc.
 #
@@ -39,7 +39,7 @@
 #  - Each sub-arch build occurs in its own WORK_DIR
 #  - Build logs are written to build-<arch>-<tcversion>.log
 #  - tc_vars* files are backed up/restored for generic architectures
-#  - Called by spksrc.rules/dependencies.mk via depend_target if REQUIRE_KERNEL_MODULE is set
+#  - Called by spksrc.rules/dependency.mk via depend_target if REQUIRE_KERNEL_MODULE is set
 ###############################################################################
 
 # Find the kernel architecture being processed
