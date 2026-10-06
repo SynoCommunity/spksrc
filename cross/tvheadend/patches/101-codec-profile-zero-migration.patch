@@ -1,0 +1,200 @@
+Make the FF_AV_PROFILE_UNKNOWN default actually reach an existing installation.
+
+Proposed follow-up to tvheadend#2117, "bullet 1" of the CodeRabbit remark on
+src/transcoding/codec/profile_class.c:121.  Ours, on top of patch 100.
+
+WHAT THE PR DOES NOW
+
+  profile.c:170        profile->profile = FF_AV_PROFILE_UNKNOWN;  (before idnode_load)
+  profile_class.c:121  if (self->profile != FF_AV_PROFILE_UNKNOWN && ...)
+
+The default is assigned before idnode_load(), and the relaxed test lets an
+explicit profile 0 reach the encoder again -- which is what the remark asked
+for, 0 being Baseline for nvenc and v4l2m2m H.264.
+
+WHY IT DOES NOT TAKE EFFECT ON AN EXISTING INSTALLATION
+
+idnode_load() runs after that assignment and overwrites it with whatever the
+saved config holds -- and saved configs do hold the field.  On a DSM install
+carrying the shipped profile set, all 13 files under
+/var/packages/tvheadend/var/codec/ contain
+
+    "profile": 0
+
+webtv-aac included.  The -99 default therefore applies only to a profile
+created from scratch, never to one loaded from disk, which is every profile on
+every existing installation.  (tvh_codec_profile_load() does go through
+tvh_codec_profile_create(), so the comment claiming the default reaches
+brand-new nodes only is no longer accurate about the mechanism, even though its
+conclusion holds for the reason above.)
+
+Where those zeros come from matters, because a fresh install does not show the
+problem: data/conf/transcoder/codecs, the shipped profile tree, carries no
+"profile" field at all, so a profile created from it keeps the -99 default and
+is saved with it.  The stored zeros are the work of earlier versions, where the
+field defaulted to 0 and idnode_save() wrote it out.  Testing on a fresh config
+therefore confirms the new default while leaving the upgrade path untested --
+which is the path every existing user is on.
+
+The consequences are not symmetrical:
+
+  aac    aac.c:26 lists FF_AV_PROFILE_AAC_MAIN, which is 0, and tvh_codec_init()
+         keeps a codec's own list, so _is_profile_available(aac, 0) is true and
+         "profile=0" is emitted.  ffmpeg 8.1.2's native aac encoder answers
+
+           [aac] Profile not supported!
+           [enc:aac] Error while opening encoder - maybe incorrect parameters
+           Error sending frames to consumers: Invalid argument
+
+         and the audio stream never opens.  This is precisely the failure the
+         "profile > 0" test was masking, restored for every upgraded install.
+
+  nvenc  nvenc.c:574 lists NV_ENC_H264_PROFILE_BASELINE, also 0, so an existing
+         nvenc profile now has Baseline imposed where the encoder used to
+         choose.  That is the mirror image of the bug the remark reported.
+
+  rest   for codecs whose list holds no 0 (libx264 and friends) nothing is
+         emitted; _is_profile_available() merely logs a warning per open.
+
+WHERE THE "profile > 0" TEST CAME FROM
+
+The test the review flagged was added for this same aac failure, in June 2026.
+webtv-aac carried no "profile" field, so it loaded as 0; AAC_MAIN being 0 and
+listed as available, "profile=0" reached the encoder, which refused it -- audio
+dead on every webtv-*-aac-* profile, software paths included.  The reasoning
+recorded with that fix was that AAC_MAIN is the only profile value equal to 0
+across the tables, h264 starting at 66 and hevc at 1, so a "profile > 0" test
+could not regress anything.  That holds for the generic tables; it missed the
+per-encoder ones, where nvenc_h264_profiles and v4l2m2m_h264_profiles both
+declare Baseline as 0.  The review is right about that, and the new default is
+the right shape of fix.
+
+A config-level fix was weighed at the time and set aside as fragile, and
+because it would not repair the instance already saved on disk.  That second
+objection turns out to apply to the new default as well, and the migration
+below is what answers it: once, persistently, for the configs already written.
+
+WHAT THIS PATCH PROPOSES
+
+Three separable changes.  The first is the one that makes bullet 1 effective.
+
+  src/config.c
+    config_migrate_v26 rewrites a stored "profile": 0 to -99 across codec/*.
+    A one-shot migration rather than a test in the load path, so that a user
+    who does select profile 0 afterwards is obeyed; a test would quietly undo
+    that choice on every restart.  The rewrite is lossless by construction:
+    under the previous "profile > 0" code a stored 0 was never emitted, so -99
+    is exactly the behaviour those configs already had.  Migrations run from
+    config_init() (main.c:1269) ahead of codec_init() (1305), so the codec
+    subsystem reads the rewritten files.
+
+  src/transcoding/codec/profile_class.c
+    Drop the commented-out test and correct the stale comment above.
+
+  src/transcoding/codec/codecs/aac.c
+    Drop Main and LTP from aac_profiles.  Measured against the ffmpeg 8.1.2
+    this package ships: of the four profiles offered, only LC and MPEG2_LC
+    open, while Main (0) and LTP (3) both answer "Profile not supported!".
+    LTP was already broken beforehand; Main becomes broken by this change,
+    having been silently ignored until now.  Offering a profile the encoder
+    cannot open has no upside.
+
+WHAT STILL WANTS HARDWARE
+
+The migration itself needs no GPU: restart with the profiles above and check
+that codec/* holds -99 and that aac streams open.  What hardware adds is
+confirmation that an explicitly chosen profile now reaches the QSV and VAAPI
+encoders and is accepted -- the half of bullet 1 no config change can show.
+
+--- src/config.c.orig
++++ src/config.c
+@@ -1514,6 +1514,38 @@ config_migrate_v25 ( void )
+   }
+ }
+ 
++/*
++ * v25 -> v26 : codec profile "profile": 0 used to mean "unset"
++ *
++ * Every codec profile config written before the AV_PROFILE_UNKNOWN default
++ * carries "profile": 0 -- not a choice, just the zeroed field.  The encoder
++ * options were built with a "profile > 0" test, so a stored 0 behaved exactly
++ * as "no profile": the encoder picked its own.  Now that an explicit 0 is
++ * honoured (it is a real profile for some encoders), those stored zeros would
++ * start reaching the encoder and change, or break, existing streams.  Rewrite
++ * them to AV_PROFILE_UNKNOWN, which is the behaviour they have always had; a
++ * user who does want profile 0 can select it again and now be obeyed.
++ *
++ * -99 is spelled out because this file builds without libavcodec.
++ */
++static void
++config_migrate_v26 ( void )
++{
++  htsmsg_t *c, *e;
++  htsmsg_field_t *f;
++
++  /* Codec profiles are loaded after the migrations, so rewrite them on disk. */
++  if ((c = hts_settings_load("codec")) == NULL)
++    return;
++  HTSMSG_FOREACH(f, c) {
++    if (!(e = htsmsg_field_get_map(f))) continue;
++    if (htsmsg_get_s32_or_default(e, "profile", -99) != 0) continue;
++    htsmsg_set_s32(e, "profile", -99);
++    hts_settings_save(e, "codec/%s", htsmsg_field_name(f));
++  }
++  htsmsg_destroy(c);
++}
++
+ /*
+  * Perform backup
+  */
+@@ -1640,7 +1672,8 @@ static const config_migrate_t config_migrate_table[] = {
+   config_migrate_v22,
+   config_migrate_v23,
+   config_migrate_v24,
+-  config_migrate_v25
++  config_migrate_v25,
++  config_migrate_v26
+ };
+ 
+ /*
+--- src/transcoding/codec/profile_class.c.orig
++++ src/transcoding/codec/profile_class.c
+@@ -111,14 +111,11 @@ static int
+ tvh_codec_profile_base_open(TVHCodecProfile *self, AVDictionary **opts)
+ {
+     AV_DICT_SET_TVH_REQUIRE_META(LST_NONE, opts, 1);
+-    // profile is set and is available.
+-    // Profile 0 is AAC Main, but it is also the zeroed value of a profile
+-    // loaded from a config without an explicit "profile" field (the class
+-    // default FF_AV_PROFILE_UNKNOWN is only applied to brand-new nodes). The
+-    // native aac encoder rejects Main ("Profile not supported!" -> EINVAL),
+-    // so only emit a positive (explicitly chosen) profile and let the encoder
+-    // pick its own default otherwise.
+-    //if (self->profile > 0 &&
++    // Emit the profile only when one was actually chosen.
++    // FF_AV_PROFILE_UNKNOWN is the default both for a new node and for a
++    // config carrying no "profile" field, and config_migrate_v26 rewrites the
++    // zeros older versions stored. 0 itself is a real profile for some
++    // encoders (nvenc and v4l2m2m H.264 Baseline), so it must pass through.
+     if (self->profile != FF_AV_PROFILE_UNKNOWN &&
+         _is_profile_available(self->codec, self->profile)) {
+         AV_DICT_SET_INT(LST_CODEC, opts, "profile", self->profile, 0);
+--- src/transcoding/codec/codecs/aac.c.orig
++++ src/transcoding/codec/codecs/aac.c
+@@ -22,11 +22,13 @@
+ 
+ 
+ /* aac ====================================================================== */
+-// see aacenc_profiles[] ffmpeg-7.0/libavcodec/aacenctab.h + AV_PROFILE_UNKNOWN
++// aacenc_profiles[] in ffmpeg's aacenctab.h lists Main and LTP, but the native
++// aac encoder implements neither: its own profile check answers "Profile not
++// supported!" (EINVAL) and the stream never starts. Measured against ffmpeg
++// 8.1.2 -- only LC and MPEG2_LC open. Offering the other two can only break a
++// stream, the more so now that an explicitly chosen profile is obeyed.
+ static const AVProfile aac_profiles[] = {
+-    { FF_AV_PROFILE_AAC_MAIN,      "Main" },
+     { FF_AV_PROFILE_AAC_LOW,       "LC" },
+-    { FF_AV_PROFILE_AAC_LTP,       "LTP" },
+     { FF_AV_PROFILE_MPEG2_AAC_LOW, "MPEG2_LC" },
+     { FF_AV_PROFILE_UNKNOWN },
+ };
