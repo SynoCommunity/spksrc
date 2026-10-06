@@ -34,8 +34,10 @@ CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 
 # WARNING: pngquant fails when built after cross/zlib (i.e. cross/libpng), so it stays the
-# first dependency named -- ahead of the alphabetical order everything below follows.
-$(call depend,cross/pngquant,--enable-pngquant)
+# first dependency named -- ahead of the alphabetical order everything below follows. Not
+# through depend: a resolved optional dependency is appended after every DEPENDS.
+DEPENDS += cross/pngquant
+CONFIGURE_ARGS += --enable-pngquant
 
 # Dependencies with no option of their own: found by probe, or pulled in by another
 DEPENDS += cross/fontconfig
@@ -52,7 +54,7 @@ export BUILD_CURL_WITH="gnutls libssh2 zstd"
 ### Optional dependencies with specific options
 ###
 
-OPTIONAL_DEPENDS  = cross/ffmpeg4
+OPTIONAL_DEPENDS += cross/ffmpeg4
 OPTIONAL_DEPENDS += cross/ffmpeg8
 OPTIONAL_DEPENDS += cross/intel-libvpl
 OPTIONAL_DEPENDS += cross/intel-mediasdk

@@ -46,6 +46,7 @@ word, from each of its dependencies.
 | `$(call depend,cross/x,<switches>)` | optional: in `DEPENDS` with the switches where the tree of `cross/x` supports the build |
 | `$(call depend,cross/x,<switches>,<else>)` | and `<else>` where it does not |
 | `$(call depend,cross/x,nop)` | optional, with no switch |
+| `$(call depend,cross/a\|cross/b)` | required alternatives: the first whose tree supports the build, else the last, which then refuses it -- a virtual package |
 
 ```makefile
 # required: a plain DEPENDS
@@ -65,7 +66,18 @@ $(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
 
 # several packages that go together: all or none
 $(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa)
+
+# a virtual package: one of the versions is required
+include ../../mk/spksrc.common.mk
+$(call depend,cross/libaom-latest|cross/libaom-3.8)
+include ../../mk/spksrc.cross-virtual.mk
 ```
+
+!!! warning "Include `spksrc.common.mk` before the first call"
+    The macro is defined there; called earlier it expands to nothing, silently.
+
+!!! note "A resolved optional dependency comes after every `DEPENDS`"
+    Where build order matters (a package that must be built first), keep it in `DEPENDS`.
 
 Instead of
 
