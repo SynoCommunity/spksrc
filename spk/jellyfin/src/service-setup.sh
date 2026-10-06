@@ -52,7 +52,7 @@ validate_preupgrade() {
             esac
             ;;
         12.*)
-            # Direct upgrades from 10.10.7 and 10.11.x to 12.0 are supported;
+            # Direct upgrades from 10.10.7 and 10.11.x to 12.x are supported;
             # database changes prevent rolling back, so back up those paths
             case "$previous" in
                 10.10.7|10.11.*)
