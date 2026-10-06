@@ -1,13 +1,14 @@
 SPK_NAME = uptime-kuma
-SPK_VERS = 2.4.0
-SPK_REV = 4
+SPK_VERS = 2.5.5
+SPK_REV = 5
 SPK_ICON = src/uptime-kuma.png
 
 DEPENDS = cross/uptime-kuma
-BUILD_DEPENDS = native/nodejs_22
 
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Node.js_v22 has no builds for these; 32-bit ARMv7 is covered
+UNSUPPORTED_ARCHS = $(filter-out $(ARMv7_ARCHS),$(32bit_ARCHS))
+UNSUPPORTED_ARCHS_REASON := no Node.js_v22 build for these archs
 
 SPK_DEPENDS = "Node.js_v22"
 
@@ -23,7 +24,7 @@ DESCRIPTION_JPN = セルフホスト型監視ツール。HTTP\(s\)、TCP、Ping�
 DESCRIPTION_SPN = Herramienta de monitoreo autoalojada. Monitoree HTTP\(s\), TCP, Ping, DNS, contenedores Docker, servidores de juegos y más con 87+ proveedores de notificaciones.
 HOMEPAGE = https://uptime.kuma.pet
 LICENSE = MIT
-CHANGELOG = "1. Update to 2.4.0."
+CHANGELOG = "1. Update to 2.5.5 with ARM startup fix and ARMv7 builds."
 
 STARTABLE = yes
 SERVICE_USER = auto
