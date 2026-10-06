@@ -1,5 +1,5 @@
 PKG_NAME = uptime-kuma
-PKG_VERS = 2.4.0
+PKG_VERS = 2.5.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/louislam/uptime-kuma/archive/refs/tags
@@ -17,23 +17,30 @@ INSTALL_TARGET = uptime_kuma_install
 # Build environment - use native Node.js from spksrc
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 
-# Uptime Kuma pre-built frontend dist URL
-DIST_URL = https://github.com/louislam/uptime-kuma/releases/download/$(PKG_VERS)/dist.tar.gz
-
 include ../../mk/spksrc.cross-install.mk
+
+# Map spksrc ARCH to Node.js arch for native module downloads
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+NODE_ARCH = arm64
+else
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+NODE_ARCH = arm
+else
+NODE_ARCH = x64
+endif
+endif
 
 .PHONY: uptime_kuma_install
 uptime_kuma_install:
 	@$(MSG) "Installing production dependencies for Uptime Kuma"
 	$(RUN) npm ci --omit dev --no-audit --no-fund
-	@$(MSG) "Downloading pre-built frontend dist"
-	$(RUN) curl -sL "$(DIST_URL)" | tar xzf -
+	@$(MSG) "Fetching sqlite native binding for target arch ($(NODE_ARCH))"
+	$(RUN) sh -c 'cd node_modules/@louislam/sqlite3 && ../../.bin/node-pre-gyp install --update-binary --target_platform=linux --target_arch=$(NODE_ARCH)'
+	$(RUN) bash -c 'keep="napi-v6-linux-$(NODE_ARCH)"; for d in node_modules/@louislam/sqlite3/lib/binding/napi-v6-linux-*/; do [ "$$(basename $$d)" = "$$keep" ] || rm -rf "$$d"; done'
 	@$(MSG) "Installing Uptime Kuma to staging directory"
 	@install -d $(STAGING_INSTALL_PREFIX)/share/uptime-kuma
 	@# Install server files
 	@cp -a $(WORK_DIR)/$(PKG_DIR)/server $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/server
-	@# Install pre-built frontend dist
-	@cp -a $(WORK_DIR)/$(PKG_DIR)/dist $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/dist
 	@# Install node_modules (production only)
 	@cp -a $(WORK_DIR)/$(PKG_DIR)/node_modules $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/node_modules
 	@# Install package metadata
