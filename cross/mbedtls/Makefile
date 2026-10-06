@@ -1,5 +1,5 @@
 PKG_NAME = mbedtls
-PKG_VERS = 3.6.7
+PKG_VERS = 4.1.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Mbed-TLS/mbedtls/releases/download/$(PKG_NAME)-$(PKG_VERS)
