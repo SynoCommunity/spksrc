@@ -1,15 +1,16 @@
-argon2_cffi_bindings==25.1.0
-cffi==2.0.0
-charset_normalizer==3.4.4
-frozendict==2.4.7
-MarkupSafe==3.0.3
+# Generated using the requirements script on October 5, 2026
+# Command: generate_requirements.sh "OctoPrint==1.11.8" 312
+
+argon2_cffi_bindings==26.1.0
+cffi==2.1.1
+charset_normalizer==3.5.2
+markupsafe==3.0.4
 netifaces==0.11.0
 psutil==6.1.1
+# see pydantic note in requirements-pure.txt
 pydantic_core==2.41.5
-PyYAML==6.0.3
-regex==2025.11.3
-sgmllib3k==1.0.0
-tornado==6.5.2
-watchdog==4.0.2
+pyyaml==6.0.3
+regex==2026.9.29
+tornado==6.5.10
 wrapt==1.17.3
 zeroconf==0.136.2
