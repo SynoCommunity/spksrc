@@ -3,7 +3,7 @@ SPK_VERS = 2.5.5
 SPK_REV = 5
 SPK_ICON = src/uptime-kuma.png
 
-DEPENDS = cross/uptime-kuma
+DEPENDS = cross/uptime-kuma cross/uptime-kuma-web
 
 REQUIRED_MIN_DSM = 7.2
 # Node.js_v22 has no builds for these; 32-bit ARMv7 is covered

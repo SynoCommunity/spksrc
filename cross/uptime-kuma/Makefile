@@ -14,18 +14,8 @@ LICENSE  = MIT
 
 INSTALL_TARGET = uptime_kuma_install
 
-# Absolute dir of this Makefile, to locate the digests file regardless of
-# whether the build runs from cross/ or via an spk/ package
-CROSS_PKG_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-
 # Build environment - use native Node.js from spksrc
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
-
-# Uptime Kuma pre-built frontend dist (cached in DISTRIB_DIR, checksums in digests).
-# NOTE: `make digests` regenerates that file from the main archive only, so
-# re-append the three dist.tar.gz lines afterwards (same three-hash format).
-UK_DIST_FILE = uptime-kuma-dist-$(PKG_VERS).tar.gz
-UK_DIST_URL = https://github.com/louislam/uptime-kuma/releases/download/$(PKG_VERS)/dist.tar.gz
 
 include ../../mk/spksrc.cross-install.mk
 
@@ -44,11 +34,6 @@ endif
 uptime_kuma_install:
 	@$(MSG) "Installing production dependencies for Uptime Kuma"
 	$(RUN) npm ci --omit dev --no-audit --no-fund
-	@$(MSG) "Downloading pre-built frontend dist"
-	$(RUN) sh -c 'f=$(DISTRIB_DIR)/$(UK_DIST_FILE); \
-		[ -f "$$f" ] || curl -sL "$(UK_DIST_URL)" -o "$$f"; \
-		h=$$(grep "^$(UK_DIST_FILE) SHA256 " $(CROSS_PKG_DIR)/digests | cut -d" " -f3); \
-		echo "$$h  $$f" | (cd $(DISTRIB_DIR) && sha256sum -c -) && tar xzf "$$f"'
 	@$(MSG) "Fetching sqlite native binding for target arch ($(NODE_ARCH))"
 	$(RUN) sh -c 'cd node_modules/@louislam/sqlite3 && ../../.bin/node-pre-gyp install --update-binary --target_platform=linux --target_arch=$(NODE_ARCH)'
 	$(RUN) bash -c 'keep="napi-v6-linux-$(NODE_ARCH)"; for d in node_modules/@louislam/sqlite3/lib/binding/napi-v6-linux-*/; do [ "$$(basename $$d)" = "$$keep" ] || rm -rf "$$d"; done'
@@ -56,8 +41,6 @@ uptime_kuma_install:
 	@install -d $(STAGING_INSTALL_PREFIX)/share/uptime-kuma
 	@# Install server files
 	@cp -a $(WORK_DIR)/$(PKG_DIR)/server $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/server
-	@# Install pre-built frontend dist
-	@cp -a $(WORK_DIR)/$(PKG_DIR)/dist $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/dist
 	@# Install node_modules (production only)
 	@cp -a $(WORK_DIR)/$(PKG_DIR)/node_modules $(STAGING_INSTALL_PREFIX)/share/uptime-kuma/node_modules
 	@# Install package metadata
