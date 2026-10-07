@@ -153,7 +153,7 @@ CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --disable-neon
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
@@ -164,6 +164,16 @@ CONFIGURE_ARGS += --disable-vfp
 ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
+endif
+
+# ARMv7L (hi3535): Cortex-A9 but SOFT float -- arm-cortexa9-linux-gnueabi, which is why it
+# has its own arch group instead of sitting with the hard-float ARMv7 ones. NEON uses the
+# VFP register file, so --enable-neon with --disable-vfp was never a coherent pair here.
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=cortex-a9
+CONFIGURE_ARGS += --disable-neon
+CONFIGURE_ARGS += --disable-vfp
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

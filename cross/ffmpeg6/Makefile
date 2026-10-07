@@ -139,13 +139,23 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ## ARCH SPECIFIC
 ##
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2
+CONFIGURE_ARGS += --disable-vfp
+endif
+
+# ARMv7L (hi3535): Cortex-A9 but SOFT float -- arm-cortexa9-linux-gnueabi, which is why it
+# has its own arch group instead of sitting with the hard-float ARMv7 ones. NEON uses the
+# VFP register file, so --enable-neon with --disable-vfp was never a coherent pair here.
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=cortex-a9
+CONFIGURE_ARGS += --disable-neon
 CONFIGURE_ARGS += --disable-vfp
 endif
 
