@@ -21,10 +21,6 @@ MIN_GLIBC_VERSION = 2.9
 # floor is ffmpeg's, and the meta below picks the version an arch can build.
 MIN_GCC_VERSION = 4.6
 
-# cccam.c calls be64toh, an <endian.h> macro glibc grew in 2.9. No compiler supplies
-# it, so the overlay cannot lift this one -- ppc853x-5.2 ships 2.8.
-MIN_GLIBC_VERSION = 2.9
-
 include ../../mk/spksrc.common.mk
 
 GNU_CONFIGURE = 1
