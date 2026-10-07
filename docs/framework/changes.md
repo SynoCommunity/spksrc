@@ -124,7 +124,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "October 7th 2026 — A git download can include submodules (#PRNUM)"
+??? note "October 7th 2026 — A git download can include submodules (#7549)"
 
     - **`git archive` leaves a submodule an empty directory**, so a project whose release
       tarball bundles its submodules could not be built from git. znc is one: its GitHub
