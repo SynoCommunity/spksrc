@@ -34,8 +34,11 @@ ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
 CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
 endif
 
-# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
-# toolchains ship no such header. Was disabled for qoriq by name.
+# New since ffmpeg7: its libavdevice/v4l2.c reaches for the multiplanar API -- v4l2_plane
+# and V4L2_CAP_VIDEO_CAPTURE_MPLANE, which Linux grew in 3.2 -- while configure only
+# checks that linux/videodev2.h exists. The 2.6.32 toolchains ship that header without
+# those symbols, so the indev is enabled and then fails to compile. ffmpeg4-6 do not use
+# them and need no such guard. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
 CONFIGURE_ARGS += --disable-indev=v4l2
 endif
@@ -61,8 +64,11 @@ else
   endif
 endif
 
-# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
-# toolchains ship no such header. Was disabled for qoriq by name.
+# New since ffmpeg7: its libavdevice/v4l2.c reaches for the multiplanar API -- v4l2_plane
+# and V4L2_CAP_VIDEO_CAPTURE_MPLANE, which Linux grew in 3.2 -- while configure only
+# checks that linux/videodev2.h exists. The 2.6.32 toolchains ship that header without
+# those symbols, so the indev is enabled and then fails to compile. ffmpeg4-6 do not use
+# them and need no such guard. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
 CONFIGURE_ARGS += --disable-indev=v4l2
 endif
