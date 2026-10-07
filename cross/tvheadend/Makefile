@@ -25,11 +25,6 @@ MIN_GCC_VERSION = 4.6
 # it, so the overlay cannot lift this one -- ppc853x-5.2 ships 2.8.
 MIN_GLIBC_VERSION = 2.9
 
-# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
-# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
-# `?=` here in turn stands down for a command line or an environment saying otherwise.
-OVERLAY_GCC ?= 1
-
 include ../../mk/spksrc.common.mk
 
 GNU_CONFIGURE = 1
