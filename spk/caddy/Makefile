@@ -1,5 +1,5 @@
 SPK_NAME = caddy
-SPK_VERS = 2.11.4
+SPK_VERS = 2.11.7
 SPK_REV = 1
 SPK_ICON = src/caddy.png
 
@@ -8,7 +8,7 @@ DEPENDS = cross/caddy
 MAINTAINER = cjheath
 DESCRIPTION = Caddy is a powerful, extensible platform for serving your sites, services, and apps, with automatic HTTPS. Configuration lives in a user-editable Caddyfile at /var/packages/caddy/var/Caddyfile. Edit it, then restart the package, or run caddy reload, to apply changes. The default site listens on port 8880. See the comments in the Caddyfile for switching to ports 80 and 443.
 DISPLAY_NAME = Caddy
-CHANGELOG = "1. Initial package. Caddy 2.11.4."
+CHANGELOG = "1. Initial package. Caddy 2.11.7."
 
 HOMEPAGE = https://caddyserver.com/
 HELPURL = https://caddy.community/

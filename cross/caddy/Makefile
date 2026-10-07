@@ -1,5 +1,5 @@
 PKG_NAME = caddy
-PKG_VERS = 2.11.4
+PKG_VERS = 2.11.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/caddyserver/caddy/archive
@@ -22,5 +22,10 @@ GO_BIN_DIR = $(GO_SRC_DIR)/caddy
 # `go build` from a release tarball has no VCS or module version to stamp, so
 # `caddy version` would report "unknown"; caddy.go documents this ldflag for it.
 GO_BUILD_ARGS += -ldflags '-X github.com/caddyserver/caddy/v2.CustomVersion=v$(PKG_VERS)'
+
+# The flags upstream builds its release binaries with (.github/workflows/cross-build.yml):
+# no build paths in the binary, and without the badger, MySQL and PostgreSQL storage
+# drivers no standard module uses -- a smaller binary.
+GO_BUILD_ARGS += -trimpath -tags=nobadger,nomysql,nopgx
 
 include ../../mk/spksrc.cross-go.mk
