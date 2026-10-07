@@ -5,7 +5,7 @@
      "enzyme>=0.5.2,<0.6.0",
      "gntp>=1.0.3",
 -    "greenlet>=3.5.5",
-+    "greenlet>=1",
++    "greenlet>=3.0.3",
      "guessit>=4.4.0",
      "html5lib>=1.1",
      "ifaddr>=0.2.0,<0.3.0",
