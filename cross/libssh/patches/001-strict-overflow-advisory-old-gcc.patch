@@ -1,0 +1,22 @@
+# Upstream forces -Werror=strict-overflow unconditionally, whose analyzer
+# on pre-8 GCC false-positives (e.g. sntrup761.c, config.c) with no cmake
+# toggle to disable it. Keep it advisory on old GCC; fatal elsewhere as
+# upstream intends. Drop if upstream gates it themselves.
+#
+--- CompilerChecks.cmake.orig
++++ CompilerChecks.cmake
+@@ -37,7 +37,13 @@
+     add_c_compiler_flag("-Wuninitialized" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Werror=uninitialized" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Wimplicit-fallthrough" SUPPORTED_COMPILER_FLAGS)
+-    add_c_compiler_flag("-Werror=strict-overflow" SUPPORTED_COMPILER_FLAGS)
++    # -Wstrict-overflow=2 false-positives on pre-8 GCC (e.g. sntrup761.c,
++    # config.c); keep it advisory there instead of fatal
++    if (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_LESS "8")
++        message(STATUS "Old GCC detected, -Wstrict-overflow will not be fatal")
++    else()
++        add_c_compiler_flag("-Werror=strict-overflow" SUPPORTED_COMPILER_FLAGS)
++    endif()
+     add_c_compiler_flag("-Wstrict-overflow=2" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Wno-format-zero-length" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Wmissing-field-initializers" SUPPORTED_COMPILER_FLAGS)
