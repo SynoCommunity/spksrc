@@ -46,6 +46,21 @@ almost every package wants.
 | `svn` | an export, archived to a tarball | `PKG_SVN_REV` (or `HEAD`) |
 | `hg` | a clone, archived to a tarball | `PKG_HG_REV` (or `tip`) |
 
+**Submodules.** `git archive` leaves a submodule an empty directory. When the
+build needs one, list its path in `PKG_GIT_SUBMODULES`: it is added to the
+tarball at the commit the superproject pins at `PKG_GIT_HASH`, from the URL its
+`.gitmodules` gives. Same sources, same tarball, so the digests hold.
+
+```makefile
+# znc's GitHub archive has no Csocket, which it cannot build without
+PKG_GIT_HASH = 6bd91573cebd1e4ee954ebd4eb6db5b654e0e412
+PKG_GIT_SUBMODULES = third_party/Csocket third_party/cctz
+PKG_DOWNLOAD_METHOD = git
+PKG_DIST_SITE = https://github.com/znc/znc.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+```
+
 The VCS methods build the tarball locally from one repository, so **everything
 below applies to HTTP downloads only** — there is nothing to mirror when the
 source is a revision in a named repository.

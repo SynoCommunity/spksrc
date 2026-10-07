@@ -124,6 +124,21 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 7th 2026 — A git download can include submodules (#PRNUM)"
+
+    - **`git archive` leaves a submodule an empty directory**, so a project whose release
+      tarball bundles its submodules could not be built from git. znc is one: its GitHub
+      archive has no `third_party/Csocket`, and the hosts carrying its release tarball
+      kept failing (znc.in's expired certificate, then a mirror that dropped it -- #7547).
+
+    - **`PKG_GIT_SUBMODULES`** lists the submodule paths to add. Each is archived at the
+      commit the superproject pins at `PKG_GIT_HASH`, from the URL its `.gitmodules`
+      gives, and appended to the tarball; `gzip -n` keeps it reproducible, so the digests
+      hold. See [Source downloads and mirrors](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors).
+
+    - **znc** builds from git, at the commit of tag `znc-1.10.3`, with Csocket and cctz.
+      The release tarball's pregenerated modpython sources are not in git: the build
+      host's SWIG generates them.
 ??? note "October 2nd 2026 — An optional dependency follows its own floors, not a copy of them (#7525)"
 
     - **ffmpeg repeated every library's floor.** `ifeq ($(call version_ge,$(TC_GCC),7.5),1)`
