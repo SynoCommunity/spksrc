@@ -34,9 +34,29 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+# ENABLE_NEON and ENABLE_VSX both default to ON (cmake/aom_config_defaults.cmake), and
+# cmake/cpu.cmake acts on them for any AOM_TARGET_CPU matching ^arm or ppc. Neither is a
+# compiler question, so MIN_GCC_VERSION cannot speak for them: the SIMD an arch actually
+# has must be named here. Carried over from cross/libaom-3.8, which states all of this.
+
+# ARMv5 (88f6281): armv5te has no NEON at all.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
 CONFIGURE_ARGS += -DENABLE_NEON=OFF
+endif
+
+# ARMv7 hard float, and ARMv7L (hi3535) which is soft float: NEON uses the VFP register
+# file, so neither gets it here. Without this, 3.15 fails on `unknown type name int16x4_t`.
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=arm
+CONFIGURE_ARGS += -DENABLE_NEON=OFF
+endif
+
+# PowerPC e500v2 (qoriq, ppc853x) is SPE, not AltiVec/VSX -- gcc refuses the pair with
+# "AltiVec and SPE instructions cannot coexist".
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -DAOM_TARGET_CPU=ppc
+CONFIGURE_ARGS += -DENABLE_VSX=0
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
