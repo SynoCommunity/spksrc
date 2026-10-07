@@ -11,10 +11,6 @@ OPTIONAL_DEPENDS = native/nasm
 
 # Needs gcc >= 7.5: needs C++17 (-std=gnu++17), i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
-# 1.16 wants more than a modern compiler: its configure refuses the 5.2 and 6.2.4
-# toolchains outright. The gcc floor above said so only while those archs had an old
-# gcc -- with the overlay reporting 8.5 it no longer does, so state the DSM as well.
-REQUIRED_MIN_DSM = 7.0
 
 HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec
