@@ -1,5 +1,5 @@
 PKG_NAME = libssh
-PKG_VERS = 0.11.4
+PKG_VERS = 0.12.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gitlab.com/libssh/libssh-mirror/-/archive/libssh-$(PKG_VERS)
