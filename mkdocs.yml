@@ -223,6 +223,7 @@ nav:
       - Node Exporter: packages/node-exporter.md
     - Network:
       - AdGuard Home: packages/adguardhome.md
+      - Caddy: packages/caddy.md
       - Cloudflared: packages/cloudflared.md
       - DNSCrypt Proxy: packages/dnscrypt-proxy.md
     - Runtime:
