@@ -40,12 +40,13 @@ include ../../mk/spksrc.common.mk
 DEPENDS += python/sickchill
 
 # [cryptography]
-# 48.0.1 needs rustc >= 1.83; qoriq pins rust 1.82, so it uses 46.0.7 there.
+# 48.0.1 needs rustc >= 1.83; older pinned toolchains (e.g. qoriq/rust 1.82)
+# stay on 46.0.7.
 DEPENDS += cross/openssl3
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-WHEELS += cryptography==46.0.7
-else
+ifeq ($(call version_ge, $(TC_RUSTC), 1.83),1)
 WHEELS += cryptography==48.0.1
+else
+WHEELS += cryptography==46.0.7
 endif
 
 # [PyYAML]
