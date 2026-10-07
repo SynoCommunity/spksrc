@@ -18,6 +18,10 @@
 #                           (single element used during leaf execution)
 #  PKG_DIST_MIRRORS       : Optional per-package fallback base URLs; the file
 #                           name is appended to each and tried in turn.
+#  PKG_GIT_HASH           : With PKG_DOWNLOAD_METHOD = git, the commit to archive.
+#  PKG_GIT_TAG            : ... or a tag instead; one of the two, not both.
+#  PKG_GIT_SUBMODULES     : With PKG_DOWNLOAD_METHOD = git, submodule paths to
+#                           include in the archive, each at its pinned commit.
 #
 # Files:
 #  $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
@@ -142,8 +146,45 @@ PKG_DIST_MIRRORS   ?=
 # Per-method download macros, spliced into download_target's case below.
 # Each ends with ';;' to close its case entry.
 # ---------------------------------------------------------------------------
+# The revision a git download archives: PKG_GIT_HASH, or PKG_GIT_TAG instead. A tag reads
+# better and bumps with PKG_VERS; it can also be moved upstream, which the digests catch.
+# The tarball and its directory are named $(NAME)-git<revision> either way.
+PKG_GIT_REF = $(or $(strip $(PKG_GIT_HASH)),$(strip $(PKG_GIT_TAG)))
+ifeq ($(PKG_DOWNLOAD_METHOD),git)
+ifneq ($(and $(strip $(PKG_GIT_HASH)),$(strip $(PKG_GIT_TAG))),)
+$(error $(NAME): set PKG_GIT_HASH or PKG_GIT_TAG, not both)
+endif
+endif
+
+# PKG_GIT_SUBMODULES: submodule paths to add to a git download, each at the commit the
+# superproject pins at $(PKG_GIT_REF) and from the URL its .gitmodules gives (a relative
+# one resolved against the superproject's). git archive leaves a submodule an empty
+# directory; a release tarball ships it filled in. One tar per repository, concatenated,
+# then gzip -n: the same sources give the same file, and the same digests.
+define DOWNLOAD_GIT_SUBMODULES
+	          git --git-dir=$${localFolder}/.git archive --prefix=$${localFolder}/ -o $${localFolder}.tar $(PKG_GIT_REF) ; \
+	          git --git-dir=$${localFolder}/.git show $(PKG_GIT_REF):.gitmodules > $${localFolder}.gitmodules ; \
+	          for path in $(PKG_GIT_SUBMODULES) ; do \
+	            name=$$(git config -f $${localFolder}.gitmodules --get-regexp '^submodule\..*\.path$$' | awk -v p="$${path}" '$$2 == p { sub(/^submodule\./, "", $$1) ; sub(/\.path$$/, "", $$1) ; print $$1 }') ; \
+	            suburl=$$(git config -f $${localFolder}.gitmodules --get "submodule.$${name}.url") ; \
+	            case "$${suburl}" in ../*) suburl="$${url%/}/$${suburl}" ;; esac ; \
+	            subsha=$$(git --git-dir=$${localFolder}/.git ls-tree $(PKG_GIT_REF) "$${path}" | awk '$$2 == "commit" { print $$3 }') ; \
+	            if [ -z "$${suburl}" ] || [ -z "$${subsha}" ]; then \
+	              $(MSG) "  $${path}: not a submodule at $(PKG_GIT_REF)" ; exit 1 ; \
+	            fi ; \
+	            $(MSG) "  git submodule $${path} @ $${subsha}" ; \
+	            rm -fr $${localFolder}.sub ; \
+	            git clone --no-checkout --quiet "$${suburl}" $${localFolder}.sub ; \
+	            git --git-dir=$${localFolder}.sub/.git archive --prefix=$${localFolder}/$${path}/ -o $${localFolder}.sub.tar $${subsha} ; \
+	            tar --concatenate -f $${localFolder}.tar $${localFolder}.sub.tar ; \
+	            rm -fr $${localFolder}.sub $${localFolder}.sub.tar ; \
+	          done ; \
+	          gzip -n -9 < $${localFolder}.tar > $${localFile}.part && mv $${localFile}.part $${localFile} ; \
+	          rm -f $${localFolder}.tar $${localFolder}.gitmodules ;
+endef
+
 define DOWNLOAD_GIT
-	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
+	      localFolder=$(NAME)-git$(PKG_GIT_REF) ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      exec 6> /tmp/git.$${localFolder}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 6 || exit 1 ; \
@@ -156,7 +197,11 @@ define DOWNLOAD_GIT
 	        rm -fr $${localFolder} $${localFolder}.part ; \
 	        git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
-	        git --git-dir=$${localFolder}/.git --work-tree=$${localFolder} archive --prefix=$${localFolder}/ -o $${localFile} $(PKG_GIT_HASH) ; \
+	        if [ -z "$(strip $(PKG_GIT_SUBMODULES))" ]; then \
+	          git --git-dir=$${localFolder}/.git --work-tree=$${localFolder} archive --prefix=$${localFolder}/ -o $${localFile} $(PKG_GIT_REF) ; \
+	        else \
+	          $(DOWNLOAD_GIT_SUBMODULES) \
+	        fi ; \
 	        rm -fr $${localFolder} ; \
 	      fi ; \
 	      flock -u 6 ; \

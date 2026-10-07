@@ -1,19 +1,18 @@
 PKG_NAME = znc
 PKG_VERS = 1.10.3
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://znc.in/releases
-# znc.in is upstream, but flaky: its TLS certificate expired on 2026-07-14 and
-# downloads fail on it until it is renewed. Gentoo serves the same tarball under
-# its upstream name, so fall back there meanwhile. The subdirectory is the first
-# two hex digits of the blake2b hash of the file name, so it must be recomputed
-# on a version bump; a stale one just 404s and we fall through.
-# Debian cannot be used: it renames the file to znc_$(PKG_VERS).orig.tar.gz, and
-# a mirror base is only ever appended with PKG_DIST_NAME.
-# GitHub is not an option either: znc publishes no release assets, and its git
-# archive ships an empty third_party/Csocket submodule, so it cannot build.
-PKG_DIST_MIRRORS = https://distfiles.gentoo.org/distfiles/c9
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+# From git, at tag znc-$(PKG_VERS): znc.in has been flaky (its TLS
+# certificate expired on 2026-07-14) and the mirrors that carried its tarball came and
+# went. GitHub's own archive leaves the submodules empty, so they are added from the
+# commits the tag pins: Csocket is needed to build, cctz for timezones. The release
+# tarball's pregenerated modpython sources are not in git; the host's SWIG (>= 4.0.1)
+# generates them instead.
+PKG_GIT_TAG = znc-$(PKG_VERS)
+PKG_GIT_SUBMODULES = third_party/Csocket third_party/cctz
+PKG_DOWNLOAD_METHOD = git
+PKG_DIST_SITE = https://github.com/znc/znc.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_TAG).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_TAG)
 
 # Ensure C++17 compatibility
 MIN_GCC_VERSION = 7
