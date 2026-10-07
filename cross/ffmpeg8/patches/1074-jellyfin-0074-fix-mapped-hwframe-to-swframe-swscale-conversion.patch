@@ -18,7 +18,7 @@ Index: FFmpeg/libswscale/swscale.c
 ===================================================================
 --- libswscale/swscale.c
 +++ libswscale/swscale.c
-@@ -1440,10 +1440,27 @@ int sws_frame_setup(SwsContext *ctx, con
+@@ -1440,10 +1440,22 @@ int sws_frame_setup(SwsContext *ctx, con
      if ((ret = validate_params(ctx)) < 0)
          return ret;
  
@@ -35,15 +35,11 @@ Index: FFmpeg/libswscale/swscale.c
 +        return AVERROR(EINVAL);
 +
      /* For now, if a single frame has a context, then both need a context */
-     if (!!src->hw_frames_ctx != !!dst->hw_frames_ctx) {
--        return AVERROR(ENOTSUP);
-+        if (src_is_hwaccel ^ dst_is_hwaccel)
-+            return AVERROR(ENOTSUP);
-+
-     } else if (!!src->hw_frames_ctx) {
-+        if (!src_is_hwaccel || !dst_is_hwaccel)
-+            return AVERROR(EINVAL);
-+
+-    if (!!src->hw_frames_ctx != !!dst->hw_frames_ctx) {
++    if (src_is_hwaccel ^ dst_is_hwaccel) {
+         return AVERROR(ENOTSUP);
+-    } else if (!!src->hw_frames_ctx) {
++    } else if (src_is_hwaccel) {
          /* Both hardware frames must already be allocated */
          if (!src->data[0] || !dst->data[0])
              return AVERROR(EINVAL);

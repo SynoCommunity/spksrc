@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver
 SPK_VERS = 1.5
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
@@ -26,6 +26,8 @@ CHANGELOG += "7. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+).<br/>"
 CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+).<br/>"
 CHANGELOG += "9. Re-publish for DSM 7.2+.<br/>"
 CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu_top) moved to synocli-videodriver-tools: this package now ships libraries only.<br/>"
+CHANGELOG += "11. Rebuilt with framework updates: components are selected on what the compiler and kernel support rather than on the DSM version.<br/>"
+CHANGELOG += "12. libva 2.23.0 for DSM 6 (was 2.17.0), the same as DSM 7; the DSM 6 drivers are unchanged.<br/>"
 
 # The Intel media stack drives i915 ioctls the running kernel either has or has not;
 # DSM 5.2's 3.2 kernel predates the render-node interface libva needs.

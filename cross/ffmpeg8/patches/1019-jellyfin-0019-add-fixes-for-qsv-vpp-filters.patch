@@ -435,7 +435,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
      QSVFramesContext   *s = ctx->hwctx;
      mfxFrameSurface1   in = {{ 0 }};
      mfxFrameSurface1 *out = (mfxFrameSurface1*)dst->data[3];
-@@ -1954,9 +1991,20 @@ static int qsv_transfer_data_to(AVHWFram
+@@ -1954,9 +1991,19 @@ static int qsv_transfer_data_to(AVHWFram
  
      src_frame = realigned ? tmp_frame : src;
  
@@ -443,8 +443,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
 -        if (s->child_frames_ref)
 +    if (!s->session_upload
 +#if CONFIG_D3D11VA /* Wa an out of sync issue in MSDK RT on Windows */
-+        || ((src_frame->format == AV_PIX_FMT_BGRA) &&
-+            !QSV_RUNTIME_VERSION_ATLEAST(device_priv->ver, 1, 255) &&
++        || (!QSV_RUNTIME_VERSION_ATLEAST(device_priv->ver, 1, 255) &&
 +            (device_priv->handle_type == MFX_HANDLE_D3D11_DEVICE))
 +#endif
 +        ) {
@@ -458,3 +457,12 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
  
          av_log(ctx, AV_LOG_ERROR, "Surface upload not possible\n");
          return AVERROR(ENOSYS);
+@@ -1980,7 +2027,7 @@ static int qsv_transfer_data_to(AVHWFram
+         err = MFXVideoCORE_SyncOperation(s->session_upload, sync, 1000);
+     } while (err == MFX_WRN_IN_EXECUTION);
+     if (err < 0) {
+-        av_log(ctx, AV_LOG_ERROR, "Error synchronizing the operation\n");
++        av_log(ctx, AV_LOG_ERROR, "Error synchronizing the operation: %d\n", err);
+         return AVERROR_UNKNOWN;
+     }
+ 

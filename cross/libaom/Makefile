@@ -1,17 +1,7 @@
 PKG_NAME = libaom-virtual
 
-OPTIONAL_DEPENDS  = cross/libaom-latest
-OPTIONAL_DEPENDS += cross/libaom-3.8
-
-MIN_GCC_VERSION = 4.8
-
 include ../../mk/spksrc.common.mk
 
-# gcc >= 7.5
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS = cross/libaom-latest
-else
-DEPENDS = cross/libaom-3.8
-endif
+$(call depend,cross/libaom-latest|cross/libaom-3.8)
 
 include ../../mk/spksrc.cross-virtual.mk

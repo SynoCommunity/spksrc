@@ -1,139 +1,83 @@
 ###############################################################################
 # spksrc.rules/depend.mk
 #
-# Build all dependencies listed in DEPENDS.
+# Resolves the optional dependencies declared with $(call depend,<pkgs>,<switches>[,<else>])
+# (spksrc.common/macros.mk): each goes to DEPENDS with its switches where its own tree
+# supports ARCH-TCVERSION, and its <else> goes to CONFIGURE_ARGS where it does not.
 #
-# Targets are executed in the following order:
-#  depend_msg_target
-#  pre_depend_target   (override with PRE_DEPEND_TARGET)
-#  depend_target       (override with DEPEND_TARGET)
-#  post_depend_target  (override with POST_DEPEND_TARGET)
+# The verdict is the one `make check` gives: `dependency-unsupported` run in the
+# dependency, its required tree included, empty when every gate is met. One sub-make per
+# candidate, run in parallel once per WORK_DIR and kept in $(_ODEP_CACHE); every later
+# parse into that WORK_DIR includes the file instead. Each walk runs in the dependency's
+# own work-<arch>-<vers> -- the depth env-default.mk expects of a WORK_DIR to find the
+# toolchain -- and with its own stamp directory: inherited from a parent make, one shared
+# stamp directory would let a walk skip what another visited, and hide its gates.
 #
-# Variables:
-#  DEPENDS             List of dependencies to go through
-#  REQUIRE_KERNEL      If set, will compile kernel modules and allow
-#                      use of KERNEL_DIR
-#  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
-#  NATIVE_DEPENDS      native/* to build INTO this package's own context
+# A dependency walk computes verdicts only for required alternatives (a|b with no switch,
+# a virtual package): the tree it walks must hold the one that is picked. Optional ones it
+# leaves out of DEPENDS unless a build already wrote the file, so the required walk the
+# pre-check and `make check` run is the required tree. A verdict walk can resolve required
+# alternatives below it in turn, down a tree without cycles. With no ARCH nothing is
+# resolved, and OPTIONAL_DEPENDS alone carries them to dependency-list-spk.
 #
+# Included before pre-check.mk, so DEPENDS is complete before any rule reads it. Each
+# outcome takes the place its call left in DEPENDS and CONFIGURE_ARGS, so the order is the
+# order of the Makefile.
 ###############################################################################
 
-### For managing kernel modules dependent builds
-include ../../mk/spksrc.kernel/depend.mk
+ifneq ($(strip $(_ODEP_LIST)),)
+ifneq ($(and $(ARCH),$(TCVERSION)),)
 
-DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
+_ODEP_CACHE  = $(WORK_DIR)/depend-$(notdir $(CURDIR)).mk
+_odep_var    = _ODEP_OK_$(subst /,__,$(1))
+_ODEP_CANDS  = $(sort $(foreach n,$(_ODEP_LIST),$(subst |, ,$(_ODEP_$(n)_PKGS))))
 
-# Stamps of the dependencies already walked during this run (dep_seen, macros.mk): a
-# dependency shared by several packages is walked once, not once per path leading to it,
-# each visit being a full make parse (and its cross-stage1/2 sub-makes) even when its
-# cookies say there is nothing left to build.
-#
-# Bound to WORK_DIR rather than handed down: DEPEND_WALK carries the WORK_DIR of the make
-# that started the walk. A sub-make building into another WORK_DIR (toolchain, toolkit)
-# does not match it and starts a walk of its own, instead of skipping dependencies that
-# were only built in its caller's. The owner of the walk clears the stamps first, so an
-# interrupted or failed run never leaves one behind for the next.
-DEPEND_SEEN = $(WORK_DIR)/.DEPEND
-ifneq ($(DEPEND_WALK),$(WORK_DIR))
-DEPEND_WALK_OWNER = 1
+-include $(_ODEP_CACHE)
+
+_ODEP_REQ_CANDS = $(sort $(foreach n,$(_ODEP_LIST),$(if $(_ODEP_$(n)_REQ),$(subst |, ,$(_ODEP_$(n)_PKGS)))))
+_ODEP_WANTED    = $(if $(filter 1,$(DEPENDENCY_WALK)),$(_ODEP_REQ_CANDS),$(_ODEP_CANDS))
+_ODEP_MISSING   = $(strip $(foreach p,$(_ODEP_WANTED),$(if $(filter undefined,$(origin $(call _odep_var,$(p)))),$(p))))
+ifneq ($(_ODEP_MISSING),)
+# "<var> := 1" when the dependency's tree is clear, 0 when anything in it refuses the arch.
+# Only verdict lines count: a toolchain bootstrap shares the walk's stdout.
+_ODEP_NEW := $(shell mkdir -p $(WORK_DIR) && \
+    printf '%s\n' $(_ODEP_MISSING) | xargs -P $$(nproc) -I{} sh -c ' \
+      v=_ODEP_OK_$$(echo {} | sed "s|/|__|g") ; \
+      out=$$(env -u RUN_ID -u DEP_FLAT_STAMP_DIR -u SPK_LIST_STAMP_DIR DEPENDENCY_WALK=1 \
+                 $(MAKE) -s --no-print-directory -C $(BASEDIR)/{} dependency-unsupported \
+                 ARCH=$(ARCH) TCVERSION=$(TCVERSION) WORK_DIR=$(BASEDIR)/{}/work-$(ARCH)-$(TCVERSION) 2>/dev/null \
+             | grep -E "^(cross|spk|diyspk|native|kernel)/") ; \
+      if [ -z "$$out" ] ; then echo "$$v~:=~1" ; else echo "$$v~:=~0" ; fi' | sort)
+$(foreach l,$(_ODEP_NEW),$(eval $(subst ~, ,$(l))))
+$(shell printf '%s\n' $(subst ~, ,$(foreach l,$(_ODEP_NEW),'$(l)')) >> $(_ODEP_CACHE))
 endif
 
-ifeq ($(strip $(PRE_DEPEND_TARGET)),)
-PRE_DEPEND_TARGET = pre_depend_target
-else
-$(PRE_DEPEND_TARGET): depend_msg_target
+# A group (space-separated) resolves when every member has a supported alternative (|-separated).
+_odep_pick = $(firstword $(foreach a,$(subst |, ,$(1)),$(if $(filter 1,$($(call _odep_var,$(a)))),$(a))))
+_odep_take = $(strip $(foreach g,$(1),$(call _odep_pick,$(g))))
+# Required: the first supported alternative, else the last, which the walk then refuses.
+_odep_must = $(strip $(foreach g,$(1),$(or $(call _odep_pick,$(g)),$(lastword $(subst |, ,$(g))))))
+
+# What each call resolves to: _ODEP_<n>_DEP for DEPENDS, _ODEP_<n>_ARG for CONFIGURE_ARGS.
+$(foreach n,$(_ODEP_LIST),\
+  $(if $(_ODEP_$(n)_REQ),\
+    $(eval _ODEP_$(n)_DEP := $(call _odep_must,$(_ODEP_$(n)_PKGS))),\
+  $(if $(filter $(words $(_ODEP_$(n)_PKGS)),$(words $(call _odep_take,$(_ODEP_$(n)_PKGS)))),\
+    $(eval _ODEP_$(n)_DEP := $(call _odep_take,$(_ODEP_$(n)_PKGS)))$(eval _ODEP_$(n)_ARG := $(_ODEP_$(n)_ON)),\
+    $(eval _ODEP_$(n)_ARG := $(_ODEP_$(n)_OFF)))))
+
 endif
-ifeq ($(strip $(DEPEND_TARGET)),)
-DEPEND_TARGET = depend_target
-else
-$(DEPEND_TARGET): $(PRE_DEPEND_TARGET)
-endif
-ifeq ($(strip $(POST_DEPEND_TARGET)),)
-POST_DEPEND_TARGET = post_depend_target
-else
-$(POST_DEPEND_TARGET): $(DEPEND_TARGET)
-endif
 
-native-depend_msg_target:
-	@$(MSG) "Processing NATIVE dependencies of $(NAME)"
+# Each call left _odep_<n>_ where it stood; put its outcome there, or nothing (no ARCH, or
+# an optional dependency a walk does not resolve). Done in every case, so no placeholder
+# ever reaches a recipe or a walk. On the unexpanded text, reassigned recursively: a
+# $(VAR) in CONFIGURE_ARGS still expands when read, after the includes that define it.
+_ODEP_RAW_DEPENDS        := $(value DEPENDS)
+_ODEP_RAW_CONFIGURE_ARGS := $(value CONFIGURE_ARGS)
+$(foreach n,$(_ODEP_LIST),\
+  $(eval _ODEP_RAW_DEPENDS        := $$(subst _odep_$(n)_,$$(_ODEP_$(n)_DEP),$$(_ODEP_RAW_DEPENDS)))\
+  $(eval _ODEP_RAW_CONFIGURE_ARGS := $$(subst _odep_$(n)_,$$(_ODEP_$(n)_ARG),$$(_ODEP_RAW_CONFIGURE_ARGS))))
+$(eval DEPENDS = $(_ODEP_RAW_DEPENDS))
+$(eval CONFIGURE_ARGS = $(_ODEP_RAW_CONFIGURE_ARGS))
 
-# Called for 'make all-supported' prior to
-# parallalizing build for every arch targets
-
-# The env -i native loops (this one and depend_target's) stay without FWRD_ARGS: host tools,
-# and the one that cares (native/rustc-1.98) sets a `?=` default a forwarded 0 would break.
-native-depend: native-depend_msg_target
-	@set -e; \
-	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
-	do \
-	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
-	done
-
-# Build meta SOURCE packages (spk/*) listed in BUILD_DEPENDS. Invoked from
-# spk-stage1 (spksrc.spk.mk) so the meta work dir exists for the stage2 parse
-# that activates SPK_BASE_TEMPLATE. Only spk/* are built here (cross/* and
-# native/* are built by depend_target below, which filters out spk/*). Each
-# meta is a self-contained `arch-` build run under an isolated env (env -i) so
-# the consumer's INSTALL_PREFIX/exports don't leak into it, and is skipped when
-# its install staging already exists (re-running arch- on a built package is
-# not idempotent at the packaging step). No-op when BUILD_DEPENDS has no spk/*.
-#
-# FWRD_ARGS crosses that isolation on purpose: those are decisions about the whole run,
-# and a meta that disagrees links a libdrm the consumer then cannot resolve.
-.PHONY: spk-meta-source
-spk-meta-source:
-	@set -e; \
-	for metasrc in $(filter spk/%,$(BUILD_DEPENDS)); do \
-	   if [ -d ../../$$metasrc/work-$(ARCH)-$(TCVERSION)/install ]; then \
-	      $(MSG) "Stage1: meta source $$metasrc already built for $(ARCH)-$(TCVERSION)" ; \
-	   else \
-	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
-	      env -i PATH="$(PATH)" HOME="$(HOME)" \
-	         $(MAKE) $(FWRD_ARGS_SPK) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
-	   fi ; \
-	done
-
-depend_msg_target:
-	@$(MSG) "Processing dependencies of $(NAME)"
-
-pre_depend_target: depend_msg_target
-
-depend_target: $(PRE_DEPEND_TARGET)
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-# As depend is also ran at toolchain-time, ensure to skip kernel-depend
-ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
-depend_target: kernel-depend
-endif
-endif
-	@set -e; \
-	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do \
-	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
-	done
-	@$(if $(DEPEND_WALK_OWNER),rm -rf $(DEPEND_SEEN) && mkdir -p $(DEPEND_SEEN),:)
-	@set -e; \
-	for depend in $(NATIVE_DEPENDS); \
-	do \
-	  $(call dep_seen,$(DEPEND_SEEN),$$depend) && continue ; \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \
-	done
-	@set -e; \
-	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do \
-	  $(call dep_seen,$(DEPEND_SEEN),$$depend) && continue ; \
-	  env $(ENV) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \
-	done
-	@$(if $(DEPEND_WALK_OWNER),rm -rf $(DEPEND_SEEN),:)
-	
-post_depend_target: $(DEPEND_TARGET)
-
-	
-ifeq ($(wildcard $(DEPEND_COOKIE)),)
-depend: $(DEPEND_COOKIE)
-
-$(DEPEND_COOKIE): $(POST_DEPEND_TARGET)
-	$(create_target_dir)
-	@touch -f $@
-else
-depend: ;
 endif

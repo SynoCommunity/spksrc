@@ -1,0 +1,13 @@
+Index: FFmpeg/fftools/ffmpeg_demux.c
+===================================================================
+--- fftools/ffmpeg_demux.c
++++ fftools/ffmpeg_demux.c
+@@ -549,7 +549,7 @@ static void readrate_sleep(Demuxer *d)
+         d->resume_progress = progress;
+ 
+         int64_t pts = FFMAX(slowest->first_dts, file_start) + progress;
+-        av_log_once(slowest, AV_LOG_WARNING, AV_LOG_DEBUG, &resume_warn,
++        av_log_once(slowest, AV_LOG_VERBOSE, AV_LOG_DEBUG, &resume_warn,
+                     "Resumed reading at pts %0.3f with rate %0.3f after a lag of %0.3fs\n",
+                     (float)pts/AV_TIME_BASE, d->readrate_catchup, (float)lag/AV_TIME_BASE);
+     }

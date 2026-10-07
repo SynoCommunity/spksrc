@@ -9,7 +9,7 @@
 #   download -> checksum -> extract -> patch -> configure -> compile -> install
 #
 # Prerequisites provided by the including entry point:
-#   - depend  (spksrc.rules/depend.mk)   referenced by the extract step
+#   - depend  (spksrc.rules/dependency.mk)   referenced by the extract step
 #   - status  (spksrc.rules/status.mk)   referenced by the extract step
 #   - the build environment (spksrc.cross/env-default.mk or
 #     spksrc.native/env-default.mk) included before this file
