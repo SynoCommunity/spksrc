@@ -23,4 +23,14 @@ CONFIGURE_ARGS += -DEXPAT_SHARED_LIBS=ON
 # secret where getrandom/getentropy are missing, not the weak fallback
 CONFIGURE_ARGS += -DEXPAT_DEV_URANDOM=ON
 
+include ../../mk/spksrc.common.mk
+
+# 2.8.5 dropped the `#ifndef O_CLOEXEC / #define O_CLOEXEC 0` fallback 2.8.4 still had,
+# and lib/random_dev_urandom.c asks for the flag through _POSIX_C_SOURCE 200809L. eglibc
+# 2.8 predates that: it keeps O_CLOEXEC under __USE_GNU, where 2.10 moved it to
+# __USE_XOPEN2K8. Only ppc853x-5.2 is that old, and only it needs the wider namespace.
+ifeq ($(call version_lt,$(TC_GLIBC),2.10),1)
+ADDITIONAL_CFLAGS += -D_GNU_SOURCE
+endif
+
 include ../../mk/spksrc.cross-cmake.mk
