@@ -54,6 +54,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Web Apps"><td><a href="bicbucstriim/">BicBucStriim</a></td><td>Web Apps</td><td>eBook server</td></tr>
     <tr data-category="Backup"><td><a href="borgbackup/">BorgBackup</a></td><td>Backup</td><td>Deduplicating backup</td></tr>
     <tr data-category="Backup"><td><a href="borgmatic/">Borgmatic</a></td><td>Backup</td><td>BorgBackup automation</td></tr>
+    <tr data-category="Network"><td><a href="caddy/">Caddy</a></td><td>Network</td><td>Web server with automatic HTTPS</td></tr>
     <tr data-category="Network"><td><a href="cloudflared/">Cloudflared</a></td><td>Network</td><td>Cloudflare Tunnel client</td></tr>
     <tr data-category="Media"><td><a href="comskip/">Comskip</a></td><td>Media</td><td>Commercial detector for recorded TV</td></tr>
     <tr data-category="Downloads"><td><a href="deluge/">Deluge</a></td><td>Downloads</td><td>Feature-rich BitTorrent client</td></tr>
