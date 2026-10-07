@@ -33,15 +33,6 @@ CONFIGURE_ARGS += --strip=$(call tc,strip)
 ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
 CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
 endif
-
-# New since ffmpeg7: its libavdevice/v4l2.c reaches for the multiplanar API -- v4l2_plane
-# and V4L2_CAP_VIDEO_CAPTURE_MPLANE, which Linux grew in 3.2 -- while configure only
-# checks that linux/videodev2.h exists. The 2.6.32 toolchains ship that header without
-# those symbols, so the indev is enabled and then fails to compile. ffmpeg4-6 do not use
-# them and need no such guard. Was disabled for qoriq by name.
-ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
-CONFIGURE_ARGS += --disable-indev=v4l2
-endif
 CONFIGURE_ARGS += --pkg-config=$(call native,pkg-config)
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-pic
@@ -166,15 +157,6 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ## ARCH SPECIFIC
 ##
 
-# ARMv7L (hi3535): Cortex-A9 but SOFT float, which is why it has its own arch group
-# instead of sitting with the hard-float ARMv7 ones. Never buildable, never configured.
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm
-CONFIGURE_ARGS += --cpu=cortex-a9
-CONFIGURE_ARGS += --disable-neon
-CONFIGURE_ARGS += --disable-vfp
-endif
-
 # ARMv5 (88f6281, Marvell Feroceon): armv5te, soft float. Never listed here because its
 # gcc 4.6.4 kept ffmpeg8 out entirely; the overlay makes it reachable. --cpu=armv5te is
 # what turns off the armv6/v6t2/neon/vfp paths this core does not have.
@@ -247,12 +229,8 @@ CONFIGURE_ARGS += --enable-vaapi
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
 #   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
-ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
-endif
 
 # Enable OpenCL and Vulkan acceleration: where the videodriver meta ships ocl-icd, the
 # Vulkan loader and shaderc -- gcc 7.5, their C++17 floor (videodriver-depends.mk)

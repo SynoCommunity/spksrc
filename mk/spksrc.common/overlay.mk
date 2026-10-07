@@ -135,9 +135,8 @@ FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC _OVERLAY_FORWARDED
 # must not mistake the value it was handed for a request of its own.
 _OVERLAY_FORWARDED := 1
 
-# A backstop for a sub-make nobody forwards to, and the only way the _VERS pins travel:
-# objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
-export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+# The only way the _VERS pins travel: objects from gcc 4.3.7 will not mix with gcc 8.5
+# C++, so a choice must hold tree-wide. The switches themselves are exported below.
 export OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
 # OVERLAY_RUSTC_VERS is exported ONLY once it has a value. It is derived from the rust
 # consumer dirs this arch ships, and there are contexts where that list is legitimately
