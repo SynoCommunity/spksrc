@@ -22,7 +22,7 @@ FWPORTS = src/caddy.sc
 # No DSM app-menu shortcut: Caddy has no web UI of its own to open - the
 # default site is just a health-check placeholder, and once a real site is
 # configured, whatever's behind the reverse proxy is a different app's
-# concern, not Caddy's (same reasoning spk/postgresql uses to opt out).
+# concern, not Caddy's.
 NO_SERVICE_SHORTCUT = 1
 
 WIZARDS_DIR = src/wizard
