@@ -124,7 +124,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "October 7th 2026 — A git download can include submodules (#7549)"
+??? note "October 7th 2026 — A git download can include submodules, and name a tag (#7549)"
 
     - **`git archive` leaves a submodule an empty directory**, so a project whose release
       tarball bundles its submodules could not be built from git. znc is one: its GitHub
@@ -136,7 +136,10 @@ If you only read one thing, read this. The details are in the dated log below.
       gives, and appended to the tarball; `gzip -n` keeps it reproducible, so the digests
       hold. See [Source downloads and mirrors](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors).
 
-    - **znc** builds from git, at the commit of tag `znc-1.10.3`, with Csocket and cctz.
+    - **`PKG_GIT_TAG`** names the revision by tag instead of `PKG_GIT_HASH` (one or the
+      other), so a version bump is `PKG_VERS` and the digests.
+
+    - **znc** builds from git, at tag `znc-1.10.3`, with Csocket and cctz.
       The release tarball's pregenerated modpython sources are not in git: the build
       host's SWIG generates them.
 ??? note "October 2nd 2026 — An optional dependency follows its own floors, not a copy of them (#7525)"

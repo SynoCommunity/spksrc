@@ -1,18 +1,18 @@
 PKG_NAME = znc
 PKG_VERS = 1.10.3
 PKG_EXT = tar.gz
-# From git, at the commit tag znc-$(PKG_VERS) points to: znc.in has been flaky (its TLS
+# From git, at tag znc-$(PKG_VERS): znc.in has been flaky (its TLS
 # certificate expired on 2026-07-14) and the mirrors that carried its tarball came and
 # went. GitHub's own archive leaves the submodules empty, so they are added from the
 # commits the tag pins: Csocket is needed to build, cctz for timezones. The release
 # tarball's pregenerated modpython sources are not in git; the host's SWIG (>= 4.0.1)
 # generates them instead.
-PKG_GIT_HASH = 6bd91573cebd1e4ee954ebd4eb6db5b654e0e412
+PKG_GIT_TAG = znc-$(PKG_VERS)
 PKG_GIT_SUBMODULES = third_party/Csocket third_party/cctz
 PKG_DOWNLOAD_METHOD = git
 PKG_DIST_SITE = https://github.com/znc/znc.git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_TAG).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_TAG)
 
 # Ensure C++17 compatibility
 MIN_GCC_VERSION = 7

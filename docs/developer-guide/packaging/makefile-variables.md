@@ -42,23 +42,28 @@ almost every package wants.
 | `PKG_DOWNLOAD_METHOD` | Fetches | Revision variable |
 |-----------------------|---------|-------------------|
 | unset / anything else | the tarball at `PKG_DIST_SITE/PKG_DIST_NAME` | — |
-| `git` | a clone, archived to a tarball | `PKG_GIT_HASH` |
+| `git` | a clone, archived to a tarball | `PKG_GIT_HASH`, or `PKG_GIT_TAG` |
 | `svn` | an export, archived to a tarball | `PKG_SVN_REV` (or `HEAD`) |
 | `hg` | a clone, archived to a tarball | `PKG_HG_REV` (or `tip`) |
 
+**A tag instead of a hash.** `PKG_GIT_TAG` names the revision by tag, e.g.
+`PKG_GIT_TAG = znc-$(PKG_VERS)`, so a version bump is `PKG_VERS` and the digests. Set
+one of `PKG_GIT_HASH` and `PKG_GIT_TAG`, not both. A tag can be moved upstream; the
+digests catch it. The tarball and its directory are `$(PKG_NAME)-git<hash or tag>`.
+
 **Submodules.** `git archive` leaves a submodule an empty directory. When the
 build needs one, list its path in `PKG_GIT_SUBMODULES`: it is added to the
-tarball at the commit the superproject pins at `PKG_GIT_HASH`, from the URL its
+tarball at the commit the superproject pins at that revision, from the URL its
 `.gitmodules` gives. Same sources, same tarball, so the digests hold.
 
 ```makefile
 # znc's GitHub archive has no Csocket, which it cannot build without
-PKG_GIT_HASH = 6bd91573cebd1e4ee954ebd4eb6db5b654e0e412
+PKG_GIT_TAG = znc-$(PKG_VERS)
 PKG_GIT_SUBMODULES = third_party/Csocket third_party/cctz
 PKG_DOWNLOAD_METHOD = git
 PKG_DIST_SITE = https://github.com/znc/znc.git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_TAG).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_TAG)
 ```
 
 The VCS methods build the tarball locally from one repository, so **everything
