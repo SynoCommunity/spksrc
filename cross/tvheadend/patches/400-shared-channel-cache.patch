@@ -6,7 +6,7 @@ channel change, a DVR-driven cache warmup, and our fixes on top.
 
 tvheadend/tvheadend#2249, the whole of it: the 28 commits of th0ma7/tvheadend
 branch record-from-buffer, rebased onto the package base as
-ebea1df92..4c896b01b.
+f082b430a..af9ab0f36.
 
 Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
 upstream as of this base.  `git rebase` dropped its three commits on its own,
@@ -37,6 +37,12 @@ report and to two review passes:
     measure from, and only on one this connection may write.
   - a null title no longer reaches the recorder's start trace, which older GCC
     rejects under -Werror=format-overflow=.
+  - a client is told its seek range exists even when it starts at zero.
+    svcts_oldest() answers 0 both for "no cache" and for a range clamped to the
+    client's own zero, and svcts_fill_status() read the second as the first, so
+    the ordinary shared-cache case -- a cache older than the subscription --
+    advertised no seekable range at all while svcts_skip() would have accepted
+    the seek.  Reported by CodeRabbit.
   - two of LiBe-net's own, cherry-picked from his pr2249-warmup-fixes branch:
     a scheduled warmup stays reschedulable after a higher-priority
     subscription takes its tuner, and scheduled warmups sit above EPG, scan
@@ -112,7 +118,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
 --- src/dvr/dvr_config.c.orig
 +++ src/dvr/dvr_config.c
-@@ -641,6 +641,19 @@
+@@ -671,6 +671,19 @@
    return 0;
  }
  
@@ -132,7 +138,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  static int
  dvr_config_class_name_set(void *o, const void *v)
  {
-@@ -993,8 +1006,23 @@
+@@ -1023,8 +1036,23 @@
        .rend     = dvr_config_class_profile_rend,
        .list     = profile_class_get_list,
        .opts     = PO_ADVANCED,
@@ -156,7 +162,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      {
        .type     = PT_U32,
        .id       = "pri",
-@@ -1005,6 +1033,7 @@
+@@ -1035,6 +1063,7 @@
        .def.i    = DVR_PRIO_NORMAL,
        .off      = offsetof(dvr_config_t, dvr_pri),
        .opts     = PO_SORTKEY | PO_ADVANCED | PO_DOC_NLIST,
@@ -164,7 +170,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1016,6 +1045,7 @@
+@@ -1046,6 +1075,7 @@
        .def.u32  = DVR_RET_ONREMOVE,
        .list     = dvr_config_class_retention_list,
        .opts     = PO_EXPERT | PO_DOC_NLIST,
@@ -172,7 +178,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1027,6 +1057,7 @@
+@@ -1057,6 +1087,7 @@
        .def.u32  = DVR_RET_REM_FOREVER,
        .list     = dvr_config_class_removal_list,
        .opts     = PO_DOC_NLIST,
@@ -180,7 +186,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1046,6 +1077,7 @@
+@@ -1076,6 +1107,7 @@
        .def.u32  = 0,
        .list     = dvr_config_class_remove_after_playback_list,
        .opts     = PO_ADVANCED,
@@ -188,7 +194,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1084,6 +1116,7 @@
+@@ -1114,6 +1146,7 @@
        .off      = offsetof(dvr_config_t, dvr_clone),
        .opts     = PO_ADVANCED,
        .def.u32  = 1,
@@ -196,7 +202,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1094,6 +1127,7 @@
+@@ -1124,6 +1157,7 @@
                       "schedule a re-record (if possible)."),
        .off      = offsetof(dvr_config_t, dvr_rerecord_errors),
        .opts     = PO_ADVANCED,
@@ -204,7 +210,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1106,6 +1140,7 @@
+@@ -1136,6 +1170,7 @@
        .off      = offsetof(dvr_config_t, dvr_max_data_errors),
        .opts     = PO_ADVANCED,
        .def.u32  = DVR_MAX_DATA_ERRORS,
@@ -212,7 +218,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1123,6 +1158,7 @@
+@@ -1153,6 +1188,7 @@
                       "requires extra overhead so is disabled by default."),
        .off      = offsetof(dvr_config_t, dvr_complex_scheduling),
        .opts     = PO_ADVANCED,
@@ -220,7 +226,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 1,
      },
      {
-@@ -1134,6 +1170,7 @@
+@@ -1164,6 +1200,7 @@
                       "you to specify your authorized key in the options below."),
        .off      = offsetof(dvr_config_t, dvr_fetch_artwork),
        .opts     = PO_ADVANCED,
@@ -228,7 +234,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 8,
      },
      {
-@@ -1150,6 +1187,7 @@
+@@ -1180,6 +1217,7 @@
                      ),
        .off      = offsetof(dvr_config_t, dvr_fetch_artwork_allow_unknown),
        .opts     = PO_ADVANCED,
@@ -236,7 +242,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 8,
      },
      {
-@@ -1162,6 +1200,7 @@
+@@ -1192,6 +1230,7 @@
        .off      = offsetof(dvr_config_t, dvr_fetch_artwork_options),
        .doc      = prop_doc_dvrconfig_fanart,
        .opts     = PO_ADVANCED,
@@ -244,7 +250,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 8,
      },
      {
-@@ -1180,6 +1219,7 @@
+@@ -1210,6 +1249,7 @@
                       "components of the path do not exist, "
                       "Tvheadend will try to create them."),
        .off      = offsetof(dvr_config_t, dvr_storage),
@@ -252,7 +258,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1190,6 +1230,7 @@
+@@ -1220,6 +1260,7 @@
        .off      = offsetof(dvr_config_t, dvr_cleanup_threshold_free),
        .def.i    = 1000,
        .opts     = PO_ADVANCED,
@@ -260,7 +266,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1200,6 +1241,7 @@
+@@ -1230,6 +1271,7 @@
        .off      = offsetof(dvr_config_t, dvr_cleanup_threshold_used),
        .def.i    = 0,
        .opts     = PO_EXPERT,
@@ -268,7 +274,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1210,6 +1252,7 @@
+@@ -1240,6 +1282,7 @@
        .off      = offsetof(dvr_config_t, dvr_muxcnf.m_directory_permissions),
        .opts     = PO_EXPERT,
        .def.u32  = 0775,
@@ -276,7 +282,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1220,6 +1263,7 @@
+@@ -1250,6 +1293,7 @@
        .off      = offsetof(dvr_config_t, dvr_muxcnf.m_file_permissions),
        .opts     = PO_EXPERT,
        .def.u32  = 0664,
@@ -284,7 +290,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1232,6 +1276,7 @@
+@@ -1262,6 +1306,7 @@
        .list     = dvr_config_class_charset_list,
        .opts     = PO_EXPERT,
        .def.s    = "UTF-8",
@@ -292,7 +298,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1245,6 +1290,7 @@
+@@ -1275,6 +1320,7 @@
        .set      = dvr_config_class_pathname_set,
        .off      = offsetof(dvr_config_t, dvr_pathname),
        .opts     = PO_EXPERT,
@@ -300,7 +306,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1259,6 +1305,7 @@
+@@ -1289,6 +1335,7 @@
        .def.i    = MC_CACHE_DONTKEEP,
        .list     = dvr_config_class_cache_list,
        .opts     = PO_EXPERT | PO_DOC_NLIST,
@@ -308,7 +314,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 2,
      },
      {
-@@ -1271,6 +1318,7 @@
+@@ -1301,6 +1348,7 @@
                       "of the directory will be ISO standard YYYY-MM-DD."),
        .off      = offsetof(dvr_config_t, dvr_dir_per_day),
        .opts     = PO_EXPERT,
@@ -316,7 +322,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 3,
      },
      {
-@@ -1283,6 +1331,7 @@
+@@ -1313,6 +1361,7 @@
                       "will be the parent of the per-channel directory."),
        .off      = offsetof(dvr_config_t, dvr_channel_dir),
        .opts     = PO_EXPERT,
@@ -324,7 +330,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 3,
      },
      {
-@@ -1295,6 +1344,7 @@
+@@ -1325,6 +1374,7 @@
                       "will be parents of this directory."),
        .off      = offsetof(dvr_config_t, dvr_title_dir),
        .opts     = PO_EXPERT,
@@ -332,7 +338,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 3,
      },
      {
-@@ -1309,6 +1359,7 @@
+@@ -1339,6 +1389,7 @@
        .off      = offsetof(dvr_config_t, dvr_format_tvmovies_subdir),
        .def.s    = "tvmovies",
        .opts     = PO_EXPERT,
@@ -340,7 +346,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 3,
      },
      {
-@@ -1323,6 +1374,7 @@
+@@ -1353,6 +1404,7 @@
        .off      = offsetof(dvr_config_t, dvr_format_tvshows_subdir),
        .def.s    = "tvshows",
        .opts     = PO_EXPERT,
@@ -348,7 +354,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 3,
      },
      {
-@@ -1334,6 +1386,7 @@
+@@ -1364,6 +1416,7 @@
                       "stored in the file and to the filename itself."),
        .off      = offsetof(dvr_config_t, dvr_channel_in_title),
        .opts     = PO_ADVANCED,
@@ -356,7 +362,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 4,
      },
      {
-@@ -1345,6 +1398,7 @@
+@@ -1375,6 +1428,7 @@
                       "stored in the file and to the filename itself."),
        .off      = offsetof(dvr_config_t, dvr_date_in_title),
        .opts     = PO_ADVANCED,
@@ -364,7 +370,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 4,
      },
      {
-@@ -1356,6 +1410,7 @@
+@@ -1386,6 +1440,7 @@
                       "stored in the file and to the filename itself."),
        .off      = offsetof(dvr_config_t, dvr_time_in_title),
        .opts     = PO_ADVANCED,
@@ -372,7 +378,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 4,
      },
      {
-@@ -1366,6 +1421,7 @@
+@@ -1396,6 +1451,7 @@
                       "title (if available)."),
        .off      = offsetof(dvr_config_t, dvr_episode_in_title),
        .opts     = PO_EXPERT,
@@ -380,7 +386,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 4,
      },
      {
-@@ -1376,6 +1432,7 @@
+@@ -1406,6 +1462,7 @@
                       "title (if available)."),
        .off      = offsetof(dvr_config_t, dvr_subtitle_in_title),
        .opts     = PO_EXPERT,
@@ -388,7 +394,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 4,
      },
      {
-@@ -1385,6 +1442,7 @@
+@@ -1415,6 +1472,7 @@
        .desc     = N_("Don't include the title in the filename."),
        .off      = offsetof(dvr_config_t, dvr_omit_title),
        .opts     = PO_EXPERT,
@@ -396,7 +402,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1397,6 +1455,7 @@
+@@ -1427,6 +1485,7 @@
        .doc      = prop_doc_dvrconfig_unsafe,
        .off      = offsetof(dvr_config_t, dvr_clean_title),
        .opts     = PO_EXPERT,
@@ -404,7 +410,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1407,6 +1466,7 @@
+@@ -1437,6 +1496,7 @@
        .doc      = prop_doc_dvrconfig_whitespace,
        .off      = offsetof(dvr_config_t, dvr_whitespace_in_title),
        .opts     = PO_EXPERT,
@@ -412,7 +418,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1419,6 +1479,7 @@
+@@ -1449,6 +1509,7 @@
        .doc      = prop_doc_dvrconfig_windows,
        .off      = offsetof(dvr_config_t, dvr_windows_compatible_filenames),
        .opts     = PO_ADVANCED,
@@ -420,7 +426,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1430,6 +1491,7 @@
+@@ -1460,6 +1521,7 @@
        .off      = offsetof(dvr_config_t, dvr_tag_files),
        .opts     = PO_ADVANCED,
        .def.i    = 1,
@@ -428,7 +434,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1440,6 +1502,7 @@
+@@ -1470,6 +1532,7 @@
                       "based on the EPG start/stop times when available."),
        .off      = offsetof(dvr_config_t, dvr_create_scene_markers),
        .def.i    = 1,
@@ -436,7 +442,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 5,
      },
      {
-@@ -1465,6 +1528,7 @@
+@@ -1495,6 +1558,7 @@
        .off      = offsetof(dvr_config_t, dvr_running),
        .opts     = PO_ADVANCED,
        .def.u32  = 1,
@@ -444,7 +450,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 6,
      },
      {
-@@ -1475,6 +1539,7 @@
+@@ -1505,6 +1569,7 @@
        .off      = offsetof(dvr_config_t, dvr_autorec_max_count),
        .opts     = PO_ADVANCED,
        .def.i    = 50,
@@ -452,7 +458,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 6,
      },
      {
-@@ -1484,6 +1549,7 @@
+@@ -1514,6 +1579,7 @@
        .desc     = N_("The maximum number of recordings that can be scheduled."),
        .off      = offsetof(dvr_config_t, dvr_autorec_max_sched_count),
        .opts     = PO_ADVANCED,
@@ -460,7 +466,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 6,
      },
      {
-@@ -1496,6 +1562,7 @@
+@@ -1526,6 +1592,7 @@
        .off      = offsetof(dvr_config_t, dvr_autorec_dedup),
        .list     = dvr_autorec_entry_class_record_list,
        .opts     = PO_ADVANCED | PO_DOC_NLIST | PO_HIDDEN,
@@ -468,7 +474,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 6,
      },
      {
-@@ -1509,6 +1576,7 @@
+@@ -1539,6 +1606,7 @@
        .off      = offsetof(dvr_config_t, dvr_skip_commercials),
        .opts     = PO_ADVANCED,
        .def.i    = 1,
@@ -476,7 +482,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 6,
      },
      {
-@@ -1520,6 +1588,7 @@
+@@ -1550,6 +1618,7 @@
        .doc      = prop_doc_preprocessor,
        .off      = offsetof(dvr_config_t, dvr_preproc),
        .opts     = PO_EXPERT,
@@ -484,7 +490,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 7,
      },
      {
-@@ -1530,6 +1599,7 @@
+@@ -1560,6 +1629,7 @@
        .doc      = prop_doc_postprocessor,
        .off      = offsetof(dvr_config_t, dvr_postproc),
        .opts     = PO_ADVANCED,
@@ -492,7 +498,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 7,
      },
      {
-@@ -1540,6 +1610,7 @@
+@@ -1570,6 +1640,7 @@
        .doc      = prop_doc_postremove,
        .off      = offsetof(dvr_config_t, dvr_postremove),
        .opts     = PO_EXPERT,
@@ -500,7 +506,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        .group    = 7,
      },
      {
-@@ -1552,6 +1623,7 @@
+@@ -1582,6 +1653,7 @@
                       "and/or send garbage data at the beginning. "),
        .off      = offsetof(dvr_config_t, dvr_warm_time),
        .opts     = PO_EXPERT,
@@ -1361,7 +1367,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    de->de_chain = prch;
  
    atomic_set(&de->de_thread_shutdown, 0);
-@@ -1370,6 +1396,7 @@
+@@ -1372,6 +1398,7 @@
    htsmsg_field_t *f;
    muxer_t *muxer;
    struct stat st;
@@ -1369,7 +1375,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    int i;
  
    if (!cfg) {
-@@ -1526,11 +1553,19 @@
+@@ -1528,11 +1555,19 @@
  
    streaming_start_unref(ss_copy);
  
@@ -1391,7 +1397,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    } else {
      htsmsg_destroy(info);
    }
-@@ -1729,6 +1764,7 @@
+@@ -1731,6 +1766,7 @@
    th_pkt_t *pkt, *pkt2, *pkt3;
    streaming_start_t *ss = NULL;
    int run = 1, started = 0, muxing = 0, comm_skip, rs;
@@ -1399,7 +1405,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    int epg_running = 0, old_epg_running, epg_pause = 0;
    int commercial = COMMERCIAL_UNKNOWN;
    int running_disabled;
-@@ -1741,10 +1777,13 @@
+@@ -1743,10 +1779,13 @@
      return NULL;
    comm_skip = de->de_config->dvr_skip_commercials;
    postproc  = de->de_config->dvr_postproc ? strdup(de->de_config->dvr_postproc) : NULL;
@@ -1415,7 +1421,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    if (!running_disabled && de->de_bcast) {
      now = gclk();
      switch (de->de_bcast->running) {
-@@ -1954,8 +1993,19 @@
+@@ -1956,8 +1995,19 @@
  
          goto fin;
  
@@ -1437,7 +1443,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
  	dvr_rec_set_state(de, DVR_RS_ERROR, sm->sm_code);
  	tvherror(LS_DVR, "Recording stopped: \"%s\": %s",
-@@ -1964,17 +2014,36 @@
+@@ -1966,17 +2016,36 @@
  
  fin:
          streaming_queue_clear(&backlog);
@@ -2169,7 +2175,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    subscription_set_skip(hs->hs_s, &skip);
  
    htsp_reply(htsp, in, htsmsg_create_map());
-@@ -3894,6 +4215,9 @@
+@@ -3918,6 +4239,9 @@
  void
  htsp_dvr_entry_add(dvr_entry_t *de)
  {
@@ -2179,7 +2185,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_dvr_entry_update(de, "dvrEntryAdd", NULL);
  }
  
-@@ -3903,6 +4227,11 @@
+@@ -3927,6 +4251,11 @@
  void
  htsp_dvr_entry_update(dvr_entry_t *de)
  {
@@ -2191,7 +2197,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_dvr_entry_update(de, "dvrEntryUpdate", NULL);
  }
  
-@@ -3913,6 +4242,9 @@
+@@ -3937,6 +4266,9 @@
  htsp_dvr_entry_update_stats(dvr_entry_t *de)
  {
    htsp_connection_t *htsp;
@@ -2201,7 +2207,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    LIST_FOREACH(htsp, &htsp_async_connections, htsp_async_link) {
      if (htsp->htsp_async_mode & HTSP_ASYNC_ON){
        if (!dvr_entry_verify(de, htsp->htsp_granted_access, 1)) {
-@@ -3960,6 +4292,9 @@
+@@ -3984,6 +4316,9 @@
  void
  htsp_autorec_entry_add(dvr_autorec_entry_t *dae)
  {
@@ -2211,7 +2217,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_autorec_entry_update(dae, "autorecEntryAdd", NULL);
  }
  
-@@ -3969,6 +4304,11 @@
+@@ -3993,6 +4328,11 @@
  void
  htsp_autorec_entry_update(dvr_autorec_entry_t *dae)
  {
@@ -2223,7 +2229,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_autorec_entry_update(dae, "autorecEntryUpdate", NULL);
  }
  
-@@ -4014,6 +4354,9 @@
+@@ -4038,6 +4378,9 @@
  void
  htsp_timerec_entry_add(dvr_timerec_entry_t *dte)
  {
@@ -2233,7 +2239,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_timerec_entry_update(dte, "timerecEntryAdd", NULL);
  }
  
-@@ -4023,6 +4366,11 @@
+@@ -4047,6 +4390,11 @@
  void
  htsp_timerec_entry_update(dvr_timerec_entry_t *dte)
  {
@@ -2245,7 +2251,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_timerec_entry_update(dte, "timerecEntryUpdate", NULL);
  }
  
-@@ -4567,6 +4915,9 @@
+@@ -4591,6 +4939,9 @@
  static void
  htsp_subscription_timeshift_status(htsp_subscription_t *hs, timeshift_status_t *status)
  {
@@ -5405,7 +5411,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1795 @@
+@@ -0,0 +1,1805 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -5770,12 +5776,22 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 + * of its own, which is what lets a recording still start at the programme's
 + * start.
 + */
++/* Whether a seekable range exists at all, whatever its bounds.  Kept apart
++ * from svcts_oldest(), which answers 0 both for "no cache" and for a range
++ * clamped to the client's own zero -- two things that mean the opposite to a
++ * client, so the presence of a range cannot be read from its value. */
++static int
++svcts_span ( svcts_t *st, int64_t *oldest, int64_t *newest )
++{
++  return st->sb != NULL && st->live_time != 0 &&
++         svcbuf_span(st->sb, oldest, newest);
++}
++
 +static int64_t
 +svcts_oldest ( svcts_t *st )
 +{
 +  int64_t oldest, newest, t;
-+  if (st->sb == NULL || st->live_time == 0 ||
-+      !svcbuf_span(st->sb, &oldest, &newest))
++  if (!svcts_span(st, &oldest, &newest))
 +    return 0;
 +  t = st->live_time - (st->live_mono - oldest) + SVCTS_PREROLL;
 +  if (st->max_time && t < st->live_time - st->max_time)
@@ -5789,12 +5805,12 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +svcts_fill_status ( svcts_t *st, timeshift_status_t *status )
 +{
 +  int64_t cur = st->state == SVCTS_LIVE ? st->live_time : st->last_time;
-+  int64_t start = svcts_oldest(st);
++  int64_t oldest, newest;
 +
 +  status->full = 0;
 +  status->shift = ts_rescale_inv(MAX(0, st->live_time - cur), 1000000);
-+  if (start) {
-+    status->pts_start = ts_rescale_inv(start, 1000000);
++  if (svcts_span(st, &oldest, &newest)) {
++    status->pts_start = ts_rescale_inv(svcts_oldest(st), 1000000);
 +    status->pts_end   = ts_rescale_inv(st->live_time, 1000000);
 +  } else {
 +    status->pts_start = PTS_UNSET;
