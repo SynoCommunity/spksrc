@@ -29,4 +29,5 @@ Found because gcc 8.5 reports fwrite's warn_unused_result and tvheadend builds w
 -Werror, so the 88f6281 jobs failed once the gcc 8.5 overlay replaced the vendor
 4.6.4 that did not warn. Silencing the warning would have left the bug.
 
-Not yet submitted to tvheadend; it should be, against src/imagecache.c on master.
+Reported upstream: tvheadend/tvheadend#2322, which carries this analysis and offers a
+PR. Still a local patch until upstream takes it; drop this one when it does.
