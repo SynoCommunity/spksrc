@@ -4,21 +4,29 @@ timeshift through that same cache, recording a programme still held in it,
 RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
 channel change, a DVR-driven cache warmup, and our fixes on top.
 
-tvheadend/tvheadend#2249, everything it carries beyond #2206 (patch 300):
-commits 4 to 28 of th0ma7/tvheadend branch record-from-buffer, rebased onto
-the package base as f643210c5..b66d3da3e.
+tvheadend/tvheadend#2249, the whole of it: the 28 commits of th0ma7/tvheadend
+branch record-from-buffer, rebased onto the package base as
+ebea1df92..4c896b01b.
+
+Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
+upstream as of this base.  `git rebase` dropped its three commits on its own,
+"patch contents already upstream", so 400 now carries the branch entire and
+there is no longer a 300 to drop it with.
 
 Beyond what 400 held before, this snapshot carries the answers to a user
 report and to two review passes:
 
   - a client is no longer offered the part of the cache that predates its own
-    subscription.  It was reported as the oldest seekable point and then
-    served as negative timestamps, which a player cannot order -- a frozen
-    picture with sound, until playback reached the moment the viewer tuned in.
-    Putting the client's clock at the cache instead fixed that and shifted
-    Kodi's guide by the cache depth, because pvr.hts anchors stream position
-    zero at the first packet it receives; that attempt is reverted here and
-    the range is clamped instead.
+    subscription *by default*.  It was reported as the oldest seekable point
+    and then served as negative timestamps, which a player cannot order -- a
+    frozen picture with sound, until playback reached the moment the viewer
+    tuned in.  Putting the client's clock at the cache instead fixed that and
+    shifted Kodi's guide by the cache depth, because pvr.hts anchors stream
+    position zero at the first packet it receives; that attempt is reverted
+    here and the range is clamped instead.  LiBe-net then reported Kodi
+    ordering negative positions correctly, so the clamp is now a choice:
+    "Cache seek before tune-in" (expert, off) lifts it for clients known to
+    handle them.  Recording from the cache is unaffected either way.
   - a retrospective recording can no longer be started a second time while it
     is already running, which is a candidate for the duplicate recording seen
     on the bench; a cache-owned recording now ends on the gate's stop whatever
@@ -29,6 +37,12 @@ report and to two review passes:
     measure from, and only on one this connection may write.
   - a null title no longer reaches the recorder's start trace, which older GCC
     rejects under -Werror=format-overflow=.
+  - two of LiBe-net's own, cherry-picked from his pr2249-warmup-fixes branch:
+    a scheduled warmup stays reschedulable after a higher-priority
+    subscription takes its tuner, and scheduled warmups sit above EPG, scan
+    and mapper activity while staying below live TV and DVR.  His third commit
+    on that branch, which drops the clamp outright, is deliberately not taken:
+    the setting above is what replaces it.
 
 Regenerated against the tree the earlier patches produce -- LiBe-net's
 headers_complete() rewrite lands on lines patch 100 re-indents, resolved with a
@@ -37,7 +51,7 @@ MAX_SCAN_TIME/MAX_NOPKT_TIME its lookahead needs, and gh_first_video_pts);
 only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 --- docs/class/timeshift.md.orig
 +++ docs/class/timeshift.md
-@@ -10,6 +10,35 @@
+@@ -10,6 +10,38 @@
  
  ---
  
@@ -65,8 +79,11 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +
 +A client can rewind only as far back as the moment it tuned the channel,
 +even when the cache holds more because another viewer tuned it earlier or
-+*Keep tuned channels* held it. A recording is not limited that way: it
-+still starts at the programme's start, as far back as the cache reaches.
++*Keep tuned channels* held it. *Cache seek before tune-in* lifts that
++limit, for clients that order negative positions correctly; one that does
++not shows a frozen picture with sound until playback reaches the moment it
++tuned in. A recording is not limited either way: it still starts at the
++programme's start, as far back as the cache reaches.
 +
 +---
 +
@@ -75,7 +92,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  <tvh_include>inc/buttons</tvh_include>
 --- .gitignore.orig
 +++ .gitignore
-@@ -66,3 +66,4 @@
+@@ -67,3 +67,4 @@
  
  # Claude Code local workspace (lock files, settings, etc.)
  .claude/
@@ -879,7 +896,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      if (running == EPG_RUNNING_NOW && de->de_dvb_eid == e->dvb_eid) {
        if (de->de_running_pause) {
          tvhdebug(LS_DVR, "dvr entry %s event %s on %s - EPG unpause",
-@@ -3092,12 +3273,197 @@
+@@ -3092,12 +3273,203 @@
  /**
   *
   */
@@ -937,7 +954,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  prch->prch_st = sink;
 +
 +  sub = subscription_create_from_channel
-+    (prch, NULL, SUBSCRIPTION_PRIO_KEEP,
++    (prch, NULL, SUBSCRIPTION_PRIO_CACHE_WARMUP,
 +     "timeshift cache warmup",
 +     SUBSCRIPTION_ONESHOT | SUBSCRIPTION_CONTACCESS,
 +     NULL, de->de_owner ?: "", "timeshift-cache-warmup", &error);
@@ -952,6 +969,17 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +             streaming_code2txt(error ?: SM_CODE_BAD_SOURCE));
 +    return -EIO;
 +  }
++
++  /*
++   * ONESHOT gives the warmup a synchronous initial attachment, which is
++   * needed here so an existing service/cache can be adopted immediately.
++   *
++   * Once that initial attachment succeeded, make the subscription
++   * reschedulable. A low-priority warmup may legitimately lose its tuner
++   * to live TV or a recording; keeping the subscription alive lets the
++   * normal subscription scheduler attach it again when capacity returns.
++   */
++  sub->ths_flags &= ~SUBSCRIPTION_ONESHOT;
 +
 +  /*
 +   * A previously-created automatic post-viewer keepalive may already
@@ -976,13 +1004,9 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  }
 +
 +  /*
-+   * Deliberately do not store 'sub' in de_s. An ONESHOT subscription
-+   * may be removed and destroyed by the scheduler when its tuner is
-+   * needed by a higher-priority request. Keeping that pointer in the
-+   * DVR entry would then leave a dangling de_s.
-+   *
-+   * The profile-chain itself remains owned by this cache-only DVR entry
-+   * and uniquely identifies a still-existing subscription.
++   * Deliberately do not store 'sub' in de_s. The profile-chain remains
++   * owned by this cache-only DVR entry and uniquely identifies the
++   * warmup subscription across scheduler detach/reattach cycles.
 +   */
 +  de->de_s = NULL;
 +  de->de_chain = prch;
@@ -999,10 +1023,9 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  th_subscription_t *s, *sub = NULL;
 +
 +  /*
-+   * The ONESHOT subscription may already have been destroyed after a
-+   * higher-priority request took its tuner. Do not retain a raw pointer
-+   * to it in the DVR entry; locate a surviving subscription by the
-+   * profile-chain that this cache-only entry owns.
++   * Locate the warmup subscription by the profile-chain owned by this
++   * cache-only entry. The subscription may currently be detached from a
++   * service while waiting for the scheduler to make an input available.
 +   */
 +  if (prch) {
 +    LIST_FOREACH(s, &subscriptions, ths_global_link) {
@@ -1077,7 +1100,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    if (!clone)
      dvr_rec_unsubscribe(de);
  
-@@ -3171,6 +3537,39 @@
+@@ -3171,6 +3543,39 @@
                          "rstart", de->de_running_start,
                          "rstop", de->de_running_stop,
                          "stop recording timer called");
@@ -1117,7 +1140,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    /* EPG thinks that the program is running */
    if (de->de_segment_stop_extra) {
      const time_t stop = dvr_entry_get_stop_time(de);
-@@ -3188,6 +3587,31 @@
+@@ -3188,6 +3593,31 @@
  
  
  
@@ -1149,7 +1172,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   *
   */
-@@ -3207,6 +3631,34 @@
+@@ -3207,6 +3637,34 @@
    tvhinfo(LS_DVR, "\"%s\" on \"%s\" recorder starting",
  	  lang_str_get(de->de_title, NULL), DVR_CH_NAME(de));
  
@@ -1184,7 +1207,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    /*
     * The running flag is updated only on the event change. When the DVR
     * entry is added too late, the running timers might not be updated.
-@@ -3237,6 +3689,13 @@
+@@ -3237,6 +3695,13 @@
    de->de_segment_stop_extra = 0;
    stop = dvr_entry_get_stop_time(de);
  
@@ -1198,7 +1221,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    dvr_entry_trace_time2(de, "original stop", de->de_stop, "stop", stop, "stop timer set");
  
    gtimer_arm_absn(&de->de_timer, dvr_timer_stop_recording, de, stop);
-@@ -3257,7 +3716,7 @@
+@@ -3257,7 +3722,7 @@
    }
  
    // if duplicate, then delete it now, don't record!
@@ -1207,7 +1230,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      dvr_entry_cancel_delete(de, 1);
      return;
    }
-@@ -3502,6 +3961,15 @@
+@@ -3502,6 +3967,15 @@
    return dvr_entry_class_time_set(de, &de->de_start_extra, *(time_t *)v);
  }
  
@@ -1223,7 +1246,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  static int
  dvr_entry_class_stop_set(void *o, const void *_v)
  {
-@@ -4532,6 +5000,19 @@
+@@ -4532,6 +5006,19 @@
        .desc     = N_("Enable/disable the entry."),
        .off      = offsetof(dvr_entry_t, de_enabled),
      },
@@ -3313,7 +3336,15 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
                                              tvh_input_t *ti,
 --- src/subscriptions.h.orig
 +++ src/subscriptions.h
-@@ -110,6 +110,14 @@
+@@ -52,6 +52,7 @@
+ #define SUBSCRIPTION_PRIO_SCAN_INIT   5 ///< Initial scan
+ #define SUBSCRIPTION_PRIO_SCAN_USER   6 ///< User defined scan
+ #define SUBSCRIPTION_PRIO_MAPPER      7 ///< Channel mapper
++#define SUBSCRIPTION_PRIO_CACHE_WARMUP 8 ///< Scheduled timeshift cache warmup
+ #define SUBSCRIPTION_PRIO_MIN        10 ///< User defined / Normal levels
+ 
+ /* Unsubscribe flags */
+@@ -110,6 +111,14 @@
  
    streaming_target_t *ths_output;
    streaming_target_t *ths_parser;
@@ -5374,7 +5405,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1794 @@
+@@ -0,0 +1,1795 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -5729,10 +5760,11 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 + *
 + * The cache can reach further back than this subscription has existed, when
 + * another viewer tuned the channel first or the keepalive held it.  That part
-+ * of it sits before the client's own zero, and a client's clock has no way to
-+ * express it: never offer it.  Reported as the oldest seekable point it was
-+ * answered with negative timestamps, which a player cannot order -- a frozen
-+ * picture with sound, until playback reached the moment the viewer tuned in.
++ * of it sits before the client's own zero, so offering it means answering with
++ * negative timestamps, which a player that cannot order them renders as a
++ * frozen picture with sound until playback reaches the moment the viewer tuned
++ * in.  Clamped away by default; offered when "Cache seek before tune-in" is
++ * set, for clients that do handle negative positions.
 + *
 + * Recording from the cache is not affected: the DVR replays it on a time base
 + * of its own, which is what lets a recording still start at the programme's
@@ -5748,7 +5780,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  t = st->live_time - (st->live_mono - oldest) + SVCTS_PREROLL;
 +  if (st->max_time && t < st->live_time - st->max_time)
 +    t = st->live_time - st->max_time;
-+  if (t < 0)
++  if (!timeshift_conf.cache_seek_tunein && t < 0)
 +    t = 0;
 +  return MIN(t, st->live_time);
 +}
@@ -7410,7 +7442,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
    idclass_register(&timeshift_conf_class);
  
-@@ -311,6 +315,66 @@
+@@ -311,6 +315,82 @@
        .off    = offsetof(timeshift_conf_t, teletext),
        .opts   = PO_EXPERT,
      },
@@ -7474,12 +7506,28 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +      .off    = offsetof(timeshift_conf_t, cache_staging),
 +      .opts   = PO_EXPERT,
 +    },
++    {
++      .type   = PT_BOOL,
++      .id     = "cache_seek_tunein",
++      .name   = N_("Cache seek before tune-in"),
++      .desc   = N_("Let a client rewind into the part of a shared channel "
++                   "cache that is older than its own subscription, filled "
++                   "because another viewer tuned the channel first or "
++                   "\"Keep tuned channels\" held it. That part is answered "
++                   "with negative positions: enable it only for clients that "
++                   "order them correctly, since a client that does not shows "
++                   "a frozen picture with sound until playback reaches the "
++                   "moment it tuned in. Recording from the cache is not "
++                   "affected either way."),
++      .off    = offsetof(timeshift_conf_t, cache_seek_tunein),
++      .opts   = PO_EXPERT,
++    },
      {}
    }
  };
 --- src/timeshift.h.orig
 +++ src/timeshift.h
-@@ -38,6 +38,11 @@
+@@ -38,6 +38,12 @@
    int       ram_only;
    int       ram_fit;
    int       teletext;
@@ -7488,6 +7536,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  uint32_t  cache_keepalive_min_period;
 +  uint32_t  cache_keepalive_max;
 +  uint32_t  cache_staging;    ///< Write-behind RAM for disk cache blocks, MB
++  int       cache_seek_tunein; ///< Offer cache from before the client tuned in
  } timeshift_conf_t;
  
  extern struct timeshift_conf timeshift_conf;

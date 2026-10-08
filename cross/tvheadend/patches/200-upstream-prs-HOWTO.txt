@@ -3,30 +3,33 @@ patches we add on top of it follow within that hundred.
 
   000-004  the package's own patches
   100      tvheadend#2117, transcoding rework (see 100-...-HOWTO.txt)
-  103        the one fix of ours still on top of it: a watchdog for a stuck
-             encoder.  101, 102 and 104 are gone, uknunknown having taken the
+  101        ours on top of it: make #2117's new codec-profile default reach an
+             upgraded install (offered to uknunknown; drop it once upstream)
+  103        ours on top of it: a watchdog for a stuck encoder.  103 keeps its
+             number so the upstream discussion still refers to the same patch.
+             The *earlier* 101, 102 and 104 are gone -- uknunknown took the
              even QSV scaler width, 360 as the default profile height and the
-             output geometry into his branch.  103 keeps its number so the
-             upstream discussion still refers to the same patch.
+             output geometry into his branch -- and 101 is now reused for the
+             patch above, which is unrelated to the one that held the number.
   200      tvheadend#2160, imagecache fetch rework
-  300      tvheadend#2206, stable stream/PID mapping
-  400      tvheadend#2249, everything it carries beyond #2206: LiBe-net's
-           shared per-channel cache and our fixes on top
+  400      tvheadend#2249, the whole of it: LiBe-net's shared per-channel
+           cache and our fixes on top
+  300      gone.  tvheadend#2206, the stable stream/PID mapping 400 used to
+           sit on, is upstream as of base ebea1df92 (Oct 8th 2026)
 
 This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
 
 One patch per PR: 400 is the whole of #2249 rather than one patch per commit,
-because that PR now carries the series as a unit -- its own commits, LiBe-net's
-shared cache reworked from them, and the fixes on top.  Dropping 400 means
-dropping 300 with it.
+because that PR carries the series as a unit -- its own commits, LiBe-net's
+shared cache reworked from them, and the fixes on top.
 
-300 and 400 are the same branch in two pieces: 300 is #2206 and 400 is
-everything th0ma7/tvheadend record-from-buffer adds on top of it (commits 4 to
-28, rebased onto the package base as f643210c5..b66d3da3e).  The SMT_SKIP_LIVE
-double free that used to be commit 4 is gone, taken upstream as 1d267d17e.
-One commit of LiBe-net's original branch
-(dvr_event_updated() use after free) is already upstream as c28ad9e3e and must
-stay dropped -- `git rebase` drops it on its own.
+400 is now the entire branch: `ebea1df92..4c896b01b`, the 28 commits of
+th0ma7/tvheadend record-from-buffer.  It used to be only what the branch added
+on top of #2206, with 300 carrying #2206 itself; rebasing onto this base
+dropped #2206's three commits on its own ("patch contents already upstream"),
+so 300 is gone and there is no longer a 300 to drop 400 with.  Two other
+commits went upstream the same way earlier: the SMT_SKIP_LIVE double free as
+1d267d17e, and LiBe-net's dvr_event_updated() use after free as c28ad9e3e.
 
 The three commits this package used to carry for #2249 are inside 400 in
 reworked form; #2249 itself now carries the whole series.
@@ -155,8 +158,10 @@ git archive $HASH | tar -x -C /tmp/pa
 (cd /tmp/pa && for p in $(ls $P/*.patch | sort); do
    [ "$p" = "$F" ] && break; patch -p0 -s < $p; done)
 cp -a /tmp/pa /tmp/pb
-# the branch's own diff, its globalheaders.c hunk rejected:
-git diff --no-prefix <last 2206 commit> <branch head> | tvh_patch \
+# the branch's own diff, its globalheaders.c hunk rejected.  The left side used
+# to be the last #2206 commit, the boundary with patch 300; now that #2206 is
+# upstream it is simply $HASH:
+git diff --no-prefix $HASH <branch head> | tvh_patch \
   | (cd /tmp/pb && patch -p0)
 # resolve that one file with a three-way merge, his side winning:
 git show $HASH:src/plumbing/globalheaders.c > /tmp/gh.base

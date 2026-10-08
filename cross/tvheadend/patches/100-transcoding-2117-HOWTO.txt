@@ -10,13 +10,31 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master bc5e863a4 (Sep 29th 2026).  100 is the diff
+Package base: master ebea1df92 (Oct 8th 2026).  100 is the diff
 bc5e863a4..30cdfc141 -- uknunknown's dev_transcoding_2026 head, which he
-rebased onto that same base himself on Oct 5th 2026, so no rebase is needed
-here any more (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb
-on 547f8bfae, 601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  Regenerate
+rebased onto bc5e863a4 himself on Oct 5th 2026, so no rebase is needed here
+any more (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
+547f8bfae, 601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  Regenerate
 whenever his head moves, and note that he force-pushes -- a plain
 `git fetch` is then rejected as non-fast-forward, so fetch with +refs or -f.
+
+Note that the diff's left side is bc5e863a4, an older base than the tarball,
+and that this is fine as long as the commits in between leave this patch's
+files alone.  Over bc5e863a4..ebea1df92 -- 57 commits, #2206 among them --
+only src/timeshift.c is touched by both, and 100's hunks there still applied
+with no fuzz and no offset.  Before rebasing anything for a base bump, check
+that first:
+
+  cd <tvheadend clone>
+  git diff --name-only <old base> <new base> | sort -u > /tmp/upstream.txt
+  for f in <spksrc>/cross/tvheadend/patches/*.patch; do
+    comm -12 <(grep -oE '^\+\+\+ [^ \t]+' $f | sed 's/^+++ //' | sort -u) \
+             /tmp/upstream.txt
+  done
+
+An empty result means the patches need no regeneration at all, and the whole
+rebase-three-upstream-branches dance below can be skipped.  Only the files
+that actually changed can move a hunk.
 
 He took three of our fixes into f4a501933, comments included: the even QSV
 scaler width, 360 as the default profile height, and the output geometry
