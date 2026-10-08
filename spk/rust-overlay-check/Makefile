@@ -2,12 +2,6 @@ SPK_NAME = rust-overlay-check
 SPK_VERS = 1.0
 SPK_REV = 1
 
-# The whole point of this package: compile real crates through the rustc overlay. 1.98
-# exists only in the gcc-8.5 variant, so without this the check silently falls back to 1.82.
-# Safe to force here and nowhere else -- this package has no consumers, so the switch
-# reaches nothing but its own dependency tree.
-OVERLAY_GCC ?= 1
-
 # One crate that mixes C and Rust and one that is pure Rust, neither of which excludes an
 # arch: pngquant3 links libimagequant and zlib, ripgrep-14 leans on std and pcre2.
 DEPENDS = cross/pngquant3 cross/ripgrep-14
