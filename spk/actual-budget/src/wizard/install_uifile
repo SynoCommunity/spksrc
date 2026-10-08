@@ -1,0 +1,10 @@
+[
+    {
+        "step_title": "Actual Budget",
+        "items": [
+            {
+                "desc": "Actual Budget needs <b>HTTPS</b> - browsers refuse to run it over plain HTTP. See the <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/actual-budget/\">package documentation</a> for the 2-minute Login Portal setup.<br><br>Budget data is stored in <b>/var/packages/actual-budget/var/</b> and persists across upgrades - include it in your backups."
+            }
+        ]
+    }
+]
