@@ -1,0 +1,55 @@
+imagecache: do not replace a cached image when the write failed.
+
+tvheadend/tvheadend#2323, our PR, one commit.  Drop this patch once it is
+merged.  Reported as tvheadend/tvheadend#2322.
+
+imagecache_new_contents() ignores the result of fwrite and of fclose and
+carries on regardless.  On ENOSPC or EIO it unlinks the image that was still
+valid, stores the sha1 of the content it meant to write, renames the partial
+file into its place, and persists that metadata.
+
+The check at the top of the same function then makes the damage permanent:
+
+    if (!empty && memcmp(sha1, img->sha1, 20) == 0)
+      return 0; /* identical */
+
+The stored sha1 matches the content that was supposed to be there, so the next
+fetch of that image returns early as "identical" and never rewrites it.  The
+entry stays corrupt while advertising itself as current, and nothing repairs it
+short of deleting the file or clearing the cache.  A channel or EPG icon that
+stays broken long after the disk-full condition is gone is the visible symptom.
+
+Found while building for the older Synology targets in SynoCommunity#7391,
+which replaces the ageing GCC there with an 8.5 overlay: those sysroots' glibc
+declares fwrite with __wur and tvheadend builds with -Werror, so the ignored
+return became fatal.  Current glibc marks fread with __wur but not fwrite, so
+on an ordinary modern build nothing is reported at all -- checked with GCC 12.2
+against glibc 2.36, clean even under -O2 -D_FORTIFY_SOURCE=2
+-Werror=unused-result.  The defect does not depend on any of that.
+
+The number 500 was the http digest patch (#2273), merged as 5a32b04b9 and
+dropped; it is reused here for an unrelated PR of its own, as each upstream PR
+owns a hundred.  200 is the other imagecache PR (#2160) and does not touch this
+function, so the two are independent and order does not matter.
+--- src/imagecache.c.orig
++++ src/imagecache.c
+@@ -268,8 +268,17 @@ imagecache_new_contents ( imagecache_image_t *img,
+   if (!(fp = tvh_fopen(tpath, "wb")))
+     return 1;
+ 
+-  fwrite(data, dsize, 1, fp);
+-  fclose(fp);
++  if (dsize && fwrite(data, dsize, 1, fp) != 1) {
++    tvherror(LS_IMAGECACHE, "unable to write file '%s'", tpath);
++    fclose(fp);
++    unlink(tpath);
++    return 1;
++  }
++  if (fclose(fp)) {
++    tvherror(LS_IMAGECACHE, "unable to close file '%s'", tpath);
++    unlink(tpath);
++    return 1;
++  }
+   unlink(path);
+   tvh_mutex_lock(&imagecache_lock);
+   memcpy(img->sha1, sha1, 20);
