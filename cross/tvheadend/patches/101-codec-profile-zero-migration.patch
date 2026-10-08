@@ -49,9 +49,13 @@ The consequences are not symmetrical:
          and the audio stream never opens.  This is precisely the failure the
          "profile > 0" test was masking, restored for every upgraded install.
 
-  nvenc  nvenc.c:574 lists NV_ENC_H264_PROFILE_BASELINE, also 0, so an existing
-         nvenc profile now has Baseline imposed where the encoder used to
-         choose.  That is the mirror image of the bug the remark reported.
+  nvenc  nvenc.c:62 defines NV_ENC_H264_PROFILE_BASELINE as 0 and
+         nvenc_h264_profiles[] lists it, as v4l2-m2m.c:23 does for
+         V4L2_H264_PROFILE_BASELINE, so for those two encoders 0 passes
+         _is_profile_available() legitimately: an existing profile now has
+         Baseline imposed where the encoder used to choose.  That is the mirror
+         image of the bug the remark reported, and no gating of another codec's
+         list can reach it.
 
   rest   for codecs whose list holds no 0 (libx264 and friends) nothing is
          emitted; _is_profile_available() merely logs a warning per open.
@@ -92,12 +96,19 @@ Three separable changes.  The first is the one that makes bullet 1 effective.
     Drop the commented-out test and correct the stale comment above.
 
   src/transcoding/codec/codecs/aac.c
-    Drop Main and LTP from aac_profiles.  Measured against the ffmpeg 8.1.2
-    this package ships: of the four profiles offered, only LC and MPEG2_LC
-    open, while Main (0) and LTP (3) both answer "Profile not supported!".
-    LTP was already broken beforehand; Main becomes broken by this change,
-    having been silently ignored until now.  Offering a profile the encoder
-    cannot open has no upside.
+    Gate Main and LTP on LIBAVCODEC_VERSION_MAJOR < 62.  uknunknown's own fix,
+    taken as he wrote it: ffmpeg 8 removed both coders, so naming that as the
+    cause is better than dropping them outright, and it keeps them on ffmpeg 7
+    where they still encode.  The package's ffmpeg 8.1.3 reports major 62, so
+    the gate excludes exactly the two that went away; measured against it, of
+    the four profiles offered only LC and MPEG2_LC open, while Main (0) and LTP
+    (3) both answer "Profile not supported!".  LTP was already broken
+    beforehand; Main becomes broken by the new default, having been silently
+    ignored until then.
+
+    With the list gated, _is_profile_available() settles the aac case on its
+    own, 0 no longer being in it -- which is why the migration below is not
+    about aac.  It is about the encoders where 0 is a real profile.
 
 WHAT STILL WANTS HARDWARE
 
@@ -181,20 +192,22 @@ encoders and is accepted -- the half of bullet 1 no config change can show.
          AV_DICT_SET_INT(LST_CODEC, opts, "profile", self->profile, 0);
 --- src/transcoding/codec/codecs/aac.c.orig
 +++ src/transcoding/codec/codecs/aac.c
-@@ -22,11 +22,13 @@
- 
+@@ -23,10 +23,18 @@
  
  /* aac ====================================================================== */
--// see aacenc_profiles[] ffmpeg-7.0/libavcodec/aacenctab.h + AV_PROFILE_UNKNOWN
-+// aacenc_profiles[] in ffmpeg's aacenctab.h lists Main and LTP, but the native
-+// aac encoder implements neither: its own profile check answers "Profile not
-+// supported!" (EINVAL) and the stream never starts. Measured against ffmpeg
-+// 8.1.2 -- only LC and MPEG2_LC open. Offering the other two can only break a
-+// stream, the more so now that an explicitly chosen profile is obeyed.
+ // see aacenc_profiles[] ffmpeg-7.0/libavcodec/aacenctab.h + AV_PROFILE_UNKNOWN
++// ffmpeg 8 has removed two profiles (The Main and LTP coders were complex, largely
++//      superseded by modern AAC-LC/HE-AAC profiles, and offered minimal real-world advantage.)
++// patch 1/2 https://lists.ffmpeg.org/lore/ffmpeg-devel/20250208041258.217102-1-dev@lynne.ee/T/#t
++// patch 2/2 https://lists.ffmpeg.org/lore/ffmpeg-devel/20250208041258.217102-2-dev@lynne.ee/T/#u
  static const AVProfile aac_profiles[] = {
--    { FF_AV_PROFILE_AAC_MAIN,      "Main" },
++#if LIBAVCODEC_VERSION_MAJOR < 62
+     { FF_AV_PROFILE_AAC_MAIN,      "Main" },
++#endif
      { FF_AV_PROFILE_AAC_LOW,       "LC" },
--    { FF_AV_PROFILE_AAC_LTP,       "LTP" },
++#if LIBAVCODEC_VERSION_MAJOR < 62
+     { FF_AV_PROFILE_AAC_LTP,       "LTP" },
++#endif
      { FF_AV_PROFILE_MPEG2_AAC_LOW, "MPEG2_LC" },
      { FF_AV_PROFILE_UNKNOWN },
  };

@@ -10,7 +10,7 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master ebea1df92 (Oct 8th 2026).  100 is the diff
+Package base: master f082b430a (Oct 8th 2026).  100 is the diff
 bc5e863a4..30cdfc141 -- uknunknown's dev_transcoding_2026 head, which he
 rebased onto bc5e863a4 himself on Oct 5th 2026, so no rebase is needed here
 any more (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
@@ -20,10 +20,12 @@ whenever his head moves, and note that he force-pushes -- a plain
 
 Note that the diff's left side is bc5e863a4, an older base than the tarball,
 and that this is fine as long as the commits in between leave this patch's
-files alone.  Over bc5e863a4..ebea1df92 -- 57 commits, #2206 among them --
-only src/timeshift.c is touched by both, and 100's hunks there still applied
-with no fuzz and no offset.  Before rebasing anything for a base bump, check
-that first:
+files alone -- or touch them somewhere else.  Over bc5e863a4..f082b430a, 64
+commits with #2206 among them, upstream and this patch both touch
+src/timeshift.c, src/dvr/dvr_rec.c and src/htsp_server.c, and 100's hunks in
+all three still applied with no fuzz and no offset.  The intersection is a
+cheap warning, not a verdict: when it is empty nothing can move, and when it
+is not, the chain test below settles it.  Check the intersection first:
 
   cd <tvheadend clone>
   git diff --name-only <old base> <new base> | sort -u > /tmp/upstream.txt
