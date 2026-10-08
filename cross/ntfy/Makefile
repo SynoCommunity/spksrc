@@ -1,7 +1,7 @@
 PKG_NAME = ntfy
-PKG_VERS = 2.26.3
+PKG_VERS = 2.29.0
 # keep the commit in sync with version $(PKG_VERS)
-PKG_COMMIT = 311138ef7b3314a140d8385e6f4549e1454fa97c
+PKG_COMMIT = f18d1137c63a26e85b91ce639e7bc72bb9a82736
 PKG_DATE = $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -15,8 +15,7 @@ DEPENDS =
 
 # go does not support ppc archs
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# ARMv5 is lacking atomics support (error: '__ATOMIC_CONSUME' undeclared, error: '__ATOMIC_RELEASE' undeclared)
-# and ARMv5 is not supported with go >= 1.24 anyway
+# ARMv5 is lacking support for atomics and is not supported with go >= 1.24 anyway
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://ntfy.sh/

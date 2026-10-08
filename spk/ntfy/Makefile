@@ -1,5 +1,5 @@
 SPK_NAME = ntfy
-SPK_VERS = 2.26.3
+SPK_VERS = 2.29.0
 SPK_REV = 1
 SPK_ICON = src/ntfy.png
 
@@ -20,6 +20,8 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8094
 # There is no web app on service port:
 NO_SERVICE_SHORTCUT = true
+
+WIZARDS_DIR = src/wizard/
 
 SPK_COMMANDS = bin/ntfy
 

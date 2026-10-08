@@ -12,6 +12,7 @@
 # - Matrix Push Gateway (to validate that the pushkey is correct)
 #
 # base-url:
+base-url: @@_base_url_@@
 
 # Listen address for the HTTP & HTTPS web server. If "listen-https" is set, you must also
 # set "key-file" and "cert-file". Format: [<ip>]:<port>, e.g. "1.2.3.4:8080".
@@ -62,6 +63,37 @@ listen-http: ":8094"
 #
 # database-url: <connection-string>
 
+# EXPERIMENTAL: Clustering options. These names are reserved and validated, but no node-to-node
+# implementation ships yet: a server started with "experimental-cluster-listen" set refuses to
+# start, rather than running single-node and looking like a cluster. The "experimental-" prefix
+# means these option names may still change.
+#
+# - experimental-cluster-listen is the ip:port of the dedicated fan-out listener that peer nodes
+#   talk to. Bind it to a private network interface (e.g. "10.0.0.5:2587"); the public listeners
+#   never serve the fan-out endpoint. Setting it is what enables clustering.
+# - experimental-cluster-node-id is a stable per-node identifier (e.g. the hostname); required.
+# - experimental-cluster-advertise-url is the base URL peer nodes use to reach this node's
+#   fan-out listener; it defaults to "http://<experimental-cluster-listen>". It must be set
+#   explicitly if the listen address binds a wildcard address (e.g. ":2587").
+# - experimental-cluster-secret authenticates node-to-node fan-out requests; it must be
+#   identical on all nodes.
+# - experimental-cluster-batch-linger is how long fan-out messages may wait to form a batch per
+#   peer node, trading up to that much cross-node delivery latency for a bounded request rate
+#   between nodes. Set to 0 to send each message immediately.
+#
+# Clustering also requires "database-url": the shared PostgreSQL database carries the durable
+# state and the cluster's own coordination tables.
+#
+# SECURITY: The fan-out endpoint injects messages into arbitrary topics. The shared secret
+# protects it, and it is only served on the dedicated cluster listener -- but you should still
+# make sure that listener is reachable only from the private network (firewall/VPC rules).
+#
+# experimental-cluster-listen: <ip:port>
+# experimental-cluster-node-id: <hostname>
+# experimental-cluster-advertise-url: "http://<ip:port>"
+# experimental-cluster-secret: <secret>
+# experimental-cluster-batch-linger: 500ms
+
 # If "cache-file" is set, messages are cached in a local SQLite database instead of only in-memory.
 # This allows for service restarts without losing messages in support of the since= parameter.
 # Not required if "database-url" is set (messages are stored in PostgreSQL instead).
@@ -98,6 +130,7 @@ listen-http: ":8094"
 # cache-startup-queries:
 # cache-batch-size: 0
 # cache-batch-timeout: "0ms"
+cache-file: /var/packages/ntfy/var/cache/cache.db
 
 # If set, access to the ntfy server and API can be controlled on a granular level using
 # the 'ntfy user' and 'ntfy access' commands. See the --help pages for details, or check the docs.
@@ -168,6 +201,7 @@ auth-file: /var/packages/ntfy/var/users.db
 # attachment-total-size-limit: "5G"
 # attachment-file-size-limit: "15M"
 # attachment-expiry-duration: "3h"
+attachment-cache-dir: /var/packages/ntfy/var/cache/attachments
 
 # Template directory for message templates.
 #
@@ -423,7 +457,10 @@ enable-reservations: true
 
 # Rate limiting: Attachment size and bandwidth limits per visitor:
 # - visitor-attachment-total-size-limit is the total storage limit used for attachments per visitor
-# - visitor-attachment-daily-bandwidth-limit is the total daily attachment download/upload traffic limit per visitor
+# - visitor-attachment-daily-bandwidth-limit is the total daily traffic limit per visitor. It covers
+#   attachment downloads/uploads AND messages replayed from the message cache by poll requests. A
+#   poll without a "since" cursor returns the topic's entire cache, so a busy topic can be re-read
+#   for many times its own size; charging it here caps what one visitor can pull per day.
 #
 # visitor-attachment-total-size-limit: "100M"
 # visitor-attachment-daily-bandwidth-limit: "500M"
@@ -462,8 +499,9 @@ enable-reservations: true
 # doing, and/or secure access to the endpoint in your reverse proxy.
 #
 # - enable-metrics enables the /metrics endpoint for the default ntfy server (i.e. HTTP, HTTPS and/or Unix socket)
-# - metrics-listen-http exposes the metrics endpoint via a dedicated [IP]:port. If set, this option implicitly
-#   enables metrics as well, e.g. "10.0.1.1:9090" or ":9090"
+# - metrics-listen-http moves the metrics endpoint to a dedicated [IP]:port, e.g. "10.0.1.1:9090" or ":9090".
+#   It implicitly enables metrics. If set, the metrics are served only on that dedicated port, and the default
+#   ntfy server does not serve /metrics, even if enable-metrics is also set.
 #
 # enable-metrics: false
 # metrics-listen-http:
