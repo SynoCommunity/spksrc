@@ -1,5 +1,5 @@
 SPK_NAME = sickchill
-SPK_VERS = 20260918
+SPK_VERS = 20261008
 SPK_REV = 14
 SPK_ICON = src/sickchill.png
 
@@ -14,7 +14,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. Update to 2026.9.18."
+CHANGELOG = "1. Update to 2026.10.8."
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
@@ -54,7 +54,7 @@ DEPENDS += cross/libyaml
 
 # [greenlet]
 # 3.5.x needs C++20 (gcc >= 8); older toolchains build 3.0.x instead.
-# Upstream requires >= 3.5.5, relaxed by python/sickchill patch.
+# Upstream requires >= 3.0.3 (satisfied by both).
 ifeq ($(call version_ge, $(TC_GCC), 8.0),1)
 WHEELS += greenlet==3.5.6
 else
