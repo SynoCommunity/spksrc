@@ -1,0 +1,26 @@
+--- src/imagecache.c.orig
++++ src/imagecache.c
+@@ -328,8 +328,21 @@
+   if (!(fp = tvh_fopen(tpath, "wb")))
+     return 1;
+ 
+-  fwrite(data, dsize, 1, fp);
+-  fclose(fp);
++  /* A failed write must not reach the steps below: they unlink the cached image,
++   * record the sha1 of the contents we meant to write and rename the partial file
++   * into its place. The entry then looks current to the memcmp above, so the next
++   * fetch of the same image returns early and the damage never heals. */
++  if (dsize && fwrite(data, dsize, 1, fp) != 1) {
++    tvherror(LS_IMAGECACHE, "unable to write file '%s'", tpath);
++    fclose(fp);
++    unlink(tpath);
++    return 1;
++  }
++  if (fclose(fp)) {
++    tvherror(LS_IMAGECACHE, "unable to close file '%s'", tpath);
++    unlink(tpath);
++    return 1;
++  }
+   unlink(path);
+   tvh_mutex_lock(&imagecache_lock);
+   memcpy(img->sha1, sha1, 20);
