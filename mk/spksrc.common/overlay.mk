@@ -63,6 +63,22 @@ _OVERLAY_RUSTC_ENABLED := $(foreach d,$(_OVERLAY_RUSTC_ANY),\
 _RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
 _RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
 
+# REQUESTED, defaulted here rather than further down: _RUSTC_POOL and TC_OVERLAY_RUSTC
+# below are immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave those
+# two seeing an unset switch while everything later sees the default. That was invisible
+# while the default was 0 -- unset and 0 filter alike -- and mismatches the moment it is 1:
+# the gcc overlay asked for, the vendor-gcc rust consumer picked, and stage0 then refuses
+# the work dir.
+OVERLAY_RUSTC          ?= 1
+OVERLAY_BINUTILS       ?= 0
+# On by default, tree-wide. A package that selects a meta on TC_GCC and has it built by
+# spk-meta-source must agree with it: the selection reads the effective compiler while
+# FWRD_ARGS_SPK deliberately does not carry the switch, so the meta decides for itself --
+# and only a shared default makes it decide the same way. Inert wherever no overlay exists
+# (TC_OVERLAY_GCC empty) and where the vendor gcc is already newer. OVERLAY_BINUTILS
+# follows through OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
+OVERLAY_GCC            ?= 1
+
 # The pool the default is picked from: the gcc-overlay builds when that overlay is on and
 # this arch has any, the vendor-gcc ones otherwise. Same preference as the selection below,
 # applied one step earlier so "newest" means newest OF THE VARIANT that will be used --
@@ -119,9 +135,7 @@ TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OV
 # Cost: `OVERLAY_BINUTILS=0 make ...` as a shell variable warns nothing. Say it on the
 # command line, where make can tell it apart from what it exported itself.
 _OVERLAY_BINUTILS_ASKED := $(if $(_OVERLAY_FORWARDED),,$(if $(findstring command,$(origin OVERLAY_BINUTILS)),1))
-OVERLAY_RUSTC          ?= 1
-OVERLAY_BINUTILS       ?= 0
-OVERLAY_GCC            ?= 0
+# The three switches are defaulted above, before the pools that read them.
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
 # Carried to every sub-make that resolves a toolchain WITHIN this package (FWRD_ARGS).
