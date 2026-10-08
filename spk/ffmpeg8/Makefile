@@ -9,11 +9,6 @@ CHANGELOG += "2. Update to jellyfin 8.1.3-1 patchset"
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
-# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's own `?=` stands down;
-# `?=` here in turn stands down for a command line or an environment saying otherwise.
-OVERLAY_GCC ?= 1
-
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
 DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://docs.synocommunity.com/packages/ffmpeg/
