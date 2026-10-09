@@ -103,7 +103,7 @@ install_ml_packages()
         "pillow>=12.2,<13" \
         "tokenizers>=0.15.0,<1.0" \
         "fastapi>=0.95.2,<1.0" \
-        uvicorn \
+        "uvicorn>=0.22.0,<1.0" \
         "gunicorn>=21.1.0" \
         "pydantic>=2.0.0,<3" \
         "pydantic-settings>=2.5.2,<3" \
