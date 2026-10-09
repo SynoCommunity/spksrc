@@ -8,6 +8,9 @@ PKG_DIR = seerr-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs_22
 
+# Node.js optional dependencies are only installed for x64 and arm64
+REQUIRE_64BIT = 1
+
 HOMEPAGE = https://github.com/seerr-team/seerr
 COMMENT  = Media request management with Jellyfin, Plex, and Emby integration.
 LICENSE  = MIT
