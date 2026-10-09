@@ -12,7 +12,7 @@ The application contains only Python, JavaScript and static assets. It does not 
 
 ## Installation and first download
 
-1. Install Python 3.12 and Archive Station in Package Center.
+1. Install and start Python 3.12, then install Archive Station in Package Center.
 2. Open **Archive Station** from the DSM main menu. It opens inside the DSM desktop.
 3. Open **Settings** to choose your destination and simultaneous download limit.
 4. Select **Add URLs** and enter one or more `https://archive.org/details/IDENTIFIER` or `https://archive.org/download/IDENTIFIER` URLs, one per line.
@@ -44,7 +44,7 @@ The standalone package is named `ArchiveStation` and uses the `ArchiveStation` a
 
 Do not uninstall a working standalone installation merely to test this recipe. A migration requires a stopped-service backup of `/var/packages/ArchiveStation/var/`, installation of the new package, restoration into its own data directory with the new account's ownership, and granting `sc-archivestation` access to every existing destination. Keep both services stopped throughout the state transfer. Downloaded content should remain at its existing paths.
 
-There is no automatic migration in this initial recipe. Keep the standalone edition until a migration has been validated for your installation. Never point two independent queues at the same destination files.
+There is no automatic migration in this initial recipe. A manual migration was tested on a DS918+ running DSM 7.1.1: the queue, settings and incident history were retained, inherited destination permissions worked for the new account, and a new download completed with the expected checksum. Keep a stopped-service backup and verify permissions on your own destinations before resuming transfers. Never point two independent queues at the same destination files.
 
 ## Build and validation
 
@@ -55,6 +55,15 @@ make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```
 
-Before publication, test a fresh installation and reinstall the same SPK as an upgrade on a test NAS. Check DSM session authentication, folder permissions, a verified download, pause/resume and recovery across service restart and upgrade. Retain the original data and downloads during these checks.
+Hardware validation on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
+
+- Fresh installation through the DSM package manager, running as `sc-archivestation`.
+- DSM-served assets and rejection of unauthenticated gateway requests.
+- Folder creation, inherited permissions, a checksum-verified download and a readable text report.
+- Pause/resume, service restart and reinstalling the same SPK during a transfer: partial bytes and settings survived, and downloading resumed automatically.
+- Manual migration from the standalone package and restoration of the original installation.
+- Rejection of concurrent installation with the standalone package.
+
+The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. Browser tests use a simulated DSM session; an authenticated interactive browser session was not rechecked during this hardware run. Other NAS architectures still need hardware testing.
 
 See the [upstream usage guide](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/USAGE.md) for the full feature reference.
