@@ -45,7 +45,7 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile --ignore-scripts
 	# Ensure target-arch sharp prebuilt is available (frozen lockfile skips non-host platforms)
-	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.35.3 --filter immich --ignore-scripts 2>/dev/null || true
+	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.35.5 --filter immich --ignore-scripts 2>/dev/null || true
 
 	# ------------------------------------------------------------
 	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
