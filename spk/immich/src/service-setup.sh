@@ -111,8 +111,11 @@ install_ml_packages()
         "rich>=13.4.2" \
         "rapidocr>=3.1.0" 2>&1
     # immich-model is not on PyPI; the wheel is prebuilt at package time
-    # (see spk Makefile) so no git binary is needed here.
-    "${ML_VENV}/bin/pip3" install --no-cache-dir \
+    # (see spk Makefile) so no git binary is needed here. Its <3.14 cap
+    # guards the rknn/export extras, which are not installed; the consumed
+    # core (constants, onnx utils, runtime) is pure Python, so bypass the
+    # version check for this package only.
+    "${ML_VENV}/bin/pip3" install --no-cache-dir --ignore-requires-python \
         "${SYNOPKG_PKGDEST}/share/immich/wheelhouse/immich_model-0.2.0-py3-none-any.whl" 2>&1
     # Keep the headless variant pinned as above; the GUI variant has
     # no place on DSM.
