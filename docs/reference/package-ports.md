@@ -93,6 +93,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Development"><td>8260</td><td>Maraschino</td><td>Development</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>8271</td><td>GateOne</td><td>Development</td><td>Terminal emulator</td></tr>
     <tr data-category="Network"><td>8281</td><td>HAProxy</td><td>Network</td><td>Web interface</td></tr>
+    <tr data-category="Downloads"><td>8274</td><td>Archive Station</td><td>Downloads</td><td>Internal HTTP backend (loopback only; access through DSM)</td></tr>
     <tr data-category="Development"><td>8282</td><td>Salt Master</td><td>Development</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>8283</td><td>SaltPad</td><td>Development</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8290</td><td>FlexGet</td><td>Media Management</td><td>Web interface</td></tr>
