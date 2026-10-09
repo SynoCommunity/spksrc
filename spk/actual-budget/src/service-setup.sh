@@ -3,7 +3,7 @@
 # Environment variables provided by the framework:
 #   SYNOPKG_PKGDEST  - Install directory (/var/packages/actual-budget/target)
 #   SYNOPKG_PKGVAR   - Data directory (/var/packages/actual-budget/var)
-#   SERVICE_PORT     - Configured service port (default 5007)
+#   SERVICE_PORT     - Configured service port
 #
 # Note: SYNOPKG_PKGVAR is automatically preserved during upgrades by DSM7.
 
@@ -23,7 +23,7 @@ SVC_KEEP_LOG=y
 
 # Environment variables for Actual Budget
 # See: https://github.com/actualbudget/actual/tree/master/packages/sync-server
-export PORT="${SERVICE_PORT:-5007}"
+export PORT="${SERVICE_PORT}"
 export ACTUAL_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 export NODE_ENV=production
 

@@ -18,7 +18,7 @@ Actual Budget is a local-first personal finance app for budgeting and expense tr
 | Package Name | actual-budget |
 | Upstream | [github.com/actualbudget/actual](https://github.com/actualbudget/actual) |
 | License | MIT |
-| Default Port | 5007 (upstream default 5006 is reserved by WebStation HTTPS) |
+| Default Port | 8007 (upstream default 5006 is reserved by WebStation HTTPS) |
 
 ## Installation
 
@@ -29,7 +29,7 @@ Actual Budget is a local-first personal finance app for budgeting and expense tr
 ## HTTPS Setup
 
 !!! warning
-    Actual Budget encrypts your data end-to-end in the browser using SharedArrayBuffer, which browsers only enable in secure contexts (HTTPS, or localhost for local testing). Over plain `http://<nas-ip>:5007` the app shows a Fatal Error page — this is expected, not a broken install. Set up a reverse proxy with a certificate before using the app. No extra proxy headers are needed: the server already sends the required `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers.
+    Actual Budget encrypts your data end-to-end in the browser using SharedArrayBuffer, which browsers only enable in secure contexts (HTTPS, or localhost for local testing). Over plain `http://<nas-ip>:8007` the app shows a Fatal Error page — this is expected, not a broken install. Set up a reverse proxy with a certificate before using the app. No extra proxy headers are needed: the server already sends the required `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers.
 
 ### Step 1: Create a Certificate (if needed)
 
@@ -53,7 +53,7 @@ Click **Create** and configure as follows:
 | **Source Port** | 443 (or custom) |
 | **Destination Protocol** | HTTP |
 | **Destination Hostname** | localhost |
-| **Destination Port** | 5007 |
+| **Destination Port** | 8007 |
 
 ### Step 3: Assign Certificate
 
@@ -71,7 +71,7 @@ Click **Create** and configure as follows:
 
 The service is configured via environment variables (see `src/service-setup.sh` in the [spksrc repository](https://github.com/SynoCommunity/spksrc)):
 
-- `PORT` — listen port (defaults to the configured service port, 5007)
+- `PORT` — listen port (defaults to the configured service port, 8007)
 - `ACTUAL_DATA_DIR` — data directory (`/var/packages/actual-budget/var/data`)
 - `NODE_ENV=production`
 
@@ -79,7 +79,7 @@ The service is configured via environment variables (see `src/service-setup.sh` 
 
 | Port | Protocol | Description |
 |------|----------|-------------|
-| 5007 | TCP | Web interface and sync API |
+| 8007 | TCP | Web interface and sync API |
 
 ## Backup
 

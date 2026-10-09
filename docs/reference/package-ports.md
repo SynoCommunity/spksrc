@@ -50,7 +50,6 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Media Server"><td>3003</td><td>Immich</td><td>Media Server</td><td>Machine Learning</td></tr>
     <tr data-category="Storage"><td>3923</td><td>Copyparty</td><td>Storage</td><td>Web interface</td></tr>
     <tr data-category="Media Server"><td>4533</td><td>Navidrome</td><td>Media Server</td><td>Web interface</td></tr>
-    <tr data-category="Utilities"><td>5007</td><td>Actual Budget</td><td>Utilities</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>5050</td><td>Couchpotato</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>5053</td><td>Couchpotato (custom)</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>5055</td><td>Seerr</td><td>Media Management</td><td>Web interface</td></tr>
@@ -67,6 +66,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Downloads"><td>6800</td><td>Aria2</td><td>Downloads</td><td>RPC interface</td></tr>
     <tr data-category="Utilities"><td>7152</td><td>Gotify</td><td>Utilities</td><td>Web interface</td></tr>
     <tr data-category="Media Server"><td>8000</td><td>Icecast</td><td>Media Server</td><td>Streaming</td></tr>
+    <tr data-category="Utilities"><td>8007</td><td>Actual Budget</td><td>Utilities</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>8050</td><td>ruTorrent</td><td>Downloads</td><td>RPC interface</td></tr>
     <tr data-category="Downloads"><td>8080</td><td>SABnzbd</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8081</td><td>SickChill</td><td>Media Management</td><td>Web interface</td></tr>
