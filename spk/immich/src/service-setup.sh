@@ -106,8 +106,12 @@ install_ml_packages()
         pydantic-settings \
         python-multipart \
         rich \
-        aiocache \
         rapidocr 2>&1
+    # immich-model is git-only upstream; the wheel is prebuilt at package
+    # time (see spk Makefile) so installing needs no git binary on DSM.
+    # Its deps (numpy, onnx, onnx-ir, onnxscript, safetensors) resolve from PyPI.
+    "${ML_VENV}/bin/pip3" install --no-cache-dir \
+        "${SYNOPKG_PKGDEST}/share/immich/wheelhouse/immich_model-0.2.0-py3-none-any.whl" 2>&1
     # ensure opencv stays headless (GUI variant has no place on DSM)
     "${ML_VENV}/bin/pip3" install \
         --force-reinstall \
@@ -293,6 +297,12 @@ service_postupgrade ()
         if "${ML_VENV}/bin/pip3" show insightface >/dev/null 2>&1; then
             echo "Removing obsolete insightface wheel."
             "${ML_VENV}/bin/pip3" uninstall -y insightface 2>&1 || true
+        fi
+        # 3.3.1 dropped aiocache; remove the leftover wheel on upgrade
+        # so it does not linger in the venv
+        if "${ML_VENV}/bin/pip3" show aiocache >/dev/null 2>&1; then
+            echo "Removing obsolete aiocache wheel."
+            "${ML_VENV}/bin/pip3" uninstall -y aiocache 2>&1 || true
         fi
         install_ml_packages
     fi
