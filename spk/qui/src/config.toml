@@ -45,7 +45,7 @@ sessionSecret = "_session_secret_"
 # If not defined, logs to stdout
 # Optional
 #logPath = "log/qui.log"
-logPath = "/var/packages/qui/var/qui.log"
+logPath = "/var/packages/qui/var/log/qui.log"
 
 # Log rotation
 # Size in MB that starts a rotation

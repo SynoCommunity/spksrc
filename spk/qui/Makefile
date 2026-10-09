@@ -5,9 +5,7 @@ SPK_ICON = src/qui.png
 
 DEPENDS = cross/qui
 
-#REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-#REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 HOMEPAGE = https://getqui.com/
