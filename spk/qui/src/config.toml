@@ -1,0 +1,184 @@
+# config.toml - provided by package installer to set DSM specific default values
+
+# Hostname / IP
+# Default: "localhost" (or "0.0.0.0" in containers)
+host = "0.0.0.0"
+
+# Port
+# Default: 7476
+port = 7476
+
+# Base URL
+# Set custom baseUrl eg /qui/ to serve in subdirectory.
+# Not needed for subdomain, or by accessing with :port directly.
+# Optional
+#baseUrl = "/qui/"
+
+# CORS allowlist
+# Empty (default) disables CORS.
+# Entries must be explicit origins (scheme + host + optional non-default port).
+# Wildcards are not allowed.
+# Example:
+#corsAllowedOrigins = ["https://sso.example.com", "https://panel.example.com"]
+
+# Allowed request hosts
+# Empty (default) permits all hosts. Restart after changes.
+# List the Host received by qui. X-Forwarded-Host is ignored.
+# Use hostnames, IP addresses, or leading *. subdomain wildcards, without ports.
+# Direct loopback GET and HEAD probes to the three built-in health endpoints bypass this list.
+#allowedHosts = ["qui.example.com", "localhost", "::1", "*.home.example.com"]
+
+# Session secret
+# Auto-generated if not provided
+# WARNING: Changing this value will break decryption of existing instance passwords!
+# If changed, you'll need to re-enter passwords for all existing qBittorrent instances in the UI.
+# The sessionSecret is only generated, when config.toml is initially created by qui
+sessionSecret = "_session_secret_"
+
+# Send the browser session cookie only over HTTPS
+# Enable this when qui is served through an HTTPS reverse proxy.
+# With this enabled, login over plain HTTP does not work.
+# An HTTPS oidcRedirectUrl enables it automatically.
+#sessionCookieSecure = false
+
+# Log file path
+# If not defined, logs to stdout
+# Optional
+#logPath = "log/qui.log"
+logPath = "/var/packages/qui/var/qui.log"
+
+# Log rotation
+# Size in MB that starts a rotation
+# Default: 50
+#logMaxSize = 50
+
+# Number of rotated log files that qui keeps (0 keeps all)
+# Rotated files are gzip-compressed. Measured on the logs of qui, a 50 MB file
+# compresses to 2 to 3 MB.
+# Default: 10
+#logMaxBackups = 10
+
+# Data directory (default: next to config file)
+# Database file (qui.db) will be created inside this directory
+#dataDir = "/var/db/qui"
+
+# Backup directory (default: <dataDir>/backups)
+# Backup manifests, archives and cached .torrent files are stored here.
+# A relative path is resolved against the config directory.
+# If you change this on an existing install, move the contents of
+# <dataDir>/backups into the new directory yourself.
+#backupDir = "/mnt/storage/qui-backups"
+
+# Custom themes directory (default: <config-dir>/themes, auto-created)
+# Drop sideloaded *.css theme files here. Listing requires premium access.
+# A relative path is resolved against the config directory.
+#customThemesDir = "/config/themes"
+
+# Database engine
+# Options: "sqlite" (default), "postgres"
+#databaseEngine = "sqlite"
+
+# Postgres connection settings (used when databaseEngine = "postgres")
+# Preferred: provide a DSN and ignore host/user/password fields.
+#databaseDsn = "postgres://user:password@localhost:5432/qui?sslmode=disable"
+#databaseHost = "localhost"
+#databasePort = 5432
+#databaseUser = ""
+#databasePassword = ""
+#databaseName = "qui"
+#databaseSSLMode = "disable"
+#databaseConnectTimeout = 10
+#databaseMaxOpenConns = 25
+#databaseMaxIdleConns = 5
+#databaseConnMaxLifetime = 300
+
+# HTTP timeout in seconds for requests qui makes to qBittorrent instances
+# (sync, health checks, capabilities). Raise it for very large or slow
+# instances whose responses take longer than 60 seconds.
+# Default: 60
+#qbittorrentTimeout = 60
+
+# Check for new releases via api.autobrr.com
+# Default: true
+#checkForUpdates = true
+checkForUpdates = false
+
+# Hide Self-update in the web UI. "qui update" from the shell still works (requires restart)
+# Package maintainers who pin the qui version should set this to true.
+# Default: false
+#disableSelfUpdate = false
+disableSelfUpdate = true
+
+# Tracker icon fetching
+# Disable to prevent qui from requesting tracker favicons from remote trackers.
+# Default: true
+#trackerIconsFetchEnabled = true
+
+# Cross-seed errored torrent recovery (requires restart)
+# When enabled, cross-seed automation will attempt to recover torrents in error/missingFiles state
+# by triggering recheck and waiting for completion. This can cause runs to take 25+ minutes.
+# When disabled (default), errored torrents are simply excluded from candidate selection.
+# Default: false
+#crossSeedRecoverErroredTorrents = false
+
+# Log level
+# Default: "DEBUG"
+# Options: "ERROR", "DEBUG", "INFO", "WARN", "TRACE"
+# DEBUG records sufficient detail to diagnose most reports.
+# TRACE adds per-request and per-sync-tick detail and makes the file grow quickly.
+#logLevel = "DEBUG"
+logLevel = "INFO"
+
+# Prometheus Metrics
+# Enable Prometheus metrics on a separate port
+# Default: false
+#metricsEnabled = false
+
+# Metrics server host (bind address for metrics endpoint)
+# Default: "127.0.0.1"
+# Set to "0.0.0.0" to bind to all interfaces if needed
+#metricsHost = "127.0.0.1"
+
+# Metrics server port (separate from main web interface)
+# Default: 9074 (standard Prometheus range)
+#metricsPort = 9074
+
+# Basic authentication for metrics endpoint (optional)
+# Format: "username:password" or "user1:password1,user2:password2" for multiple users
+# Passwords are plaintext and can contain colons. Usernames cannot contain colons.
+# Commas cannot appear in usernames or passwords. Protect this configuration file.
+# Example: "prometheus:secret"
+# Leave empty to disable authentication (default)
+#metricsBasicAuthUsers = ""
+
+# External program allow list
+# Restrict which executables can be started from qui.
+# Provide absolute paths to binaries or directories. Leave commented to allow any program.
+#externalProgramAllowList = [
+#       "/usr/local/bin/my-script",
+#       "/home/user/bin",
+#]
+
+# Maximum number of external programs that run at the same time (requires restart)
+# Other programs wait for a free slot. A value of 0 or less uses the default.
+# Default: 8
+#externalProgramMaxRunning = 8
+
+# OpenID Connect (OIDC) Configuration
+# Enable OIDC authentication
+#oidcEnabled = false
+
+# OIDC Issuer URL (e.g. https://auth.example.com)
+#oidcIssuer = ""
+
+# OIDC Client ID
+#oidcClientId = ""
+
+# OIDC Client Secret
+#oidcClientSecret = ""
+
+# OIDC Redirect URL (e.g. http://localhost:7476/api/auth/oidc/callback)
+#oidcRedirectUrl = ""
+
+# Disable Built-In Login Form (only works when OIDC is enabled)
+#oidcDisableBuiltInLogin = false
