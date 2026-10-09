@@ -6,7 +6,7 @@ channel change, a DVR-driven cache warmup, and our fixes on top.
 
 tvheadend/tvheadend#2249, the whole of it: the 28 commits of th0ma7/tvheadend
 branch record-from-buffer, rebased onto the package base as
-f082b430a..af9ab0f36.
+a87be591f..53f37b29b.
 
 Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
 upstream as of this base.  `git rebase` dropped its three commits on its own,
@@ -1685,44 +1685,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    while ((ebc = RB_FIRST(&ch->ch_epg_schedule)))
      _epg_channel_rem_broadcast(ch, ebc, NULL);
    gtimer_disarm(&ch->ch_epg_timer);
-@@ -1496,19 +1664,32 @@
-   ( epg_broadcast_t *b, epg_genre_list_t *genre, epg_changes_t *changed )
- {
-   int save = 0;
--  epg_genre_t *g1, *g2;
-+  epg_genre_t *g1, *g2, *last = NULL;
- 
-   if (!b) return 0;
- 
-   if (changed) *changed |= EPG_CHANGED_GENRE;
- 
-+  /* Its own list: nothing to change, and it must not be emptied below
-+   * while it is searched */
-+  if (genre == &b->genre) return 0;
-+
-   g1 = LIST_FIRST(&b->genre);
-+  LIST_INIT(&b->genre);
- 
--  /* Remove old */
-+  /* Remove old: relink the entries still wanted, in order, and free the
-+   * others.  Same result as unlinking them in place, but the list head is
-+   * rewritten explicitly: static analysers do not follow LIST_REMOVE()
-+   * updating it through le_prev, and took the head for a freed entry. */
-   while (g1) {
-     g2 = LIST_NEXT(g1, link);
--    if (!epg_genre_list_contains(genre, g1, 0)) {
--      LIST_REMOVE(g1, link);
-+    if (epg_genre_list_contains(genre, g1, 0)) {
-+      if (last)
-+        LIST_INSERT_AFTER(last, g1, link);
-+      else
-+        LIST_INSERT_HEAD(&b->genre, g1, link);
-+      last = g1;
-+    } else {
-       free(g1);
-       save = 1;
-     }
-@@ -2826,6 +3007,8 @@
+@@ -2839,6 +3007,8 @@
  {
    epg_broadcast_t **broad;
  

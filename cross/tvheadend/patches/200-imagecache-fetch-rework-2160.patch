@@ -1,3 +1,39 @@
+Imagecache: fetch guide artwork sooner and more reliably.
+
+tvheadend/tvheadend#2160, ours: a87be591f..4592129a1, four commits on branch
+th0ma7/tvheadend imagecache-fetch-rework.  Its head is a merge of master into
+the branch rather than a rebase, which costs nothing here: master's tip is an
+ancestor of that merge, so the diff from the package base is the branch's own
+work and nothing else.
+
+  1  the fetch rework itself: artwork is fetched when the guide names it
+     rather than on first use, and a transient failure (no HTTP response, or
+     429/5xx -- a cold CDN edge rather than a property of the image) gets a
+     short per-image retry before falling back to the hours-coarse
+     fail_period.
+  2  epg: rebuild the genre list instead of unlinking from it.  Deliberately
+     in both this PR and #2249, which reaches that file for an unrelated
+     reason, so either one stays mergeable on its own.  It therefore arrives
+     here twice over; 200 and 400 are generated from trees that both contain
+     it, so the chain stays consistent.
+  3  wait for the fetch to finish, not for the next wakeup.  imagecache_cond
+     is signalled by several events, a transient failure parking the image in
+     RETRY now among them, and the wait loop returned on the first wakeup that
+     was not a timeout without re-reading the state -- so a failure signal told
+     the caller the image was ready and imagecache_filename() built a path to a
+     file that does not exist.  Reported by CodeRabbit.
+  4  clear the failed flag when a fetch succeeds.  It is documented as "Last
+     update failed" and picks the re-check interval between fail_period and
+     ok_period, but has only ever been set, never cleared, since the image
+     cache was written in 2013: an image that failed once was re-checked at the
+     coarse interval for good, even once serving again, and the flag is
+     persisted so a restart did not help.  Pre-existing upstream, fixed here
+     because this PR is the fetch and retry rework and already resets
+     `attempts` in the same branch.
+
+Drop this patch once #2160 is merged.  See 200-upstream-prs-HOWTO.txt for the
+regeneration recipe.
+
 --- src/api/api_epg.c.orig
 +++ src/api/api_epg.c
 @@ -183,7 +183,7 @@ api_epg_entry ( epg_broadcast_t *eb, const char *lang, const access_t *perm, con
@@ -65,6 +101,43 @@
  int epg_broadcast_set_epnumber
    ( epg_broadcast_t *b, uint16_t number, epg_changes_t *changed )
  {
+@@ -1479,19 +1496,32 @@ int epg_broadcast_set_genre
+   ( epg_broadcast_t *b, epg_genre_list_t *genre, epg_changes_t *changed )
+ {
+   int save = 0;
+-  epg_genre_t *g1, *g2;
++  epg_genre_t *g1, *g2, *last = NULL;
+ 
+   if (!b) return 0;
+ 
+   if (changed) *changed |= EPG_CHANGED_GENRE;
+ 
++  /* Its own list: nothing to change, and it must not be emptied below
++   * while it is searched */
++  if (genre == &b->genre) return 0;
++
+   g1 = LIST_FIRST(&b->genre);
++  LIST_INIT(&b->genre);
+ 
+-  /* Remove old */
++  /* Remove old: relink the entries still wanted, in order, and free the
++   * others.  Same result as unlinking them in place, but the list head is
++   * rewritten explicitly: static analysers do not follow LIST_REMOVE()
++   * updating it through le_prev, and took the head for a freed entry. */
+   while (g1) {
+     g2 = LIST_NEXT(g1, link);
+-    if (!epg_genre_list_contains(genre, g1, 0)) {
+-      LIST_REMOVE(g1, link);
++    if (epg_genre_list_contains(genre, g1, 0)) {
++      if (last)
++        LIST_INSERT_AFTER(last, g1, link);
++      else
++        LIST_INSERT_HEAD(&b->genre, g1, link);
++      last = g1;
++    } else {
+       free(g1);
+       save = 1;
+     }
 --- src/epg.h.orig
 +++ src/epg.h
 @@ -473,6 +473,9 @@ htsmsg_t        *epg_broadcast_serialize   ( epg_broadcast_t *b );
@@ -263,7 +336,7 @@
      tvh_cond_signal(&imagecache_cond, 1);
    } else {
      time(&img->updated);
-@@ -289,10 +359,62 @@ imagecache_new_contents ( imagecache_image_t *img,
+@@ -298,10 +368,62 @@ imagecache_new_contents ( imagecache_image_t *img,
    return r;
  }
  
@@ -327,7 +400,7 @@
    url_t url;
    char tpath[PATH_MAX + 4] = "", path[PATH_MAX];
    tvhpoll_event_t ev;
-@@ -314,6 +436,15 @@ imagecache_image_fetch ( imagecache_image_t *img )
+@@ -323,6 +445,15 @@ imagecache_image_fetch ( imagecache_image_t *img )
      goto error;
    snprintf(tpath, sizeof(tpath), "%s.tmp", path);
  
@@ -343,7 +416,7 @@
    /* Fetch (release lock, incase of delays) */
    tvh_mutex_unlock(&imagecache_lock);
  
-@@ -325,20 +456,61 @@ imagecache_image_fetch ( imagecache_image_t *img )
+@@ -334,20 +465,61 @@ imagecache_image_fetch ( imagecache_image_t *img )
      goto error_lock;
    }
  
@@ -418,7 +491,7 @@
  
    while (tvheadend_is_running()) {
      r = tvhpoll_wait(efd, &ev, 1, -1);
-@@ -350,6 +522,8 @@ imagecache_image_fetch ( imagecache_image_t *img )
+@@ -359,6 +531,8 @@ imagecache_image_fetch ( imagecache_image_t *img )
      if (r < 0)
        break;
      if (r == HTTP_CON_DONE) {
@@ -427,7 +500,7 @@
        if (hc->hc_code == HTTP_STATUS_OK && hc->hc_data_size > 0)
          res = imagecache_new_contents(img, tpath, path,
                                        (uint8_t *)hc->hc_data, hc->hc_data_size);
-@@ -359,19 +533,51 @@ imagecache_image_fetch ( imagecache_image_t *img )
+@@ -368,19 +542,55 @@ imagecache_image_fetch ( imagecache_image_t *img )
  
    /* Process */
  error_lock:
@@ -478,10 +551,14 @@
      tvhwarn(LS_IMAGECACHE, "failed to download %s", img->url);
    } else {
 +    img->attempts = 0;
++    if (img->failed) {
++      img->failed = 0;
++      imagecache_image_save(img);
++    }
      tvhdebug(LS_IMAGECACHE, "downloaded %s", img->url);
    }
    tvh_cond_signal(&imagecache_cond, 1);
-@@ -379,6 +585,25 @@ error:
+@@ -388,6 +598,25 @@ error:
    return res;
  };
  
@@ -507,7 +584,7 @@
  static void
  imagecache_timer ( void )
  {
-@@ -396,7 +621,7 @@ imagecache_timer ( void )
+@@ -405,7 +634,7 @@ imagecache_timer ( void )
          continue;
        }
      }
@@ -516,7 +593,7 @@
      when = img->failed ? imagecache_conf.fail_period
                         : imagecache_conf.ok_period;
      when = img->updated + (when * 3600);
-@@ -410,6 +635,7 @@ imagecache_thread ( void *p )
+@@ -419,6 +648,7 @@ imagecache_thread ( void *p )
  {
    imagecache_image_t *img;
    int64_t timer_expire = mclk() + sec2mono(600);
@@ -524,7 +601,7 @@
  
    tvh_mutex_lock(&imagecache_lock);
    while (tvheadend_is_running()) {
-@@ -420,9 +646,19 @@ imagecache_thread ( void *p )
+@@ -429,9 +659,19 @@ imagecache_thread ( void *p )
        imagecache_timer();
      }
  
@@ -545,7 +622,7 @@
        continue;
      }
  
-@@ -434,10 +670,18 @@ retry:
+@@ -443,10 +683,18 @@ retry:
        htsmsg_t *m = imagecache_image_htsmsg(img);
        img->state = IDLE;
        img->savepend = 0;
@@ -564,7 +641,7 @@
  
      } else if (img->state == QUEUED) {
        /* Fetch */
-@@ -446,6 +690,11 @@ retry:
+@@ -455,6 +703,11 @@ retry:
          img->state = FETCHING;
          (void)imagecache_image_fetch(img);
        }
@@ -576,7 +653,7 @@
        if (img->savepend) {
          img->state = SAVE;
          imagecache_decref(img);
-@@ -484,12 +733,14 @@ imagecache_init ( void )
+@@ -493,12 +746,14 @@ imagecache_init ( void )
    imagecache_conf.ok_period      = 24 * 7; // weekly
    imagecache_conf.fail_period    = 24;     // daily
    imagecache_conf.ignore_sslcert = 0;
@@ -591,7 +668,7 @@
  
    /* Load settings */
    if ((m = hts_settings_load("imagecache/config"))) {
-@@ -507,6 +758,10 @@ imagecache_init ( void )
+@@ -516,6 +771,10 @@ imagecache_init ( void )
        img->url      = strdup(url);
        img->accessed = htsmsg_get_s64_or_default(e, "accessed", 0);
        img->updated  = htsmsg_get_s64_or_default(e, "updated", 0);
@@ -602,7 +679,7 @@
        sha1 = htsmsg_get_str(e, "sha1");
        if (sha1 && strlen(sha1) == 40)
          hex2bin(img->sha1, 20, sha1);
-@@ -543,7 +798,15 @@ imagecache_init ( void )
+@@ -552,7 +811,15 @@ imagecache_init ( void )
  static void
  imagecache_destroy ( imagecache_image_t *img, int delconf )
  {
@@ -618,7 +695,7 @@
      hts_settings_remove("imagecache/meta/%d", img->id);
      hts_settings_remove("imagecache/data/%d", img->id);
    }
-@@ -565,6 +828,7 @@ imagecache_done ( void )
+@@ -574,6 +841,7 @@ imagecache_done ( void )
    tvh_mutex_unlock(&imagecache_lock);
    pthread_join(imagecache_tid, NULL);
    tvh_mutex_lock(&imagecache_lock);
@@ -626,7 +703,7 @@
    while ((img = RB_FIRST(&imagecache_by_id)) != NULL) {
      if (img->state == SAVE) {
        htsmsg_t *m = imagecache_image_htsmsg(img);
-@@ -666,6 +930,17 @@ imagecache_trigger( void )
+@@ -675,6 +943,17 @@ imagecache_trigger( void )
   */
  int
  imagecache_get_id ( const char *url )
@@ -644,7 +721,7 @@
  {
    int id = 0;
    imagecache_image_t *i;
-@@ -692,10 +967,22 @@ imagecache_get_id ( const char *url )
+@@ -701,10 +980,22 @@ imagecache_get_id ( const char *url )
      i = imagecache_skel;
      i->ref = 1;
      i->url = strdup(url);
@@ -667,7 +744,7 @@
    }
  
    /* Do file:// to imagecache ID mapping even if imagecache is not enabled */
-@@ -721,7 +1008,19 @@ imagecache_get_id ( const char *url )
+@@ -730,7 +1021,19 @@ imagecache_get_id ( const char *url )
  const char *
  imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
  {
@@ -688,7 +765,7 @@
    if (id == 0) return image;
    snprintf(buf, buflen, "imagecache/%d", id);
    return buf;
-@@ -730,6 +1029,52 @@ imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
+@@ -739,6 +1042,59 @@ imagecache_get_propstr ( const char *image, char *buf, size_t buflen )
  /*
   * Get data
   */
@@ -705,15 +782,22 @@
 +  if (i->updated)
 +    return 0;
 +
-+  /* Wait for the in-flight fetch */
++  /* Wait for the in-flight fetch.  imagecache_cond is signalled by several
++   * events, a transient failure parking the image in RETRY among them, so wait
++   * on the state rather than on a wakeup: returning on the first signal told
++   * the caller the image was ready when the fetch had just failed, and
++   * imagecache_filename() then built a path to a file that does not exist.
++   * IDLE cannot tell a success from a hard failure -- both land there and both
++   * set `updated` -- so only RETRY, where there is certainly no new data, is
++   * reported as a failure here. */
 +  if (i->state == FETCHING) {
 +    mono = mclk() + sec2mono(5);
-+    do {
++    while (i->state == FETCHING) {
 +      e = tvh_cond_timedwait(&imagecache_cond, &imagecache_lock, mono);
 +      if (e == ETIMEDOUT)
 +        return -1;
-+    } while (ERRNO_AGAIN(e));
-+    return 0;
++    }
++    return i->state == RETRY ? -1 : 0;
 +  }
 +
 +  /* Attempt to fetch directly */
@@ -741,7 +825,7 @@
  int
  imagecache_filename ( int id, char *name, size_t len )
  {
-@@ -754,29 +1099,8 @@ imagecache_filename ( int id, char *name, size_t len )
+@@ -763,29 +1119,8 @@ imagecache_filename ( int id, char *name, size_t len )
  
    /* Remote file */
    else if (imagecache_conf.enabled) {
