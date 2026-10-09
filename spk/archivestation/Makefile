@@ -30,7 +30,14 @@ DSM_APP_NAME = com.archivestation.app
 CONF_DIR = src/conf
 WIZARDS_DIR = src/wizard
 
-# Supply the final package revision to the upstream payload staging command.
-export ARCHIVE_STATION_SPK_VERSION := $(SPK_VERS)-$(SPK_REV)
-
 include ../../mk/spksrc.spk.mk
+
+# Cross dependencies are cached independently of SPK_REV. Render the final
+# payload and regenerate INFO on every packaging run, after the staging copy.
+.PHONY: archivestation_stage
+archivestation_stage: copy
+	python3 $(WORK_DIR)/ArchiveStation-$(SPK_VERS)-1-source/scripts/stage_synology.py \
+		--destination $(STAGING_DIR) --version "$(SPK_VERS)-$(SPK_REV)" \
+		--package-id archivestation --python-relative env/bin/python3
+
+$(WORK_DIR)/package.tgz $(WORK_DIR)/INFO: archivestation_stage

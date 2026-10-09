@@ -18,5 +18,5 @@ include ../../mk/spksrc.cross-install.mk
 archivestation_install:
 	python3 $(WORK_DIR)/$(PKG_DIR)/scripts/stage_synology.py \
 		--destination $(STAGING_INSTALL_PREFIX) \
-		--version "$${ARCHIVE_STATION_SPK_VERSION:-$(PKG_VERS)-1}" \
+		--version "$(PKG_VERS)-1" \
 		--package-id archivestation --python-relative env/bin/python3
