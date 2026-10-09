@@ -1,5 +1,5 @@
 PKG_NAME = archivestation
-PKG_VERS = 1.0.0
+PKG_VERS = 1.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = ArchiveStation-$(PKG_VERS)-1-source.tar.gz
 PKG_DIST_SITE = https://github.com/jbdemonte/synology-archive-downloader/releases/download/v$(PKG_VERS)-1
@@ -16,4 +16,7 @@ include ../../mk/spksrc.cross-install.mk
 
 .PHONY: archivestation_install
 archivestation_install:
-	python3 $(CURDIR)/src/install.py $(WORK_DIR)/$(PKG_DIR) $(STAGING_INSTALL_PREFIX)
+	python3 $(WORK_DIR)/$(PKG_DIR)/scripts/stage_synology.py \
+		--destination $(STAGING_INSTALL_PREFIX) \
+		--version "$${ARCHIVE_STATION_SPK_VERSION:-$(PKG_VERS)-1}" \
+		--package-id archivestation --python-relative env/bin/python3

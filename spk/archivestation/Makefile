@@ -1,6 +1,6 @@
 SPK_NAME = archivestation
-SPK_VERS = 1.0.0
-SPK_REV = 1
+SPK_VERS = 1.0.1
+SPK_REV = 2
 SPK_ICON = src/archivestation.png
 
 DEPENDS = cross/archivestation
@@ -16,7 +16,7 @@ REQUIRED_MIN_DSM = 7.0
 MAINTAINER = jbdemonte
 DESCRIPTION = Download public Internet Archive items into separate folders with file selection, progress tracking, resumable transfers, integrity verification and scheduling. Opens inside the DSM desktop and uses your administrator session.
 DISPLAY_NAME = Archive Station
-CHANGELOG = "Initial SynoCommunity package of Archive Station 1.0.0."
+CHANGELOG = "Initial SynoCommunity package of Archive Station 1.0.1."
 HOMEPAGE = https://github.com/jbdemonte/synology-archive-downloader
 LICENSE = MIT
 STARTABLE = yes
@@ -30,12 +30,7 @@ DSM_APP_NAME = com.archivestation.app
 CONF_DIR = src/conf
 WIZARDS_DIR = src/wizard
 
-POST_STRIP_TARGET = archivestation_extra_install
+# Supply the final package revision to the upstream payload staging command.
+export ARCHIVE_STATION_SPK_VERSION := $(SPK_VERS)-$(SPK_REV)
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: archivestation_extra_install
-archivestation_extra_install:
-	printf '%s\n' '$(SPK_VERS)-$(SPK_REV)' > $(STAGING_DIR)/app/archive_station/VERSION
-	sed -i 's|@VERSION@|$(SPK_VERS)-$(SPK_REV)|g' $(STAGING_DIR)/ui/config
-	sed -i -E 's#"(app.js|i18n.js|style.css|icon.png)"#"\1?v=$(SPK_VERS)-$(SPK_REV)"#g' $(STAGING_DIR)/ui/web/index.html

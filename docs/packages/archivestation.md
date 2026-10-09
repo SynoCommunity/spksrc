@@ -48,14 +48,16 @@ There is no automatic migration in this initial recipe. A manual migration was t
 
 ## Build and validation
 
-The recipe uses a checksum-verified upstream 1.0.0 source release and a pinned pure-Python dependency. From the spksrc build environment:
+The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md).
+
+The recipe uses a checksum-verified upstream 1.0.1 source release and a pinned pure-Python dependency. From the spksrc build environment:
 
 ```bash
 make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```
 
-Hardware validation on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
+Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
 
 - Fresh installation through the DSM package manager, running as `sc-archivestation`.
 - DSM-served assets and rejection of unauthenticated gateway requests.

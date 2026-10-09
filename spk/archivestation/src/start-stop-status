@@ -8,6 +8,8 @@ PYTHON="$TASK_DEST/env/bin/python3"
 export PYTHONPATH="$TASK_DEST/app"
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
+export ARCHIVE_STATION_PACKAGE_ID=archivestation
+export ARCHIVE_STATION_SERVICE_USER=sc-archivestation
 export ARCHIVE_STATION_PACKAGE_CENTER=1
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 running() {
