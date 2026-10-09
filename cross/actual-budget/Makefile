@@ -18,7 +18,10 @@ LICENSE  = MIT
 INSTALL_TARGET = actual_budget_install
 
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
-ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# Upstream pins its Yarn (yarnPath in .yarnrc.yml) and ships the bundle in
+# .yarn/releases. Run it with node: a yarn shim in the native install is not
+# guaranteed (CI builds lack it) and corepack would re-download it anyway.
+YARN = node .yarn/releases/yarn-4.17.1.cjs
 # .yarnrc.yml refuses packages published less than 3 days ago; a fresh release
 # can be newer than that, so disable the gate for the pinned lockfile.
 ENV += YARN_NPM_MINIMAL_AGE_GATE=0
@@ -39,10 +42,10 @@ actual_budget_install:
 	# The lage build orchestrator requires git metadata, absent from the archive
 	$(RUN) git init -q && git add -A && \
 		git -c user.email=spksrc@synocommunity.com -c user.name=spksrc commit -qm spksrc || true
-	$(RUN) yarn install --immutable
+	$(RUN) $(YARN) install --immutable
 	# Build the web frontend (clones the upstream translations repo) and the server
-	$(RUN) yarn build:server
-	$(RUN) yarn workspaces focus --production @actual-app/sync-server
+	$(RUN) $(YARN) build:server
+	$(RUN) $(YARN) workspaces focus --production @actual-app/sync-server
 	# keep only the target-arch glibc prebuilds (DSM has no musl, no 32-bit)
 	$(RUN) find node_modules/argon2/prebuilds node_modules/bcrypt/prebuilds -maxdepth 1 -mindepth 1 ! -name 'linux-$(NODE_ARCH)' -exec rm -rf {} +
 	$(RUN) find node_modules/argon2/prebuilds node_modules/bcrypt/prebuilds -name '*.musl.node' -delete
