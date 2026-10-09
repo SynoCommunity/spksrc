@@ -1,6 +1,6 @@
 SPK_NAME = archivestation
 SPK_VERS = 1.0.1
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/archivestation.png
 
 DEPENDS = cross/archivestation
@@ -30,14 +30,14 @@ DSM_APP_NAME = com.archivestation.app
 CONF_DIR = src/conf
 WIZARDS_DIR = src/wizard
 
+# Render distribution metadata after the standard staging/strip steps.
+POST_STRIP_TARGET = archivestation_extra_install
+
 include ../../mk/spksrc.spk.mk
 
-# Cross dependencies are cached independently of SPK_REV. Render the final
-# payload and regenerate INFO on every packaging run, after the staging copy.
-.PHONY: archivestation_stage
-archivestation_stage: copy
-	python3 $(WORK_DIR)/ArchiveStation-$(SPK_VERS)-1-source/scripts/stage_synology.py \
-		--destination $(STAGING_DIR) --version "$(SPK_VERS)-$(SPK_REV)" \
-		--package-id archivestation --python-relative env/bin/python3
-
-$(WORK_DIR)/package.tgz $(WORK_DIR)/INFO: archivestation_stage
+.PHONY: archivestation_extra_install
+archivestation_extra_install:
+	$(MAKE) --no-print-directory -C ../../cross/archivestation \
+		WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) \
+		ARCHIVESTATION_DESTDIR=$(STAGING_DIR) \
+		ARCHIVESTATION_VERSION=$(SPK_VERS)-$(SPK_REV) archivestation_stage

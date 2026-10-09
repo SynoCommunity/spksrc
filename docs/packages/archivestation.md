@@ -48,11 +48,12 @@ There is no automatic migration in this initial recipe. A manual migration was t
 
 ## Build and validation
 
-The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md). Final package metadata is rendered again when building an SPK, so a cached dependency build cannot retain an older package revision in the displayed version or resource URLs.
+The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md). Final distribution metadata is rendered through the standard `POST_STRIP_TARGET` hook. Run `make clean` before rebuilding after a source version or package revision change; spksrc caches the intermediate build steps and `INFO`.
 
 The recipe uses a checksum-verified upstream 1.0.1 source release and a pinned pure-Python dependency. From the spksrc build environment:
 
 ```bash
+make -C spk/archivestation clean
 make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```

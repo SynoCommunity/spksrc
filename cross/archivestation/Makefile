@@ -12,11 +12,14 @@ LICENSE = MIT
 
 INSTALL_TARGET = archivestation_install
 
+ARCHIVESTATION_DESTDIR ?= $(STAGING_INSTALL_PREFIX)
+ARCHIVESTATION_VERSION ?= $(PKG_VERS)-1
+
 include ../../mk/spksrc.cross-install.mk
 
-.PHONY: archivestation_install
-archivestation_install:
+.PHONY: archivestation_install archivestation_stage
+archivestation_install archivestation_stage:
 	python3 $(WORK_DIR)/$(PKG_DIR)/scripts/stage_synology.py \
-		--destination $(STAGING_INSTALL_PREFIX) \
-		--version "$(PKG_VERS)-1" \
+		--destination $(ARCHIVESTATION_DESTDIR) \
+		--version "$(ARCHIVESTATION_VERSION)" \
 		--package-id archivestation --python-relative env/bin/python3
