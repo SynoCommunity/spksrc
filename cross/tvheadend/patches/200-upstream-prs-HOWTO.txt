@@ -14,15 +14,14 @@ patches we add on top of it follow within that hundred.
   200      tvheadend#2160, imagecache fetch rework
   400      tvheadend#2249, the whole of it: LiBe-net's shared per-channel
            cache and our fixes on top
-  500      tvheadend#2323, ours: imagecache ignores a failed write and then
-           replaces the good entry with the partial file, which the sha1 check
-           at the top of the function makes permanent.  Reported as #2322.
-           The number was the http digest patch (#2273), merged and dropped;
-           reused here since each upstream PR owns a hundred.  200 is the other
-           imagecache PR and does not touch that function, so the two are
-           independent and their order does not matter.
   300      gone.  tvheadend#2206, the stable stream/PID mapping 400 used to
            sit on, is upstream as of base ebea1df92 (Oct 8th 2026)
+  500      gone too, and it lasted a day: tvheadend#2323, ours -- imagecache
+           ignoring a failed write and then replacing the good entry with the
+           partial file, which the sha1 check at the top of the function made
+           permanent -- was reported as #2322 on Oct 8th and merged as
+           a87be591f on Oct 9th, which is this base.  The number had been the
+           http digest patch (#2273), also merged and dropped.
 
 This file covers 200 and up; 100 to 104 have their own HOWTO next to it.
 
@@ -30,7 +29,7 @@ One patch per PR: 400 is the whole of #2249 rather than one patch per commit,
 because that PR carries the series as a unit -- its own commits, LiBe-net's
 shared cache reworked from them, and the fixes on top.
 
-400 is now the entire branch: `f082b430a..af9ab0f36`, the 29 commits of
+400 is now the entire branch: `a87be591f..53f37b29b`, the 29 commits of
 th0ma7/tvheadend record-from-buffer.  It used to be only what the branch added
 on top of #2206, with 300 carrying #2206 itself; rebasing onto this base
 dropped #2206's three commits on its own ("patch contents already upstream"),
