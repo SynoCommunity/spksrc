@@ -23,7 +23,7 @@
 #
 # Notes:
 #  - Terminal color variables rely on tput(1)
-#  - PSTAT_TIME is enabled only when PSTAT is set to 1 or ON
+#  - PSTAT_TIME is enabled only when PSTAT is true (1, yes, on, ... -- see is_true)
 #
 ###############################################################################
 
@@ -47,7 +47,7 @@ NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
 STATUS_LOG   = $(LOG_DIR)/status-build.log
 
 # Enable stats over parallel build mode
-ifneq ($(filter 1 on ON,$(PSTAT)),)
+ifneq ($(call is_true,$(PSTAT)),)
 # GNU time(1) by path, not by name: under bash "time" is a keyword that rejects -o, and
 # the recipes that pipe need bash for pipefail. Empty if absent, which disables PSTAT.
 TIME_CMD := $(shell command -v time 2>/dev/null)
