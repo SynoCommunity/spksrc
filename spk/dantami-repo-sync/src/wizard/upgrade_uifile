@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Preserve app settings",
+    "items": [
+      {
+        "desc": "Existing app accounts, passwords, tokens and repository settings are preserved. No administrator is created or reset during an upgrade."
+      }
+    ]
+  }
+]
