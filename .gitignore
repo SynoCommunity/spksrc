@@ -5,6 +5,7 @@
 
 # Build artifacts
 native/*/work*
+native/*/*.txz
 native/*/build*
 native/*/status*
 
@@ -33,6 +34,9 @@ diyspk/*/status*
 toolchain/*/work*
 toolchain/*/build*
 toolchain/*/status*
+
+overlay/*/work*
+overlay/*/status*
 
 toolkit/*/work*
 toolkit/*/build*

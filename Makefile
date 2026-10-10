@@ -70,7 +70,7 @@ clean: native-clean cross-clean
 endif
 
 dist-clean: clean  ## Clean everything, including kernel/toolchain/toolkit
-dist-clean: kernel-clean toolchain-clean toolkit-clean
+dist-clean: kernel-clean toolchain-clean overlay-clean toolkit-clean
 
 native-clean:  ## Clean all native/ work dirs
 	@for native in $(dir $(wildcard native/*/Makefile)) ; \
@@ -82,6 +82,12 @@ toolchain-clean:  ## Clean all toolchain/ work dirs
 	@for tc in $(dir $(wildcard toolchain/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${tc} clean ; \
+	done
+
+overlay-clean:  ## Clean all overlay/ work dirs
+	@for ovl in $(dir $(wildcard overlay/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${ovl} clean ; \
 	done
 
 toolkit-clean:  ## Clean all toolkit/ work dirs

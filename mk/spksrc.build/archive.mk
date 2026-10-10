@@ -114,8 +114,10 @@ archive_target: $(PRE_ARCHIVE_TARGET)
 	    while read f; do $(ARCHIVE_STRIP_HOST) --strip-debug "$$f" 2>/dev/null || true ; done ; \
 	fi
 	@$(MSG) "archive: $(PKG_NAME) -> $(ARCHIVE)"
-	@$(ARCHIVE_CMD) $(ARCHIVE) -C $(ARCHIVE_DIR) $(ARCHIVE_EXCLUDES) $(ARCHIVE_KEEP) || \
-	  { $(MSG) "$(PKG_NAME): nothing to archive under $(ARCHIVE_DIR)/$(firstword $(ARCHIVE_KEEP)) -- build it first" ; exit 1 ; }
+	@# Under a temporary name, then renamed: an interrupted tar must not leave a truncated
+	@# file under the name a producer takes as a finished build (spksrc.native-toolchain.mk).
+	@$(ARCHIVE_CMD) $(ARCHIVE).part -C $(ARCHIVE_DIR) $(ARCHIVE_EXCLUDES) $(ARCHIVE_KEEP) && mv -f $(ARCHIVE).part $(ARCHIVE) || \
+	  { rm -f $(ARCHIVE).part ; $(MSG) "$(PKG_NAME): nothing to archive under $(ARCHIVE_DIR)/$(firstword $(ARCHIVE_KEEP)) -- build it first" ; exit 1 ; }
 
 # Cookie-guarded: 'archive' runs in the native _all pipeline (after install), 'build-archive'
 # is the on-demand entry point; both share one cookie. Remove $(ARCHIVE_COOKIE) to force a rebuild.

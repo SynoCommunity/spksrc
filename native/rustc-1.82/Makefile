@@ -17,7 +17,7 @@ LICENSE  = Apache-2.0, MIT
 
 # The source tarball bundles src/llvm-project and vendors every crate, so the whole
 # build is offline: no `git clone`, no submodule fetch. The x.py steps (config.toml,
-# LLVM, stage1/stage2) are custom targets in spksrc.native-toolchain-rust.mk; the
+# LLVM, stage1/stage2) are custom targets in spksrc.native/toolchain-rust.mk; the
 # source pipeline (download/extract/patch) is the framework's, so patches live in
 # ./patches and are applied by the normal patch step.
 #
@@ -30,7 +30,7 @@ LICENSE  = Apache-2.0, MIT
 ##############################################################################
 # Packaging via the generic helper (mk/spksrc.build/archive.mk): host the x.py
 # stage2 tree (= the rustup toolchain layout), consumed by
-# toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>.
+# overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>.
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
 #
 # Declared BEFORE the native front-end include so the helper (pulled in via
@@ -53,31 +53,3 @@ ARCHIVE_KEEP = .
 # Generic native-toolchain front-end dispatches to mk/spksrc.native/toolchain-rust.mk.
 NATIVE_TOOLCHAIN = rust
 include ../../mk/spksrc.native-toolchain.mk
-
-##############################################################################
-# Build rustc for EVERY custom-rust toolchain of a DSM version (a real rust target iff it
-# has a rust consumer dir -- the same marker as TC_OVERLAY_RUSTC).
-#   make all-5.2                 one arch at a time
-#   make RUST_JOBS=2 all-6.2.4   2 archs at a time (each still max threads)
-# Concurrency via xargs -P, NOT make -j (which would propagate into the x.py sub-builds).
-##############################################################################
-RUST_REAL_ARCHS = $(sort $(foreach d,$(wildcard ../../toolchain/syno-*-$(1)_rust-*),$(patsubst syno-%-$(1),%,$(firstword $(subst _, ,$(notdir $(d)))))))
-
-RUST_JOBS ?= 1
-
-.PHONY: all-%
-all-%:
-	@$(MSG) "rustc-$(PKG_VERS): all-$* -- $(words $(call RUST_REAL_ARCHS,$*)) archs, $(RUST_JOBS) at a time"
-	@echo "$(sort $(call RUST_REAL_ARCHS,$*))" | tr ' ' '\n' | \
-	   xargs -P $(RUST_JOBS) -I@ $(MAKE) --no-print-directory arch-@-$*
-	@$(MSG) "rustc-$(PKG_VERS): all-$* complete"
-
-##############################################################################
-# Build rustc for a SPECIFIC toolchain of a given DSM version, then archive it.
-#   make arch-ppc853x-5.2     make arch-qoriq-6.2.4
-##############################################################################
-.PHONY: arch-%
-arch-%:
-	@$(MSG) "===== rustc-$(PKG_VERS): $* ====="
-	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
-	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
