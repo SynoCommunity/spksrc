@@ -81,7 +81,7 @@ ARCHIVE_EXCLUDES += --exclude='./include/isl'
 #   * --enable-default-pie present      -> carried, so the overlay links as the stock one
 ##############################################################################
 _GCC_ABI_STOCK = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-gcc
-_GCC_ABI_RAW   = $(shell test -x $(_GCC_ABI_STOCK) && $(_GCC_ABI_STOCK) -v 2>&1 | tr ' ' '\n' | \
+_GCC_ABI_RAW   = $(shell test -x $(_GCC_ABI_STOCK) && $(TC_VENDOR_ENV) $(_GCC_ABI_STOCK) -v 2>&1 | tr ' ' '\n' | \
                    grep -iE '^--with-(arch|cpu|tune|float|fpu)=|^--enable-(e500_double|default-pie)$$' | sort -u)
 
 _GCC_ABI_ARCH  = $(filter --with-arch=%,$(_GCC_ABI_RAW))
@@ -113,7 +113,7 @@ _GCC_ABI_FLOAT2   = $(or $(_GCC_ABI_FLOAT),\
 # TC_EXTRA_BUILD_FLAGS names something narrower -- vfp is what the vendor's own libgcc and
 # libstdc++ were built with, and the overlay replaces exactly those. ARM only: a PowerPC
 # gcc answers "none", which configure would take literally.
-_GCC_ABI_DEF_FPU = $(if $(findstring arm,$(TC_TARGET)),$(patsubst %,--with-fpu=%,$(word 2,$(shell $(_GCC_ABI_STOCK) -Q --help=target 2>/dev/null | grep -E '^[[:space:]]+-mfpu=[[:space:]]'))))
+_GCC_ABI_DEF_FPU = $(if $(findstring arm,$(TC_TARGET)),$(patsubst %,--with-fpu=%,$(word 2,$(shell $(TC_VENDOR_ENV) $(_GCC_ABI_STOCK) -Q --help=target 2>/dev/null | grep -E '^[[:space:]]+-mfpu=[[:space:]]'))))
 # TC_EXTRA_BUILD_FLAGS is deliberately NOT consulted here, though it is the authority for
 # compiling PACKAGES: it is per-model, and alpine's neon-vfpv4 would give this compiler a
 # libstdc++ that no longer serves the generic armv7 arch every ARMv7 package builds through.
@@ -170,9 +170,9 @@ CONFIGURE_ARGS += --with-build-sysroot=$(GCC_BUILD_SYSROOT)
 # The sysroot the target's OWN compiler uses -- the single source of truth, as for the ABI
 # above. A toolchain Makefile can declare something else: ppc853x-5.2 says TC_SYSROOT =
 # $(TC_TARGET) while its gcc reports $(TC_TARGET)/libc, and building against the wrong one
-# fails deep in libgcc with "cannot find crti.o". Empty when the stock gcc has no sysroot
-# configured (x86-5.2), hence the fallback.
-_GCC_STOCK_SYSROOT  = $(realpath $(shell $(_GCC_ABI_STOCK) -print-sysroot 2>/dev/null))
+# fails deep in libgcc with "cannot find crti.o". Every Synology gcc reports one; the
+# fallback is for a stock gcc that cannot answer.
+_GCC_STOCK_SYSROOT  = $(realpath $(shell $(TC_VENDOR_ENV) $(_GCC_ABI_STOCK) -print-sysroot 2>/dev/null))
 GCC_BUILD_SYSROOT   = $(or $(_GCC_STOCK_SYSROOT),$(TC_SYSROOT_DIR))
 # Probe rather than tabulate: whichever of the two layouts actually holds the headers.
 GCC_SYSROOT_HEADERS = $(if $(wildcard $(GCC_BUILD_SYSROOT)/usr/include/stdio.h),/usr/include,/include)
