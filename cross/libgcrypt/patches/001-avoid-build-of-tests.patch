@@ -2,10 +2,10 @@
 # - tests are not added to the package
 # - tests would fail to run in cross environment
 # - tests fail to build for OLD_PPC_ARCHS
-# 
---- Makefile.in.orig	2025-05-07 11:51:54
-+++ Makefile.in	2025-07-12 09:14:22
-@@ -414,12 +414,12 @@
+#
+--- Makefile.in.orig	2026-10-10
++++ Makefile.in
+@@ -418,12 +418,12 @@
  GITLOG_TO_CHANGELOG = gitlog-to-changelog
  @BUILD_DOC_FALSE@doc = 
  @BUILD_DOC_TRUE@doc = doc
