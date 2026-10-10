@@ -59,6 +59,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Media"><td><a href="comskip/">Comskip</a></td><td>Media</td><td>Commercial detector for recorded TV</td></tr>
     <tr data-category="Downloads"><td><a href="deluge/">Deluge</a></td><td>Downloads</td><td>Feature-rich BitTorrent client</td></tr>
     <tr data-category="Network"><td><a href="dnscrypt-proxy/">DNSCrypt Proxy</a></td><td>Network</td><td>DNS encryption proxy</td></tr>
+    <tr data-category="Downloads"><td><a href="dsm-mini/">DSM mini</a></td><td>Downloads</td><td>Telegram bot and Mini App for Download Station, File Station and DSM notifications</td></tr>
     <tr data-category="Utilities"><td><a href="dsm-utilities/">DSM Utilities</a></td><td>Utilities</td><td>Helpful DSM configuration for packages</td></tr>
     <tr data-category="Backup"><td><a href="duplicity/">Duplicity</a></td><td>Backup</td><td>Encrypted bandwidth-efficient backup</td></tr>
     <tr data-category="Media"><td><a href="ffmpeg/">FFmpeg</a></td><td>Media</td><td>Complete multimedia framework</td></tr>

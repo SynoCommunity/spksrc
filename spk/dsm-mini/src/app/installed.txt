@@ -1,0 +1,9 @@
+enu|DSM mini is installed but not set up yet. Open DSM mini from the main menu (or press Open here), fill in the settings and press Start.
+rus|DSM mini установлен, но ещё не настроен. Откройте DSM mini в главном меню (или нажмите здесь «Открыть»), заполните настройки и нажмите «Запустить».
+ger|DSM mini ist installiert, aber noch nicht eingerichtet. Öffnen Sie DSM mini im Hauptmenü (oder klicken Sie hier auf „Öffnen“), tragen Sie die Einstellungen ein und klicken Sie auf „Starten“.
+fre|DSM mini est installé mais pas encore configuré. Ouvrez DSM mini depuis le menu principal (ou cliquez ici sur « Ouvrir »), remplissez les réglages et cliquez sur « Démarrer ».
+spn|DSM mini está instalado, pero aún sin configurar. Abre DSM mini desde el menú principal (o pulsa aquí «Abrir»), rellena los ajustes y pulsa «Iniciar».
+ita|DSM mini è installato ma non ancora configurato. Apri DSM mini dal menu principale (o premi qui «Apri»), compila le impostazioni e premi «Avvia».
+ptb|O DSM mini está instalado, mas ainda não configurado. Abra o DSM mini pelo menu principal (ou clique aqui em «Abrir»), preencha as configurações e clique em «Iniciar».
+plk|DSM mini jest zainstalowany, ale jeszcze nieskonfigurowany. Otwórz DSM mini z menu głównego (albo kliknij tu „Otwórz”), wypełnij ustawienia i kliknij „Uruchom”.
+trk|DSM mini kuruldu ama henüz ayarlanmadı. DSM mini'yi ana menüden açın (ya da burada «Aç»a basın), ayarları doldurun ve «Başlat»a basın.
