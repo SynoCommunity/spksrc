@@ -1,5 +1,5 @@
 PKG_NAME = gnupg
-PKG_VERS = 2.4.9
+PKG_VERS = 2.5.24
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/gnupg
@@ -19,12 +19,15 @@ COMMENT  = GnuPG allows to encrypt and sign your data and communication, feature
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS = --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-ksba-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-libksba-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += GPGRT_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/gpgrt-config
+# Docs are not packaged (PLIST); 2.5 no longer ships prebuilt man pages and
+# generating them needs yat2m, unavailable when cross-compiling.
+CONFIGURE_ARGS += --disable-doc
 
 ADDITIONAL_CPPFLAGS = -O
 

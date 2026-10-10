@@ -1,5 +1,5 @@
 PKG_NAME = libgcrypt
-PKG_VERS = 1.11.1
+PKG_VERS = 1.12.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/libgcrypt
@@ -13,7 +13,7 @@ LICENSE  = LGPLv2.1+
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS = --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-doc
 
 # error "The CPU Jitter random number generator must not be compiled with optimizations. 
@@ -30,6 +30,12 @@ include ../../mk/spksrc.common.mk
 # avoid key generation failure for aarch64 (#5150)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-arm-crypto-support
+endif
+# libgcrypt 1.12 builds crc-intel-pclmul.c with EVEX vpclmulqdq forms that
+# binutils paired with gcc < 7 cannot assemble (4.7.3/4.9.3 fail, 7.5+ OK);
+# upstream's configure probe only tests a VEX form and misses it.
+ifeq ($(call version_lt,$(TC_GCC),7),1)
+CONFIGURE_ARGS += --disable-pclmul-support
 endif
 
 include ../../mk/spksrc.cross-cc.mk
