@@ -4,7 +4,6 @@ bin:bin/gnutls-cli-debug
 bin:bin/gnutls-serv
 bin:bin/ocsptool
 bin:bin/psktool
-bin:bin/srptool
 lnk:lib/libgnutls.so
 lnk:lib/libgnutls.so.30
 lib:lib/libgnutls.so.30.42.0
