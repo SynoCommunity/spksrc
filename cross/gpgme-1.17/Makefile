@@ -7,7 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Versions newer than 1.17.1 are not compatible with DSM 6 toolchains anymore...
 
-DEPENDS = cross/libgpg-error cross/libassuan
+# Pinned to libassuan 2.x: 1.17.1 is incompatible with libassuan 3 (see
+# the hold-back note in cross/libassuan-2.5); the virtual would resolve 3.0.
+DEPENDS = cross/libgpg-error cross/libassuan-2.5
 
 # gcc: unrecognized command line options "-Wno-format-truncation" "-Wno-sizeof-pointer-div"
 # this might be solved by a patch...
