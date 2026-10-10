@@ -56,8 +56,8 @@ ARCHIVE_KEEP = usr/local
 # it. -g is deliberate -- DWARF emission is a large part of what as does in a real build,
 # and ld -r is the operation the v3 benchmark already measured.
 ##############################################################################
-_PGO_CC   = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-gcc
-_PGO_CXX  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-g++
+_PGO_CC   = $(TC_VENDOR_ENV) $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-gcc
+_PGO_CXX  = $(TC_VENDOR_ENV) $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-g++
 _PGO_BIN  = $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/$(TC_TARGET)-
 # Scratch per arch: three parallel builds writing t-o2.s into one shared directory
 # clobbered one another -- an x86 as was handed ARM assembly.
