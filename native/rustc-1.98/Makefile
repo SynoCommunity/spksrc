@@ -17,7 +17,7 @@ LICENSE  = Apache-2.0, MIT
 
 # The source tarball bundles src/llvm-project and vendors every crate, so the whole
 # build is offline: no `git clone`, no submodule fetch. The x.py steps (config.toml,
-# LLVM, stage1/stage2) are custom targets in spksrc.native-toolchain-rust.mk; the
+# LLVM, stage1/stage2) are custom targets in spksrc.native/toolchain-rust.mk; the
 # source pipeline (download/extract/patch) is the framework's, so patches live in
 # ./patches and are applied by the normal patch step.
 #
@@ -54,8 +54,9 @@ ARCHIVE_KEEP = .
 # This rustc exists to be built BY the gcc 8.5 overlay -- that is the whole point of the
 # 1.98 line here, and without it RUST_CC is the vendor gcc: 4.9.3 on qoriq, which has no
 # __builtin_sadd_overflow (GCC 5) and fails compiling compiler-rt for compiler_builtins.
-# Declared before the front-end include, where overlay.mk reads it; `?=` so a command
-# line or local.mk can still say otherwise.
+# overlay.mk defaults it on too; this line is what still holds when local.mk turns it off
+# tree-wide, since it is read first. `?=`, so a command line or the environment can still
+# say otherwise.
 OVERLAY_GCC ?= 1
 
 NATIVE_TOOLCHAIN = rust
