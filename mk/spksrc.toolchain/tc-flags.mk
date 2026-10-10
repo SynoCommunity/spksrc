@@ -109,18 +109,6 @@ _TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
 _tc_ld_syslibs = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
 TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(_tc_ld_syslibs)
 
-# The ABI flags a build compiles with. The Synology gcc is the reference an overlay must
-# match to stay binary-compatible, so each overlay consumer is SEEDED from the legacy
-# toolchain -- but it carries its own copy, and that copy wins while it is active.
-#
-# The two are identical everywhere today; the indirection is the point. A compiler that
-# spells or defaults differently -- a future gcc-12, or gcc 8.5 already on the archs whose
-# 2008 gcc under-declared its ABI -- is then corrected next to itself, instead of by
-# editing a legacy toolchain every other package still builds against.
-_TC_LEGACY_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS)
-_TC_OVERLAY_BUILD_FLAGS = $(if $(OVERLAY_GCC_ON),$(shell sed -n 's/^TC_EXTRA_BUILD_FLAGS *= *//p' $(TC_OVERLAY_GCC)/Makefile 2>/dev/null))
-TC_EXTRA_BUILD_FLAGS = $(or $(_TC_OVERLAY_BUILD_FLAGS),$(_TC_LEGACY_BUILD_FLAGS))
-
 # TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
 # -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
 # (and the link, above) -- passing them only to CFLAGS would silently build C++ or
