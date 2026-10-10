@@ -8,6 +8,11 @@ DEPENDS = cross/kiwix-tools
 # compiler for cross/libzim
 MIN_GCC_VERSION = 7.5
 
+# build libicu with data archive
+# to avoid runtime errors loading libicu (seen on 32-bit arm archs)
+# Loading time of libicu is slightly reduced, therefore all archs benefit from this setting
+export LIBICU_DATA_PACKAGING_MODE=archive
+
 HOMEPAGE = https://www.kiwix.org/
 DESCRIPTION = Kiwix is an offline reader for online content like Wikipedia, Project Gutenberg, or TED Talks. It makes knowledge available to people with no or limited internet access. The software as well as the content is free to use for anyone.
 LICENSE  = GPLv3
