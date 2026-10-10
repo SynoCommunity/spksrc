@@ -217,7 +217,11 @@ gcc-prepare: tc-install
 	  exit 1 ; \
 	}
 	@$(MSG) "gcc-$(PKG_VERS): building binutils for $(TC_ARCH)-$(TC_VERS) to build against"
-	@$(MAKE) --no-print-directory -C $(GCC_BINUTILS_DIR) TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
+	@# Build tools, not a publishable binutils. PGO_PHASE emptied: it would reach this
+	@# sub-make through MAKEFLAGS, and pass 1 leave an instrumented binutils that pass 2
+	@# reuses, cookies intact. ARCHIVE_NAME emptied: an archive left here would be taken
+	@# for a finished profile-guided binutils by its own arch- target.
+	@$(MAKE) --no-print-directory -C $(GCC_BINUTILS_DIR) TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE= ARCHIVE_NAME=
 
 # PGO training: the instrumented compiler over the generated sources (TOOLCHAIN_PGO_SOURCES),
 # so the counters describe compilation, not just whatever the build happened to do. The
