@@ -17,7 +17,7 @@ LICENSE  = Apache-2.0, MIT
 
 # The source tarball bundles src/llvm-project and vendors every crate, so the whole
 # build is offline: no `git clone`, no submodule fetch. The x.py steps (config.toml,
-# LLVM, stage1/stage2) are custom targets in spksrc.native-toolchain-rust.mk; the
+# LLVM, stage1/stage2) are custom targets in spksrc.native/toolchain-rust.mk; the
 # source pipeline (download/extract/patch) is the framework's, so patches live in
 # ./patches and are applied by the normal patch step.
 #
