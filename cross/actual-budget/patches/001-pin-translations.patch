@@ -1,0 +1,16 @@
+# Pin the translations repo to the last commit before the release.
+# bin/package-browser clones/pulls actualbudget/translations from main with no
+# ref, so frontend output drifts as locales change after release day. That repo
+# has no tags, so re-derive the SHA per release: the commit preceding the tag.
+--- bin/package-browser.orig
++++ bin/package-browser
+@@ -25,7 +25,8 @@
+   fi
+   pushd packages/desktop-client/locale > /dev/null
+   git checkout .
+-  git pull
++  git fetch -q origin
++  git checkout -q 1d3585a06ae3ad8b2833667234317ae149c3c008
+   popd > /dev/null
+   packages/desktop-client/bin/remove-untranslated-languages
+ fi

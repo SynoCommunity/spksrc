@@ -238,6 +238,7 @@ nav:
     - Utilities:
       - DSM Utilities: packages/dsm-utilities.md
     - Web Apps:
+      - Actual Budget: packages/actual-budget.md
       - Adminer: packages/adminer.md
       - BicBucStriim: packages/bicbucstriim.md
       - File Browser: packages/file-browser.md
