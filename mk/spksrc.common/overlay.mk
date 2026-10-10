@@ -50,9 +50,9 @@ OVERLAY_GCC_VERS       ?= 8.5
 # ---- AVAILABLE ---------------------------------------------------------------------
 # Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
 # "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
-_OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
-_OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
-_OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
+_OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-*)
+_OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-*)
+_OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_gcc-*)
 # A rust toolchain is built against a specific gcc, and its directory says which. Both
 # variants coexist, so the _gcc-* glob alone would match two; these split them -- first
 # across EVERY version the arch ships, to choose the default version from the right pool.
@@ -96,7 +96,7 @@ _RUSTC_POOL_VERS      := $(shell printf '%s\n' $(patsubst $(_OVERLAY_TC)_rust-%,
 # means here -- nothing below can tell the difference.
 OVERLAY_RUSTC_VERS    ?= $(firstword $(_RUSTC_POOL_VERS))
 
-_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
+_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
 _OVERLAY_RUSTC_MATCHED := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
 _OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
 
@@ -108,8 +108,8 @@ _OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUST
 TC_OVERLAY_RUSTC      := $(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),\
                            $(or $(_OVERLAY_RUSTC_MATCHED),$(_OVERLAY_RUSTC_VENDOR)),\
                            $(_OVERLAY_RUSTC_VENDOR))
-TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
-TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
+TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
+TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
 # ---- REQUESTED (switches) ----------------------------------------------------------
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,

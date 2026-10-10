@@ -35,13 +35,8 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
-# A toolchain overlay consumer (toolchain/syno-<arch>-<dsm>_<comp>-...) installs a
-# COMPILER, not package payload: nothing downstream ever reads its plist, and the two
-# tree walks always produced an empty file. Skip them. Same /toolchain/ scoping as the
-# WORK_DIR override in spksrc.native-install.mk.
-ifneq ($(findstring /toolchain/,$(CURDIR)),)
-INSTALL_PLIST_SKIP = 1
-endif
+# INSTALL_PLIST_SKIP = 1 skips the two tree walks for a package whose install nothing ever
+# reads as a plist -- an overlay consumer installs a compiler (spksrc.overlay.mk).
 
 # Sensible default for the classic gnu-make install path only: the standard
 # make install command. Excluded for cmake/meson (via DEFAULT_ENV) and for the

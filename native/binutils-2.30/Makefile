@@ -74,12 +74,11 @@ HOST_OPTFLAGS += $(if $(filter use,$(PGO_PHASE)),$(BINUTILS_PGO_USE))
 # v3: same binutils, rebuilt with the flags above actually reaching the compiler.
 # v4: same again, profile-guided. Every consumer pins the same rev.
 PKG_REV ?= v4
-# The consumer fetches by PKG_DIST_ARCH, which is not always TC_ARCH: aarch64 takes
-# rtd1296, armv7 armada38x, x64 x86 or apollolake. Read back from the consumer rather
-# than tabulated here, so the name this produces cannot drift from the name fetched.
-TC_DIST_ARCH = $(or $(strip $(shell sed -n 's/^PKG_DIST_ARCH[[:space:]]*=[[:space:]]*//p' \
-                 ../../toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-$(PKG_VERS)/Makefile \
-                 2>/dev/null | sed 's|$$(TC_ARCH)|$(TC_ARCH)|')),$(TC_ARCH))
+# The arch the archive is named after: TC_ARCH, or for a generic arch (x64, armv7,
+# aarch64) the real arch whose toolchain it shares -- derived by the helper the consumer
+# uses, so the name this produces is the name that is fetched.
+include ../../mk/spksrc.overlay/dist-arch.mk
+TC_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_DIST_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
@@ -179,7 +178,7 @@ binutils-pgo-train:
 # Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
 # propagates into every sub-make, parallelising toolchain targets not written for it.
 ##############################################################################
-BINUTILS_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_binutils-2.30 2>/dev/null | \
+BINUTILS_ARCHS = $(shell ls -d ../../overlay/syno-*-$(1)_binutils-2.30 2>/dev/null | \
                     sed 's|.*/syno-||; s|-$(1)_binutils-2.30$$||')
 BINUTILS_JOBS ?= 1
 

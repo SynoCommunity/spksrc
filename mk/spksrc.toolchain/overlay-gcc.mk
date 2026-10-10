@@ -10,7 +10,7 @@
 # use time: that is what lets a gcc be rebuilt without touching binutils, and vice versa.
 #
 # PRODUCED by native/gcc-<vers>, CONSUMED here by downloading the published .txz through
-# toolchain/syno-<arch>-<dsm>_gcc-<vers>_gcc-<base> -- no per-build recompile in CI.
+# overlay/syno-<arch>-<dsm>_gcc-<vers> -- no per-build recompile in CI.
 ###############################################################################
 
 # The extracted compilers (<target>-gcc-8.5, <target>-g++-8.5, ...), inside the CONSUMER's
@@ -32,7 +32,7 @@ OVERLAY_GCC_SUFFIX = $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
 
 # Provision the gcc overlay as a normal DEPENDS, symmetric with the binutils consumer.
 ifeq ($(OVERLAY_GCC_ON),1)
-DEPENDS += toolchain/$(notdir $(TC_OVERLAY_GCC))
+DEPENDS += overlay/$(notdir $(TC_OVERLAY_GCC))
 endif
 
 # Provision at tcvars time, not only through the toolchain's DEPENDS above: _all is skipped

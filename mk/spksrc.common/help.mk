@@ -20,7 +20,7 @@ SPKSRC_TREE := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
 # the spksrc checkout happens to live under a parent directory named like a
 # package tree (e.g. /home/user/spk/spksrc).
 ifneq ($(CURDIR),$(BASEDIR))
-ifneq ($(filter $(SPKSRC_TREE),cross spk native toolchain toolkit kernel diyspk python),)
+ifneq ($(filter $(SPKSRC_TREE),cross spk native toolchain overlay toolkit kernel diyspk python),)
 
 # Build lifecycle steps; spk/cross/diyspk additionally generate a PLIST.
 HELP_STEPS := download checksum extract patch configure compile install

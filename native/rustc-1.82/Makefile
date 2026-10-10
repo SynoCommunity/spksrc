@@ -30,7 +30,7 @@ LICENSE  = Apache-2.0, MIT
 ##############################################################################
 # Packaging via the generic helper (mk/spksrc.build/archive.mk): host the x.py
 # stage2 tree (= the rustup toolchain layout), consumed by
-# toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>.
+# overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>.
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
 #
 # Declared BEFORE the native front-end include so the helper (pulled in via
@@ -61,7 +61,7 @@ include ../../mk/spksrc.native-toolchain.mk
 #   make RUST_JOBS=2 all-6.2.4   2 archs at a time (each still max threads)
 # Concurrency via xargs -P, NOT make -j (which would propagate into the x.py sub-builds).
 ##############################################################################
-RUST_REAL_ARCHS = $(sort $(foreach d,$(wildcard ../../toolchain/syno-*-$(1)_rust-*),$(patsubst syno-%-$(1),%,$(firstword $(subst _, ,$(notdir $(d)))))))
+RUST_REAL_ARCHS = $(sort $(foreach d,$(wildcard ../../overlay/syno-*-$(1)_rust-*),$(patsubst syno-%-$(1),%,$(firstword $(subst _, ,$(notdir $(d)))))))
 
 RUST_JOBS ?= 1
 
