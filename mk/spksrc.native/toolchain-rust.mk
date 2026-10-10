@@ -115,6 +115,10 @@ RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils
 
 _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 
+# The overlay directories this component's consumers carry: all-<vers> builds for them
+# (spksrc.native-toolchain.mk).
+TOOLCHAIN_CONSUMER = rust-$(basename $(PKG_VERS))_gcc-*
+
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # overlay-rustc.mk's _RUST_TC_ID on the package-build side.

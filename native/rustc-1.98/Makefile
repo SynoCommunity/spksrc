@@ -60,31 +60,3 @@ OVERLAY_GCC ?= 1
 
 NATIVE_TOOLCHAIN = rust
 include ../../mk/spksrc.native-toolchain.mk
-
-##############################################################################
-# Build rustc for EVERY custom-rust toolchain of a DSM version (a real rust target iff it
-# has a rust consumer dir -- the same marker as TC_OVERLAY_RUSTC).
-#   make all-5.2                 one arch at a time
-#   make RUST_JOBS=2 all-6.2.4   2 archs at a time (each still max threads)
-# Concurrency via xargs -P, NOT make -j (which would propagate into the x.py sub-builds).
-##############################################################################
-RUST_REAL_ARCHS = $(sort $(foreach d,$(wildcard ../../overlay/syno-*-$(1)_rust-*),$(patsubst syno-%-$(1),%,$(firstword $(subst _, ,$(notdir $(d)))))))
-
-RUST_JOBS ?= 1
-
-.PHONY: all-%
-all-%:
-	@$(MSG) "rustc-$(PKG_VERS): all-$* -- $(words $(call RUST_REAL_ARCHS,$*)) archs, $(RUST_JOBS) at a time"
-	@echo "$(sort $(call RUST_REAL_ARCHS,$*))" | tr ' ' '\n' | \
-	   xargs -P $(RUST_JOBS) -I@ $(MAKE) --no-print-directory arch-@-$*
-	@$(MSG) "rustc-$(PKG_VERS): all-$* complete"
-
-##############################################################################
-# Build rustc for a SPECIFIC toolchain of a given DSM version, then archive it.
-#   make arch-ppc853x-5.2     make arch-qoriq-6.2.4
-##############################################################################
-.PHONY: arch-%
-arch-%:
-	@$(MSG) "===== rustc-$(PKG_VERS): $* ====="
-	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
-	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
