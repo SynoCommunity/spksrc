@@ -1,0 +1,24 @@
+# add missing includes to fix compilation with gcc >= 10
+# 
+--- docopt.h.orig	2016-12-02 19:12:44.000000000 +0000
++++ docopt.h	2026-07-28 12:07:26.719920454 +0000
+@@ -14,6 +14,7 @@
+ #include <map>
+ #include <vector>
+ #include <string>
++#include <stdexcept>
+ 
+ #ifdef DOCOPT_HEADER_ONLY
+     #define DOCOPT_INLINE inline
+
+
+--- docopt_value.h.orig	2016-12-02 19:12:44.000000000 +0000
++++ docopt_value.h	2026-07-28 12:11:04.714218330 +0000
+@@ -13,6 +13,7 @@
+ #include <vector>
+ #include <functional> // std::hash
+ #include <iosfwd>
++#include <stdexcept>
+ 
+ namespace docopt {
+ 
