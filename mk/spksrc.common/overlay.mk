@@ -187,8 +187,10 @@ OVERLAY_GCC_ON       = $(if $(strip $(TC_OVERLAY_GCC)),$(if $(strip $(TC_OVERLAY
 OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(_OVERLAY_BINUTILS_ASKED),$(call is_false,$(_OVERLAY_BINUTILS_ASKED))))
 
 # All three uses pull the same archive; they differ only in scope. The gcc overlay ships
-# no as/ld of its own, so without this it would silently drive the vendor ones.
-_OVERLAY_BINUTILS_WANTED    = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(call is_true,$(OVERLAY_GCC)),1)
+# no as/ld of its own, so without this it would silently drive the vendor ones. The gcc one
+# counts only where the arch ships a gcc overlay: elsewhere the default OVERLAY_GCC=1 asks
+# for nothing, and must not announce a missing binutils on every build of a 7.2 arch.
+_OVERLAY_BINUTILS_WANTED    = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(if $(strip $(TC_OVERLAY_GCC)),$(call is_true,$(OVERLAY_GCC))),1)
 OVERLAY_BINUTILS_PROVISION  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_WANTED))
 
 # ---- Degraded states, and what to say about them ------------------------------------
