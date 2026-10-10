@@ -52,7 +52,7 @@ endif
 # Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
 # builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer).
 ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
-DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
+DEPENDS += overlay/$(notdir $(TC_OVERLAY_BINUTILS))
 endif
 
 # Same reason as overlay-gcc-install: an arch with no rust consumer has nothing else

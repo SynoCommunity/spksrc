@@ -36,12 +36,11 @@ PRE_CONFIGURE_TARGET = gcc-prepare
 # rebuild lands under a new name instead of replacing a file consumers cached.
 ##############################################################################
 PKG_REV ?= v5
-# The consumer fetches by PKG_DIST_ARCH, which is not always TC_ARCH: aarch64-6.2.4 takes
-# rtd1296, armv7-6.2.4 armada38x, x64-6.2.4 x86. Read back rather than tabulated here, so
-# the name this produces cannot drift from the name that is fetched.
-TC_DIST_ARCH = $(or $(strip $(shell sed -n 's/^PKG_DIST_ARCH[[:space:]]*=[[:space:]]*//p' \
-                 ../../toolchain/syno-$(TC_ARCH)-$(TC_VERS)_gcc-$(basename $(PKG_VERS))/Makefile \
-                 2>/dev/null | sed 's|$$(TC_ARCH)|$(TC_ARCH)|')),$(TC_ARCH))
+# The arch the archive is named after: TC_ARCH, or for a generic arch (x64, armv7,
+# aarch64) the real arch whose toolchain it shares -- derived by the helper the consumer
+# uses, so the name this produces is the name that is fetched.
+include ../../mk/spksrc.overlay/dist-arch.mk
+TC_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 ARCHIVE_NAME = gcc-$(PKG_VERS)-$(TC_TARGET)-$(TC_DIST_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
@@ -285,7 +284,7 @@ endif
 # Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
 # propagates into every sub-make, parallelising toolchain targets not written for it.
 ##############################################################################
-GCC_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_gcc-8.5 2>/dev/null | \
+GCC_ARCHS = $(shell ls -d ../../overlay/syno-*-$(1)_gcc-8.5 2>/dev/null | \
                     sed 's|.*/syno-||; s|-$(1)_gcc-8.5$$||')
 GCC_JOBS ?= 1
 # A gcc build tree is ~2 GB and only the .txz matters afterwards: 59 of them would fill

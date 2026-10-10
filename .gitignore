@@ -41,7 +41,6 @@ toolchain/*/build*
 toolchain/*/status*
 
 overlay/*/work*
-overlay/*/build*
 overlay/*/status*
 
 toolkit/*/work*

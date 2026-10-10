@@ -192,7 +192,7 @@ endif
 # vendor build -- while this toolchain is built once per run. Provisioning only the first
 # left python314 asking rustup for a toolchain nobody had installed.
 ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED)),)
-DEPENDS += $(addprefix toolchain/,$(notdir $(_OVERLAY_RUSTC_ENABLED)))
+DEPENDS += $(addprefix overlay/,$(notdir $(_OVERLAY_RUSTC_ENABLED)))
 endif
 
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the shim

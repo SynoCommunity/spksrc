@@ -1,0 +1,18 @@
+make[1]: Entering directory '/home/spksrc/prO/overlay/syno-x64-6.2.4_binutils-2.30'
+===>  Downloading files for binutils
+===>    File binutils-2.30-x86_64-pc-linux-gnu-x86-6.2.4-v4.txz already downloaded
+===>  Verifying files for binutils
+===>    Checking sha1sum of file binutils-2.30-x86_64-pc-linux-gnu-x86-6.2.4-v4.txz
+===>    Checking sha256sum of file binutils-2.30-x86_64-pc-linux-gnu-x86-6.2.4-v4.txz
+===>    Checking md5sum of file binutils-2.30-x86_64-pc-linux-gnu-x86-6.2.4-v4.txz
+===>  Processing dependencies of binutils
+===>  20261010-121721 MAKELEVEL: 01, PARALLEL_MAKE: max, ARCH: x64-6.2.4_binutils-2.30, NAME: overlay
+===>  Extracting for binutils
+tar -xpf /home/spksrc/prO/overlay/syno-x64-6.2.4_binutils-2.30/../../distrib/binutils-2.30-x86_64-pc-linux-gnu-x86-6.2.4-v4.txz -C /home/spksrc/prO/overlay/syno-x64-6.2.4_binutils-2.30/work/install  
+===>  Patching for binutils
+===>  Configuring for binutils
+===>  - Configure ARGS:
+===>  - Install prefix: /usr/local/binutils
+===>  Compiling for binutils
+===>  Installing for binutils
+make[1]: Leaving directory '/home/spksrc/prO/overlay/syno-x64-6.2.4_binutils-2.30'
