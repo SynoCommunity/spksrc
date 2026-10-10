@@ -28,7 +28,7 @@ The package creates an `ArchiveStation` shared folder by default. To use another
 - Application log: `/var/packages/archivestation/var/archive-station.log`.
 - Internal backend: `127.0.0.1:8274`. This port is not exposed on the LAN.
 
-The DSM gateway validates the current administrator session before forwarding requests. Trusted local NAS processes can reach the loopback service; this is not an isolation boundary against other software running on the NAS.
+The application reuses your existing DSM administrator session without a separate login or password. It automatically attempts to recover a missing or outdated session token. The DSM gateway validates the current administrator session before forwarding requests. Trusted local NAS processes can reach the loopback service; this is not an isolation boundary against other software running on the NAS.
 
 Closing the window does not stop downloads. Pause/resume, individual file selection, scheduling, retries, SHA-1/MD5 verification, transfer history and readable text reports are available in the application. Partial files are retained separately and published under their final names after verification.
 
@@ -50,13 +50,15 @@ There is no automatic migration in this initial recipe. A manual migration was t
 
 The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md). Final distribution metadata is rendered through the standard `POST_STRIP_TARGET` hook. Run `make clean` before rebuilding after a source version or package revision change; spksrc caches the intermediate build steps and `INFO`.
 
-The recipe uses a checksum-verified upstream 1.0.1 source release and a pinned pure-Python dependency. From the spksrc build environment:
+The recipe uses the checksum-verified upstream 1.0.2-2 source release and a pinned pure-Python dependency. `UPSTREAM_REV` identifies the upstream source archive independently of the SynoCommunity `SPK_REV`, which remains 1 for this first package submission. From the spksrc build environment:
 
 ```bash
 make -C spk/archivestation clean
 make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```
+
+The current 1.0.2 recipe was built for both targets and checked against the published source. An isolated Linux upgrade from community 1.0.1-1 to 1.0.2-1 retained settings and an active partial download, resumed automatically and completed with the expected SHA-1. This is not a DSM hardware test.
 
 Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
 
@@ -67,6 +69,6 @@ Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Updat
 - Manual migration from the standalone package and restoration of the original installation.
 - Rejection of concurrent installation with the standalone package.
 
-The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. Browser tests use a simulated DSM session; an authenticated interactive browser session was not rechecked during this hardware run. Other NAS architectures still need hardware testing.
+The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. DSM 7.4.1 session recovery has not been hardware-verified. Browser tests use a simulated DSM session; an authenticated interactive browser session was not rechecked during this hardware run. Other NAS architectures still need hardware testing.
 
 See the [upstream usage guide](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/USAGE.md) for the full feature reference.
