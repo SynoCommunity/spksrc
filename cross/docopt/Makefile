@@ -15,25 +15,23 @@ HOMEPAGE = https://github.com/docopt/docopt.cpp
 COMMENT = C++11 port of docopt, C++ command line argument parser.
 LICENSE = BSL-1.0 and MIT
 
-POST_INSTALL_TARGET = docopt_post_install
+DOCOPT_PC = $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/docopt.pc
+POST_INSTALL_TARGET = $(DOCOPT_PC)
 
 include ../../mk/spksrc.cross-cmake.mk
 
-.PHONY: docopt_post_install
-docopt_post_install:
-	@$(MSG) Create pkgconfig file
-	@install -d $(STAGING_INSTALL_PREFIX)/lib/pkgconfig
-	@( \
-		echo "prefix=$(STAGING_INSTALL_PREFIX)"; \
-		echo "exec_prefix=\$${prefix}"; \
-		echo "libdir=\$${exec_prefix}/lib"; \
-		echo "includedir=\$${prefix}/include"; \
-		echo ""; \
-		echo "Name: docopt"; \
-		echo "Description: C++ command line argument parser"; \
-		echo "Version: $(PKG_VERS)"; \
-		echo ""; \
-		echo "Requires:"; \
-		echo "Libs: -L\$${libdir} -ldocopt"; \
-		echo "Cflags: -I\$${includedir}"; \
-	) > $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/docopt.pc
+$(DOCOPT_PC):
+	@$(MSG) - Creating pkgconfig $(notdir $@)
+	@install -d $(dir $@)
+	@printf 'prefix=$(INSTALL_PREFIX)\n' > $@
+	@printf 'exec_prefix=$${prefix}\n' >> $@
+	@printf 'libdir=$${exec_prefix}/lib\n' >> $@
+	@printf 'includedir=$${prefix}/include\n' >> $@
+	@printf '\n' >> $@
+	@printf 'Name: docopt\n' >> $@
+	@printf 'Description: C++ command line argument parser\n' >> $@
+	@printf 'Version: $(PKG_VERS)\n' >> $@
+	@printf '\n' >> $@
+	@printf 'Requires:\n' >> $@
+	@printf 'Cflags: -I$${includedir}\n' >> $@
+	@printf 'Libs: -L\$${libdir} -ldocopt\n' >> $@
