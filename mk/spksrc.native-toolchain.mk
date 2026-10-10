@@ -62,6 +62,12 @@ TC_GLIBC   := $(call _tc_get,TC_GLIBC)
 # components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
 TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
+# Prefix for running a binary of that toolchain: the C locale. The gcc 4.7.3 of x86-5.2
+# (and x64-5.2) aborts on a current host's locale data -- "loadlocale.c:129:
+# _nl_intern_locale_data: Assertion ... failed" -- on -v, -print-sysroot and every compile.
+# Inline, as toolchain-rust.mk does for x.py: an export reaches $(shell) only from make 4.4.
+TC_VENDOR_ENV = LC_ALL=C
+
 # The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
 # (single source of truth -- the same value tc_vars emits as SYSROOT). A plain string, so
 # valid before extraction too, unlike a wildcard probe. Used e.g. for binutils --with-sysroot.
