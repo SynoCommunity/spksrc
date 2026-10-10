@@ -90,30 +90,40 @@ setup_proxy ()
 
 install_ml_packages()
 {
+    # Version bounds mirror machine-learning/pyproject.toml. uvicorn is
+    # plain rather than [standard]; the extra pulls compiled event-loop
+    # and http parsers with no place on DSM.
     "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
-        onnxruntime \
-        onnx \
-        opencv-python-headless \
-        huggingface-hub \
-        numpy \
-        orjson \
-        pillow \
-        tokenizers \
-        fastapi \
-        uvicorn \
-        gunicorn \
-        pydantic \
-        pydantic-settings \
-        python-multipart \
-        rich \
-        aiocache \
-        rapidocr 2>&1
-    # ensure opencv stays headless (GUI variant has no place on DSM)
+        "onnxruntime>=1.23.2,<2" \
+        "onnx>=1.22.0" \
+        "opencv-python-headless>=4.7.0.72,<5.0" \
+        "huggingface-hub>=1.0,<2.0" \
+        "numpy>=2.4.0,<3.0" \
+        "orjson>=3.9.5" \
+        "pillow>=12.2,<13" \
+        "tokenizers>=0.15.0,<1.0" \
+        "fastapi>=0.95.2,<1.0" \
+        "uvicorn>=0.22.0,<1.0" \
+        "gunicorn>=21.1.0" \
+        "pydantic>=2.0.0,<3" \
+        "pydantic-settings>=2.5.2,<3" \
+        "python-multipart>=0.0.6,<1.0" \
+        "rich>=13.4.2" \
+        "rapidocr>=3.1.0" 2>&1
+    # immich-model is not on PyPI; the wheel is prebuilt at package time
+    # (see spk Makefile) so no git binary is needed here. Its <3.14 cap
+    # guards the rknn/export extras, which are not installed; the consumed
+    # core (constants, onnx utils, runtime) is pure Python, so bypass the
+    # version check for this package only.
+    "${ML_VENV}/bin/pip3" install --no-cache-dir --ignore-requires-python \
+        "${SYNOPKG_PKGDEST}/share/immich/wheelhouse/immich_model-0.2.0-py3-none-any.whl" 2>&1
+    # Keep the headless variant pinned as above; the GUI variant has
+    # no place on DSM.
     "${ML_VENV}/bin/pip3" install \
         --force-reinstall \
         --no-deps \
         --no-cache-dir \
-        opencv-python-headless 2>&1
+        "opencv-python-headless>=4.7.0.72,<5.0" 2>&1
 }
 
 service_prestart()
@@ -293,6 +303,12 @@ service_postupgrade ()
         if "${ML_VENV}/bin/pip3" show insightface >/dev/null 2>&1; then
             echo "Removing obsolete insightface wheel."
             "${ML_VENV}/bin/pip3" uninstall -y insightface 2>&1 || true
+        fi
+        # 3.3.1 dropped aiocache; remove the leftover wheel on upgrade
+        # so it does not linger in the venv
+        if "${ML_VENV}/bin/pip3" show aiocache >/dev/null 2>&1; then
+            echo "Removing obsolete aiocache wheel."
+            "${ML_VENV}/bin/pip3" uninstall -y aiocache 2>&1 || true
         fi
         install_ml_packages
     fi
