@@ -32,7 +32,7 @@ RED=$$(tput setaf 1)
 GREEN=$$(tput setaf 2)
 NC=$$(tput sgr0)
 
-ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
+ifneq ($(filter toolchain overlay,$(notdir $(abspath $(CURDIR)/..))),)
   DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS).log
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
   DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TK_NAME))),$(TK_ARCH))-$(TK_VERS).log
