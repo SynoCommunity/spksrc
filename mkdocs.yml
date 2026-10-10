@@ -194,6 +194,7 @@ nav:
       - Git: packages/git.md
       - PostgreSQL: packages/postgresql.md
     - Downloads:
+      - Archive Station: packages/archivestation.md
       - Aria2: packages/aria2.md
       - Deluge: packages/deluge.md
       - ruTorrent: packages/rutorrent.md

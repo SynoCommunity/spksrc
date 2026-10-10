@@ -1,0 +1,69 @@
+#!/bin/sh
+set -eu
+PACKAGE=archivestation
+TASK_DEST="${SYNOPKG_PKGDEST:-/var/packages/$PACKAGE/target}"
+TASK_VAR="${SYNOPKG_PKGVAR:-/var/packages/$PACKAGE/var}"
+PID_FILE="$TASK_VAR/run.pid"
+PYTHON="$TASK_DEST/env/bin/python3"
+export PYTHONPATH="$TASK_DEST/app"
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONUNBUFFERED=1
+export ARCHIVE_STATION_PACKAGE_ID=archivestation
+export ARCHIVE_STATION_SERVICE_USER=sc-archivestation
+export ARCHIVE_STATION_PACKAGE_CENTER=1
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+running() {
+    [ -f "$PID_FILE" ] || return 1
+    pid="$(cat "$PID_FILE")"
+    case "$pid" in ''|*[!0-9]*) return 1 ;; esac
+    args="$(ps -p "$pid" -o args= 2>/dev/null || true)"
+    case "$args" in *"archive_station"*"$TASK_VAR"*) return 0 ;; *) return 1 ;; esac
+}
+start() {
+    running && return 0
+    mkdir -p "$TASK_VAR"
+    chmod 700 "$TASK_VAR"
+    default_dir="$(readlink -f "/var/packages/$PACKAGE/shares/ArchiveStation" 2>/dev/null || true)"
+    [ -n "$default_dir" ] || default_dir="/volume1/ArchiveStation"
+    set --
+    for volume in /volume[0-9]*; do
+        [ -d "$volume" ] && set -- "$@" --allow-root "$volume"
+    done
+    "$PYTHON" -m archive_station --host 127.0.0.1 --port 8274 --dsm-auth \
+        --data-dir "$TASK_VAR" --download-dir "$default_dir" "$@" \
+        </dev/null >>"$TASK_VAR/service.log" 2>&1 &
+    echo "$!" > "$PID_FILE"
+    sleep 2
+    running
+}
+stop() {
+    if running; then
+        kill "$pid" 2>/dev/null || true
+        count=0
+        while running; do
+            count=$((count+1))
+            if [ "$count" -ge 60 ]; then
+                echo "Graceful shutdown timed out; stopping Archive Station forcibly" >&2
+                # running rechecks the process identity before using this PID.
+                kill -9 "$pid" 2>/dev/null || true
+                count=0
+                while running; do
+                    count=$((count+1))
+                    [ "$count" -lt 5 ] || { echo "Process is still blocked" >&2; return 1; }
+                    sleep 1
+                done
+                break
+            fi
+            sleep 1
+        done
+    fi
+    rm -f "$PID_FILE"
+}
+case "${1:-}" in
+    start) start ;;
+    stop) stop ;;
+    restart) stop; start ;;
+    status) running ;;
+    log) echo "$TASK_VAR/archive-station.log" ;;
+    *) exit 1 ;;
+esac
