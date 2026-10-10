@@ -15,7 +15,7 @@
 #                           ppc853x REQUIRES it: its 2008 ld 2.18 mishandles Rust's TLS/PIE.
 #
 # PRODUCED by native/binutils-<ver>, CONSUMED here by downloading the published .txz through
-# toolchain/syno-<arch>-<dsm>_binutils-<ver>_gcc-<gcc> -- no per-build recompile in CI.
+# overlay/syno-<arch>-<dsm>_binutils-<ver> -- no per-build recompile in CI.
 ###############################################################################
 
 # The extracted cross tools (<target>-ld, <target>-as, ...), inside the CONSUMER's own work
@@ -52,7 +52,7 @@ endif
 # Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
 # builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer).
 ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
-DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
+DEPENDS += overlay/$(notdir $(TC_OVERLAY_BINUTILS))
 endif
 
 # Same reason as overlay-gcc-install: an arch with no rust consumer has nothing else
