@@ -99,12 +99,17 @@ _TCV_ASKED_GCC   := $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC))
 _TCV_ASKED_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC))
 -include $(WORK_DIR)/tc_vars.mk
 
+# Shown relative to the tree, not by name alone: the comparison is on the whole path, and a
+# consumer that moved keeps its name -- the message would then show the same two strings.
+_tcv_show  = $(or $(patsubst $(BASEDIR)/%,%,$(strip $(1))),none)
+_tcv_moved = $(if $(findstring /toolchain/syno-,$(TC_OVERLAY_GCC)$(TC_OVERLAY_RUSTC)), -- this work dir predates the move of the overlays from toolchain/ to overlay/)
+
 ifneq ($(and $(wildcard $(WORK_DIR)/tc_vars.mk),\
              $(filter-out $(strip $(_TCV_ASKED_GCC))|$(strip $(_TCV_ASKED_RUSTC)),\
                           $(strip $(TC_OVERLAY_GCC))|$(strip $(TC_OVERLAY_RUSTC)))),)
 $(error $(WORK_DIR)/tc_vars.mk was generated for a different overlay selection -- \
-gcc [$(notdir $(TC_OVERLAY_GCC))] rustc [$(notdir $(TC_OVERLAY_RUSTC))], now asked \
-gcc [$(notdir $(_TCV_ASKED_GCC))] rustc [$(notdir $(_TCV_ASKED_RUSTC))]. Run `make clean` here first)
+gcc [$(call _tcv_show,$(TC_OVERLAY_GCC))] rustc [$(call _tcv_show,$(TC_OVERLAY_RUSTC))], now asked \
+gcc [$(call _tcv_show,$(_TCV_ASKED_GCC))] rustc [$(call _tcv_show,$(_TCV_ASKED_RUSTC))]$(_tcv_moved). Run `make clean` here first)
 endif
 
 # Keyed on the extracted $(TC_TARGET), the toolchain no longer generating a file to
