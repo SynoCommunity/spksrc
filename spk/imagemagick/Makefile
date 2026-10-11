@@ -1,6 +1,6 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.1.2
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/imagemagick.png
 
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
@@ -10,9 +10,9 @@ DEPENDS += cross/imagemagick
 DEPENDS += cross/jpegoptim cross/pngcrush cross/optipng
 
 MAINTAINER = hgy59
-DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; OptiPNG is a PNG optimizer that recompresses image files to a smaller size, without losing any information; pngcrush an optimizer for png files; pngquant for lossy compression of PNG images.
+DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images. This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; OptiPNG is a PNG optimizer that recompresses image files to a smaller size, without losing any information; pngcrush an optimizer for png files; pngquant for lossy compression of PNG images.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.2-29. <br/>2. Update jpegoptim to v1.5.6. "
+CHANGELOG = "Update ImageMagick to v7.1.2-33 (security fixes)."
 
 STARTABLE = no
 
@@ -37,13 +37,14 @@ include ../../mk/spksrc.spk.mk
 # or false paths in generated pkgconfig files
 imagemagick_patch_rpath:
 	@$(MSG) "Patching binaries and libraries of $(SPK_NAME) (some have bad library rpath)."
-	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
+	@command -v objdump >/dev/null && command -v patchelf >/dev/null || { echo "objdump and patchelf are required" >&2; exit 1; }; \
+	sed 's/:/ /' $(INSTALL_PLIST) | while read type file ; \
 	do \
 	  case $${type} in \
 	    lib|bin) \
 	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep RPATH | grep spk/$(SPK_NAME))" ]; then \
 	         echo -n "Patch rpath in $${file}... " ; \
-	         patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/$${file} &> /dev/null && echo "ok." || echo "failed!" ; \
+	         patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/$${file} &> /dev/null && echo "ok." || { echo "failed!"; exit 1; } ; \
 	      fi \
 	      ;; \
 	  esac ; \

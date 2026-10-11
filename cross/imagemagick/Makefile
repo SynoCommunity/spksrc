@@ -1,5 +1,5 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.1.2-29
+PKG_VERS = 7.1.2-33
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
@@ -10,7 +10,7 @@ OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/
 OPTIONAL_DEPENDS += cross/jemalloc cross/jemalloc_5.2
 OPTIONAL_DEPENDS += cross/libjxl cross/libultrahdr cross/sjpeg
 
-DEPENDS  = cross/bzip2 
+DEPENDS  = cross/bzip2
 DEPENDS += cross/xz
 DEPENDS += cross/zstd
 DEPENDS += cross/libxml2
@@ -35,6 +35,8 @@ CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
 CONFIGURE_ARGS += --without-perl --without-x
 # magick *++* files fail to add to package by PLIST
 CONFIGURE_ARGS += --without-magick-plus-plus
+CONFIGURE_ARGS += --with-fpx
+CONFIGURE_ARGS += --with-fftw
 
 include ../../mk/spksrc.common.mk
 SUPPORT_CPP11 = 1
@@ -69,8 +71,6 @@ LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS += --with-fpx
-CONFIGURE_ARGS += --with-fftw
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/jemalloc_5.2
 else
@@ -90,8 +90,6 @@ endif
 
 ADDITIONAL_CFLAGS = -O2
 
-include ../../mk/spksrc.cross-cc.mk
-
 # MIN_GLIBC_VERSION on highway, which libjxl requires: the C library decides here, not
 # only the compiler.
 ifeq ($(call version_gt, $(TC_GCC), 5)$(call version_ge, $(TC_GLIBC), 2.12),11)
@@ -99,3 +97,5 @@ DEPENDS += cross/libjxl
 DEPENDS += cross/libultrahdr
 CONFIGURE_ARGS += --with-uhdr
 endif
+
+include ../../mk/spksrc.cross-cc.mk
