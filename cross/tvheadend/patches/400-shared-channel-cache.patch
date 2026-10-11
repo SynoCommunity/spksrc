@@ -6,7 +6,7 @@ channel change, a DVR-driven cache warmup, and our fixes on top.
 
 tvheadend/tvheadend#2249, the whole of it: the 28 commits of th0ma7/tvheadend
 branch record-from-buffer, rebased onto the package base as
-a87be591f..53f37b29b.
+a87be591f..371869305.
 
 Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
 upstream as of this base.  `git rebase` dropped its three commits on its own,
@@ -37,6 +37,12 @@ report and to two review passes:
     measure from, and only on one this connection may write.
   - a null title no longer reaches the recorder's start trace, which older GCC
     rejects under -Werror=format-overflow=.
+  - the whole cache is offered, not just the configured timeshift period.
+    svcbuf_expire() keeps blocks a reader still needs however old they are, so
+    a cache feeding a recording reaches back to the programme's start whatever
+    the period says; svcts_oldest() applied the period a second time and hid
+    exactly that data, while the in-progress recording played it back without
+    complaint.  Found on a film recorded from 18:29 and tuned live at 20:54.
   - a client is told its seek range exists even when it starts at zero.
     svcts_oldest() answers 0 both for "no cache" and for a range clamped to the
     client's own zero, and svcts_fill_status() read the second as the first, so
@@ -2730,7 +2736,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 -  if (timeshift_period > 0)
 +  /* one cache per channel: timeshift through it when there is one */
 +  if (timeshift_period > 0 && svcts_enabled())
-+    dst = prch->prch_svcts = svcts_create(dst, timeshift_period);
++    dst = prch->prch_svcts = svcts_create(dst);
 +  else if (timeshift_period > 0)
      dst = prch->prch_timeshift = timeshift_create(dst, timeshift_period);
  #endif
@@ -5374,7 +5380,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +#endif /* __TVH_TIMESHIFT_SVCBUF_H__ */
 --- src/timeshift/timeshift_svcts.c.orig
 +++ src/timeshift/timeshift_svcts.c
-@@ -0,0 +1,1805 @@
+@@ -0,0 +1,1809 @@
 +/*
 + *  TV headend - Timeshift - clients timeshifting through the channel cache
 + *  Copyright (C) 2026 Vincent Fortier
@@ -5457,7 +5463,6 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +typedef struct svcts {
 +  streaming_target_t   input;
 +  streaming_target_t  *output;
-+  int64_t              max_time;    ///< us the client may go back
 +  tvh_mutex_t          lock;
 +  tvh_cond_t           cond;
 +  pthread_t            thread;
@@ -5727,9 +5732,17 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +
 +/* Oldest time (us, client base) the client may go back to, 0 if none.
 + *
-+ * The cache can reach further back than this subscription has existed, when
-+ * another viewer tuned the channel first or the keepalive held it.  That part
-+ * of it sits before the client's own zero, so offering it means answering with
++ * Bounded by what the cache actually holds, not by the configured timeshift
++ * period.  Retention is svcbuf_expire()'s business, and it deliberately keeps
++ * blocks a reader still needs however old they are, so a cache feeding a
++ * recording reaches back to the programme's start whatever the period says.
++ * Applying the period again here would hide exactly the data that exception
++ * preserved, and the same bytes are served without complaint when the
++ * in-progress recording is played back instead.
++ *
++ * The cache can also reach further back than this subscription has existed,
++ * when another viewer tuned the channel first or the keepalive held it.  That
++ * part sits before the client's own zero, so offering it means answering with
 + * negative timestamps, which a player that cannot order them renders as a
 + * frozen picture with sound until playback reaches the moment the viewer tuned
 + * in.  Clamped away by default; offered when "Cache seek before tune-in" is
@@ -5757,8 +5770,6 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +  if (!svcts_span(st, &oldest, &newest))
 +    return 0;
 +  t = st->live_time - (st->live_mono - oldest) + SVCTS_PREROLL;
-+  if (st->max_time && t < st->live_time - st->max_time)
-+    t = st->live_time - st->max_time;
 +  if (!timeshift_conf.cache_seek_tunein && t < 0)
 +    t = 0;
 +  return MIN(t, st->live_time);
@@ -7089,12 +7100,11 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 + * *************************************************************************/
 +
 +streaming_target_t *
-+svcts_create ( streaming_target_t *out, time_t max_period )
++svcts_create ( streaming_target_t *out )
 +{
 +  svcts_t *st = calloc(1, sizeof(*st));
 +
 +  st->output   = out;
-+  st->max_time = (int64_t)max_period * 1000000;
 +  st->state    = SVCTS_LIVE;
 +  st->speed    = 100;
 +  st->run      = 1;
@@ -7213,7 +7223,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
 +int svcts_enabled ( void );
 +
 +/* In a client chain, where timeshift_create() would go */
-+streaming_target_t *svcts_create ( streaming_target_t *out, time_t max_period );
++streaming_target_t *svcts_create ( streaming_target_t *out );
 +void svcts_destroy ( streaming_target_t *pad );
 +
 +/* The client's subscription linked to / unlinked from a service
