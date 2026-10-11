@@ -90,8 +90,6 @@ endif
 
 ADDITIONAL_CFLAGS = -O2
 
-include ../../mk/spksrc.cross-cc.mk
-
 # MIN_GLIBC_VERSION on highway, which libjxl requires: the C library decides here, not
 # only the compiler.
 ifeq ($(call version_gt, $(TC_GCC), 5)$(call version_ge, $(TC_GLIBC), 2.12),11)
@@ -99,3 +97,5 @@ DEPENDS += cross/libjxl
 DEPENDS += cross/libultrahdr
 CONFIGURE_ARGS += --with-uhdr
 endif
+
+include ../../mk/spksrc.cross-cc.mk

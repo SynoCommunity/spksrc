@@ -37,13 +37,14 @@ include ../../mk/spksrc.spk.mk
 # or false paths in generated pkgconfig files
 imagemagick_patch_rpath:
 	@$(MSG) "Patching binaries and libraries of $(SPK_NAME) (some have bad library rpath)."
-	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
+	@command -v objdump >/dev/null && command -v patchelf >/dev/null || { echo "objdump and patchelf are required" >&2; exit 1; }; \
+	sed 's/:/ /' $(INSTALL_PLIST) | while read type file ; \
 	do \
 	  case $${type} in \
 	    lib|bin) \
 	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep RPATH | grep spk/$(SPK_NAME))" ]; then \
 	         echo -n "Patch rpath in $${file}... " ; \
-	         patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/$${file} &> /dev/null && echo "ok." || echo "failed!" ; \
+	         patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/$${file} &> /dev/null && echo "ok." || { echo "failed!"; exit 1; } ; \
 	      fi \
 	      ;; \
 	  esac ; \
