@@ -10,7 +10,7 @@ OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/
 OPTIONAL_DEPENDS += cross/jemalloc cross/jemalloc_5.2
 OPTIONAL_DEPENDS += cross/libjxl cross/libultrahdr cross/sjpeg
 
-DEPENDS  = cross/bzip2 
+DEPENDS  = cross/bzip2
 DEPENDS += cross/xz
 DEPENDS += cross/zstd
 DEPENDS += cross/libxml2
@@ -35,6 +35,8 @@ CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
 CONFIGURE_ARGS += --without-perl --without-x
 # magick *++* files fail to add to package by PLIST
 CONFIGURE_ARGS += --without-magick-plus-plus
+CONFIGURE_ARGS += --with-fpx
+CONFIGURE_ARGS += --with-fftw
 
 include ../../mk/spksrc.common.mk
 SUPPORT_CPP11 = 1
@@ -69,8 +71,6 @@ LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS += --with-fpx
-CONFIGURE_ARGS += --with-fftw
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/jemalloc_5.2
 else
