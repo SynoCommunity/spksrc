@@ -1,35 +1,37 @@
 Imagecache: fetch guide artwork sooner and more reliably.
 
-tvheadend/tvheadend#2160, ours: a87be591f..4592129a1, four commits on branch
-th0ma7/tvheadend imagecache-fetch-rework.  Its head is a merge of master into
-the branch rather than a rebase, which costs nothing here: master's tip is an
-ancestor of that merge, so the diff from the package base is the branch's own
-work and nothing else.
+tvheadend/tvheadend#2160, ours: a87be591f..53da320d1, now a single commit on
+branch th0ma7/tvheadend imagecache-fetch-rework, squashed and rebased onto the
+package base and ready to merge.  What it carries:
 
-  1  the fetch rework itself: artwork is fetched when the guide names it
-     rather than on first use, and a transient failure (no HTTP response, or
-     429/5xx -- a cold CDN edge rather than a property of the image) gets a
-     short per-image retry before falling back to the hours-coarse
-     fail_period.
-  2  epg: rebuild the genre list instead of unlinking from it.  Deliberately
-     in both this PR and #2249, which reaches that file for an unrelated
-     reason, so either one stays mergeable on its own.  It therefore arrives
-     here twice over; 200 and 400 are generated from trees that both contain
-     it, so the chain stays consistent.
-  3  wait for the fetch to finish, not for the next wakeup.  imagecache_cond
-     is signalled by several events, a transient failure parking the image in
-     RETRY now among them, and the wait loop returned on the first wakeup that
-     was not a timeout without re-reading the state -- so a failure signal told
-     the caller the image was ready and imagecache_filename() built a path to a
-     file that does not exist.  Reported by CodeRabbit.
-  4  clear the failed flag when a fetch succeeds.  It is documented as "Last
-     update failed" and picks the re-check interval between fail_period and
-     ok_period, but has only ever been set, never cleared, since the image
-     cache was written in 2013: an image that failed once was re-checked at the
-     coarse interval for good, even once serving again, and the flag is
-     persisted so a restart did not help.  Pre-existing upstream, fixed here
-     because this PR is the fetch and retry rework and already resets
-     `attempts` in the same branch.
+  - the fetch rework itself: artwork is fetched in first-airing order rather
+    than EPG-parse order, the HTTP connection is reused across fetches
+    (2.3x faster on a 15-day guide, and a new "Reuse HTTP connection" setting
+    restores the old behaviour), and a transient failure -- no HTTP response,
+    429 or 5xx, typically a cold CDN edge rather than a property of the image
+    -- gets up to three short per-image retries before falling back to the
+    hours-coarse fail_period.  Four pre-existing bugs surfaced on the way and
+    are fixed with it, the worst being imagecache_destroy() leaving
+    QUEUED/SAVE images linked in the fetch queue, so cleaning the cache while
+    it filled made the fetch thread walk freed memory.
+  - epg_broadcast_set_genre() rebuilds its list instead of unlinking from it.
+    Also in #2249, deliberately, since that PR reaches the same file for an
+    unrelated reason and either must stay mergeable alone -- whichever lands
+    first makes the other's copy vanish on rebase.  It therefore arrives here
+    twice over, so 400 has to be generated against the tree this patch
+    produces or its epg.c hunk lands a second time.
+  - waiting on an in-flight fetch waits for the fetch to finish rather than
+    for the next wakeup.  imagecache_cond is signalled by several events, a
+    transient failure parking the image in RETRY now among them, so returning
+    on the first signal told the caller the image was ready when the fetch had
+    just failed, and imagecache_filename() then built a path to a file that
+    does not exist.  Reported by CodeRabbit; its suggestion also tested
+    i->failed, which cannot serve -- hence the next item.
+  - `failed` is cleared when a fetch succeeds.  Documented as "Last update
+    failed" and picking the re-check interval between fail_period and
+    ok_period, it had only ever been set, never cleared, since 2013: an image
+    that failed once was re-checked at the coarse interval for good, even once
+    serving again, and the flag is persisted so a restart did not help.
 
 Drop this patch once #2160 is merged.  See 200-upstream-prs-HOWTO.txt for the
 regeneration recipe.
