@@ -1,12 +1,13 @@
 PKG_NAME = dar
-PKG_VERS = 2.8.1
+PKG_VERS = 2.8.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# error: C++ compiler lack support for c++14 standard
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.9: C++14 required by configure (proven: 4.7.3 fails,
+# 4.9.3 builds).
+MIN_GCC_VERSION = 4.9
 
 DEPENDS  = cross/attr
 DEPENDS += cross/argon2

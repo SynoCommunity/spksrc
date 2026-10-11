@@ -1,27 +1,99 @@
-# avoid cross compiling error when testing for libthreadar
-# 
---- configure.orig	2024-03-23 11:43:33.000000000 +0000
-+++ configure	2024-03-28 20:18:54.638679310 +0000
-@@ -29035,13 +29035,6 @@
+# avoid cross compiling errors on runtime tests
+# - several AC_RUN_IFELSE checks have no action-if-cross-compiling and
+#   hard-error otherwise; drop the error branch so the test runs and
+#   falls back to its 'no' result (largefile, gcrypt, librhash, libthreadar).
+#
+--- configure.orig
++++ configure
+@@ -24906,13 +24906,7 @@
+ 
+ fi
+ 
+-if test "$cross_compiling" = yes
+-then :
+-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
+-printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See 'config.log' for more details" "$LINENO" 5; }
+-else case e in #(
++case e in #(
+   e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+  extern "C"
+@@ -24955,7 +24949,6 @@
+ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+   conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+ esac
+-fi
+ 
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+@@ -28893,13 +28886,7 @@
+ 
+                                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+ printf "%s\n" "ok" >&6; }
+-                                  if test "$cross_compiling" = yes
+-then :
+-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
+-printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See 'config.log' for more details" "$LINENO" 5; }
+-else case e in #(
++                                  case e in #(
+   e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+  extern "C"
+@@ -28933,7 +28920,6 @@
+ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+   conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+ esac
+-fi
+ 
+ 
+ else case e in #(
+@@ -29051,13 +29037,7 @@
+ 		if test "$local_rhash" = "yes" ; then
+ 		  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for librhash usability" >&5
+ printf %s "checking for librhash usability... " >&6; }
+-		  if test "$cross_compiling" = yes
+-then :
+-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
+-printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See 'config.log' for more details" "$LINENO" 5; }
+-else case e in #(
++		  case e in #(
+   e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+  extern "C"
+@@ -29101,7 +29081,6 @@
+ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+   conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+ esac
+-fi
+ 
+ 		else
+ 		  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: whirpool hash is not available, librhash abstent" >&5
+@@ -32362,13 +32341,7 @@
  if  test "$local_threadar" = "yes"
  then :
  
 -    if test "$cross_compiling" = yes
 -then :
--  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
--printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
+-printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
 -as_fn_error $? "cannot run test program while cross compiling
--See \`config.log' for more details" "$LINENO" 5; }
--else $as_nop
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-See 'config.log' for more details" "$LINENO" 5; }
+-else case e in #(
++    case e in #(
+   e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  
-@@ -29082,8 +29075,6 @@
- fi
+@@ -32411,7 +32384,6 @@
  rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-   conftest.$ac_objext conftest.beam conftest.$ac_ext
+   conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+ esac
 -fi
--
  
  
- fi
+    local_threadar_barrier_mac=no

@@ -1,0 +1,18 @@
+# use centralized forward declarations for pre-GCC 4.4 compilers
+# - g10/keyring.h duplicated the KEYRING_HANDLE typedef from kbx/keybox-fwddecl.h
+# - identical duplicate typedefs are an error on gcc < 4.4 (OLD_PPC_ARCHS)
+#
+--- g10/keyring.h.orig
++++ g10/keyring.h
+@@ -21,8 +21,9 @@
+ #define GPG_KEYRING_H 1
+ 
+ #include "../common/userids.h"
+-
+-typedef struct keyring_handle *KEYRING_HANDLE;
++/* KEYRING_HANDLE lives in kbx/keybox-fwddecl.h; duplicating the
++ * typedef here is a hard error on compilers predating GCC 4.4. */
++#include "../kbx/keybox-fwddecl.h"
+ 
+ int keyring_register_filename (const char *fname, int read_only, void **ptr);
+ int keyring_is_writable (void *token);
