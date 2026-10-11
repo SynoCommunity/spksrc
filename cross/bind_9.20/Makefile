@@ -1,5 +1,5 @@
 PKG_NAME = bind
-PKG_VERS = 9.20.24
+PKG_VERS = 9.20.29
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
@@ -13,16 +13,15 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS  = cross/libuv
 DEPENDS += cross/liburcu
 DEPENDS += cross/openssl3
-DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
 DEPENDS += cross/nghttp2
+# libcap is a hard configure requirement though nothing shipped links it
 DEPENDS += cross/libcap
 
-# needs C11 with some C17 features
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# needs C11 with some C17 features (gcc >= 7; comcerto2k is the only
+# DSM-7 arch below that and every older DSM is too)
+MIN_GCC_VERSION = 7
 
 
 HOMEPAGE = https://www.isc.org/
