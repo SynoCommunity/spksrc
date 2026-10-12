@@ -1,0 +1,117 @@
+#!/bin/sh
+# Duplicate Finder daemon control (runs as the package user on DSM 7).
+# spksrc copy: identical to spk/scripts/start-stop-status except that the
+# package id comes from SYNOPKG_PKGNAME instead of a literal, so the same
+# script serves the lowercase SynoCommunity id.
+
+PKG="${SYNOPKG_PKGNAME:-duplicatefinder}"
+PKG_DEST="${SYNOPKG_PKGDEST:-/var/packages/$PKG/target}"
+PKG_VAR="${SYNOPKG_PKGVAR:-/var/packages/$PKG/var}"
+PID_FILE="$PKG_VAR/dupfinder.pid"
+LOG_FILE="$PKG_VAR/dupfinder.log"
+READY_FILE="$PKG_VAR/dupfinder.ready"
+# The one port the daemon, this script and the CGI shim agree on. There is
+# deliberately no environment override: the shim is exec'd by DSM's web
+# server and could never see one, so an override only ever produced a daemon
+# nobody could reach.
+PORT=9807
+
+# fail writes the reason where Package Center surfaces it (SYNOPKG_TEMP_LOGFILE)
+# in addition to stderr, then exits with the given code.
+fail() {
+	echo "$2" >&2
+	[ -n "$SYNOPKG_TEMP_LOGFILE" ] && echo "$2" >> "$SYNOPKG_TEMP_LOGFILE"
+	exit "$1"
+}
+
+# pid_running also confirms the PID is still OUR daemon. PIDs are reused, and
+# a NAS runs for months: a stale pid file whose number now belongs to some
+# other process of the same user would otherwise make "start" do nothing and
+# "stop" send TERM and then KILL to an innocent process.
+pid_running() {
+	[ -f "$PID_FILE" ] || return 1
+	PID="$(cat "$PID_FILE" 2>/dev/null)"
+	[ -n "$PID" ] || return 1
+	kill -0 "$PID" 2>/dev/null || return 1
+	[ -r "/proc/$PID/cmdline" ] || return 1
+	# The DAEMON specifically: every UI request is a short-lived
+	# `dupfinder -mode cgi` child running as the same package user, and a
+	# reused PID landing on one of those must not pass as the daemon.
+	case "$(tr '\0' ' ' < "/proc/$PID/cmdline" 2>/dev/null)" in
+		*dupfinder*-mode\ daemon*) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+case "$1" in
+	start)
+		if pid_running; then
+			exit 0
+		fi
+		# One spk per architecture ships exactly one binary (see build.sh),
+		# so there is no runtime dispatch to do.
+		DAEMON="$PKG_DEST/bin/dupfinder"
+		[ -x "$DAEMON" ] || fail 1 "Daemon binary missing: $DAEMON"
+		mkdir -p "$PKG_VAR" || fail 1 "Cannot create $PKG_VAR"
+		# The log names files in shares other users may not see: private
+		# like every other var-dir artifact (the daemon opens it 0600 too).
+		touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
+		rm -f "$READY_FILE"
+		"$DAEMON" -mode daemon -port "$PORT" -var "$PKG_VAR" >>"$LOG_FILE" 2>&1 &
+		PID=$!
+		echo "$PID" > "$PID_FILE"
+		# The daemon writes the ready file once it is bound and has its
+		# token — everything that can still fail fatally has passed. Wait
+		# for THAT, not a fixed second: a daemon that dies during startup
+		# (port taken, unreadable token file) must fail the package start
+		# visibly, and a fixed sleep let a slow start report success and then
+		# leave Package Center showing a running package while the UI got
+		# "service is not running".
+		i=0
+		while [ ! -f "$READY_FILE" ]; do
+			if ! kill -0 "$PID" 2>/dev/null; then
+				rm -f "$PID_FILE"
+				fail 1 "Duplicate Finder daemon exited during startup: $(tail -n 3 "$LOG_FILE" 2>/dev/null | tr '\n' ' ')"
+			fi
+			i=$((i + 1))
+			if [ "$i" -ge 30 ]; then
+				kill "$PID" 2>/dev/null
+				rm -f "$PID_FILE"
+				fail 1 "Duplicate Finder daemon did not become ready within 30 seconds: $(tail -n 3 "$LOG_FILE" 2>/dev/null | tr '\n' ' ')"
+			fi
+			sleep 1
+		done
+		exit 0
+		;;
+	stop)
+		if pid_running; then
+			kill "$PID" 2>/dev/null
+			for i in 1 2 3 4 5 6 7 8 9 10; do
+				kill -0 "$PID" 2>/dev/null || break
+				sleep 1
+			done
+			# Only if it is still there — and still the daemon: pid_running
+			# re-reads the process's command line, so a number the kernel
+			# has meanwhile handed to some other process is left alone
+			# rather than killed.
+			if pid_running; then
+				kill -9 "$PID" 2>/dev/null
+			fi
+		fi
+		rm -f "$PID_FILE" "$READY_FILE"
+		exit 0
+		;;
+	status)
+		if pid_running; then
+			exit 0
+		fi
+		exit 3
+		;;
+	log)
+		echo "$LOG_FILE"
+		exit 0
+		;;
+	*)
+		exit 0
+		;;
+esac

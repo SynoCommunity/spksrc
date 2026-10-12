@@ -1,0 +1,3 @@
+bin:bin/dupfinder
+rsc:share/duplicatefinder/ui
+rsc:share/duplicatefinder/icons
