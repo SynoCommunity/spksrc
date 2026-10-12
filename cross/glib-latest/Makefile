@@ -11,10 +11,8 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-# Only the 2008 PowerPC compiler (4.3.7) was ever excluded here. The real floor for
-# glib 2.84 is far higher -- cross/glib only ever selects it from gcc 7.5 -- but that
-# is the selector's business; this restates the exclusion that was here, nothing more.
-MIN_GCC_VERSION = 4.6
+# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8
+MIN_GCC_VERSION = 4.8
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
