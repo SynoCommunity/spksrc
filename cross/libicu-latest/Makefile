@@ -1,13 +1,14 @@
 PKG_NAME = libicu
-PKG_VERS = 77.1
+PKG_VERS = 78.3
 PKG_EXT = tgz
-PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
+PKG_DIST_NAME = icu4c-$(PKG_VERS)-sources.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(PKG_VERS)
 PKG_DIR = icu/source
 
 # Remarks:
 # libicu 74 is the latest version that builds for DSM 6
 # libicu >= 75 requires compiler with c++17
+MIN_GCC_VERSION = 7
 
 BUILD_DEPENDS = native/libicu
 
@@ -15,12 +16,9 @@ HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
-include ../../mk/spksrc.common.mk
-
-# Compiler too old, stdc++11 is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=arm-unknown-linux-gnueabi
