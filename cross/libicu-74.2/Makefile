@@ -9,18 +9,18 @@ PKG_DIR = icu/source
 # libicu 74 is the latest version that builds for DSM 6
 # libicu >= 75 requires compiler with c++17
 
+# Compiler too old, stdc++11 is required.
+MIN_GCC_VERSION = 4.8
+
 BUILD_DEPENDS = native/libicu
 
 HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
-include ../../mk/spksrc.common.mk
-
-# Compiler too old, stdc++11 is required.
-MIN_GCC_VERSION = 4.8
-
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=arm-unknown-linux-gnueabi
