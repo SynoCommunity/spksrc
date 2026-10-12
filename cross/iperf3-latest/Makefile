@@ -13,8 +13,10 @@ HOMEPAGE = https://software.es.net/iperf/
 COMMENT  = The iperf series of tools perform active measurements to determine the maximum achievable bandwidth on IP networks. It supports tuning of various parameters related to timing, protocols, and buffers. For each test it reports the measured throughput, loss, and other parameters.
 LICENSE  = 3-Clause BSD
 
-GNU_CONFIGURE = 1
+# Needs full <stdatomic.h>
+MIN_GCC_VERSION = 4.9
 
+GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
