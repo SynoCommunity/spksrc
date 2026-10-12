@@ -11,6 +11,9 @@ HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger.
 LICENSE  = GPLv2/LGPLv2
 
+# Needs gcc >= 7: C++17 features unavailable before gcc 7 (experimental)
+MIN_GCC_VERSION = 7
+
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib

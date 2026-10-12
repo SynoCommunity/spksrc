@@ -11,6 +11,9 @@ HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger.
 LICENSE  = GPLv2/LGPLv2
 
+# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8
+MIN_GCC_VERSION = 4.8
+
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
