@@ -123,16 +123,20 @@ export INSTALL_PREFIX
 # tc_vars.meson-native, with no .mk suffix, and the wildcard below never matches them.
 #
 # Both are appended, so the order packages include their mk files in does not matter.
-# This file is the last of them, through spksrc.cross-cc.mk, and fills in the rest: the
-# autotools pair for whoever does not read the flags from a generated file of its own,
-# then rust for every package.
+# This file fills in the rest: the autotools pair for an autotools build, which reads
+# CC and the flags from the environment, then rust for every package. cmake and meson
+# read theirs from their own generated file; cargo reads the per-triple and HOST_*
+# variables tc_vars.rust.mk names, so neither needs the bare ones.
+# none means nothing is built: cross-virtual.mk and spk.mk set it, and each
+# env-<system>.mk declines to append over it, so an env pulled in further down the tree
+# -- wheel.mk reaches env-cmake.mk for a python spk -- cannot turn it into a build.
 ifneq ($(filter none,$(BUILD_SYSTEM)),)
 TC_VARS_ENV :=
 else
   ifeq ($(strip $(BUILD_SYSTEM)),)
 BUILD_SYSTEM += autotools
   endif
-  ifeq ($(filter cmake meson,$(BUILD_SYSTEM)),)
+  ifneq ($(filter autotools,$(BUILD_SYSTEM)),)
 TC_VARS_ENV += autotools flags
   endif
 TC_VARS_ENV += rust

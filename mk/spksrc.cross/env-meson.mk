@@ -7,7 +7,9 @@
 
 # Meson reads the flags from its own generated cross file, so no tc_vars fragment is
 # asked for here; env-default.mk adds rust for every cross package.
+ifeq ($(filter none,$(BUILD_SYSTEM)),)
 BUILD_SYSTEM += meson
+endif
 
 # Set default base meson directory
 # Exceptionnally it is under a sub-directory (ex: zstd)
