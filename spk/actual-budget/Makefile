@@ -25,11 +25,10 @@ STARTABLE = yes
 # Upstream default is 5006, which is reserved by WebStation HTTPS
 SERVICE_PORT = 8007
 SERVICE_PORT_TITLE = Actual Budget (HTTP)
-ADMIN_PORT = $(SERVICE_PORT)
 
-# The raw HTTP port cannot serve the app (browsers require HTTPS for
-# SharedArrayBuffer), so suppress the DSM app icon / shortcut that would
-# open it directly. The ADMIN_PORT link on the Package Center page stays.
+# No Package Center URL: the raw HTTP port cannot serve the app
+# (browsers require HTTPS for SharedArrayBuffer). Suppress the DSM
+# shortcut that would open it directly.
 NO_SERVICE_SHORTCUT = 1
 
 WIZARDS_DIR = src/wizard/

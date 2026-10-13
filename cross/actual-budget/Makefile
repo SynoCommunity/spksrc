@@ -7,6 +7,7 @@ PKG_DIST_FILE = actual-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = actual-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS += cross/actual-budget-translations
 
 # better-sqlite3 ships prebuilds for 64-bit Linux only
 REQUIRE_64BIT = 1
@@ -51,7 +52,7 @@ actual_budget_install:
 	$(RUN) find node_modules/argon2/prebuilds node_modules/bcrypt/prebuilds -name '*.musl.node' -delete
 	$(RUN) find node_modules/better-sqlite3/prebuilds -maxdepth 1 -mindepth 1 -type f ! -name 'linux-$(NODE_ARCH).node' -delete
 	# drop build-only tooling (the native modules ship prebuilt binaries)
-	$(RUN) rm -rf node_modules/node-gyp node_modules/@npmcli node_modules/cacache \
+	$(RUN) rm -rf node_modules/node-gyp node_modules/@npmcli node_modules/cacache node_modules/.cache \
 		node_modules/make-fetch-happen node_modules/minipass node_modules/minipass-* \
 		node_modules/glob node_modules/@isaacs node_modules/tar
 	# stage the runtime tree
