@@ -1,0 +1,33 @@
+112-imagecache-check-write-errors.patch
+
+Upstream bug, not a packaging workaround. src/imagecache.c, imagecache_new_contents():
+
+    if (!(fp = tvh_fopen(tpath, "wb")))
+      return 1;
+
+    fwrite(data, dsize, 1, fp);     <-- return value ignored
+    fclose(fp);                     <-- return value ignored
+    unlink(path);
+    memcpy(img->sha1, sha1, 20);
+    ... rename(tpath, path);
+
+A short write or a failed flush -- ENOSPC, EIO, a full @appstore volume -- is not
+detected, and the function then goes on to delete the cached image that was valid,
+record the sha1 of the contents it MEANT to write, rename the partial file into
+place and persist that metadata. The entry is now corrupt and looks current: the
+memcmp earlier in the same function makes the next fetch of identical content
+return 0 immediately, so nothing ever repairs it.
+
+The patch checks both calls and leaves the cache untouched on failure: the temp
+file is removed, the old image and the old sha1 stay as they were, and the caller
+gets non-zero.
+
+`dsize &&` guards the legitimate zero-length case, where fwrite returns 0 without
+error.
+
+Found because gcc 8.5 reports fwrite's warn_unused_result and tvheadend builds with
+-Werror, so the 88f6281 jobs failed once the gcc 8.5 overlay replaced the vendor
+4.6.4 that did not warn. Silencing the warning would have left the bug.
+
+Reported upstream: tvheadend/tvheadend#2322, which carries this analysis and offers a
+PR. Still a local patch until upstream takes it; drop this one when it does.

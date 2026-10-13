@@ -113,16 +113,69 @@ If you only read one thing, read this. The details are in the dated log below.
   against the same toolchain. See
   [tc_vars Files](../framework/toolchain.md#tc_vars-files).
 
+- **gcc 8.5 on DSM 5.2 to 7.1, on by default.** 65 toolchains get gcc 8.5 and binutils
+  2.30 beside their vendor compiler, so a package whose `MIN_GCC_VERSION` the vendor gcc
+  misses builds there all the same, and `TC_GCC` reports the compiler actually used.
+  **`OVERLAY_GCC=0`** builds on the vendor gcc. See
+  [Toolchain Overlays](../framework/toolchain.md#toolchain-overlays).
+
 - **Rust builds on the legacy archs, and overlays are a first-class notion.** The archs
   `rustup` has no usable `rust-std` for — PowerPC e500 (`qoriq`, `ppc853x`), ARMv5
   `88f6281`, `x86-5.2` — now get a Rust toolchain built from source, published as an
   archive and pulled in like any other dependency. That fixes long-standing failures on
   those archs (SPE float, the ppc853x TLS relocations, `AtomicU64`). It also
   generalises: a component shipped **beside** a base toolchain is an *overlay*, switched
-  with **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`** from `local.mk`, and `make help`
+  with **`OVERLAY_GCC`** / **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`**, and `make help`
   shows which are active for your arch.
 
 ---
+
+??? note "October 10th 2026 — A gcc 8.5 overlay for DSM 5.2 to 7.1, on by default (#7391)"
+
+    - **What:** gcc 8.5 is installed beside the vendor gcc of 65 toolchains -- DSM 5.2
+      (4), 6.2.4 (31), 7.0 (28), 7.1 (2) -- together with binutils 2.30, whose `as`/`ld`
+      it needs. One component, one archive: either rebuilds without the other, and the
+      consumer composes them at install time. A package then builds with
+      `<target>-gcc-8.5`, and `TC_GCC` reports `8.5.0`, so `MIN_GCC_VERSION` gates and
+      `version_ge` selections follow the compiler actually used.
+
+    - **On by default** (`OVERLAY_GCC ?= 1`), tree-wide, so a package and the meta
+      packages it builds agree without the switch crossing the spk boundary. Inert where
+      an arch ships no overlay. `x64-7.1`, whose vendor gcc is 8.5.0 already, keeps one:
+      the overlay build is profile-guided, and on the most built arch that saves roughly
+      15-25% of build time. `OVERLAY_GCC=0` returns to the vendor compiler; an explicit
+      `OVERLAY_BINUTILS=0` beside an active gcc overlay stops the build with a banner,
+      since gcc 8.5 cannot drive the vendor `as`.
+
+    - **The effective compiler, wherever the toolchain was asked.** The overlay's
+      libstdc++ and libgcc are searched first, with `-L` and `--rpath-link` (which `ld`
+      uses for a shared library's own `DT_NEEDED`); the toolchain's include directory
+      moves to `-idirafter`, so it no longer shadows gcc 8.5's headers; `TC_HAS_LIBATOMIC`
+      probes the compiler that will run.
+
+    - **Overlays get their own directory.** The 145 consumers move from
+      `toolchain/syno-<arch>-<dsm>_<component>-<vers>` to `overlay/`, four lines each --
+      `PKG_VERS`, `PKG_REV`, `include ../../mk/spksrc.overlay.mk` -- the directory name
+      giving arch, DSM and component. A generic arch (`x64`, `armv7`, `aarch64`) downloads
+      the archive of the real arch whose toolchain it shares, named by the same helper on
+      both sides (`mk/spksrc.overlay/dist-arch.mk`).
+
+    - **A producer is a version, a rev and a component name.** `native/gcc-8.5`,
+      `native/binutils-2.30` and `native/rustc-*` include `mk/spksrc.native-toolchain.mk`,
+      which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the
+      two profile-guided passes (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5%
+      faster at `-O2` and 12.5% at `-O3`, `as` 10%. A generic arch is built as the real arch
+      whose archive it fetches (`arch-x64-7.1` builds `apollolake-7.1`), and an archive that
+      exists is not rebuilt, so `all-<dsm>` builds each one once, **`TOOLCHAIN_JOBS`** at a
+      time, and resumes where it stopped. The training sources are generated per arch.
+
+    - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
+      `macros.mk`. The overlay switches accept `1 y yes true on` and `0 n no false off` in
+      any case, and stop the build on anything else rather than reading it as off. See
+      [Boolean values](../reference/macros.md#boolean-values).
+
+    - See [Toolchain Overlays](toolchain.md#toolchain-overlays).
+    - Pull request: [#7391](https://github.com/SynoCommunity/spksrc/pull/7391)
 
 ??? note "October 7th 2026 — A git download can include submodules, and name a tag (#7549)"
 

@@ -35,6 +35,9 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
+# INSTALL_PLIST_SKIP = 1 skips the two tree walks for a package whose install nothing ever
+# reads as a plist -- an overlay consumer installs a compiler (spksrc.overlay.mk).
+
 # Sensible default for the classic gnu-make install path only: the standard
 # make install command. Excluded for cmake/meson (via DEFAULT_ENV) and for the
 # python pip / meson-python installers, whose *_python_* INSTALL_TARGET reads
@@ -80,7 +83,11 @@ install_msg_target:
 $(PRE_INSTALL_PLIST):
 	$(create_target_dir)
 	@mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX) $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR)
+ifneq ($(strip $(INSTALL_PLIST_SKIP)),1)
 	find $(PLIST_SEARCH_PATH) \! -type d -printf '%P\n' | sed 's?^target/??g' | sort > $@
+else
+	@: > $@
+endif
 
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
@@ -90,8 +97,12 @@ install_target: $(PRE_INSTALL_TARGET)
 post_install_target: $(INSTALL_TARGET)
 
 $(INSTALL_PLIST):
+ifneq ($(strip $(INSTALL_PLIST_SKIP)),1)
 	find $(PLIST_SEARCH_PATH)/ \! -type d -printf '%P\n' | sed 's?^target/??g' | sort | \
 	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | sed 's?> ??g' > $@
+else
+	@: > $@
+endif
 
 install_correct_lib_files: $(INSTALL_PLIST)
 	@for pc_file in $$(grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)) ; \

@@ -1,0 +1,19 @@
+make[1]: Entering directory '/home/spksrc/prO/overlay/syno-x64-6.2.4_gcc-8.5'
+===>  Downloading files for gcc
+===>    File gcc-8.5.0-x86_64-pc-linux-gnu-x86-6.2.4-v5.txz already downloaded
+===>  Verifying files for gcc
+===>    Checking sha1sum of file gcc-8.5.0-x86_64-pc-linux-gnu-x86-6.2.4-v5.txz
+===>    Checking sha256sum of file gcc-8.5.0-x86_64-pc-linux-gnu-x86-6.2.4-v5.txz
+===>    Checking md5sum of file gcc-8.5.0-x86_64-pc-linux-gnu-x86-6.2.4-v5.txz
+===>  Processing dependencies of gcc
+===>  20261010-121721 MAKELEVEL: 01, PARALLEL_MAKE: max, ARCH: x64-6.2.4_gcc-8.5, NAME: overlay
+===>  Extracting for gcc
+tar -xpf /home/spksrc/prO/overlay/syno-x64-6.2.4_gcc-8.5/../../distrib/gcc-8.5.0-x86_64-pc-linux-gnu-x86-6.2.4-v5.txz -C /home/spksrc/prO/overlay/syno-x64-6.2.4_gcc-8.5/work/install  
+===>  Patching for gcc
+===>  Configuring for gcc
+===>  - Configure ARGS:
+===>  - Install prefix: /usr/local/gcc
+===>  Compiling for gcc
+===>  Installing for gcc
+===>  gcc overlay: linked sysroot + as/ld from syno-x64-6.2.4_binutils-2.30
+make[1]: Leaving directory '/home/spksrc/prO/overlay/syno-x64-6.2.4_gcc-8.5'

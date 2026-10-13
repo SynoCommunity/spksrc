@@ -30,7 +30,11 @@
 
 # Does this toolchain's gcc ship libatomic? Ask it -- a gcc too old to have it also predates
 # __atomic_* and never needs it. Lazy (=), outside the ARCH guard: it runs the cross gcc.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+#
+# The one a build will USE, not the one shipped: an overlay gcc has libatomic exactly where
+# the vendor one predates it. By wildcard -- packages read this file, overlay-gcc.mk not.
+_TC_LIBATOMIC_CC = $(or $(firstword $(wildcard $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/$(TC_PREFIX)gcc-[0-9]*))),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(_TC_LIBATOMIC_CC) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 # Outside the guard on purpose: the native producers read TC_HAS_LIBATOMIC with no ARCH.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
@@ -44,7 +48,17 @@ _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
 # over the same file, on every parse the framework goes through.
 _TC_CAP_DECL := $(shell sed -n 's/^\(TC_GCC\|TC_GLIBC\|TC_KERNEL\|TC_BINUTILS\) *= *\(.*\)/\1=\2/p' $(_TC_CAP_MK) 2>/dev/null)
 _tc_cap_of    = $(patsubst $(1)=%,%,$(filter $(1)=%,$(_TC_CAP_DECL)))
-TC_GCC      := $(call _tc_cap_of,TC_GCC)
+# TC_GCC is the compiler a build will actually use: the ACTIVE overlay's, else the
+# toolchain's own, which TC_GCC_VENDOR keeps for the callers that mean the stock one.
+# PKG_VERS of the consumer, like the rustc arm below, rather than OVERLAY_GCC_VERS: the
+# latter is the directory form (8.5) and would read as older than a vendor 8.5.0.
+TC_GCC_VENDOR := $(call _tc_cap_of,TC_GCC)
+_TC_CAP_GCC_MK := $(wildcard $(firstword $(TC_OVERLAY_GCC))/Makefile)
+ifeq ($(strip $(OVERLAY_GCC_ON)),1)
+TC_GCC        := $(or $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_GCC_MK) 2>/dev/null),$(TC_GCC_VENDOR))
+else
+TC_GCC        := $(TC_GCC_VENDOR)
+endif
 TC_GLIBC    := $(call _tc_cap_of,TC_GLIBC)
 TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
 TC_BINUTILS := $(call _tc_cap_of,TC_BINUTILS)
@@ -82,7 +96,7 @@ endif
 endif
 endif
 
-# ---- gcc: the compiler the toolchain ships ----------------------------------
+# ---- gcc ---------------------------------------------------------------------
 # Plain ifeq rather than a nested $(if): version_ge returns empty for false.
 ifneq ($(strip $(MIN_GCC_VERSION)),)
 ifneq ($(strip $(TC_GCC)),)
