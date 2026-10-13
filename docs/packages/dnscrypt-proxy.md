@@ -1,5 +1,5 @@
 ---
-title: DNSCrypt-Proxy
+title: dnscrypt-proxy
 description: DNS encryption and privacy proxy
 tags:
   - network
@@ -8,7 +8,7 @@ tags:
   - privacy
 ---
 
-# DNSCrypt-Proxy
+# dnscrypt-proxy
 
 DNSCrypt-proxy provides DNS encryption, prevents DNS spoofing, and blocks ads and malware.
 

@@ -1,5 +1,5 @@
 ---
-title: Mosh
+title: mosh
 description: Mobile shell - robust SSH replacement
 tags:
   - network
@@ -7,7 +7,7 @@ tags:
   - remote
 ---
 
-# Mosh
+# mosh
 
 Mosh (mobile shell) is a remote terminal application that supports intermittent connectivity and roaming.
 

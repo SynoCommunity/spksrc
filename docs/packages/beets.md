@@ -1,5 +1,5 @@
 ---
-title: Beets
+title: beets
 description: Music library management system
 tags:
   - media
@@ -7,7 +7,7 @@ tags:
   - library
 ---
 
-# Beets
+# beets
 
 Beets is the media library management system for obsessive music geeks. It catalogs your collection, automatically improving its metadata.
 
