@@ -1,5 +1,5 @@
 PKG_NAME = vaultwarden
-PKG_VERS = 1.37.3
+PKG_VERS = 1.37.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dani-garcia/vaultwarden/archive
@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/openssl3 cross/mariadb-connector-c cross/libpq
 
 # rust edition 2024 required (see rust-version in Cargo.toml)
-MIN_RUSTC_VERSION = 1.95
+MIN_RUSTC_VERSION = 1.97
 
 # issue with dependent component "libmimalloc-sys"
 # error: failed to run custom build command for `libmimalloc-sys v0.1.30`

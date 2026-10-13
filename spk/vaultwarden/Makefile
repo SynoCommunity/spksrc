@@ -1,19 +1,19 @@
 SPK_NAME = vaultwarden
-SPK_VERS = 1.37.3
-SPK_REV = 6
+SPK_VERS = 1.37.4
+SPK_REV = 7
 SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
 
 # rust edition 2024 required (see rust-version in vaultwarden Cargo.toml)
-MIN_RUSTC_VERSION = 1.95
+MIN_RUSTC_VERSION = 1.97
 # issue with dependent component "libmimalloc-sys" (stdatomic.h missing)
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 DISPLAY_NAME = Vaultwarden
-CHANGELOG = "Update Vaultwarden to v1.37.3 (security fixes: 2FA remember-token revocation, pre-login/auth rate limiting)."
+CHANGELOG = "Update Vaultwarden to v1.37.4."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3
