@@ -13,7 +13,7 @@ __ENV_RUST_MK__ := 1
 # Force rustc environment, bypassing default autotools settings.
 # The rust tc_vars comes HOST_CC, HOST_C++ and HOST_AR variables.
 # If the default autotools environment is loaded CC and *FLAGS get
-# wronly used for host builds.
+# wrongly used for host builds.
 DEFAULT_ENV ?= rust
 
 ifeq ($(TC_RUSTC),)
