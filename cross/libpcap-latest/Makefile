@@ -16,11 +16,9 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-pcap=linux
-ADDITIONAL_CFLAGS = -O
 
-# Workaround for Assembler Error: invalid operands (.text and *UND* sections) for `-'
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-ADDITIONAL_CFLAGS = -save-temps=obj
-endif
+# Using -O make ARMv7L to fail on Assembler
+#    Error: invalid operands (.text and *UND* sections) for `-'
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
