@@ -7,7 +7,7 @@ body:
     id: package-name
     attributes:
       label: Software Name
-      description: What sould we call the package?
+      description: What should we call the package?
       placeholder: Jellyfin
     validations:
       required: true
@@ -23,7 +23,7 @@ body:
     id: website
     attributes:
       label: Website
-      description: Where can we find th homepage of the software?
+      description: Where can we find the homepage of the software?
       placeholder: https://jellyfin.org/
     validations:
       required: true
@@ -31,31 +31,55 @@ body:
     id: documentation
     attributes:
       label: Documentation
-      description: Where can we find the documentaions for the software?
-      placeholder: ex. https://docs.jellyfin.org/
+      description: Where can we find the documentation for the software?
+      placeholder: https://docs.jellyfin.org/
     validations:
       required: false
   - type: input
     id: build-instructions
     attributes:
-      label: Build/Installation documentation
-      description: How do we compile the Software?
+      label: Build/Installation Documentation
+      description: How do we compile the software?
       placeholder: https://jellyfin.org/docs/general/administration/building.html
     validations:
       required: true
   - type: input
     id: source-code
     attributes:
-      label: Source code
-      description: A link to the source code, typically a Git reposetory or tarball
+      label: Source Code
+      description: A link to the source code, typically a Git repository or tarball.
       placeholder: https://github.com/jellyfin/jellyfin
+    validations:
+      required: true
+  - type: input
+    id: first-release
+    attributes:
+      label: First Public Release / Development
+      description: When did the project first become publicly available? Include the date of its first stable release, if different.
+      placeholder: "e.g. First public development: 2025-10; first stable release: 2026-01"
+    validations:
+      required: true
+  - type: textarea
+    id: upstream-maturity
+    attributes:
+      label: Upstream Project Maturity
+      description: Describe the project's development and maintenance history. Include evidence of releases over time, recent maintenance activity, and responses to issues or bug reports. If the project is relatively new, explain why it is ready to be packaged now.
+      placeholder: Describe the project's release history, maintenance activity, and current development status.
+    validations:
+      required: true
+  - type: textarea
+    id: package-support
+    attributes:
+      label: Ongoing Maintenance and Support
+      description: Are you willing to help maintain this package? Explain how you would handle packaging issues and coordinate with upstream if bugs or compatibility problems arise. If you cannot commit to this, please say so.
+      placeholder: Describe your plans for supporting the package and any limitations.
     validations:
       required: true
   - type: dropdown
     id: license
     attributes:
-      label: OpenSource License
-      description: What is the OpenSource license of the project?
+      label: Open Source License
+      description: What is the open-source license of the project?
       options:
         - MIT
         - BSD-2-clause
@@ -69,7 +93,7 @@ body:
     id: license-other
     attributes:
       label: Other License
-      description: Other [Common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type)
-      placeholder: ex. GPLv2 or a link to the licence file
+      description: Other [common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type).
+      placeholder: e.g. GPLv2 or a link to the license file
     validations:
       required: false
