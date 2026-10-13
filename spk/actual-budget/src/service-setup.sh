@@ -25,5 +25,7 @@ export ACTUAL_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 export NODE_ENV=production
 
 service_postinst () {
-    mkdir -p "${ACTUAL_DATA_DIR}"
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        mkdir -p "${ACTUAL_DATA_DIR}"
+    fi
 }
