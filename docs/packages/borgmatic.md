@@ -72,6 +72,6 @@ To see current config options after an update of borgmatic:
 
 ### BTRFS Snapshots
 
-To create btrfs snapshots you need the `findmnt` tool. Install the `synocli-misc` package (SynoCli misc. Tools) to have `findmnt` available.
+To create btrfs snapshots you need the `findmnt` tool. Install the `synocli-misc` package (SynoCli Misc Tools) to have `findmnt` available.
 
 Note that btrfs support on Synology is limited - the btrfs function in borgmatic is currently for subvolumes, so it is somewhat limited on Synology if you want to back up shared folders.
