@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.3
-SPK_REV = 32
+SPK_REV = 33
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -123,6 +123,7 @@ CHANGELOG += "2. Update pcre2 from v10.46 to v10.48. <br/>"
 CHANGELOG += "3. Update fd from v10.4.2 to v10.5.0; brings fd back to NVR and VS models (ARMv7L). <br/>"
 CHANGELOG += "4. Update fzf from v0.74.2 to v0.74.3. <br/>"
 CHANGELOG += "5. Update jdupes from v1.31.1 to v1.31.2. <br/>"
+CHANGELOG += "6. Rebuilt bat against the isolated Rust build environment. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
