@@ -305,17 +305,11 @@ tc_rust_vars:
 	@# and it also wrongly leaked the target sysroot link-args onto the host's build
 	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
 	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
-	@# Same reasoning for the C flags cc-rs reads, one layer down. A bare CFLAGS in the
-	@# environment is what cc-rs falls back to for BOTH sides, so the cross sysroot and
-	@# -idirafter leaked onto host build scripts -- the psm crate failing on old-gcc archs
-	@# (#7573). cc-rs prefers CFLAGS_<triple> for the target and HOST_CFLAGS for the host
-	@# over that bare value, so naming both leaves the autotools CFLAGS unconsulted here
-	@# without having to keep it out of the environment: #7577 tried that by narrowing
-	@# the env list and lost the flags env ADDITIONAL_CFLAGS needs (#7581).
-	@# ADDITIONAL_C*FLAGS stay deferred, as in tc_autotools_vars, or a package's own
-	@# additions never reach cc-rs -- the pngquant3 half of that revert.
-	@# HOST_C*FLAGS are empty on purpose: the host compiler wants no target sysroot, and
-	@# nothing in the tree expects inherited optimisation flags for build scripts.
+	@# Same for the C flags, one layer down: cc-rs prefers CFLAGS_<triple> for the target
+	@# and HOST_CFLAGS for the host over a bare CFLAGS, which it would otherwise use for
+	@# both sides -- putting the cross sysroot on host build scripts. HOST_C*FLAGS are
+	@# empty: the host compiler wants no target sysroot. ADDITIONAL_C*FLAGS are deferred,
+	@# as in tc_autotools_vars, so a package's own additions reach cc-rs.
 	@# TC_EXTRA_RUSTFLAGS is skipped when the rust overlay is on: the JSON spec already
 	@# carries cpu/features, and re-passing them makes rustc warn ("unknown feature: spe").
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \

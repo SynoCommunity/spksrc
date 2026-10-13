@@ -111,41 +111,34 @@ ifneq ($(strip $(TC)),)
 export INSTALL_DIR
 export INSTALL_PREFIX
 
-# Two things used to share one variable, which is what made #7577 breakable: narrowing
-# the list to isolate the rust env also dropped a build-system marker. They are separate
-# now.
+# Two variables, two questions.
 #
-# BUILD_SYSTEM -- autotools, cmake, meson or none. What install.mk and compile.mk ask
-# about: a cmake or meson build installs through its own tool, not `make install`. Set by
-# each env-<system>.mk, or to none by cross-virtual.mk and spk.mk.
+# BUILD_SYSTEM -- autotools, cargo, cmake, meson or none. What install.mk and compile.mk
+# ask about: a cmake or meson build installs through its own tool, a cargo build through
+# rust_install_target. Set by the build system's own mk, or to none by cross-virtual.mk
+# and spk.mk.
 #
 # TC_VARS_ENV -- which tc_vars.<word>.mk fragments to load. Only autotools, flags and
-# rust name a real file; cmake and meson never did, their generated files being
-# tc_vars.cmake, tc_vars.meson-cross and tc_vars.meson-native, with no .mk suffix. The
-# wildcard below matched nothing for those two words, silently, which is exactly what hid
-# the marker role.
+# rust name a file: the cmake and meson files are tc_vars.cmake, tc_vars.meson-cross and
+# tc_vars.meson-native, with no .mk suffix, and the wildcard below never matches them.
 #
-# Both are appended, never claimed with `?=`: that cannot compose a list -- the first
-# file to run would claim the variable and silence every later one, so the result
-# depended on each package's include order. This file is always the last of them,
-# included through spksrc.cross-cc.mk, so it supplies what nobody asked for.
-#
-# `flags` goes with autotools and only there, as before: cmake and meson read the flags
-# through their own generated toolchain/cross file, whose sub-make asks for them on its
-# command line. The tc_vars generation does not need the word either -- tc_flags,
-# tc_autotools_vars and tc_rust_vars all snapshot the live $(CFLAGS) the toolchain
-# computes, not the recorded tc_vars.flags.mk.
+# Both are appended, so the order packages include their mk files in does not matter.
+# This file is the last of them, through spksrc.cross-cc.mk, and fills in the rest: the
+# autotools pair for whoever does not read the flags from a generated file of its own,
+# then rust for every package.
 ifneq ($(filter none,$(BUILD_SYSTEM)),)
 TC_VARS_ENV :=
 else
   ifeq ($(strip $(BUILD_SYSTEM)),)
 BUILD_SYSTEM += autotools
-TC_VARS_ENV  += autotools flags
+  endif
+  ifeq ($(filter cmake meson,$(BUILD_SYSTEM)),)
+TC_VARS_ENV += autotools flags
   endif
 TC_VARS_ENV += rust
 endif
 
-# Map TC_VARS_ENV to filenames; sort to drop any word added twice.
+# Map TC_VARS_ENV to filenames; sort drops any word added twice.
 TC_VARS_FILES := $(wildcard $(foreach b,$(sort $(TC_VARS_ENV)),$(WORK_DIR)/tc_vars.$(b).mk))
 
 # Load full toolchain environment ONLY after tc_vars have been generated at stage1

@@ -5,10 +5,9 @@
 #
 ###############################################################################
 
-# Appended, not claimed: env-default.mk composes the rest once every env file has run.
-# No rust word here: env-default.mk adds it for every cross package. A project building
-# crates (Corrosion) needs it at build time, where the toolchain file's set(ENV{...}) from
-# configure time no longer reach -- and gets it without declaring anything.
+# CMake reads the flags from its own generated toolchain file, so no tc_vars fragment is
+# asked for here. env-default.mk adds rust for every cross package, which a Corrosion
+# project needs at build time, past where the toolchain file's set(ENV{...}) reaches.
 BUILD_SYSTEM += cmake
 
 # We normally build regular Release
