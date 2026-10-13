@@ -318,9 +318,6 @@ tc_rust_vars:
 	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(call tc,g++)\" ; \
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
-	echo TC_ENV += HOST_CC=\"$(call native,gcc)\" ; \
-	echo TC_ENV += HOST_CXX=\"$(call native,g++)\" ; \
-	echo TC_ENV += HOST_AR=\"$(call native,ar)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 

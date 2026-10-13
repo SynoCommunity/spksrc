@@ -112,7 +112,7 @@ export INSTALL_DIR
 export INSTALL_PREFIX
 
 # Default is autotools / make
-DEFAULT_ENV ?= autotools flags
+DEFAULT_ENV ?= autotools flags rust
 
 # Map DEFAULT_ENV definitions to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
