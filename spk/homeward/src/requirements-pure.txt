@@ -1,0 +1,37 @@
+# Pure Python wheels, installed from PyPI at installation time.
+# Regenerate after a Homeward release with:
+#   python3.12 -m venv /tmp/hw && /tmp/hw/bin/pip install "homeward[icloud]==<version>"
+#   /tmp/hw/bin/pip freeze
+# and move cffi, charset_normalizer, cryptography and pydantic_core to
+# requirements-crossenv.txt.
+
+homeward==0.1.0
+
+annotated-types==0.8.0
+certifi==2026.7.22
+fido2==2.2.1
+idna==3.20
+jaraco.classes==3.4.0
+jaraco.context==6.1.2
+jaraco.functools==4.6.0
+jeepney==0.9.0
+keyring==25.7.0
+keyrings.alt==5.0.2
+markdown-it-py==4.2.0
+mdurl==0.1.2
+more-itertools==11.1.0
+protobuf==7.36.2
+pycparser==3.11
+pydantic==2.14.1
+Pygments==2.21.0
+pyicloud==2.7.0
+requests==2.34.2
+rich==15.0.0
+SecretStorage==3.5.0
+six==1.17.0
+srp==1.0.22
+tinyhtml==1.3.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+tzlocal==5.3.1
+urllib3==2.8.0
