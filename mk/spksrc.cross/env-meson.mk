@@ -5,8 +5,10 @@
 #
 ###############################################################################
 
-# Force meson environment, bypassing default autotools settings.
-DEFAULT_ENV ?= meson rust
+# Appended, not claimed: env-default.mk composes the rest once every env file has run.
+# No rust word here: env-default.mk adds it for every cross package, so a project that
+# builds crates needs to declare nothing.
+BUILD_SYSTEM += meson
 
 # Set default base meson directory
 # Exceptionnally it is under a sub-directory (ex: zstd)

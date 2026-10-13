@@ -71,7 +71,7 @@ endif
 # CMake specific targets
 .PHONY: cmake_generate_toolchain_file
 cmake_generate_toolchain_file:
-	$(MAKE) --no-print-directory DEFAULT_ENV="flags rust" $(CMAKE_TOOLCHAIN_FILE_PKG)
+	$(MAKE) --no-print-directory TC_VARS_ENV="flags rust" $(CMAKE_TOOLCHAIN_FILE_PKG)
 
 .PHONY: cmake_configure_target
 cmake_configure_target: cmake_generate_toolchain_file

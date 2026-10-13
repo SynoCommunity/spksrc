@@ -53,9 +53,6 @@ POST_PATCH_TARGET = netdata_post_patch
 COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
-# RUST_TARGET / TC_RUSTUP_TOOLCHAIN for cross-compiling the journal reader crate.
-# Not provided by the generated tc_vars.mk, so included explicitly.
-include ../../mk/spksrc.cross/env-rust.mk
 # GOOS/GOARCH/GOARM + CGO_ENABLED=0 + native/go PATH for the go.d plugin build.
 include ../../mk/spksrc.cross/env-go.mk
 

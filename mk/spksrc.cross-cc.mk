@@ -58,7 +58,7 @@
 # │   spksrc.cross/env-default.mk                                                │
 # │        │                                                             │
 # │        ├─ loads tc_vars.mk (always)                                  │
-# │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
+# │        ├─ loads tc_vars.<env>.mk based on TC_VARS_ENV                │
 # │        ├─ exports TC_ENV into ENV                                    │
 # │        │                                                             │
 # │        └─ loads tk_vars.mk (optional)                                │

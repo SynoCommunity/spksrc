@@ -31,10 +31,9 @@ POST_EXTRACT_TARGET = librsvg_post_extract
 # PATH to find (the framework RUN env does not provide it).
 ENV += PATH=$(CARGO_HOME)/bin:$(PATH)
 
-# common.mk must precede env-rust.mk: the RUST_TARGET arch map below
-# evaluates arch groups at parse time, before cross-meson.mk runs.
+# common.mk first: the RUST_TARGET arch map evaluates arch groups at parse time,
+# before cross-meson.mk runs.
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.cross/env-rust.mk
 include ../../mk/spksrc.cross-meson.mk
 
 .PHONY: librsvg_post_extract

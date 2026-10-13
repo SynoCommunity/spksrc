@@ -147,7 +147,7 @@ else
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
 	   $(MSG) $(MAKE) ARCH=\"$(ARCH)\" \
-	                  DEFAULT_ENV=\"autotools flags rust\" \
+	                  TC_VARS_ENV=\"autotools flags rust\" \
 	                  TCVERSION=\"$(TCVERSION)\" \
 	                  WHEEL_NAME=\"$${name}\" \
 	                  WHEEL_VERSION=\"$${version}\" \
@@ -156,7 +156,7 @@ else
 	                  REQUIREMENT_GOAL=\"$(REQUIREMENT_GOAL)\" \
 	                  $(REQUIREMENT_GOAL) ; \
 	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" \
-	                  DEFAULT_ENV="autotools flags rust" \
+	                  TC_VARS_ENV="autotools flags rust" \
 	                  TCVERSION="$(TCVERSION)" \
 	                  WHEEL_NAME="$${name}" \
 	                  WHEEL_VERSION="$${version}" \
