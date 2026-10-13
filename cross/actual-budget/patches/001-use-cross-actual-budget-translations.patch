@@ -1,0 +1,21 @@
+# Use translations from cross/actual-budget-translations instead of pulling from repo
+# The main reason for this solution is the creation of reproducible builds,
+# (i.e. avoid unexpected translation updates).
+#
+--- bin/package-browser.orig	2026-10-02 13:05:34.000000000 +0000
++++ bin/package-browser	2026-10-13 12:13:28.263296091 +0000
+@@ -19,14 +19,7 @@
+ done
+
+ if [ "$SKIP_TRANSLATIONS" = false ]; then
+-  echo "Updating translations..."
+-  if ! [ -d packages/desktop-client/locale ]; then
+-      git clone https://github.com/actualbudget/translations packages/desktop-client/locale
+-  fi
+-  pushd packages/desktop-client/locale > /dev/null
+-  git checkout .
+-  git pull
+-  popd > /dev/null
++  echo "Skipping git operations (translations come from cross/actual-budget-translations)"
+   packages/desktop-client/bin/remove-untranslated-languages
+ fi
