@@ -1,5 +1,5 @@
 PKG_NAME = uptime-kuma-web
-PKG_VERS = 2.5.5
+PKG_VERS = 2.5.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = dist.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/louislam/uptime-kuma/releases/download/$(PKG_VERS)
