@@ -21,12 +21,8 @@ HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
-# modpython builds against a python, and PYTHON_PACKAGE names which one -- the spk sets
-# it and builds it first, a standalone cross build has neither, so default the name and
-# depend on it. The include path below reads the same variable.
-PYTHON_PACKAGE ?= python314
-ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+ifeq ($(strip $(PYTHON_PACKAGE)),)
+BUILD_DEPENDS = cross/python314
 endif
 
 CONFIGURE_ARGS += -DWANT_PYTHON=true
