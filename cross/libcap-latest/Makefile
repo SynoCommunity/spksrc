@@ -22,13 +22,20 @@ ADDITIONAL_CFLAGS = -O2 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 
 include ../../mk/spksrc.cross-cc.mk
 
-# empty and _makenames are run with "make libcap" and therefore must be compiled for the host (first)
+# Make.Rules sets CC, AR, RANLIB and OBJCOPY with := , so the environment is ignored and
+# each tool has to be named on the command line. BUILD_CC defaults to $(CC), which is why
+# _makenames -- a generator run on the host -- gets an invocation of its own, with no CC.
+#
+# 'empty' is not a host tool: libcap compiles it for the target and reads its .interp back
+# with objcopy, to bake the loader path into libcap.so (-DSHARED_LOADER). Built on the
+# host it yields the host's loader instead. 2.78 compiles it with $(CFLAGS) too, which is
+# what made that visible: the target flags now reach the host compiler, and it stops.
 .PHONY: libcap_compile
 libcap_compile:
 	@$(MSG) Build _makenames for host
-	@$(RUN) make -C libcap empty _makenames
+	@$(RUN) make -C libcap _makenames
 	@$(MSG) Build libcap for $(ARCH)
-	@$(RUN) make CC=$(call tc,gcc) -C libcap
+	@$(RUN) make CC=$(call tc,gcc) AR=$(call tc,ar) RANLIB=$(call tc,ranlib) OBJCOPY=$(call tc,objcopy) -C libcap
 
 # install libs only
 # and force install in /lib rather than /lib64 for x86_64
