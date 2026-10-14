@@ -111,6 +111,12 @@ ifneq ($(strip $(TC)),)
 export INSTALL_DIR
 export INSTALL_PREFIX
 
+# rust is in TC_VARS_ENV for every cross package, so the definitions tc_rust_vars needs
+# come from here rather than from each package: env-rust.mk maps the arch to RUST_TARGET
+# and names the rustup toolchain. Guarded against double inclusion, so a cargo build
+# reaching it through spksrc.cross-rust.mk is unaffected.
+include ../../mk/spksrc.cross/env-rust.mk
+
 # Two variables, two questions.
 #
 # BUILD_SYSTEM -- autotools, cargo, cmake, meson or none. What install.mk and compile.mk

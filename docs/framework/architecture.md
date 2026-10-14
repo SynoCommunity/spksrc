@@ -214,12 +214,30 @@ The framework exports numerous variables to configure cross-compilation:
 
 ### Toolchain Variable Files (`tc_vars*`)
 
-Two variables decide what a package gets, and they answer different questions:
-`BUILD_SYSTEM` is `autotools`, `cmake`, `meson` or `none` — what `install.mk` and
-`compile.mk` ask about, since a CMake or Meson build installs through its own tool.
+Two variables decide what a package gets, and they answer different questions.
+
+`BUILD_SYSTEM` is `autotools`, `cargo`, `cmake`, `meson` or `none` — what `install.mk`
+and `compile.mk` ask about, since each installs through its own tool. It is set by the
+build system's own mk (`cross-rust.mk` for cargo, `env-cmake.mk`, `env-meson.mk`), or to
+`none` by `cross-virtual.mk` and `spk.mk` for something that builds nothing; each of the
+others declines to append over `none`.
+
 `TC_VARS_ENV` lists which `tc_vars.<word>.mk` fragments to load. Only `autotools`,
 `flags` and `rust` name a real file; `cmake` and `meson` never did, as the table below
-shows.
+shows. `rust` is loaded for every cross package, so `env-default.mk` includes
+`env-rust.mk` to define what it needs — `RUST_TARGET` and the rustup toolchain.
+
+| `BUILD_SYSTEM` | `TC_VARS_ENV` | reads `CC` and the flags from |
+|---|---|---|
+| `autotools` | `autotools flags rust` | the environment |
+| `cargo` | `rust` | `CFLAGS_<triple>`, `HOST_*` |
+| `cmake` | `rust` | its generated toolchain file |
+| `meson` | `rust` | its generated cross file |
+| `none` | *(nothing)* | — |
+
+A package adds to `TC_VARS_ENV` when it needs more than its build system: `cross/znc` is
+a CMake build whose modules go through `znc-buildmod`, which reads `CC` and the flags
+from the environment, so it asks for `autotools flags`.
 
 
 The toolchain bootstrap (stage 1; the toolchain-dir `tc_vars.mk` also at stage 0) generates a set of `tc_vars*` files. `cross-env.mk` loads a subset of them into the make environment, selected by `DEFAULT_ENV` (default `autotools flags rust`):

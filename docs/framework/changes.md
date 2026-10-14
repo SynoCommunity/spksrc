@@ -142,8 +142,21 @@ If you only read one thing, read this. The details are in the dated log below.
     - **`DEFAULT_ENV` held two jobs**, and that is what made #7577 breakable: narrowing the
       list to isolate the rust env also dropped a build-system marker, so librsvg lost its
       ninja install and pngquant3 its flags (reverted in #7581). They are separate now --
-      `BUILD_SYSTEM` is `autotools`, `cmake`, `meson` or `none`, what `install.mk` and
-      `compile.mk` ask about; `TC_VARS_ENV` lists which `tc_vars.<word>.mk` to load.
+      `BUILD_SYSTEM` is `autotools`, `cargo`, `cmake`, `meson` or `none`, what `install.mk`
+      and `compile.mk` ask about; `TC_VARS_ENV` lists which `tc_vars.<word>.mk` to load.
+      A cargo build loads `rust` alone, reading the per-triple and `HOST_*` variables
+      rather than the bare `CC` and `CFLAGS`; `cross-rust.mk` declared no build system at
+      all before, so a pure Rust package fell through to the autotools default.
+
+    - **`none` holds wherever it is set.** `cross-virtual.mk` and `spk.mk` set it for
+      something that builds nothing, and each `env-<system>.mk` declines to append over
+      it -- the guard has to be local, since `env-default.mk` is last only for cross
+      packages, not for a python spk whose metas come after it (`spk-meta/python.mk`
+      reaches `wheel.mk`, which includes `env-cmake.mk`).
+
+    - **`env-default.mk` includes `env-rust.mk`**, since `rust` is in `TC_VARS_ENV` for
+      every cross package and `tc_rust_vars` needs what that file defines: the arch to
+      `RUST_TARGET` map and the rustup toolchain name.
 
     - **The words `cmake` and `meson` never loaded anything.** Their generated files are
       `tc_vars.cmake`, `tc_vars.meson-cross` and `tc_vars.meson-native`, with no `.mk`

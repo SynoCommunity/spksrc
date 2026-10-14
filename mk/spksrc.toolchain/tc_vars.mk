@@ -298,20 +298,16 @@ tc_meson_native_vars:
 # and underscored since dash drops hyphenated names from the environment.
 .PHONY: tc_rust_vars
 tc_rust_vars:
-	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
-	@# RUSTFLAGS. cargo gives the global RUSTFLAGS env higher precedence than the
-	@# per-target flags, so a global RUSTFLAGS would SILENTLY DROP the arch codegen
-	@# options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc SPE) --
-	@# and it also wrongly leaked the target sysroot link-args onto the host's build
-	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
-	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
-	@# Same for the C flags, one layer down: cc-rs prefers CFLAGS_<triple> for the target
-	@# and HOST_CFLAGS for the host over a bare CFLAGS, which it would otherwise use for
-	@# both sides -- putting the cross sysroot on host build scripts. HOST_C*FLAGS are
-	@# empty: the host compiler wants no target sysroot. ADDITIONAL_C*FLAGS are deferred,
-	@# as in tc_autotools_vars, so a package's own additions reach cc-rs.
-	@# TC_EXTRA_RUSTFLAGS is skipped when the rust overlay is on: the JSON spec already
-	@# carries cpu/features, and re-passing them makes rustc warn ("unknown feature: spe").
+	@# Target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS, never a global
+	@# RUSTFLAGS: cargo ranks the global one higher, so it would silently drop the arch
+	@# codegen options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc
+	@# SPE) and put the target sysroot link-args on host build scripts and proc-macros.
+	@# Consolidated here -- link-args, arch codegen, debug ADDITIONAL_RUSTFLAGS -- they
+	@# reach the target alone. TC_EXTRA_RUSTFLAGS is skipped under the rust overlay,
+	@# whose JSON spec carries cpu/features already; re-passing them makes rustc warn.
+	@# The C flags work the same, one layer down: cc-rs prefers CFLAGS_<triple> and
+	@# HOST_CFLAGS over a bare CFLAGS it would otherwise use for both sides. HOST_C*FLAGS
+	@# are empty, the host wanting no target sysroot; ADDITIONAL_C*FLAGS stay deferred.
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
