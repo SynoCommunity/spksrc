@@ -6,9 +6,6 @@ SPK_ICON = src/postgresql.png
 DEPENDS = cross/postgresql
 OPTIONAL_DEPENDS = cross/postgis cross/pgvector
 
-# libicu-74.2 (used for GCC < 5 / DSM 6) doesn't support ARMv5
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
 CHANGELOG = "1. Update PostgreSQL to 17.11. <br/>2. Update PostGIS to 3.6.4 and pgvector to 0.8.6"
