@@ -11,8 +11,12 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8
-MIN_GCC_VERSION = 4.8
+# cross/glib has only ever selected this line from gcc 7.5 (and kernel 3.2, which every
+# gcc >= 7.5 toolchain satisfies), and the floor is real rather than historical: the
+# installed gmacros.h of glib 2.90 reaches for g_macro__has_attribute(flag_enum) with no
+# fallback define, so a consumer compiled without __has_attribute (gcc < 5) fails on
+# glib's own header -- json-glib does, under -Werror=undef.
+MIN_GCC_VERSION = 7.5
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
