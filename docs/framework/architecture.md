@@ -239,12 +239,20 @@ A package adds to `TC_VARS_ENV` when it needs more than its build system: `cross
 a CMake build whose modules go through `znc-buildmod`, which reads `CC` and the flags
 from the environment, so it asks for `autotools flags`.
 
+A cargo build is given no bare `CFLAGS`, and that is what the isolation rests on: cc-rs
+*adds* a bare `CFLAGS` to whatever `HOST_CFLAGS` says rather than choosing between them,
+so one in the environment puts the target ABI on host build scripts whatever the host
+value — the `psm` failure of #7573. A package that needs one anyway names it in its own
+`ENV`, as `cross/nushell` does for the CMake build inside `aws-lc-sys`. The per-triple
+`CFLAGS_<triple>` ends with `$(ADDITIONAL_CFLAGS)`, so a package adds target flags with
+`ADDITIONAL_CFLAGS +=` and they are concatenated rather than overwritten.
 
-The toolchain bootstrap (stage 1; the toolchain-dir `tc_vars.mk` also at stage 0) generates a set of `tc_vars*` files. `cross-env.mk` loads a subset of them into the make environment, selected by `DEFAULT_ENV` (default `autotools flags rust`):
+
+The toolchain bootstrap (stage 1; the toolchain-dir `tc_vars.mk` also at stage 0) generates a set of `tc_vars*` files. `cross-env.mk` loads a subset of them into the make environment, selected by `TC_VARS_ENV`:
 
 | File | Contents | Loaded into the make env |
 |------|----------|--------------------------|
-| `tc_vars.mk` | Toolchain identity and paths (`TC`, `TC_PATH`, `CC`, `CXX`, `TC_GCC`, ...) | **always** |
+| `tc_vars.mk` | Toolchain identity and paths (`TC_PATH`, `TC_TARGET`, `TC_SYSROOT`, `TC_GCC`, ...) | **always** |
 | `tc_vars.flags.mk` | C / C++ / CPP / LD compiler & linker flags | autotools |
 | `tc_vars.autotools.mk` | Autotools (`configure`) environment | autotools |
 | `tc_vars.rust.mk` | Rust / Cargo environment | **every cross package** |

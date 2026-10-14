@@ -148,6 +148,23 @@ If you only read one thing, read this. The details are in the dated log below.
       rather than the bare `CC` and `CFLAGS`; `cross-rust.mk` declared no build system at
       all before, so a pure Rust package fell through to the autotools default.
 
+    - **A bare `CFLAGS` cannot be made safe by naming the host's.** cc-rs *adds* it to
+      whatever `HOST_CFLAGS` says rather than choosing between them, so one in the
+      environment puts the target ABI on a host compile whatever the host value -- measured
+      on `psm` at comcerto2k, which fails on `-mfloat-abi=hard` with `HOST_CFLAGS` empty
+      and with `-O2` alike. The isolation rests on the bare flags being absent from a
+      cargo environment, which is why they stay autotools' own. A package that genuinely
+      needs one names it in its own `ENV`: `cross/nushell` does, since `aws-lc-sys`
+      builds BoringSSL through CMake, which reads the bare `CFLAGS` and nothing cc-rs
+      offers, and without the sysroot include `bcm.c` compiles against the host glibc and
+      the link ends on undefined `__isoc23_*`.
+
+    - **`cross/fish` and `cross/helix` state their flag through `ADDITIONAL_CFLAGS`.**
+      Both set `CFLAGS_<triple>` by hand -- fish `-std=c99` for pcre2-sys on gcc < 5,
+      helix `-O3` -- and `tc_rust_vars` names that variable too, from a later `ENV +=`
+      that wins. The deferred form is concatenated into the framework's value instead of
+      competing with it, so both flags arrive.
+
     - **`none` holds wherever it is set.** `cross-virtual.mk` and `spk.mk` set it for
       something that builds nothing, and each `env-<system>.mk` declines to append over
       it -- the guard has to be local, since `env-default.mk` is last only for cross
