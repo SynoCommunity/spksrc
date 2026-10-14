@@ -7,16 +7,12 @@ PKG_DIST_SITE = https://github.com/systemd/systemd/archive
 PKG_DIST_FILE = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libgcrypt cross/dbus
+DEPENDS = cross/libgcrypt cross/dbus cross/libcap
 
 HOMEPAGE = https://github.com/systemd/systemd
 COMMENT = The systemd System and Service Manager provides an array of system components for Linux operating systems.
 # we take libraries only (tools are GPLv2)
 LICENSE = LGPLv2.1
-
-include ../../mk/spksrc.common.mk
-
-$(call depend,cross/libcap|cross/libcap-2.51)
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libudev_pre_configure
