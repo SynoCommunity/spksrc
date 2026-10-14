@@ -102,7 +102,7 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 #####
 
 # Do not initialize any environment to avoid variable leakage.
-DEFAULT_ENV = none
+BUILD_SYSTEM = none
 
 #####
 

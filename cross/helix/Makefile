@@ -21,45 +21,29 @@ LICENSE  = MPL-2.0
 PATCH_TARGET = helix_patch
 INSTALL_TARGET = helix_install
 
-include ../../mk/spksrc.cross-rust.mk
-
-# we can't build with --locked, since we patched the cc crate
 CARGO_BUILD_ARGS = --release --target=$(RUST_TARGET)
 
-ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# tweaks to fix build with host compiler
-ENV += CFLAGS=""
-# use gcc as host compiler, default (cc) does not work
-ENV += CC_x86_64_unknown_linux_gnu=gcc
-ENV += CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=gcc
-endif
+include ../../mk/spksrc.cross-rust.mk
 
-ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-gcc
-ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-g++
-ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-ar
-ENV += RANLIB_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-ranlib
-
-ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-O3
+# Deferred, so it adds to the per-triple cc-rs flags tc_vars.rust.mk sets rather
+# than replacing them.
+ADDITIONAL_CFLAGS += -O3
 
 # for build error analysis
 ENV += RUST_BACKTRACE=full
 
 .PHONY: helix_patch
 helix_patch:
-	@$(MSG) "- Add patched cc crate for crossbuild"
-	@tar -xf src/cargo-cc-patched-1.2.29.tar.gz -C $(WORK_DIR)/helix/
-	@$(MSG) "- Patch Cargo.toml to use patched cc"
-	@cat patches/001-cargo-cc.patch | (cd $(WORK_DIR)/helix/ && patch -b -p0)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 ifeq ($(call version_lt, ${TCVERSION}, 7.0)$(call version_ge, ${TCVERSION}, 6.0),11)
 	@$(MSG) "- Patch languages.toml to remove gitcommit grammar (build fails for $(ARCH)-$(TCVERSION))"
-	@cat patches/002-drop-unsupported-grammar.patch | (cd $(WORK_DIR)/helix/ && patch -b -p0)
+	@cat patches/001-drop-unsupported-grammar.patch | (cd $(WORK_DIR)/helix/ && patch -b -p0)
 endif
 endif
 
 .PHONY: helix_build
 helix_build:
-	@$(MSG) "- Avoid dubious ownership restriction in github CI for clonging repositories with 'fetch tree-sitter grammars'"
+	@$(MSG) "- Avoid dubious ownership restriction in github CI for cloning repositories with 'fetch tree-sitter grammars'"
 	git config --global --add safe.directory '*'
 	@$(MSG) "- Build helix with cargo build"
 	$(RUN) cargo build $(CARGO_BUILD_ARGS)

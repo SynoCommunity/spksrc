@@ -13,8 +13,8 @@ CMAKE_TOOLCHAIN_FILE_PKG = $(BUILD_DIR)/$(CMAKE_TOOLCHAIN_FILE_NAME)
 
 CONFIGURE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
 
-# Map DEFAULT_ENV definitions to filenames
-TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Map TC_VARS_ENV definitions to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(TC_VARS_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 

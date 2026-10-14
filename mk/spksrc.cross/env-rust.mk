@@ -79,8 +79,7 @@ RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 # underscores are the whole conversion -- no shell, and it is read three times.
 RUST_TARGET_LENV = $(subst -,_,$(RUST_TARGET))
 
-# Deterministic cargo output in the build logs
-ENV += CARGO_TERM_COLOR=never
-ENV += CARGO_TERM_PROGRESS_WHEN=never
+# Deterministic cargo output in the build logs is stated by tc_rust_vars, which every
+# cross package loads; this file is also read by contexts that build no package.
 
 endif # __ENV_RUST_MK__

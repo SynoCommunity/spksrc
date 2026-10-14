@@ -12,7 +12,7 @@
 ###############################################################################
 
 # No own source and no build environment (avoids variable leakage).
-DEFAULT_ENV   = none
+BUILD_SYSTEM  = none
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 

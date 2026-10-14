@@ -124,6 +124,97 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 13th 2026 — The Rust build environment is isolated, and DEFAULT_ENV splits in two (#7584)"
+
+    - **A bare `CFLAGS` is what cc-rs falls back to for both sides of a cross build.**
+      `tc_vars.flags.mk` only records make variables; `tc_autotools_vars` is what puts
+      `CFLAGS` into the *environment*, and from there the target sysroot and `-idirafter`
+      reached host build scripts -- the `psm` crate failing on old-gcc archs (#7573).
+
+    - **`tc_rust_vars` now names every variable cc-rs consults**: `CFLAGS_<triple>` and
+      `CXXFLAGS_<triple>` for the target, `HOST_CC`, `HOST_CXX`, `HOST_AR` and empty
+      `HOST_CFLAGS` / `HOST_CXXFLAGS` for the host, beside the `CC_/CXX_/AR_<triple>` it
+      already emitted. cc-rs prefers those over the bare value, so the autotools `CFLAGS`
+      is never consulted there -- with nothing kept out of the environment.
+      `ADDITIONAL_C*FLAGS` stay deferred, as in `tc_autotools_vars`, so a package's own
+      additions still reach cc-rs.
+
+    - **`DEFAULT_ENV` held two jobs**, and that is what made #7577 breakable: narrowing the
+      list to isolate the rust env also dropped a build-system marker, so librsvg lost its
+      ninja install and pngquant3 its flags (reverted in #7581). They are separate now --
+      `BUILD_SYSTEM` is `autotools`, `cargo`, `cmake`, `meson` or `none`, what `install.mk`
+      and `compile.mk` ask about; `TC_VARS_ENV` lists which `tc_vars.<word>.mk` to load.
+      A cargo build loads `rust` alone, reading the per-triple and `HOST_*` variables
+      rather than the bare `CC` and `CFLAGS`; `cross-rust.mk` declared no build system at
+      all before, so a pure Rust package fell through to the autotools default.
+
+    - **A bare `CFLAGS` cannot be made safe by naming the host's.** cc-rs *adds* it to
+      whatever `HOST_CFLAGS` says rather than choosing between them, so one in the
+      environment puts the target ABI on a host compile whatever the host value -- measured
+      on `psm` at comcerto2k, which fails on `-mfloat-abi=hard` with `HOST_CFLAGS` empty
+      and with `-O2` alike. The isolation rests on the bare flags being absent from a
+      cargo environment, which is why they stay autotools' own. A package that genuinely
+      needs one names it in its own `ENV`: `cross/nushell` does, since `aws-lc-sys`
+      builds BoringSSL through CMake, which reads the bare `CFLAGS` and nothing cc-rs
+      offers, and without the sysroot include `bcm.c` compiles against the host glibc and
+      the link ends on undefined `__isoc23_*`.
+
+    - **`cross/fish` and `cross/helix` state their target flag through `ADDITIONAL_CFLAGS`.**
+      Both named `CFLAGS_<triple>` themselves -- fish `-std=c99` for pcre2-sys under
+      gcc < 5, helix `-O3` -- and `tc_rust_vars` names it too, so whichever `ENV +=` ran
+      last took the variable whole: fish includes the framework after its own line and
+      lost the flag, helix includes it before and kept the flag while losing the sysroot
+      includes. `ADDITIONAL_CFLAGS` is deferred into `CFLAGS_<triple>`, so it
+      concatenates and both arrive. helix also drops its hand-written
+      `CC_/CXX_/AR_/RANLIB_<triple>`: they spelled the vendor path directly and so
+      ignored a gcc overlay, where the framework's come from the `tc` macro.
+
+    - **`none` holds wherever it is set.** `cross-virtual.mk` and `spk.mk` set it for
+      something that builds nothing, and each `env-<system>.mk` declines to append over
+      it -- the guard has to be local, since `env-default.mk` is last only for cross
+      packages, not for a python spk whose metas come after it (`spk-meta/python.mk`
+      reaches `wheel.mk`, which includes `env-cmake.mk`).
+
+    - **`tc_rust_vars` states the Rust identity a package reads**: `RUST_TARGET` and
+      `TC_RUSTC` as before, now `TC_RUSTUP_TOOLCHAIN` beside them, so `cross/netdata`
+      and `cross/nushell` can call `cargo +$(TC_RUSTUP_TOOLCHAIN)` without a Rust mk
+      file of their own -- that is what `invalid toolchain name ''` was. The fragment
+      also carries `RANLIB_<triple>` and `HOST_RANLIB`, which cc-rs reads through the
+      same per-triple and `HOST_*` prefixes as `AR`, and the deterministic
+      `CARGO_TERM_*` that `env-rust.mk` used to put in every environment that read it.
+
+    - **The words `cmake` and `meson` never loaded anything.** Their generated files are
+      `tc_vars.cmake`, `tc_vars.meson-cross` and `tc_vars.meson-native`, with no `.mk`
+      suffix, while the wildcard globs `tc_vars.<word>.mk`. It matched nothing for those
+      two, silently, which is exactly what hid the marker role -- the architecture page
+      already said there was no `tc_vars.cmake.mk` to pick up; only the variable name
+      implied otherwise.
+
+    - **Both are appended, never claimed with `?=`**, which cannot compose a list: the
+      first file to run claimed the variable and silenced every later one, so the result
+      depended on each package's include order. `env-default.mk`, always last through
+      `spksrc.cross-cc.mk`, supplies what nobody asked for. `flags` stays autotools'
+      companion; CMake and Meson read the flags through their own generated toolchain and
+      cross file.
+
+    - **Nothing is declared per package any more.** The explicit `env-rust.mk` includes in
+      `cross/librsvg-latest` and `cross/netdata` are gone; `cross/fish` builds crates
+      through Corrosion and declared nothing, and gets the rust tc_vars all the same.
+      `cross/znc` is the only package that declared any of this and the only one the split
+      simplifies -- three lines to one, since its `BUILD_SYSTEM` is cmake and what it
+      needed was the two fragments `znc-buildmod` reads.
+
+    - **`none`** carried both senses too, and the second was vestigial: `cross-virtual.mk`
+      does include `install.mk`, so the filter ran and set `INSTALL_ARGS` for a package
+      that installs nothing. It is now `BUILD_SYSTEM = none` with `TC_VARS_ENV` empty.
+
+    - **Note for packagers**: `HOST_CC`, `HOST_CXX` and `HOST_AR` now reach every cross
+      package's environment, since `rust` is in `TC_VARS_ENV` for all of them. For
+      autotools that is `HOST_CC`'s conventional meaning -- a compiler for the build host
+      -- and it was previously unset.
+
+    - **Documented**: [Toolchain Variable Files](architecture.md#toolchain-variable-files-tc_vars).
+
 ??? note "October 7th 2026 — A git download can include submodules, and name a tag (#7549)"
 
     - **`git archive` leaves a submodule an empty directory**, so a project whose release

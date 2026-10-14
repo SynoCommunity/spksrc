@@ -36,11 +36,11 @@ INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
 # Sensible default for the classic gnu-make install path only: the standard
-# make install command. Excluded for cmake/meson (via DEFAULT_ENV) and for the
+# make install command. Excluded for cmake/meson (via BUILD_SYSTEM) and for the
 # python pip / meson-python installers, whose *_python_* INSTALL_TARGET reads
 # INSTALL_ARGS itself. Gives INSTALL_ARGS a usable value so package-specific
 # make routines can reference $(INSTALL_ARGS) directly.
-ifeq ($(filter cmake meson,$(DEFAULT_ENV)),)
+ifeq ($(filter cmake meson,$(BUILD_SYSTEM)),)
 ifeq ($(findstring python,$(INSTALL_TARGET)),)
 INSTALL_ARGS ?= install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 endif

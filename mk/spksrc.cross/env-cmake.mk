@@ -5,10 +5,12 @@
 #
 ###############################################################################
 
-# Force CMake environment, bypassing default autotools settings. The rust tc_vars come
-# along for projects that build crates (Corrosion): cargo runs at build time, where the
-# toolchain file's set(ENV{...}) from configure time no longer reach it.
-DEFAULT_ENV ?= cmake rust
+# CMake reads the flags from its own generated toolchain file, so no tc_vars fragment is
+# asked for here. env-default.mk adds rust for every cross package, which a Corrosion
+# project needs at build time, past where the toolchain file's set(ENV{...}) reaches.
+ifeq ($(filter none,$(BUILD_SYSTEM)),)
+BUILD_SYSTEM += cmake
+endif
 
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
