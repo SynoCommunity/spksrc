@@ -15,10 +15,8 @@ LICENSE  = 3-Clause BSD
 
 # The virtual took this line everywhere except ARMv5 and DSM < 6, over libatomic, which
 # iperf3 wants from 3.16 on. <stdatomic.h> itself is not a requirement: configure probes
-# for it with and without -latomic and iperf builds without it, warning. The arch half
-# stays an arch, so an overlay reporting a newer gcc cannot defeat it; the era half is a
-# gcc floor, every DSM 5 toolchain shipping 4.7.3 or older.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# for it with and without -latomic and iperf builds without it, warning. One floor covers
+# both halves -- 88f6281 ships gcc 4.6.4 and every DSM 5 toolchain 4.7.3 or older.
 MIN_GCC_VERSION = 4.8
 
 GNU_CONFIGURE = 1

@@ -44,8 +44,3 @@ PLIST_TRANSFORM = sed $(PLIST_TRANSFORM_SED_ARGS)
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
-# archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARCHS)
-endif
