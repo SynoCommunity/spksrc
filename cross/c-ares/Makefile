@@ -1,14 +1,7 @@
 PKG_NAME = c-ares-virtual
 
-OPTIONAL_DEPENDS  = cross/c-ares-latest
-OPTIONAL_DEPENDS += cross/c-ares-1.28
-
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/c-ares-1.28
-else
-DEPENDS = cross/c-ares-latest
-endif
+$(call depend,cross/c-ares-latest|cross/c-ares-1.28)
 
 include ../../mk/spksrc.cross-virtual.mk
