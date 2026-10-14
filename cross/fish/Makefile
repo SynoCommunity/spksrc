@@ -31,9 +31,11 @@ CONFIGURE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 # The cargo target, linker and cc-rs compilers come from the framework
 # (cmake toolchain file and rust tc_vars).
 
-# pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
+# pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89. ADDITIONAL_CFLAGS
+# is the deferred form the framework folds into the per-triple cc-rs flags, so it
+# adds to them instead of replacing what tc_vars.rust.mk puts there.
 ifeq ($(call version_lt, $(TC_GCC), 5),1)
-ENV += CFLAGS_$(subst -,_,$(RUST_TARGET))=-std=c99
+ADDITIONAL_CFLAGS += -std=c99
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

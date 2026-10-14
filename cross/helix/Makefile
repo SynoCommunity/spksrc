@@ -39,7 +39,9 @@ ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-g++
 ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-ar
 ENV += RANLIB_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-ranlib
 
-ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-O3
+# Deferred, so it adds to the per-triple cc-rs flags tc_vars.rust.mk sets rather
+# than replacing them.
+ADDITIONAL_CFLAGS += -O3
 
 # for build error analysis
 ENV += RUST_BACKTRACE=full
