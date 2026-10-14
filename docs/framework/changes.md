@@ -159,11 +159,15 @@ If you only read one thing, read this. The details are in the dated log below.
       offers, and without the sysroot include `bcm.c` compiles against the host glibc and
       the link ends on undefined `__isoc23_*`.
 
-    - **`cross/fish` and `cross/helix` state their flag through `ADDITIONAL_CFLAGS`.**
-      Both set `CFLAGS_<triple>` by hand -- fish `-std=c99` for pcre2-sys on gcc < 5,
-      helix `-O3` -- and `tc_rust_vars` names that variable too, from a later `ENV +=`
-      that wins. The deferred form is concatenated into the framework's value instead of
-      competing with it, so both flags arrive.
+    - **`cross/fish` and `cross/helix` state their target flag through `ADDITIONAL_CFLAGS`.**
+      Both named `CFLAGS_<triple>` themselves -- fish `-std=c99` for pcre2-sys under
+      gcc < 5, helix `-O3` -- and `tc_rust_vars` names it too, so whichever `ENV +=` ran
+      last took the variable whole: fish includes the framework after its own line and
+      lost the flag, helix includes it before and kept the flag while losing the sysroot
+      includes. `ADDITIONAL_CFLAGS` is deferred into `CFLAGS_<triple>`, so it
+      concatenates and both arrive. helix also drops its hand-written
+      `CC_/CXX_/AR_/RANLIB_<triple>`: they spelled the vendor path directly and so
+      ignored a gcc overlay, where the framework's come from the `tc` macro.
 
     - **`none` holds wherever it is set.** `cross-virtual.mk` and `spk.mk` set it for
       something that builds nothing, and each `env-<system>.mk` declines to append over
