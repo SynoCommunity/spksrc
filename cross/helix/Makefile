@@ -26,13 +26,6 @@ include ../../mk/spksrc.cross-rust.mk
 # we can't build with --locked, since we patched the cc crate
 CARGO_BUILD_ARGS = --release --target=$(RUST_TARGET)
 
-# Host artefacts -- build scripts and proc-macros -- link with the host triple's linker,
-# which cargo defaults to cc. The framework names no linker for a triple that is not the
-# target, so name gcc here. The host compiler itself comes from HOST_CC.
-ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ENV += CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=gcc
-endif
-
 # Deferred, so it adds to the per-triple cc-rs flags tc_vars.rust.mk sets rather
 # than replacing them.
 ADDITIONAL_CFLAGS += -O3
