@@ -8,11 +8,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
 
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
+OPTIONAL_DEPENDS = cross/libcap cross/libcap-2.51
 
 include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
+DEPENDS += cross/libcap-2.51
 else
 DEPENDS += cross/libcap
 endif

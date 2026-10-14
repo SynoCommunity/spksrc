@@ -16,7 +16,7 @@ LICENSE = LGPLv2.1
 
 include ../../mk/spksrc.common.mk
 
-$(call depend,cross/libcap|cross/libcap_2.51)
+$(call depend,cross/libcap|cross/libcap-2.51)
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libudev_pre_configure
