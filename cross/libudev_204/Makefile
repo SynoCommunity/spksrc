@@ -8,11 +8,6 @@ PKG_DIST_FILE = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libgcrypt cross/dbus
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-# unable to find "library containing cap_init..."
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 
 HOMEPAGE = https://github.com/systemd/systemd
 COMMENT = The systemd System and Service Manager provides an array of system components for Linux operating systems.
@@ -20,11 +15,8 @@ COMMENT = The systemd System and Service Manager provides an array of system com
 LICENSE = LGPLv2.1
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
-DEPENDS += cross/libcap
-endif
+
+$(call depend,cross/libcap|cross/libcap_2.51)
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libudev_pre_configure

@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# missing support for atomics:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Needs gcc >= 4.7: __atomic_test_and_set / __atomic_clear (libcap.h) rejected below.
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = https://sites.google.com/site/fullycapable/
 COMMENT  = POSIX 1003.1e capabilities (library). Libcap implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. 
