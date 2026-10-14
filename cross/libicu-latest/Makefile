@@ -38,18 +38,22 @@ endif
 
 NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR))
 
-# the packaging can be customized in a dependent package by definition
-# of LIBICU_DATA_PACKAGING_MODE like:
-# export LIBICU_DATA_PACKAGING_MODE=archive
-# 
+# archive is the default: in library mode the ICU data lives in libicudata.so, which DSM
+# ARMv7 systems fail to load at runtime (#7347). Every package that cared said so for
+# itself -- postgresql, znc -- and the ones that did not were simply broken there, so the
+# working mode belongs here rather than in each consumer.
+#
+# A dependent package can still ask for the other one:
+# export LIBICU_DATA_PACKAGING_MODE=library
+#
 # valid data packaging values are
-# - library (the default)
-# - archive
+# - archive (the default)
+# - library
 
 DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
 ifeq ($(strip $(DATA_PACKAGING)),)
 # default data packaging
-DATA_PACKAGING = library
+DATA_PACKAGING = archive
 endif
 CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
 

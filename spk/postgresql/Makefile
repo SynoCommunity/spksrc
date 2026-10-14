@@ -26,10 +26,6 @@ NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
 
-# Use ICU archive data packaging to avoid runtime libicudata shared library
-# loading issues observed on DSM ARMv7 systems.
-export LIBICU_DATA_PACKAGING_MODE=archive
-
 # PostGIS requires gcc 8+ (libgeos 3.14.1 and libroj 9.8.1 demand C++17)
 # Only include postgis if toolchain supports required gcc
 ifeq ($(call version_ge, $(TC_GCC), 8),1)

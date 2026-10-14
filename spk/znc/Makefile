@@ -45,10 +45,6 @@ DEPENDS += cross/znc
 
 include ../../mk/spksrc.common.mk
 
-# Use ICU archive data packaging to avoid runtime libicudata shared library
-# loading issues observed on DSM ARMv7 systems.
-export LIBICU_DATA_PACKAGING_MODE=archive
-
 include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: znc_extra_install
