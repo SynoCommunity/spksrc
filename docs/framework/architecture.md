@@ -224,8 +224,10 @@ others declines to append over `none`.
 
 `TC_VARS_ENV` lists which `tc_vars.<word>.mk` fragments to load. Only `autotools`,
 `flags` and `rust` name a real file; `cmake` and `meson` never did, as the table below
-shows. `rust` is loaded for every cross package, so `env-default.mk` includes
-`env-rust.mk` to define what it needs — `RUST_TARGET` and the rustup toolchain.
+shows. `rust` is loaded for every cross package, because any of them may build crates,
+and `tc_vars.rust.mk` is also where `RUST_TARGET`, `TC_RUSTC` and `TC_RUSTUP_TOOLCHAIN`
+come from — so a package that calls `cargo` in a recipe of its own, as `cross/netdata`
+and `cross/nushell` do, needs no Rust mk file of its own.
 
 | `BUILD_SYSTEM` | `TC_VARS_ENV` | reads `CC` and the flags from |
 |---|---|---|

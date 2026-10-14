@@ -175,9 +175,13 @@ If you only read one thing, read this. The details are in the dated log below.
       packages, not for a python spk whose metas come after it (`spk-meta/python.mk`
       reaches `wheel.mk`, which includes `env-cmake.mk`).
 
-    - **`env-default.mk` includes `env-rust.mk`**, since `rust` is in `TC_VARS_ENV` for
-      every cross package and `tc_rust_vars` needs what that file defines: the arch to
-      `RUST_TARGET` map and the rustup toolchain name.
+    - **`tc_rust_vars` states the Rust identity a package reads**: `RUST_TARGET` and
+      `TC_RUSTC` as before, now `TC_RUSTUP_TOOLCHAIN` beside them, so `cross/netdata`
+      and `cross/nushell` can call `cargo +$(TC_RUSTUP_TOOLCHAIN)` without a Rust mk
+      file of their own -- that is what `invalid toolchain name ''` was. The fragment
+      also carries `RANLIB_<triple>` and `HOST_RANLIB`, which cc-rs reads through the
+      same per-triple and `HOST_*` prefixes as `AR`, and the deterministic
+      `CARGO_TERM_*` that `env-rust.mk` used to put in every environment that read it.
 
     - **The words `cmake` and `meson` never loaded anything.** Their generated files are
       `tc_vars.cmake`, `tc_vars.meson-cross` and `tc_vars.meson-native`, with no `.mk`

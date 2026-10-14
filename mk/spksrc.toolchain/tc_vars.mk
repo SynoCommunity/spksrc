@@ -294,8 +294,11 @@ tc_meson_native_vars:
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
-# cc-rs CC_/CXX_/AR_<rust triple>: TARGET_CC is ignored on x64 (host == target triple),
-# and underscored since dash drops hyphenated names from the environment.
+# cc-rs CC_/CXX_/AR_/RANLIB_<rust triple>: TARGET_CC is ignored on x64 (host == target
+# triple), and underscored since dash drops hyphenated names from the environment.
+# RUST_TARGET, TC_RUSTC and TC_RUSTUP_TOOLCHAIN are emitted as make variables: this
+# fragment is what every cross package reads them from, so a package calling cargo
+# itself needs no rust mk of its own.
 .PHONY: tc_rust_vars
 tc_rust_vars:
 	@# Target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS, never a global
@@ -319,15 +322,20 @@ tc_rust_vars:
 	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(call tc,g++)\" ; \
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
+	echo TC_ENV += RANLIB_$(RUST_TARGET_LENV)=\"$(call tc,ranlib)\" ; \
 	echo TC_ENV += CFLAGS_$(RUST_TARGET_LENV)=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CXXFLAGS_$(RUST_TARGET_LENV)=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	echo TC_ENV += HOST_CC=\"$(call native,gcc)\" ; \
 	echo TC_ENV += HOST_CXX=\"$(call native,g++)\" ; \
 	echo TC_ENV += HOST_AR=\"$(call native,ar)\" ; \
+	echo TC_ENV += HOST_RANLIB=\"$(call native,ranlib)\" ; \
 	echo TC_ENV += HOST_CFLAGS=\"\" ; \
 	echo TC_ENV += HOST_CXXFLAGS=\"\" ; \
+	echo TC_ENV += CARGO_TERM_COLOR=\"never\" ; \
+	echo TC_ENV += CARGO_TERM_PROGRESS_WHEN=\"never\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
-	echo TC_RUSTC := $(TC_RUSTC)
+	echo TC_RUSTC := $(TC_RUSTC) ; \
+	echo TC_RUSTUP_TOOLCHAIN := $(TC_RUSTUP_TOOLCHAIN)
 
 .PHONY: tc_autotools_vars
 tc_autotools_vars:

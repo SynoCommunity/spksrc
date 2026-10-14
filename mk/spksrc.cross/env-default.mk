@@ -111,12 +111,6 @@ ifneq ($(strip $(TC)),)
 export INSTALL_DIR
 export INSTALL_PREFIX
 
-# rust is in TC_VARS_ENV for every cross package, so the definitions tc_rust_vars needs
-# come from here rather than from each package: env-rust.mk maps the arch to RUST_TARGET
-# and names the rustup toolchain. Guarded against double inclusion, so a cargo build
-# reaching it through spksrc.cross-rust.mk is unaffected.
-include ../../mk/spksrc.cross/env-rust.mk
-
 # Two variables, two questions.
 #
 # BUILD_SYSTEM -- autotools, cargo, cmake, meson or none. What install.mk and compile.mk
@@ -132,20 +126,22 @@ include ../../mk/spksrc.cross/env-rust.mk
 # This file fills in the rest: the autotools pair for an autotools build, which reads
 # CC and the flags from the environment, then rust for every package. cmake and meson
 # read theirs from their own generated file; cargo reads the per-triple and HOST_*
-# variables tc_vars.rust.mk names, so neither needs the bare ones.
+# names tc_vars.rust.mk states. rust is loaded for every package because any of them may
+# build crates, and tc_vars.rust.mk is also where RUST_TARGET and TC_RUSTUP_TOOLCHAIN
+# come from -- so a package calling cargo itself needs no rust mk of its own.
 # none means nothing is built: cross-virtual.mk and spk.mk set it, and each
 # env-<system>.mk declines to append over it, so an env pulled in further down the tree
 # -- wheel.mk reaches env-cmake.mk for a python spk -- cannot turn it into a build.
 ifneq ($(filter none,$(BUILD_SYSTEM)),)
-TC_VARS_ENV :=
+  TC_VARS_ENV :=
 else
   ifeq ($(strip $(BUILD_SYSTEM)),)
-BUILD_SYSTEM += autotools
+    BUILD_SYSTEM += autotools
   endif
   ifneq ($(filter autotools,$(BUILD_SYSTEM)),)
-TC_VARS_ENV += autotools flags
+    TC_VARS_ENV += autotools flags
   endif
-TC_VARS_ENV += rust
+  TC_VARS_ENV += rust
 endif
 
 # Map TC_VARS_ENV to filenames; sort drops any word added twice.
