@@ -11,6 +11,8 @@ HOMEPAGE = https://www.gnu.org/software/binutils/
 COMMENT  = GNU Binutils
 LICENSE  = GPLv2/LGPLv2
 
+MIN_GCC_VERSION = 4.6
+
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --disable-static

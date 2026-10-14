@@ -8,6 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
+# Requires 'pipe2'
+MIN_GLIBC_VERSION = 2.9
 # bat >= 0.26.1 declares MSRV 1.87, and locks etcetera 0.11.0 (edition2024)
 MIN_RUSTC_VERSION = 1.87
 

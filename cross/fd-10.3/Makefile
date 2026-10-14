@@ -7,12 +7,10 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # tikv-jemalloc-sys fails to build:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+MIN_BINUTILS_VERSION = 2.22
 
-# PKG_VERS >= 8.7.1 fails to build for RUST_TARGET = armv7-unknown-linux-gnueabi $(ARMv7L_ARCHS)
-# PKG_VERS <= 8.7.0 fails with newer rustc 1.80.1
 # see: https://github.com/sharkdp/fd/issues/1428
-# but fd >= 10.5.0 and rustc >= 1.90 fixed the build with ARMv7L toolchain.
+# fd >= 10.5.0 and rustc >= 1.90 fixed the build with ARMv7L toolchain.
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://github.com/sharkdp/fd
