@@ -13,8 +13,13 @@ HOMEPAGE = https://software.es.net/iperf/
 COMMENT  = The iperf series of tools perform active measurements to determine the maximum achievable bandwidth on IP networks. It supports tuning of various parameters related to timing, protocols, and buffers. For each test it reports the measured throughput, loss, and other parameters.
 LICENSE  = 3-Clause BSD
 
-# Needs full <stdatomic.h>
-MIN_GCC_VERSION = 4.9
+# The virtual took this line everywhere except ARMv5 and DSM < 6, over libatomic, which
+# iperf3 wants from 3.16 on. <stdatomic.h> itself is not a requirement: configure probes
+# for it with and without -latomic and iperf builds without it, warning. The arch half
+# stays an arch, so an overlay reporting a newer gcc cannot defeat it; the era half is a
+# gcc floor, every DSM 5 toolchain shipping 4.7.3 or older.
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+MIN_GCC_VERSION = 4.8
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
