@@ -1,6 +1,6 @@
 SPK_NAME = vaultwarden
 SPK_VERS = 1.37.4
-SPK_REV = 8
+SPK_REV = 7
 SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 DISPLAY_NAME = Vaultwarden
-CHANGELOG = "Rebuilt against the isolated Rust build environment."
+CHANGELOG = "Update Vaultwarden to v1.37.4."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3

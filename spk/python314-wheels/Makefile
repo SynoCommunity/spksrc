@@ -1,7 +1,7 @@
 SPK_NAME = python314-wheels
 SPK_VERS = 1.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
 # Python 3.14 needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
@@ -15,8 +15,7 @@ DESCRIPTION_FRE = Collection of programs for the Python 3.14 programming languag
 DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.14.
 STARTABLE = no
 DISPLAY_NAME = Python 3.14 Wheels Collection
-CHANGELOG  = "1. Initial package<br/>"
-CHANGELOG += "2. Rebuilt against the isolated Rust build environment."
+CHANGELOG = "1. Initial package"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
