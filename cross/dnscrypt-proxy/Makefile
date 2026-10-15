@@ -9,9 +9,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
-# Both go tiers, for the dependency scan: it runs with no ARCH, where the conditional
-# below collapses to one branch and the other tier becomes invisible to CI.
-# OPTIONAL_DEPENDS is the superset that scan reads (mk/spksrc.rules/dependency-tree.mk).
 OPTIONAL_DEPENDS = native/go native/go_1.23
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/go_1.23
