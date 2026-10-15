@@ -685,13 +685,6 @@ jobs:
             -exec cat {} \; 2>/dev/null \
             || echo "No status-build.log found"
 
-          # Disk critical marker
-          if [ "${{ env.disk_critical }}" == "true" ]; then
-            echo "Build failed due to critical disk space (>95% full)" \
-              > collected_logs/DISK_SPACE_CRITICAL.txt
-            df -h >> collected_logs/DISK_SPACE_CRITICAL.txt
-          fi
-
       - name: Build Status
         id: build_status
         # We need this status since we don't want to stop the build on errors.
@@ -717,7 +710,7 @@ jobs:
           mkdir -p artifacts/diagnostics/collected_logs
 
           # Copy flat diagnostic files
-          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt \
+          for file in docker_logs.txt \
                       build_errors.txt build_log_errors.txt \
                       build_unsupported.txt build_success.txt \
                       build_remaining.txt build_timeout.txt; do
