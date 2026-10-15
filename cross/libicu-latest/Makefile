@@ -38,30 +38,15 @@ endif
 
 NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR))
 
-# archive is the default: in library mode the ICU data lives in libicudata.so, which DSM
-# ARMv7 systems fail to load at runtime (#7347), and loading it is slightly slower
-# everywhere else. Every package that cared said so for itself -- postgresql, znc, kiwix --
-# and the ones that did not were simply broken there, so the working mode belongs here
-# rather than in each consumer.
-#
-# A dependent package can still ask for the other one:
-# export LIBICU_DATA_PACKAGING_MODE=library
-#
-# valid data packaging values are
-# - archive (the default)
-# - library
+# archive is the only mode built. In library mode the ICU data lives in libicudata.so,
+# which DSM ARMv7 systems fail to load at runtime (#7347) and every other arch loads
+# slightly slower. postgresql, znc and kiwix each asked for archive themselves; the
+# packages that did not were simply broken on ARMv7, so this is not a choice a consumer
+# should have to make -- and with the knob gone nothing can make it wrongly.
+CONFIGURE_ARGS += --with-data-packaging=archive
 
-DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
-ifeq ($(strip $(DATA_PACKAGING)),)
-# default data packaging
-DATA_PACKAGING = archive
-endif
-CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
-
-ifeq ($(strip $(DATA_PACKAGING)),archive)
 # add the ICU data file.
 PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/*/icudt*.dat'
-endif
 
 PRE_COMPILE_TARGET = libicu_prepare_dir
 POST_INSTALL_TARGET = libicu_post_install
