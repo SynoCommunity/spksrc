@@ -76,6 +76,13 @@ NPM_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../$(BUILD_DEPENDS)/work-native/no
 MARIADB_BIN_FOLDER = $(realpath $(WORK_DIR)/mariadb-connector-c/build/NATIVE/bin)
 ENV += "PATH=$(PATH):$(MARIADB_BIN_FOLDER):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
 
+# 'make dist' below is npm, and npm compiles the frontend's native addons (node-sass)
+# for the node that runs them -- the native one, on the build machine. node-gyp takes
+# its architecture from that node, so it emits -m64, which no cross compiler accepts.
+# Name the build machine's tools for that step; everything else keeps the cross ones.
+NPM_ENV  = CC="$(call native,gcc)" CXX="$(call native,g++)" AR="$(call native,ar)"
+NPM_ENV += CPPFLAGS= CFLAGS= CXXFLAGS= LDFLAGS=
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: ntopng_pre_configure
@@ -98,4 +105,4 @@ ntopng_pre_compile:
 .PHONY: ntopng_pre_install
 ntopng_pre_install:
 	@$(MSG) "- COMPILE ntopng frontend (shared/ntopng/httpdocs/dist)"
-	@$(RUN) $(MAKE) dist
+	@$(RUN) $(NPM_ENV) $(MAKE) dist
