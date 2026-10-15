@@ -41,9 +41,10 @@ endif
 NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR))
 
 # archive is the default: in library mode the ICU data lives in libicudata.so, which DSM
-# ARMv7 systems fail to load at runtime (#7347). Every package that cared said so for
-# itself -- postgresql, znc -- and the ones that did not were simply broken there, so the
-# working mode belongs here rather than in each consumer.
+# ARMv7 systems fail to load at runtime (#7347), and loading it is slightly slower
+# everywhere else. Every package that cared said so for itself -- postgresql, znc, kiwix --
+# and the ones that did not were simply broken there, so the working mode belongs here
+# rather than in each consumer.
 #
 # A dependent package can still ask for the other one:
 # export LIBICU_DATA_PACKAGING_MODE=library
