@@ -8,6 +8,7 @@ EXTRACT_PATH = $(WORK_DIR)/src/github.com/
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
+
 OPTIONAL_DEPENDS = native/go native/go_1.23
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/go_1.23
