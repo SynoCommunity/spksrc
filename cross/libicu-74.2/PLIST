@@ -10,3 +10,4 @@ lib:lib/libicuio.so.74.2
 lnk:lib/libicuuc.so
 lnk:lib/libicuuc.so.74
 lib:lib/libicuuc.so.74.2
+rsc:share/icu/*/icudt*.dat

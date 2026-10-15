@@ -1,15 +1,7 @@
 PKG_NAME = libicu-virtual
 
-OPTIONAL_DEPENDS  = cross/libicu-latest
-OPTIONAL_DEPENDS += cross/libicu-74.2
-
 include ../../mk/spksrc.common.mk
 
-# If gcc >= 5 (i.e. DSM >= 7.0)
-ifeq ($(call version_ge, $(TC_GCC), 5),1)
-DEPENDS = cross/libicu-latest
-else
-DEPENDS = cross/libicu-74.2
-endif
+$(call depend,cross/libicu-latest|cross/libicu-74.2)
 
 include ../../mk/spksrc.cross-virtual.mk
