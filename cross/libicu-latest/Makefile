@@ -42,11 +42,9 @@ NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-nativ
 # which DSM ARMv7 systems fail to load at runtime (#7347) and every other arch loads
 # slightly slower. postgresql, znc and kiwix each asked for archive themselves; the
 # packages that did not were simply broken on ARMv7, so this is not a choice a consumer
-# should have to make -- and with the knob gone nothing can make it wrongly.
+# should have to make -- and with the knob gone nothing can make it wrongly. The data file
+# archive installs, share/icu/*/icudt*.dat, is a plain PLIST line.
 CONFIGURE_ARGS += --with-data-packaging=archive
-
-# add the ICU data file.
-PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/*/icudt*.dat'
 
 PRE_COMPILE_TARGET = libicu_prepare_dir
 POST_INSTALL_TARGET = libicu_post_install
