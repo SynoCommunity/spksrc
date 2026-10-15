@@ -10,6 +10,13 @@ DEPENDS =
 # Needs gcc >= 4.7: __atomic_test_and_set / __atomic_clear (libcap.h) rejected below.
 MIN_GCC_VERSION = 4.7
 
+# Needs binutils >= 2.25: the loader probe below reads empty's .interp with
+# "objcopy --dump-section", which objcopy only learned in 2.25. Measured on the extracted
+# toolchains, the boundary is exactly there -- ppc853x 2.18.50, 88f6281 and x86/x64-5.2
+# 2.22 and hi3535 2.24 answer "unrecognized option", 2.25 and up all carry it. Those
+# archs take libcap 2.51, which has no probe.
+MIN_BINUTILS_VERSION = 2.25
+
 HOMEPAGE = https://sites.google.com/site/fullycapable/
 COMMENT  = POSIX 1003.1e capabilities (library). Libcap implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. 
 LICENSE  = GPLv2
