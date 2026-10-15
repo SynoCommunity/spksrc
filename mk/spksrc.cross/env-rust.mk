@@ -79,6 +79,13 @@ RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 # underscores are the whole conversion -- no shell, and it is read three times.
 RUST_TARGET_LENV = $(subst -,_,$(RUST_TARGET))
 
+# The build machine's own rust triple, to compare RUST_TARGET against. Stated rather
+# than asked: every Synology toolchain ships x86_64 host binaries, so a machine that can
+# run one is x86_64, and rustc names itself the same there. x64 is the single arch whose
+# target triple is this string, and that equality is what tc_vars.rust.mk tests before
+# naming anything HOST_*.
+RUST_BUILD_TRIPLE = x86_64-unknown-linux-gnu
+
 # Deterministic cargo output in the build logs is stated by tc_rust_vars, which every
 # cross package loads; this file is also read by contexts that build no package.
 

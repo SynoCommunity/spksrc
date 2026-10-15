@@ -18,13 +18,6 @@ DEPENDS = cross/openssl3
 # OpenSSL only build when the target happens to match the build host (x64).
 ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 
-# aws-lc-sys, reached through rustls, builds BoringSSL with CMake, which takes its C
-# flags from the bare CFLAGS -- the per-triple name cc-rs reads does not get there. The
-# Synology toolchain finds its own headers only when told, so without this bcm.c compiles
-# against the host glibc and the link ends on undefined __isoc23_* symbols. A cargo build
-# is given no bare CFLAGS, deliberately, so name the one thing needed and nothing else.
-ENV += CFLAGS=-I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
-
 # some archs are supported under DSM 6, but x64 isn't (BoringSSL issue with ring crates).
 # since nushell is a new package, we don't want to support DSM < 7 at all
 REQUIRED_MIN_DSM = 7.0

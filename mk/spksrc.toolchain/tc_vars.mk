@@ -311,6 +311,18 @@ tc_rust_vars:
 	@# The C flags work the same, one layer down: cc-rs prefers CFLAGS_<triple> and
 	@# HOST_CFLAGS over a bare CFLAGS it would otherwise use for both sides. HOST_C*FLAGS
 	@# are empty, the host wanting no target sysroot; ADDITIONAL_C*FLAGS stay deferred.
+	@#
+	@# HOST_* names the build machine, and is emitted only where that machine's triple
+	@# differs from the target's -- so everywhere but x64, where the two are the same
+	@# string. A build script that answers "am I cross compiling?" by comparing them
+	@# (aws-lc-sys: cargo_env("HOST") != target()) then reads HOST_CC and HOST_CFLAGS as
+	@# if they described the target, and overwrites CC_<triple> and CFLAGS_<triple> with
+	@# them. Its bcm.c is compiled by the build machine's gcc against the build machine's
+	@# headers, where _GNU_SOURCE over glibc >= 2.38 redirects sscanf and strtol to
+	@# __isoc23_*, which no DSM sysroot carries (glibc 2.26 on 7.1), and the link ends on
+	@# those two symbols. Left unsaid, the per-triple names stand: the target gets the
+	@# cross compiler, and so does a host-side crate on x64 -- the same arch, built
+	@# against an older sysroot, which is what it had before HOST_* existed.
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
@@ -324,14 +336,16 @@ tc_rust_vars:
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
 	echo TC_ENV += RANLIB_$(RUST_TARGET_LENV)=\"$(call tc,ranlib)\" ; \
 	echo TC_ENV += CFLAGS_$(RUST_TARGET_LENV)=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS_$(RUST_TARGET_LENV)=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
-	echo TC_ENV += HOST_CC=\"$(call native,gcc)\" ; \
+	echo TC_ENV += CXXFLAGS_$(RUST_TARGET_LENV)=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\"
+ifneq ($(RUST_TARGET),$(RUST_BUILD_TRIPLE))
+	@echo TC_ENV += HOST_CC=\"$(call native,gcc)\" ; \
 	echo TC_ENV += HOST_CXX=\"$(call native,g++)\" ; \
 	echo TC_ENV += HOST_AR=\"$(call native,ar)\" ; \
 	echo TC_ENV += HOST_RANLIB=\"$(call native,ranlib)\" ; \
 	echo TC_ENV += HOST_CFLAGS=\"\" ; \
-	echo TC_ENV += HOST_CXXFLAGS=\"\" ; \
-	echo TC_ENV += CARGO_TERM_COLOR=\"never\" ; \
+	echo TC_ENV += HOST_CXXFLAGS=\"\"
+endif
+	@echo TC_ENV += CARGO_TERM_COLOR=\"never\" ; \
 	echo TC_ENV += CARGO_TERM_PROGRESS_WHEN=\"never\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC) ; \
