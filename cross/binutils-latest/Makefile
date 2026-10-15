@@ -1,5 +1,5 @@
 PKG_NAME = binutils
-PKG_VERS = 2.46.0
+PKG_VERS = 2.46.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/binutils
@@ -7,12 +7,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/mpfr
 
-# c++11 compiler is required (the real check is in cross/binutils/Makefile)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 HOMEPAGE = https://www.gnu.org/software/binutils/
 COMMENT  = GNU Binutils
 LICENSE  = GPLv2/LGPLv2
+
+MIN_GCC_VERSION = 4.7
 
 GNU_CONFIGURE = 1
 
