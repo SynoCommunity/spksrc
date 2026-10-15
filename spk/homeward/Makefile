@@ -1,5 +1,5 @@
 SPK_NAME = homeward
-SPK_VERS = 0.1.0
+SPK_VERS = 0.2.0
 SPK_REV = 1
 SPK_ICON = src/homeward.png
 

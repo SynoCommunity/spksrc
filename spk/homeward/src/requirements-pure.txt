@@ -5,7 +5,7 @@
 # and move cffi, charset_normalizer, cryptography and pydantic_core to
 # requirements-crossenv.txt.
 
-homeward==0.1.0
+homeward==0.2.0
 
 annotated-types==0.8.0
 certifi==2026.7.22
