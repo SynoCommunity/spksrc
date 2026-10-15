@@ -1,17 +1,7 @@
 PKG_NAME = nmap-virtual
 
-OPTIONAL_DEPENDS  = cross/nmap-latest
-OPTIONAL_DEPENDS += cross/nmap-7.98
-OPTIONAL_DEPENDS += cross/nmap-7.92
-
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/nmap-7.92
-else ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/nmap-7.98
-else
-DEPENDS = cross/nmap-latest
-endif
+$(call depend,cross/nmap-latest|cross/nmap-7.98|cross/nmap-7.92)
 
 include ../../mk/spksrc.cross-virtual.mk
