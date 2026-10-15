@@ -52,6 +52,23 @@ _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils
 TC_OVERLAY_RUSTC      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
 TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS)_gcc-*)
 
+# The as/ld version the GLOBAL overlay supplies, as the consumer's own PKG_VERS -- what
+# tc-capability.mk reports for TC_BINUTILS when the overlay drives this build, so a
+# MIN_BINUTILS_VERSION floor measures the linker the compile will really use rather than
+# the vendor one it replaces. Empty when the overlay is off or the arch has none.
+#
+# Immediate, and deliberately not TC_OVERLAY_BINUTILS or OVERLAY_BINUTILS_ON read back
+# later: the generated tc_vars.mk emits TC_OVERLAY_BINUTILS with ACTIVE semantics and
+# stage0.mk includes that file ahead of tc-capability.mk, so a work dir generated with the
+# overlay off would hand back an empty one and the floor would see the vendor version.
+OVERLAY_BINUTILS_PKG_VERS := $(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS))),$(shell sed -n 's/^PKG_VERS *= *//p' $(firstword $(TC_OVERLAY_BINUTILS))/Makefile 2>/dev/null))
+
+# The effective as/ld version, given the vendor one to fall back to. Two callers, because
+# TC_BINUTILS reaches them from different places: tc-capability.mk reads it out of the
+# toolchain's Makefile for a package, while a toolchain declares its own and
+# spksrc.toolchain/tc_vars.mk emits it. One macro so they cannot drift apart.
+overlay_binutils_vers = $(or $(strip $(OVERLAY_BINUTILS_PKG_VERS)),$(strip $(1)))
+
 # ---- REQUESTED (switches) ----------------------------------------------------------
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,
 #                        these archs ship an overlay because the stock std does not fit.
