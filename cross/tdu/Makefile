@@ -8,6 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
+
+OPTIONAL_DEPENDS = native/go native/go_1.23
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/go_1.23
 NATIVE_GO = native/go_1.23
