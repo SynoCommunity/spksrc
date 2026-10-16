@@ -116,7 +116,8 @@ TC_VAR_MAPPING_MK = \
 TC_VAR_MAPPING_OTHER = \
 	tc_cmake_vars:tc_vars.cmake \
 	tc_meson_cross_vars:tc_vars.meson-cross \
-	tc_meson_native_vars:tc_vars.meson-native
+	tc_meson_native_vars:tc_vars.meson-native \
+	tc_meson_properties_vars:tc_vars.meson-properties
 
 # Common variables to simply calls
 # (e.g. direct call such as 'make work/tc_vars.mk')
@@ -127,6 +128,7 @@ TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
 TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
+TC_VARS_MESON_PROPERTIES = $(WORK_DIR)/tc_vars.meson-properties
 
 # Template to generate toolchain rule
 define make_tc_var_rule
@@ -293,6 +295,29 @@ tc_meson_native_vars:
 	@echo "g-ir-compiler = '$$(which g-ir-compiler)'" ; \
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
+
+# Per-package [properties] for meson cross builds (tc_vars.meson-properties).
+# Only numpy reads from it today: its meson.build detects the long double
+# representation by compiling *and running* a test program, which meson refuses
+# in a cross environment ("Can not run test applications in this cross
+# environment"). Stating it per target CPU family lets
+# meson.get_external_property('longdouble_format') skip the run entirely.
+# Unknown to every other build system; values match numpy's own detection
+# patterns (verified against 2.5.2): x86_64/i686 80-bit extended, AArch64
+# 128-bit quad, 32-bit ARM and e500/SPE long double is 64-bit double, e500
+# big-endian. The pip crossenv flow passes this file to meson only when it
+# exists (see the tc_vars.meson-properties hook in spksrc.python-crossenv.mk).
+_LDOUBLE_FORMAT_x86_64 = INTEL_EXTENDED_16_BYTES_LE
+_LDOUBLE_FORMAT_x86 = INTEL_EXTENDED_12_BYTES_LE
+_LDOUBLE_FORMAT_aarch64 = IEEE_QUAD_LE
+_LDOUBLE_FORMAT_arm = IEEE_DOUBLE_LE
+_LDOUBLE_FORMAT_ppc = IEEE_DOUBLE_BE
+.PHONY: tc_meson_properties_vars
+tc_meson_properties_vars:
+	@echo "[properties]"
+ifneq ($(strip $(_LDOUBLE_FORMAT_$(MESON_HOST_CPU_FAMILY))),)
+	@echo "longdouble_format = '$(_LDOUBLE_FORMAT_$(MESON_HOST_CPU_FAMILY))'"
+endif
 
 # cc-rs CC_/CXX_/AR_/RANLIB_<rust triple>: TARGET_CC is ignored on x64 (host == target
 # triple), and underscored since dash drops hyphenated names from the environment.
