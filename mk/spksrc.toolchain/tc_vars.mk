@@ -415,6 +415,12 @@ tc_flags:
 #
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
+#
+# TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
+# it was the one missing here, so a package reading the generated file saw an empty value
+# where the other three were there. Emitted as the version this build will use -- the
+# overlay's as/ld when that is what every compile goes through, like TC_GCC under a gcc
+# overlay -- through the same macro tc-capability.mk resolves a package's with.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -437,6 +443,7 @@ tc_vars:
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS)) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
