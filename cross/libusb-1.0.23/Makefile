@@ -1,13 +1,11 @@
 PKG_NAME = libusb
+# 1.0.23 is the last release that builds as C99: 1.0.24 made C11 a requirement, which
+# the archs below have no default dialect for. Kept frozen for them.
 PKG_VERS = 1.0.23
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libusb/libusb/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-# this is the latest version that builds with C99 compiler.
-# libusb >= v1.0.24 needs C11 compiler (not supported by OLD_PPC_ARCHS, ARMv5_ARCHS and ARMv7L_ARCHS).
-# qoriq has C11 compiler, but fails with "configure: error: Linux netlink header not found"
 
 DEPENDS =
 
@@ -16,12 +14,10 @@ COMMENT  = C library that provides generic access to USB devices. It is intended
 LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
-ifneq ($(strip $(LIBUSB_ENABLE_STATIC)),1)
+
 CONFIGURE_ARGS += --disable-static
-endif
-ifneq ($(strip $(LIBUSB_WITH_LIBUDEV)),1)
 CONFIGURE_ARGS += --disable-udev
-endif
+
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

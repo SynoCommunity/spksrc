@@ -1,14 +1,7 @@
 PKG_NAME = rhash-virtual
 
-OPTIONAL_DEPENDS  = cross/rhash-latest
-OPTIONAL_DEPENDS += cross/rhash-1.4.5
-
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/rhash-1.4.5
-else
-DEPENDS = cross/rhash-latest
-endif
+$(call depend,cross/rhash-latest|cross/rhash-1.4.5)
 
 include ../../mk/spksrc.cross-virtual.mk

@@ -1,5 +1,5 @@
 PKG_NAME = binutils
-PKG_VERS = 2.46.1
+PKG_VERS = 2.47
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/binutils
@@ -28,6 +28,15 @@ include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-gprofng
 PLIST_TRANSFORM = sed -e '/bin\/gprofng/d' -e '/bin\/gp\-/d' -e '/lib\/gprofng/d'
+endif
+
+# 2.47 builds with -Werror by default, and gcc 4.9 misfires -Wmaybe-uninitialized on
+# bfd.c's va_arg switch (_bfd_doprnt_scan) for the powerpc target:
+#   bfd.c:1557: error: 'va_arg_tmp.46' may be used uninitialized [-Werror=maybe-uninitialized]
+# A false positive the same 4.9.3 does not report for ARM, so this is the target and not
+# the compiler's age -- comcerto2k-7.1 carries the same gcc and builds 2.47 clean.
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --disable-werror
 endif
 
 # Avoid conflicts with gdb

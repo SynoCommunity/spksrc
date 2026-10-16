@@ -9,7 +9,10 @@ PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libgcrypt cross/dbus cross/libcap cross/libmount
 
+# Not a capability floor: libudev must match the udev the system runs. DSM 7 runs
+# systemd 219; DSM 6 and SRM 1.x run udev 204 (cross/libudev_204).
 REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_SRM = 3.0
 
 HOMEPAGE = https://github.com/systemd/systemd
 COMMENT = The systemd System and Service Manager provides an array of system components for Linux operating systems.
@@ -81,9 +84,6 @@ include ../../mk/spksrc.common.mk
 # Build fix for aarch64 and x64 for DSM-7.2:
 #   error: static declaration of 'renameat2' follows non-static declaration
 ifeq ($(call version_ge, $(TCVERSION), 7.2),1)
-CONFIGURE_ARGS += ac_cv_have_decl_renameat2=yes
-else ifeq ($(strip $(TCVERSION)),1.3)
-# Same for armv7 and aarch64 for SRM 1.3 (but SRM 1.3 is still on systemd 204):
 CONFIGURE_ARGS += ac_cv_have_decl_renameat2=yes
 endif
 

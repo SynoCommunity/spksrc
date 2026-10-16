@@ -1,5 +1,5 @@
 PKG_NAME = gdb
-PKG_VERS = 17.1
+PKG_VERS = 18.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
@@ -10,6 +10,9 @@ DEPENDS = cross/zlib cross/libexpat cross/gmp cross/ncursesw cross/mpfr
 HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger.
 LICENSE  = GPLv2/LGPLv2
+
+# Needs gcc >= 7: C++17 features unavailable before gcc 7 (experimental)
+MIN_GCC_VERSION = 7
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
@@ -41,8 +44,3 @@ PLIST_TRANSFORM = sed $(PLIST_TRANSFORM_SED_ARGS)
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
-# archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARCHS)
-endif

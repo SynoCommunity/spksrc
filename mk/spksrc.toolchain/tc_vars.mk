@@ -351,6 +351,22 @@ endif
 	echo TC_RUSTC := $(TC_RUSTC) ; \
 	echo TC_RUSTUP_TOOLCHAIN := $(TC_RUSTUP_TOOLCHAIN)
 
+# The build/host split autoconf actually uses. With --host=<triple> the *bare* CC, CFLAGS
+# and LDFLAGS below are the host's -- autoconf's host being the machine the output runs on,
+# which is our target -- so they stay as they are. Drop them and AC_PROG_CC probes for
+# itself: no <triple>-gcc on PATH, so it settles on /usr/bin/gcc and configures a native
+# build that looks like it worked.
+#
+# What was missing is the other axis, the build machine, which autoconf spells *_FOR_BUILD
+# and reads for a generator a package compiles and runs during the build. Having no name
+# for it, each package that needs one invented its own: cross/bind_9.* says BUILD_CC,
+# cross/cyrus-sasl patches CC_FOR_BUILD into a Makefile.in, cross/ffmpeg* passes
+# --host-cc. The standard names are emitted here once, so a package can ask instead of
+# improvise. The flags are empty on purpose, as HOST_CFLAGS is in the rust fragment above:
+# the build machine wants none of the target's.
+#
+# No TARGET_*: --target and CC_FOR_TARGET mean something only for a package that is itself
+# a compiler, and autoconf warns when they reach anything else.
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
@@ -364,7 +380,14 @@ tc_autotools_vars:
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
 	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
-	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\"
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += CC_FOR_BUILD=\"$(call native,gcc)\" ; \
+	echo TC_ENV += CXX_FOR_BUILD=\"$(call native,g++)\" ; \
+	echo TC_ENV += CPP_FOR_BUILD=\"$(call native,cpp)\" ; \
+	echo TC_ENV += CFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += CXXFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += CPPFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += LDFLAGS_FOR_BUILD=\"\"
 
 .PHONY: tc_flags
 tc_flags:
@@ -392,6 +415,12 @@ tc_flags:
 #
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
+#
+# TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
+# it was the one missing here, so a package reading the generated file saw an empty value
+# where the other three were there. Emitted as the version this build will use -- the
+# overlay's as/ld when that is what every compile goes through, like TC_GCC under a gcc
+# overlay -- through the same macro tc-capability.mk resolves a package's with.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -414,6 +443,7 @@ tc_vars:
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS)) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \

@@ -12,41 +12,28 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
-
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
 DEPENDS += cross/libcap
-endif
 
 HOMEPAGE = https://www.isc.org/
 COMMENT  = BIND (Berkeley Internet Name Domain) is a complete, highly portable implementation of the DNS (Domain Name System) protocol.
 LICENSE  = MPL 2.0
 
 GNU_CONFIGURE = 1
-PRE_COMPILE_TARGET = bind_pre_compile
 
 ADDITIONAL_CFLAGS = -O2
 ADDITIONAL_CPPFLAGS = -O2
 
 CONFIGURE_ARGS  = --without-python
 CONFIGURE_ARGS += --enable-full-report
-# needed for cross compile:
-CONFIGURE_ARGS += BUILD_CC="$(CC)"
-CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS) $(ADDITIONAL_CFLAGS)"
-CONFIGURE_ARGS += BUILD_CPPFLAGS="$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS)"
-CONFIGURE_ARGS += BUILD_LDFLAGS="$(LDFLAGS)"
-CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
+# gen is compiled and run on the build machine, so it takes the build compiler and none of
+# the target's flags; configure.ac errors out if BUILD_CC is unset when cross compiling,
+# and takes the other four verbatim. $(CC) was not the cross compiler here -- in make's own
+# namespace it is the built-in default, cc -- while $(CFLAGS) and $(LDFLAGS) are the
+# target's, so the host compile of gen was handed the target sysroot and its -m flags.
+CONFIGURE_ARGS += BUILD_CC="$(call native,gcc)"
+CONFIGURE_ARGS += BUILD_CFLAGS=""
+CONFIGURE_ARGS += BUILD_CPPFLAGS=""
+CONFIGURE_ARGS += BUILD_LDFLAGS=""
+CONFIGURE_ARGS += BUILD_LIBS=""
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: bind_pre_compile
-# compile gen tool with host compiler to run in build environment
-bind_pre_compile:
-	@$(MSG) Build gen tool for host
-	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -I../../lib/isc/include -o gen ./gen.c

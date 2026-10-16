@@ -9,9 +9,7 @@ HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
 LICENSE = Apache v2.0 with LLVM Exceptions
 
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
-REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 5
 
 # -----------------------------------------------------------------------------
 # Dependencies
