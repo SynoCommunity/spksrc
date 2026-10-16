@@ -9,12 +9,7 @@ HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
 LICENSE = Apache v2.0 with LLVM Exceptions
 
-REQUIRED_MIN_DSM = 7.1
-# Needs gcc >= 5.1, which is what the virtual used to ask on its behalf. The arch lists
-# stay: comcerto2k is excluded for its own reasons, not the compiler's.
-MIN_GCC_VERSION = 5.1
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
-REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 5
 
 # -----------------------------------------------------------------------------
 # Dependencies
