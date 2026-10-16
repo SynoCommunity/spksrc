@@ -3,7 +3,20 @@
 #
 # Configuration for python wheel build
 #
-###############################################################################
+# Pass meson cross file only when cross-compiling (different arch than host)
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+MESON_CROSS_ARGS = -Csetup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-cross \
+	-Csetup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties \
+	-Csetup-args=--cross-file=$(MESON_PYTHON_CROSS_FILE)
+endif
+
+# Cross-file fragment pointing meson's python module at the crossenv
+# cross-python. Without it meson resolves the build-machine (host) python,
+# whose headers break 32-bit cross builds (LONG_BIT mismatch, e.g. scipy).
+# Not added to tc_vars.meson-cross: that file is the base for per-package
+# cross-files, which already declare 'python' when MESON_PYTHON is set.
+MESON_PYTHON_CROSS_FILE = $(WORK_DIR)/tc_vars.meson-python
+MESON_PYTHON_CROSS_FILE_CMD = printf "[binaries]\npython = '$(CROSSENV_PATH)/cross/bin/python3'\n" > $(MESON_PYTHON_CROSS_FILE)
 
 ### python wheel requirement processing
 include ../../mk/spksrc.wheel/requirement.mk
