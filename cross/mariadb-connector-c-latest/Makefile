@@ -1,5 +1,5 @@
 PKG_NAME = mariadb-connector-c
-PKG_VERS = 3.4.8
+PKG_VERS = 3.4.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -10,8 +10,7 @@ HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/
 COMMENT  = MariaDB C Connector
 LICENSE  = LGPL
 
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 5
 
 POST_INSTALL_TARGET = mariadb_post_install
 CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
