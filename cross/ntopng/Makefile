@@ -83,6 +83,11 @@ ENV += "PATH=$(PATH):$(MARIADB_BIN_FOLDER):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):
 NPM_ENV  = CC="$(call native,gcc)" CXX="$(call native,g++)" AR="$(call native,ar)"
 NPM_ENV += CPPFLAGS= CFLAGS= CXXFLAGS= LDFLAGS=
 
+# npm gives up on the second failure and the registry is reached hundreds of times here,
+# so one reset ends the build. Five tries, and a longer ceiling between them, since what
+# fails is a read part-way through a tarball rather than a refused connection.
+NPM_ENV += npm_config_fetch_retries=5 npm_config_fetch_retry_maxtimeout=120000
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: ntopng_pre_configure
