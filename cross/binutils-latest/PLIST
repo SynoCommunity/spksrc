@@ -15,6 +15,7 @@ bin:bin/gprofng-collect-app
 bin:bin/gprofng-display-html
 bin:bin/gprofng-display-src
 bin:bin/gprofng-display-text
+bin:bin/gprofng-gmon
 bin:bin/ld
 bin:bin/ld.bfd
 bin:bin/nm
