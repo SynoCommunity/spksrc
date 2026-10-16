@@ -6,8 +6,10 @@ SPK_ICON = src/beets.png
 PYTHON_PACKAGE = python314
 
 # numpy, pygobject, llvm (for librosa/autobpm via llvmlite)
+# No SRM support: python314 is not published for SRM and the autobpm
+# dependency chain (numba/llvmlite) is 64-bit only.
 REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_SRM = 1.3
+REQUIRED_MIN_SRM = 3.0
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
