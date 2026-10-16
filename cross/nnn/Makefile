@@ -1,20 +1,7 @@
 PKG_NAME = nnn-virtual
 
-OPTIONAL_DEPENDS  = cross/nnn-latest
-OPTIONAL_DEPENDS += cross/nnn-4.8
-OPTIONAL_DEPENDS += cross/nnn-4.0
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-DEPENDS += cross/nnn-latest
-else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn-4.8
-else
-# 32-bit archs with glibc < 2.23
-DEPENDS += cross/nnn-4.0
-endif
+$(call depend,cross/nnn-latest|cross/nnn-4.8|cross/nnn-4.0)
 
 include ../../mk/spksrc.cross-virtual.mk
