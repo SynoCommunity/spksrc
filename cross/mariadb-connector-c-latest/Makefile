@@ -10,11 +10,7 @@ HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/
 COMMENT  = MariaDB C Connector
 LICENSE  = LGPL
 
-REQUIRED_MIN_DSM = 7.1
-# Needs gcc >= 5, which is what the virtual used to ask on its behalf. comcerto2k stays
-# listed: it is excluded for its own reasons, not the compiler's.
 MIN_GCC_VERSION = 5
-UNSUPPORTED_ARCHS = comcerto2k
 
 POST_INSTALL_TARGET = mariadb_post_install
 CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
