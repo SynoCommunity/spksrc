@@ -42,8 +42,18 @@ include ../../mk/spksrc.python-wheel-meson.mk
 numpy_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/numpy.meson
 	@echo "needs_exe_wrapper = false" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
+# long double representation per target arch (values match numpy's own meson
+# detection patterns; keep in sync with _LDOUBLE_FORMAT_* in
+# mk/spksrc.toolchain/tc_vars.mk): x86_64/i686 80-bit extended, AArch64
+# 128-bit quad, 32-bit ARM and e500/SPE long double is 64-bit double.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_BE'" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
-else ifeq ($(findstring $(ARCH),$(ARM_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'IEEE_QUAD_LE'" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
+else ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_LE'" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'INTEL_EXTENDED_12_BYTES_LE'" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
+else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'INTEL_EXTENDED_16_BYTES_LE'" >> $(WORK_DIR)/$(PKG_DIR)/numpy.meson
 endif
