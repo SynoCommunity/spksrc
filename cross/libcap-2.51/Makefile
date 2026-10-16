@@ -8,6 +8,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# Needs glibc >= 2.9: pipe2() (libcap.so) unresolved below -- the ppc853x glibc 2.8 links
+# the library, then fails every consumer at cap_init ("POSIX caps library not found").
+MIN_GLIBC_VERSION = 2.9
+
 HOMEPAGE = https://sites.google.com/site/fullycapable/
 COMMENT  = POSIX 1003.1e capabilities (library). Libcap implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. 
 LICENSE  = GPLv2

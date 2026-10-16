@@ -12,17 +12,7 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
-
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
 DEPENDS += cross/libcap
-endif
 
 HOMEPAGE = https://www.isc.org/
 COMMENT  = BIND (Berkeley Internet Name Domain) is a complete, highly portable implementation of the DNS (Domain Name System) protocol.

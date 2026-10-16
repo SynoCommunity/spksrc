@@ -6,16 +6,8 @@ PKG_DIST_SITE = https://github.com/traviscross/mtr/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncursesw
-
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
+DEPENDS  = cross/ncursesw
 DEPENDS += cross/libcap
-endif
 
 HOMEPAGE = https://www.bitwizard.nl/mtr/
 COMMENT  = My traceroute combines the functionality of the 'traceroute' and 'ping' programs in a single network diagnostic tool.
