@@ -286,6 +286,8 @@ tc_meson_cross_vars:
 	true
 	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
 	echo "rust = '$(CARGO_HOME)/bin/rustc'"
+	@echo "pkgconfig = '$$(which pkg-config)'" ; \
+	echo "pkg-config = '$$(which pkg-config)'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
