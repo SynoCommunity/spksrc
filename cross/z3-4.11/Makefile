@@ -9,9 +9,6 @@ HOMEPAGE = https://github.com/Z3Prover/z3
 COMMENT  = Theorem prover from Microsoft Research.
 LICENSE  = MIT
 
-REQUIRED_MIN_DSM = 7.1
-
-# Needs gcc >= 5, which is what the virtual used to ask on its behalf.
 MIN_GCC_VERSION = 5
 
 include ../../mk/spksrc.cross-cmake.mk
