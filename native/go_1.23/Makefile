@@ -5,7 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).linux-amd64.$(PKG_EXT)
 PKG_DIST_SITE = https://go.dev/dl
 PKG_DIR = $(PKG_NAME)
 
-# Version 1.23 is required to build syncthing for ARMv5 ARCHS
+# Go 1.24+ no longer runs on ARMv5, so this legacy toolchain builds the packages
+# that still support it (e.g. dnscrypt-proxy, node-exporter, gdu, fzf).
 
 HOMEPAGE = https://golang.org/
 COMMENT  = Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
