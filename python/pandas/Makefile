@@ -13,9 +13,11 @@ LICENSE  = 3-Clause BSD license
 
 # Documentation: https://pandas.pydata.org/docs/dev/development/contributing_environment.html
 
-# Numpy dependency requires gcc>=8.4 to build sucesfully
+# Numpy dependency requires gcc >= 8.4 to build successfully -- and python/numpy is
+# in OPTIONAL_DEPENDS below, so its floor does not reach pandas: this one has to
+# stand on its own.
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 8.4
 
 OPTIONAL_DEPENDS  = python/numpy
 OPTIONAL_DEPENDS  = python/numpy-latest
