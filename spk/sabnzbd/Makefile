@@ -13,12 +13,10 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-# Ensure C++17 compatibility -- sabctools >= 9.0.0 requirement. It is a crossenv
-# wheel out of src/requirements-crossenv.txt, with no Makefile of its own, so the
-# floor belongs here. gcc takes -std=c++17 from 7; comcerto2k is at 4.9.3.
+# Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
 REQUIRED_MIN_DSM = 7.0
-MIN_GCC_VERSION = 7
 REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 7
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
