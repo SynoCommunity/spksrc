@@ -24,8 +24,11 @@ HOMEPAGE = https://deluge-torrent.org
 LICENSE  = GPL
 HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
+# src/requirements-crossenv.txt builds libtorrent from git and notes of it
+#   NOTE: version 2.1.x requires c++17 > gcc-8.5
+# Another wheel with no Makefile to carry a floor. gcc takes -std=c++17 from 7.
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 7
 REQUIRED_MIN_SRM = 1.3
 
 WIZARDS_DIR = src/wizard/

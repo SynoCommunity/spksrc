@@ -15,7 +15,6 @@ LICENSE  = GPLv2
 # - removed Boost dependency
 # GCC version is too old. You need at least version 12.
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 DEPENDS  = cross/glib
