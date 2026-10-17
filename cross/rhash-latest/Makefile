@@ -9,7 +9,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/openssl3
 
 # blake3 and shani not supported (and other changes)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# gcc 4.3.7 has no C11 anonymous struct/union members, which blake3_ctx uses:
+#   librhash/algorithms.c:140: 'blake3_ctx' has no member named 'root'
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = http://rhash.sf.net/
 COMMENT  = RHash (Recursive Hasher) is a console utility for computing and verifying hash sums of files. It supports CRC32, CRC32C, MD4, MD5, SHA1, SHA256, SHA512, SHA3, AICH, ED2K, DC++ TTH, BitTorrent BTIH, Tiger, GOST R 34.11-94, RIPEMD-160, HAS-160, EDON-R, and Whirlpool.

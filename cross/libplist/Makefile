@@ -5,7 +5,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libimobiledevice/libplist/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# gcc 4.3.7 rejects the C11 typedef redefinitions the headers rely on:
+#   libcnary/include/node.h:33: redefinition of typedef 'node_t'
+MIN_GCC_VERSION = 4.6
 
 DEPENDS =
 

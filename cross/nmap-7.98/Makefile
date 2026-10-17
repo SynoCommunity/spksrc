@@ -7,8 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpcap cross/openssl3
 
-# latest version for OLD_PPC_ARCHS is 7.92
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Below this floor cross/nmap falls through to nmap-7.92.
+# gcc 4.3.7 in C++98 mode rejects the 64-bit literals nmap uses:
+#   MACLookup.cc:162: integer constant is too large for 'long' type
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = https://nmap.org/
 COMMENT  = Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
