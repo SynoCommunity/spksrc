@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/alsa-utils
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system.
 STARTABLE = no
