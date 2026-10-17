@@ -15,8 +15,10 @@ REQUIRED_MIN_DSM = 7.1
 #  The Qt library is now required for building all applications, even the
 #  command-line ones, as they use Qt's MIME type detection capabilities
 
-# comcerto2k has older toolchain than other DSM 7.1 archs
-UNSUPPORTED_ARCHS = comcerto2k
+# configure requires the -std=c++17 flag itself (ac/c++-features.m4), then the
+# C++17 features behind it -- maybe_unused, structured bindings, std::optional:
+#   checking for support for the "-std=c++17" flag... no
+MIN_GCC_VERSION = 7
 REQUIRED_MIN_SRM = 1.3
 
 BUILD_DEPENDS = native/ruby
