@@ -11,8 +11,14 @@
 # Package paths
 SVC_CWD="${SYNOPKG_PKGDEST}"
 DNSCRYPT_PROXY="${SYNOPKG_PKGDEST}/bin/dnscrypt-proxy"
-PID_FILE="${SYNOPKG_PKGVAR}/dnscrypt-proxy.pid"
 CFG_FILE="${SYNOPKG_PKGVAR}/dnscrypt-proxy.toml"
+
+# Service command: run in the foreground; the framework backgrounds it and
+# writes its pid to PID_FILE (service_prestart runs first, to set up the port,
+# cron and DHCP forwarding).
+SERVICE_COMMAND="env GOMAXPROCS=1 USER=root HOME=/root ${DNSCRYPT_PROXY} --config ${CFG_FILE}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 
 # Ports
 MONITORING_PORT="8153"  # Web UI for monitoring DNS queries
@@ -195,10 +201,6 @@ service_prestart() {
 
     blocklist_cron_install
     forward_dns_dhcpd "yes"
-
-    # Start dnscrypt-proxy
-    cd "$SVC_CWD" || exit 1
-    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" &
 }
 
 service_poststop() {

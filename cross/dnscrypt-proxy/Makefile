@@ -1,5 +1,5 @@
 PKG_NAME = dnscrypt-proxy
-PKG_VERS = 2.1.15
+PKG_VERS = 2.1.18
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/DNSCrypt/dnscrypt-proxy/archive/refs/tags
@@ -7,7 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS = native/go native/go_1.23
