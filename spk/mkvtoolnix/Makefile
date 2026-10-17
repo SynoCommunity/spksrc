@@ -8,7 +8,6 @@ DEPENDS = cross/mkvtoolnix
 # mkvtoolnix > 53.x and <= 58.x are DSM 7.1 only
 REQUIRED_MIN_DSM = 7.1
 # comcerto2k has older toolchain than other DSM 7 archs
-UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = cytec
