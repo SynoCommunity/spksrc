@@ -9,8 +9,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 BUILD_DEPENDS = native/erlang
 DEPENDS = cross/ncursesw cross/erlang cross/libexpat cross/zlib cross/openssl3 cross/libyaml
 
-# PPC archs except qoriq have compiler errors with 64 bit values
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# gcc 4.3.7 rejects jiffy's 64-bit literals, and -Werror makes it fatal:
+#   deps/jiffy/c_src/encoder.c:420: integer constant is too large for 'long' type
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = https://www.ejabberd.im
 COMMENT  = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
