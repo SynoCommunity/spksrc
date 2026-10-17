@@ -2,8 +2,6 @@ SPK_NAME = lsd
 SPK_VERS = 1.2.0
 SPK_REV = 1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 DEPENDS = cross/lsd
 
 include ../../mk/spksrc.common.mk

@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/sshfs
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_ge,${TCVERSION},3.0),11)
