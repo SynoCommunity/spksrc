@@ -11,8 +11,13 @@ BUILD_DEPENDS = native/lua
 LUA_NATIVE_PATH = $(abspath $(PWD)/../../native/lua/work-native/install/bin)
 ENV += PATH=$(LUA_NATIVE_PATH):$$PATH
 
+# cmake asks for -std=gnu17, finds gcc 4.9.3 cannot take it and drops the flag
+# rather than failing, leaving the compiler's own default -- gnu90 before gcc 5:
+#   dist/mongoose/mongoose.c:1: C++ style comments are not allowed in ISO C90
+#   [-Werror]
+# Builds on gcc 7.5, whose default is gnu11.
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 5
 REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://jcorporation.github.io/
