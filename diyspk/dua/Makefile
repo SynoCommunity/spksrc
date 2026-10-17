@@ -2,8 +2,6 @@ SPK_NAME = dua
 SPK_VERS = 2.32.0
 SPK_REV = 1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 SPK_VERS = 2.30.0

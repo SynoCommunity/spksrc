@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/procs
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = A modern replacement for ps written in Rust.
 STARTABLE = no
