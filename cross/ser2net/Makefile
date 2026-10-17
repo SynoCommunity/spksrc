@@ -10,8 +10,9 @@ DEPENDS = cross/libyaml
 
 OPTIONAL_DEPENDS = cross/gensio cross/gensio_2.6.8
 
-# cross/gensio
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# gcc 4.3.7 has no C11 anonymous union members, which scalar_next_state uses:
+#   yamlconf.c:755: unknown field 'keyval_info' specified in initializer
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = https://sourceforge.net/projects/ser2net/
 COMMENT  = Serial to network interface, allows TCP/UDP to serial port connections.

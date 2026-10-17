@@ -3,9 +3,6 @@ SPK_VERS = 2.0
 SPK_REV = 5
 SPK_ICON = src/itools.png
 
-# since cross/libplist 2.3.0
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 # A collection of tools from ifuse and usbmuxd projects of libimobiledevice.org
 # There exists no source code package "itools" and therefore no cross/itools project
 # current versions listed on https://libimobiledevice.org/#downloads

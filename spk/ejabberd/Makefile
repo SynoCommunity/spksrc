@@ -6,8 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/ejabberd
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
 ADMIN_URL = /admin/
