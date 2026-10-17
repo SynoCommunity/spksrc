@@ -1,5 +1,5 @@
 PKG_NAME = cloudflared
-PKG_VERS = 2026.9.0
+PKG_VERS = 2026.10.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive
@@ -8,9 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go
 
-UNSUPPORTED_ARCHS  = $(PPC_ARCHS)
-# cloudflared v2025.5.0 is the last version that builds with go < 1.24
-# and go >= 1.24 requires a linux kernel >= 3.2
+# ARMv5 (88f6281) runs kernel 2.6.32; go >= 1.24 requires Linux >= 3.2, so
+# cloudflared built with the current go (1.27.2) cannot run there. v2025.5.0 was
+# the last release that still built with go < 1.24.
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/cloudflare/cloudflared
