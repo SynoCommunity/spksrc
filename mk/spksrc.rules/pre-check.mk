@@ -68,7 +68,7 @@ ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 ifneq ($(PRECHECK_TREE_DONE),$(WORK_DIR))
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
-                   | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
+                   | grep -E '^(cross|spk|diyspk|native|python|kernel)/' | sed 's/ /~/g')
 endif
 endif
 
