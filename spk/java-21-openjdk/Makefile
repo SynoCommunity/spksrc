@@ -9,7 +9,6 @@ DEPENDS = cross/java-21-openjdk
 
 # gcc >= 5.0 required
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
