@@ -71,7 +71,7 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 # stage0's bootstrap notice is an $(info) from the sub-make's PARSE, outside that pipe.
 _gate_walk = DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
                  ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
-                 | grep -E '^(cross|spk|diyspk|native|kernel)/'
+                 | grep -E '^(cross|spk|diyspk|native|python|kernel)/'
 
 # Package name in a column of its own, reason after it.
 _gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }'
