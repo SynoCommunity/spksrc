@@ -8,13 +8,13 @@ PKG_DIR = $(PKG_NAME)-cli-$(PKG_VERS)
 
 DEPENDS =
 
-# linker error: dwarf version '4' is not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# error[E0658]: use of unstable library feature 'iter_repeat_n'
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-# To build v2.31.0 we need to update rust for qoriq.
-# dua 2.31.0 requires rust 1.83.0 (we currently have rust 1.82.0 for qoriq)
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# error: failed to compile `dua-cli v2.32.0`: rustc 1.82.0-dev is not supported
+# by the following packages: dua-cli@2.32.0 requires rustc 1.83.0
+# Every arch whose rustc comes from the from-source overlay is pinned at 1.82,
+# which is what the three arch lists this replaces were spelling out one family
+# at a time -- plus x86-5.2, which they missed and which failed as soon as
+# DSM 5.2 was enabled in CI.
+MIN_RUSTC_VERSION = 1.83
 
 CARGO_BUILD_ARGS = --locked
 
