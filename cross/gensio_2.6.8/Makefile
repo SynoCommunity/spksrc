@@ -10,9 +10,6 @@ DEPENDS = cross/openssl3
 
 # v2.6.8 is the latest version that is compatible with ARMv5_ARCHS
 
-# qoriq is the only PPC arch that is supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 HOMEPAGE = https://github.com/cminyard/gensio
 COMMENT  = A library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc.
 LICENSE  = GPLv2

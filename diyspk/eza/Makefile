@@ -2,8 +2,6 @@ SPK_NAME = eza
 SPK_VERS = 0.23.5
 SPK_REV = 1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 DEPENDS = cross/eza
 
 include ../../mk/spksrc.common.mk

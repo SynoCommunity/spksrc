@@ -8,9 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fuse3 cross/libexpat cross/zstd cross/curl
 
-# fuse3
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 HOMEPAGE = https://github.com/archiecobbs/s3backer/wiki/ManPage
 COMMENT  = FUSE-based single file backing store via Amazon S3.
 LICENSE  = GPLv2
