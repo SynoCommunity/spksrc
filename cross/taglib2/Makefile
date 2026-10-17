@@ -7,9 +7,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/utfcpp
 
-# requires "CMAKE_CXX_STANDARD 17"
+# CMakeLists.txt sets CMAKE_CXX_STANDARD 17 without CMAKE_CXX_STANDARD_REQUIRED,
+# so cmake silently drops the flag and the C++17 code is a syntax error instead:
+#   taglib/mpeg/mpegheader.cpp:184: expected ')' before ';' token
+# (an if with initialiser, if(const int layerBits = ...; layerBits == 1))
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 7
 REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://taglib.org/

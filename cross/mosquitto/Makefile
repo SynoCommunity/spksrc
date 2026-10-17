@@ -10,10 +10,12 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/cjson
 DEPENDS += cross/sqlite
 
-# C++17 required by mosquittopp, GCC < 7 not supported
+# C++17 required by mosquittopp:
+#   CMake Error in lib/cpp/CMakeLists.txt: Target "mosquittopp" requires the
+#   language dialect "CXX17"
 REQUIRED_MIN_DSM = 7.0
 REQUIRED_MIN_SRM = 1.3
-UNSUPPORTED_ARCHS = comcerto2k
+MIN_GCC_VERSION = 7
 
 HOMEPAGE = https://www.mosquitto.org/
 COMMENT  = Eclipse Mosquitto is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.

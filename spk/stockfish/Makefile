@@ -9,7 +9,6 @@ SPK_DEPENDS = "Node.js_v18"
 
 # C++17 requires GCC 8+ (comcerto2k has GCC 4.9.3)
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = mayweed
 DISPLAY_NAME = Stockfish

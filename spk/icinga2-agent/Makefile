@@ -7,7 +7,6 @@ DEPENDS = cross/icinga2-agent
 DEPENDS += cross/monitoring-plugins
 
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 agent connects to an Icinga 2 master server for distributed monitoring.

@@ -6,7 +6,6 @@ SPK_ICON = src/navidrome.png
 DEPENDS = cross/navidrome
 
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
