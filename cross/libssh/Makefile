@@ -7,8 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 HOMEPAGE = https://www.libssh.org/
 COMMENT  = libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side.
 LICENSE  = LGPL v2.1
