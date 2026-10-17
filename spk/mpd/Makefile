@@ -7,7 +7,6 @@ DSM_UI_DIR = app
 DEPENDS = cross/mpd cross/mpc
 
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
