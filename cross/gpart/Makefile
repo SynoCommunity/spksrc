@@ -8,7 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has no htole16/le16toh in <endian.h> (added in 2.9):
+#   gpart.c: undefined reference to `htole16'
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://github.com/baruch/gpart
 COMMENT  = Gpart is a small tool which tries to guess what partitions are on a PC type, MBR-partitioned hard disk in case the primary partition table was damaged.

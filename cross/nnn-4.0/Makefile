@@ -10,8 +10,8 @@ DEPENDS = cross/ncursesw cross/readline
 # REMARKS:
 # nnn version 4.0 is the latest version for 32-bit archs with glibc < 2.23 (DSM 6 and comcerto2k)
 
-# lacking inotify capabilities (IN_NONBLOCK, i.e. O_NONBLOCK not supported)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 <sys/inotify.h> has neither inotify_init1 nor IN_NONBLOCK (added in 2.9).
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://github.com/jarun/nnn
 COMMENT  = n³ The unorthodox terminal file manager.

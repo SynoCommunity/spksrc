@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/gpart
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gpart is a small tool which tries to guess what partitions are on a PC type, MBR-partitioned hard disk in case the primary partition table was damaged.
 STARTABLE = no
