@@ -309,7 +309,10 @@ jobs:
           add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
-          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
+          # TEMP (revert before merge): activate DSM 7.0, the archs this branch's
+          # gcc 8 floors newly refuse -- the matrix arms 7.1 and 6.2, never 7.0,
+          # which is why screen5 and transmission failed there unnoticed.
+          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'true' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}

@@ -26,7 +26,9 @@ include ../../mk/spksrc.common.mk
 
 OPTIONAL_DESC =
 
-ifeq ($(call version_lt,${TCVERSION},7.0),1)
+# cross/screen5 needs gcc >= 8 (-std=c17), so DSM 6, DSM 7.0 and comcerto2k all
+# take cross/screen. Before, DSM 7.0 asked for screen5 and the build failed there.
+ifeq ($(call version_lt,${TCVERSION},7.1),1)
 DEPENDS += cross/screen
 else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 DEPENDS += cross/screen
