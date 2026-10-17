@@ -6,9 +6,6 @@ SPK_ICON = src/git.png
 DEPENDS = cross/git
 OPTIONAL_DEPENDS = cross/git-lfs
 
-# fsmonitor daemon requires inotify_init1 (glibc >= 2.9)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
 DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
