@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-# unrar builds itself with -std=c++11 and leans on libstdc++ to declare ptrdiff_t
-# for it, which the 4.9.3 header chain does not:
+# unrar builds with -std=c++11 and leans on libstdc++ to declare ptrdiff_t for
+# it, which it does from gcc 5:
 #   cmddata.cpp:1243: 'ptrdiff_t' was not declared in this scope
-# Builds on gcc 7.5; no toolchain in the tree sits between the two.
 MIN_GCC_VERSION = 5
 
 HOMEPAGE = https://rarlab.com

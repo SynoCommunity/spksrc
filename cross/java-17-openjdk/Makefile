@@ -32,10 +32,8 @@ HOMEPAGE = https://openjdk.org/projects/jdk/17/
 COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
 LICENSE  = GPLv2 with the Classpath Exception
 
-# make/autoconf/toolchain.m4 of jdk-17.0.16+7 declares
+# configure stops on anything older; make/autoconf/toolchain.m4 declares
 #   TOOLCHAIN_MINIMUM_VERSION_gcc="5.0"
-# and configure stops on anything older. Carried here from spk/java-17-openjdk,
-# which named the version without saying where the build fails.
 MIN_GCC_VERSION = 5
 
 # Make configure script executable

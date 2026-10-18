@@ -40,10 +40,8 @@ HOMEPAGE = https://openjdk.org/projects/jdk/21/
 COMMENT  = OpenJDK 21 is the open-source reference implementation of version 21 of the Java SE Platform as specified by JSR 396 in the Java Community Process.
 LICENSE  = GPLv2 with the Classpath Exception
 
-# make/autoconf/toolchain.m4 of jdk-21.0.5+11 declares
+# configure stops on anything older; make/autoconf/toolchain.m4 declares
 #   TOOLCHAIN_MINIMUM_VERSION_gcc="6.0"
-# and configure stops on anything older. Carried here from spk/java-21-openjdk,
-# which named the version without saying where the build fails.
 MIN_GCC_VERSION = 6
 
 PRE_CONFIGURE_TARGET = java-21-openjdk_pre_configure
