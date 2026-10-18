@@ -5,9 +5,8 @@ SPK_ICON = src/mkvtoolnix.png
 
 DEPENDS = cross/mkvtoolnix
 
-# mkvtoolnix > 53.x and <= 58.x are DSM 7.1 only
+# mkvtoolnix > 53.x and <= 58.x are DSM>=7.1 and SRM>=1.3
 REQUIRED_MIN_DSM = 7.1
-# comcerto2k has older toolchain than other DSM 7 archs
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = cytec
