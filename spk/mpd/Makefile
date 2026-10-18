@@ -6,9 +6,8 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/mpd cross/mpc
 
+# cross/mpd needs gcc 12 and no SRM toolchain goes past
 REQUIRED_MIN_DSM = 7.2
-# No REQUIRED_MIN_SRM: cross/mpd needs gcc 12 and no SRM toolchain goes past
-# 10.3, so none of them can build it.
 
 MAINTAINER = hgy59
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
