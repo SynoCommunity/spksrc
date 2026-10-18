@@ -7,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/alsa-lib cross/ncursesw
 
-# Defining ADDITIONAL_CFLAGS += -DIN_NONBLOCK=O_NONBLOCK was tried and is not enough.
 # glibc 2.8 <sys/inotify.h> has neither inotify_init1 nor its flags (added in 2.9):
 #   alsactl/monitor.c:412: 'IN_NONBLOCK' undeclared
 MIN_GLIBC_VERSION = 2.9
