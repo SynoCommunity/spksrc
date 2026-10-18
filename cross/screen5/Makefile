@@ -9,10 +9,6 @@ DEPENDS = cross/ncursesw cross/linux-pam
 
 # screen 5 is built with -std=c17, which gcc only accepts from 8:
 #   cc1: error: unrecognized command line option '-std=c17'
-# Measured on both vendor compilers below that: 4.9.3 (comcerto2k) and 7.5.0
-# (every other DSM 7.0 arch) are refused. The arch list named only comcerto2k,
-# so DSM 7.0 was attempted and failed; spk/synocli-net now falls back to
-# cross/screen there, as it already did for DSM 6 and comcerto2k.
 MIN_GCC_VERSION = 8
 
 HOMEPAGE = https://www.gnu.org/software/screen/
