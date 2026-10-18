@@ -1,6 +1,6 @@
 SPK_NAME = deluge
 SPK_VERS = 2.2.0
-SPK_REV = 28
+SPK_REV = 29
 SPK_ICON = src/deluge.png
 
 PYTHON_PACKAGE = python314
@@ -12,24 +12,17 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG  = "1. Migrate to python314<br/>"
-CHANGELOG += "2. Update libtorrent to 2.0.14<br/>"
-CHANGELOG += "3. Update all wheels<br/>"
-CHANGELOG += "4. Pin setuptools to 81.0.0 to fix launch error<br/>"
-CHANGELOG += "5. Replace GeoIP C binding with pygeoip, as used upstream<br/>"
-CHANGELOG += "6. Migrate to libboost 1.92.0"
+CHANGELOG += "1. Update libtorrent to 2.1.2"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
 LICENSE  = GPL
 HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
-# src/requirements-crossenv.txt builds libtorrent from git and notes of it
-#   NOTE: version 2.1.x requires c++17 > gcc-8.5
-# Another wheel with no Makefile to carry a floor. gcc takes -std=c++17 from 7.
-REQUIRED_MIN_DSM = 7.0
-MIN_GCC_VERSION = 7
+# libtorrent-2.1.x requires c++20 > gcc-8.5
+REQUIRED_MIN_DSM = 7.2
 REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 10
 
 WIZARDS_DIR = src/wizard/
 
