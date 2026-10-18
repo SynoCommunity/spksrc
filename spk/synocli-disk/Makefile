@@ -35,10 +35,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 SPK_COMMANDS += bin/dua bin/dutree
-# dua 2.32.0 requires rustc >= 1.83; every arch whose rustc comes from the
-# from-source overlay is pinned at 1.82 and takes the older 2.30.0. Keying on
-# the capability rather than on an arch list also covers x86-5.2, which the
-# ARMv5/PPC list missed and which therefore attempted 2.32.0 and failed.
+# dua 2.32.0 needs rustc >= 1.83; below that take the older 2.30.0.
 ifeq ($(call version_ge,$(TC_RUSTC),1.83),1)
 DEPENDS += cross/dua cross/dutree
 else

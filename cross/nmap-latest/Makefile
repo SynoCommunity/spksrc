@@ -26,14 +26,9 @@ CONFIGURE_ARGS += --with-libpcre=included
 CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_INSTALL_PREFIX)
 
 ADDITIONAL_CPPFLAGS = -O3
-# 7.992 uses the inttypes.h PRI* and stdint.h limit macros from C++ code, and the
-# DSM 5.2 sys-root (glibc 2.17) still hides both behind the C++98 feature-test
-# macros, so the sources are syntax errors there:
+# a glibc 2.17 sys-root hides the inttypes.h PRI* and stdint.h limit macros from
+# C++ behind these, and nmap uses them:
 #   MACLookup.cc:163:30: error: expected ')' before 'PRIX64'
-#   nmap.cc:2576:43:     error: expected ')' before 'PRId64'
-#   nse_main.cc:371:27:  error: 'SIZE_MAX' was not declared in this scope
-# Newer sys-roots define the macros unconditionally and ignore these, so they go
-# on for every arch rather than behind a condition.
 ADDITIONAL_CPPFLAGS += -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 ADDITIONAL_CPPFLAGS += -D__STDC_CONSTANT_MACROS
 

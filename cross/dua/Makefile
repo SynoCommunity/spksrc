@@ -8,12 +8,9 @@ PKG_DIR = $(PKG_NAME)-cli-$(PKG_VERS)
 
 DEPENDS =
 
-# error: failed to compile `dua-cli v2.32.0`: rustc 1.82.0-dev is not supported
-# by the following packages: dua-cli@2.32.0 requires rustc 1.83.0
-# Every arch whose rustc comes from the from-source overlay is pinned at 1.82,
-# which is what the three arch lists this replaces were spelling out one family
-# at a time -- plus x86-5.2, which they missed and which failed as soon as
-# DSM 5.2 was enabled in CI.
+# cargo refuses the crate outright:
+#   error: failed to compile `dua-cli v2.32.0`: rustc 1.82.0-dev is not supported
+#   by the following packages: dua-cli@2.32.0 requires rustc 1.83.0
 MIN_RUSTC_VERSION = 1.83
 
 CARGO_BUILD_ARGS = --locked
