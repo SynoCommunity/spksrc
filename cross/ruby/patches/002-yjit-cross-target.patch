@@ -1,0 +1,15 @@
+# Ruby's release-mode YJIT build invokes rustc directly (YJIT_RUSTC_ARGS has
+# no --target), so a cross build compiles host-architecture objects and the
+# final link fails with "File in wrong format". Pass the target the framework
+# exports (CARGO_BUILD_TARGET) so YJIT can be built for x64 and aarch64; the
+# guard leaves native/host builds unchanged.
+--- common.mk.orig
++++ common.mk
+@@ -268,6 +268,7 @@
+ 
+ # For release builds
+ YJIT_RUSTC_ARGS = --crate-name=yjit \
++	$(if $(CARGO_BUILD_TARGET),--target=$(CARGO_BUILD_TARGET)) \
+ 	$(JIT_RUST_FLAGS) \
+ 	--edition=2021 \
+ 	-g \

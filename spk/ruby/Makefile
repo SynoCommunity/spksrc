@@ -1,11 +1,11 @@
 SPK_NAME = ruby
-SPK_VERS = 3.4.5
-SPK_REV = 13
+SPK_VERS = 4.0.7
+SPK_REV = 14
 SPK_ICON = src/ruby.png
 
 DEPENDS = cross/ruby
 
-CHANGELOG = "1. Update to v3.4.5."
+CHANGELOG = "1. Update to v4.0.7."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Ruby Programming Language.
