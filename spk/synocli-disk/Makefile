@@ -10,7 +10,6 @@ DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 DEPENDS += cross/disktype
 
 OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
-OPTIONAL_DEPENDS += cross/dua cross/dutree
 OPTIONAL_DEPENDS += cross/smartmontools
 OPTIONAL_DEPENDS += cross/mergerfs
 OPTIONAL_DEPENDS += cross/gpart
@@ -35,7 +34,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 SPK_COMMANDS += bin/dua bin/dutree
-DEPENDS += cross/dua cross/dutree
+$(call depend,cross/dua cross/dutree,nop)
 endif
 
 
