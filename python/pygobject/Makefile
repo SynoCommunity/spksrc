@@ -9,9 +9,8 @@ HOMEPAGE = https://pygobject.gnome.org/
 COMMENT  = PyGObject is a Python package which provides bindings for GObject based libraries such as GTK, GStreamer, WebKitGTK, GLib, GIO and many more.
 LICENSE  = LGPLv2.1+
 
-# meson.build:30 sets glib_version_req '>= 2.80.0', which only cross/glib-latest
-# can meet -- and it declares MIN_GCC_VERSION = 7.5. Below that the cross/glib
-# virtual falls back to glib-2.66 and meson stops on
+# needs glib >= 2.80, i.e. cross/glib-latest, which declares gcc 7.5; below that
+# the glib virtual offers 2.66 and meson stops on
 #   Dependency 'glib-2.0' ... found '2.66.x' but need '>= 2.80.0'
 REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 7.5

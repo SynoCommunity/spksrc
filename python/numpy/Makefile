@@ -24,10 +24,7 @@ HOMEPAGE = https://numpy.org/
 COMMENT  = NumPy is the fundamental package for scientific computing with Python.
 LICENSE  = NumPy Developers
 
-# Requires gcc >= 8.4 to build successfully. meson.build asks for
-# c_std=c11 and cpp_std=c++17, which gcc takes from 7; the 8.4 above it is
-# this repo's own measurement, kept as the floor rather than loosened to
-# what the build files alone prove.
+# Requires gcc >= 8.4 to build successfully.
 REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 8.4
 REQUIRED_MIN_SRM = 1.3
