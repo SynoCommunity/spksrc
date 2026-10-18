@@ -16,9 +16,7 @@ ENV += PATH=$(LUA_NATIVE_PATH):$$PATH
 #   dist/mongoose/mongoose.c:1: C++ style comments are not allowed in ISO C90
 #   [-Werror]
 # Builds on gcc 7.5, whose default is gnu11.
-REQUIRED_MIN_DSM = 7.0
 MIN_GCC_VERSION = 5
-REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://jcorporation.github.io/
 COMMENT  = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.

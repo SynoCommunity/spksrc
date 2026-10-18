@@ -11,9 +11,7 @@ DEPENDS =
 # for it, which the 4.9.3 header chain does not:
 #   cmddata.cpp:1243: 'ptrdiff_t' was not declared in this scope
 # Builds on gcc 7.5; no toolchain in the tree sits between the two.
-REQUIRED_MIN_DSM = 7.0
 MIN_GCC_VERSION = 5
-REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://rarlab.com
 COMMENT  = Extract files from rar archives.
