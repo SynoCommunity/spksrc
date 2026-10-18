@@ -12,7 +12,6 @@ LICENSE  = LGPLv2.1+
 # needs glib >= 2.80, i.e. cross/glib-latest, which declares gcc 7.5; below that
 # the glib virtual offers 2.66 and meson stops on
 #   Dependency 'glib-2.0' ... found '2.66.x' but need '>= 2.80.0'
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 7.5
 
 DEPENDS += python/pycairo
