@@ -18,9 +18,7 @@ LICENSE  = GPLv2/GPLv3
 #   bits/stl_construct.h:75: use of deleted function 'tr_variant::tr_variant(const tr_variant&)'
 # So the floor is 8, not the "gcc >= 5.1" this file used to claim, and it refuses
 # DSM 7.0 as well as comcerto2k.
-REQUIRED_MIN_DSM = 7.0
 MIN_GCC_VERSION = 8
-REQUIRED_MIN_SRM = 1.3
 
 CONFIGURE_ARGS = -DCMAKE_BUILD_TYPE=RelWithDebInfo
 CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=OFF

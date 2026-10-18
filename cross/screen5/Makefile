@@ -13,9 +13,7 @@ DEPENDS = cross/ncursesw cross/linux-pam
 # (every other DSM 7.0 arch) are refused. The arch list named only comcerto2k,
 # so DSM 7.0 was attempted and failed; spk/synocli-net now falls back to
 # cross/screen there, as it already did for DSM 6 and comcerto2k.
-REQUIRED_MIN_DSM = 7.0
 MIN_GCC_VERSION = 8
-REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://www.gnu.org/software/screen/
 COMMENT  = Screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.

@@ -5,7 +5,9 @@ SPK_ICON = src/transmission.png
 
 DEPENDS = cross/transmission
 
-REQUIRED_MIN_DSM = 7.0
+# transmission 4.1.3 needs gcc >= 8 (see cross/transmission), so DSM 7.0 --
+# gcc 7.5 on every arch -- cannot build it; 7.1 is the first DSM that can.
+REQUIRED_MIN_DSM = 7.1
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
