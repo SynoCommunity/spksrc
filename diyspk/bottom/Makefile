@@ -3,7 +3,8 @@ SPK_VERS = 0.11.4
 SPK_REV = 1
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+# see spk/synocli-monitor: 0.11.4 needs cargo >= 1.85 for edition2024
+ifneq ($(call version_ge,$(TC_RUSTC),1.85),1)
 DEPENDS = cross/bottom_0.10
 SPK_VERS = 0.10.2
 else

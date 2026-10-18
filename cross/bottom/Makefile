@@ -8,9 +8,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
-# requires rust 1.85 but for qoriq we have only 1.82
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# cargo cannot even parse a dependency's manifest below 1.85:
+#   failed to parse manifest at .../ratatui-crossterm-0.1.0-beta.0/Cargo.toml
+#   feature `edition2024` is required ... not stabilized in this version of
+#   Cargo (1.82.0-dev)
+# The three arch lists this replaces were naming the archs whose rustc comes
+# from the from-source overlay and is pinned at 1.82, one family at a time --
+# and they missed x86-5.2, which therefore attempted the build and failed.
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://clementtsang.github.io/bottom
 COMMENT  = A customizable cross-platform graphical process/system monitor for the terminal.

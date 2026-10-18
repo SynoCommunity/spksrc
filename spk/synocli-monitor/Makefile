@@ -30,10 +30,12 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
 DEPENDS += cross/bandwhich cross/procs
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bottom_0.10
-else
+# bottom 0.11.4 needs cargo >= 1.85 for edition2024; the overlay-rust archs are
+# pinned at 1.82 and take 0.10.2, the last release that builds below 1.81.
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
 DEPENDS += cross/bottom
+else
+DEPENDS += cross/bottom_0.10
 endif
 endif
 
