@@ -7,7 +7,11 @@ DSM_UI_DIR = app
 DEPENDS = cross/mpd cross/mpc
 
 REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_SRM = 1.3
+# No REQUIRED_MIN_SRM: cross/mpd needs gcc 12 and the newest gcc any SRM
+# toolchain carries is 10.3 (SRM 1.3; 1.2 is at 4.9.3). The 1.3 floor here dates
+# from #6717, when this was mpd 0.23; #6944 took 0.24.8 and raised the DSM floor
+# to 7.2 "for C++20 support" without touching the SRM one, so it has been
+# promising a package no SRM arch could build ever since.
 
 MAINTAINER = hgy59
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
