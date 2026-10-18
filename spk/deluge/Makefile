@@ -21,7 +21,6 @@ HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
 # libtorrent-2.1.x requires c++20 > gcc-8.5
 REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_SRM = 1.3
 MIN_GCC_VERSION = 10
 
 WIZARDS_DIR = src/wizard/

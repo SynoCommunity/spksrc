@@ -14,8 +14,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 # Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
-REQUIRED_MIN_DSM = 7.0
-REQUIRED_MIN_SRM = 1.3
 MIN_GCC_VERSION = 7
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
