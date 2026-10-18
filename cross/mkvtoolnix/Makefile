@@ -14,12 +14,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 #  The Qt library is now required for building all applications, even the
 #  command-line ones, as they use Qt's MIME type detection capabilities
 
-# configure requires the -std=c++17 flag itself (ac/c++-features.m4), then the
-# C++17 features behind it -- maybe_unused, structured bindings, std::optional:
+# configure wants -std=c++17, and 58.0.0 also wants the C++17 filesystem
+# library, which libstdc++ carries complete from 8:
 #   checking for support for the "-std=c++17" flag... no
-# 58.0.0 is past the 53.x line above, so it also needs the C++17 filesystem
-# library, which libstdc++ 7.5 does not carry complete -- hence 8, not 7, which
-# is the floor that reproduces the DSM 7.1 minimum this file used to spell out.
 MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = native/ruby

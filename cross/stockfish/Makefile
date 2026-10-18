@@ -18,8 +18,7 @@ INSTALL_TARGET = stockfish_install
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-# src/Makefile compiles with -std=c++17, which gcc takes from 7. Carried here from
-# spk/stockfish, which gated comcerto2k by name.
+# src/Makefile compiles with -std=c++17, which gcc takes from 7.
 MIN_GCC_VERSION = 7
 
 include ../../mk/spksrc.common.mk
