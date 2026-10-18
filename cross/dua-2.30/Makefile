@@ -9,9 +9,10 @@ PKG_DIR = $(PKG_NAME)-cli-$(PKG_VERS)
 # dua v2.30.0 is the latest version that builds for ARMv5 with rust 1.77.2
 DEPENDS =
 
-# rust's std for this target links against glibc 2.9 wrappers the 2.8 sysroot lacks:
-#   undefined reference to `epoll_create1', undefined reference to `pipe2'
-MIN_GLIBC_VERSION = 2.9
+# linker error: 
+# unrecognised emulation mode: elf32ppclinux
+# Supported emulations: elf_x86_64 elf32_x86_64 elf_i386 elf_iamcu i386pep i386pe
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CARGO_BUILD_ARGS = --locked
 

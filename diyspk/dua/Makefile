@@ -1,6 +1,8 @@
 SPK_NAME = dua
 SPK_REV = 1
 
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/dua
