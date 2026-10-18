@@ -13,9 +13,6 @@ LICENSE  = GPLv2
 # with mpd ver 0.24 (2025/03/11)
 # - switch to C++20 (GCC 12 or clang 14)
 # - removed Boost dependency
-# 0.24 needs libstdc++ 12; meson only warns, the compiler is where it stops:
-#   src/tag/Id3Load.cxx:55: error: 'make_unique_for_overwrite' is not a member
-#   of 'std'
 MIN_GCC_VERSION = 12
 
 DEPENDS  = cross/glib
