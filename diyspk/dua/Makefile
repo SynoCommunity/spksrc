@@ -5,11 +5,13 @@ SPK_REV = 1
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-SPK_VERS = 2.30.0
-DEPENDS = cross/dua_2.30.0
-else
+
 DEPENDS = cross/dua
+
+# the virtual falls back to cross/dua-2.30 where 2.32.0's rustc floor is not met,
+# and SPK_VERS has to follow it
+ifneq ($(call version_ge,$(TC_RUSTC),1.83),1)
+SPK_VERS = 2.30.0
 endif
 
 MAINTAINER = SynoCommunity

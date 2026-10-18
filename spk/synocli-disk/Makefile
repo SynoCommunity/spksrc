@@ -10,7 +10,7 @@ DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 DEPENDS += cross/disktype
 
 OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
-OPTIONAL_DEPENDS += cross/dua cross/dua_2.30.0 cross/dutree
+OPTIONAL_DEPENDS += cross/dua cross/dutree
 OPTIONAL_DEPENDS += cross/smartmontools
 OPTIONAL_DEPENDS += cross/mergerfs
 OPTIONAL_DEPENDS += cross/gpart
@@ -35,12 +35,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 SPK_COMMANDS += bin/dua bin/dutree
-# dua 2.32.0 needs rustc >= 1.83; below that take the older 2.30.0.
-ifeq ($(call version_ge,$(TC_RUSTC),1.83),1)
 DEPENDS += cross/dua cross/dutree
-else
-DEPENDS += cross/dua_2.30.0 cross/dutree
-endif
 endif
 
 
