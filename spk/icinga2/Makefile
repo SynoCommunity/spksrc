@@ -7,8 +7,6 @@ DEPENDS = cross/icinga2
 DEPENDS += cross/monitoring-plugins
 SPK_DEPENDS = MariaDB10
 
-REQUIRED_MIN_DSM = 7.1
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 is an open source monitoring system which checks the availability of your network resources, notifies users of outages, and generates performance data for reporting.
 CHANGELOG = "Initial release of Icinga 2"

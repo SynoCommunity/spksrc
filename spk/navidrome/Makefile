@@ -5,8 +5,6 @@ SPK_ICON = src/navidrome.png
 
 DEPENDS = cross/navidrome
 
-REQUIRED_MIN_DSM = 7.1
-
 MAINTAINER = hgy59
 HOMEPAGE = https://www.navidrome.org/
 DESCRIPTION = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic. It gives you freedom to listen to your music collection from any browser or mobile device.
