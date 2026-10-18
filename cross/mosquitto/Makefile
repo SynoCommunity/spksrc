@@ -13,8 +13,6 @@ DEPENDS += cross/sqlite
 # C++17 required by mosquittopp:
 #   CMake Error in lib/cpp/CMakeLists.txt: Target "mosquittopp" requires the
 #   language dialect "CXX17"
-REQUIRED_MIN_DSM = 7.0
-REQUIRED_MIN_SRM = 1.3
 MIN_GCC_VERSION = 7
 
 HOMEPAGE = https://www.mosquitto.org/

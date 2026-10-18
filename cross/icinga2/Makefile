@@ -7,8 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Icinga2 requires C++17 (GCC >= 7)
-# DSM 7.1 provides GCC 12.x for most architectures
-REQUIRED_MIN_DSM = 7.1
 # icinga2's own CMakeLists.txt refuses it before we would:
 #   Your version of GCC (4.9.3) is too old for building Icinga 2
 #   (GCC >= 7.0.0 is required).

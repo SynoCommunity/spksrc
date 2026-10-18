@@ -7,7 +7,6 @@ PKG_DIST_FILE = icinga2-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = icinga2-$(PKG_VERS)
 
 # Icinga2 requires C++17 (GCC >= 7)
-REQUIRED_MIN_DSM = 7.1
 # Same CMakeLists.txt as cross/icinga2, same refusal:
 #   (GCC >= 7.0.0 is required).
 MIN_GCC_VERSION = 7

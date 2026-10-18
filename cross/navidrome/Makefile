@@ -9,9 +9,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 BUILD_DEPENDS = native/go native/nodejs
 DEPENDS = cross/taglib2
 
-# taglib2:
-REQUIRED_MIN_DSM = 7.1
-REQUIRED_MIN_SRM = 1.3
+# No floor of its own: cross/taglib2 declares MIN_GCC_VERSION = 7 and the
+# dependency walk propagates its refusal.
 
 HOMEPAGE = https://www.navidrome.org/
 COMMENT  = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic.

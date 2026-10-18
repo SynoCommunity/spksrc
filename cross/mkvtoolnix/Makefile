@@ -5,7 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-REQUIRED_MIN_DSM = 7.1
 # mkvtoolnix > 22.x require C++14 (DSM 7 only)
 # no further updates possible:
 # mkvtoolnix > 46.x need some features of C++17
@@ -18,8 +17,10 @@ REQUIRED_MIN_DSM = 7.1
 # configure requires the -std=c++17 flag itself (ac/c++-features.m4), then the
 # C++17 features behind it -- maybe_unused, structured bindings, std::optional:
 #   checking for support for the "-std=c++17" flag... no
-MIN_GCC_VERSION = 7
-REQUIRED_MIN_SRM = 1.3
+# 58.0.0 is past the 53.x line above, so it also needs the C++17 filesystem
+# library, which libstdc++ 7.5 does not carry complete -- hence 8, not 7, which
+# is the floor that reproduces the DSM 7.1 minimum this file used to spell out.
+MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support

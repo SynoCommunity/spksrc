@@ -11,9 +11,7 @@ DEPENDS = cross/zlib cross/utfcpp
 # so cmake silently drops the flag and the C++17 code is a syntax error instead:
 #   taglib/mpeg/mpegheader.cpp:184: expected ')' before ';' token
 # (an if with initialiser, if(const int layerBits = ...; layerBits == 1))
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 7
-REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://taglib.org/
 COMMENT  = TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack, TrueAudio, WAV, AIFF, MP4 and ASF files.
