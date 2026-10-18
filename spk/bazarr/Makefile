@@ -20,9 +20,6 @@ HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
 STARTABLE = yes
 
-REQUIRED_MIN_DSM = 7.1
-REQUIRED_MIN_SRM = 1.3
-
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
 
