@@ -13,9 +13,12 @@ LICENSE  = GPLv2
 # with mpd ver 0.24 (2025/03/11)
 # - switch to C++20 (GCC 12 or clang 14)
 # - removed Boost dependency
-# GCC version is too old. You need at least version 12.
-REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_SRM = 1.3
+# meson refuses the toolchain itself:
+#   GCC version is too old. You need at least version 12.
+# DSM 7.2 is the first DSM with gcc 12.2, which is what the DSM floor here used
+# to stand for; stating the compiler instead also refuses SRM 1.3, whose gcc is
+# 10.3 and which the old SRM floor let through.
+MIN_GCC_VERSION = 12
 
 DEPENDS  = cross/glib
 DEPENDS += cross/alsa-lib
