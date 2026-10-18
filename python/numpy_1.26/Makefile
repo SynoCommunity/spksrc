@@ -23,9 +23,7 @@ COMMENT  = NumPy is the fundamental package for scientific computing with Python
 LICENSE  = NumPy Developers
 
 # Requires gcc >= 8.4 to build successfully.
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 8.4
-REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.common.mk
 

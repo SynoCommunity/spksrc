@@ -14,9 +14,7 @@ LICENSE  = 3-Clause BSD license
 # Documentation:  https://docs.scipy.org/doc/scipy/building/cross_compilation.html
 
 # Requires gcc >= 8.4 to build successfully.
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 8.4
-REQUIRED_MIN_SRM = 1.3
 
 OPTIONAL_DEPENDS  = python/numpy
 OPTIONAL_DEPENDS  = python/numpy-latest

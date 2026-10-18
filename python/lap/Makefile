@@ -10,9 +10,7 @@ COMMENT  = lap is a linear assignment problem solver using Jonker-Volgenant algo
 LICENSE  = BSD-2-Clause license
 
 # Requires gcc >= 8.4 to build successfully.
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 8.4
-REQUIRED_MIN_SRM = 1.3
 
 DEPENDS  = python/numpy_1.26
 

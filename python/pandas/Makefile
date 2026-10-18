@@ -15,7 +15,6 @@ LICENSE  = 3-Clause BSD license
 
 # Numpy dependency requires gcc >= 8.4, and it is optional below, so its floor
 # does not reach here.
-REQUIRED_MIN_DSM = 7.1
 MIN_GCC_VERSION = 8.4
 
 OPTIONAL_DEPENDS  = python/numpy
