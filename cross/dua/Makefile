@@ -13,6 +13,10 @@ DEPENDS =
 #   by the following packages: dua-cli@2.32.0 requires rustc 1.83.0
 MIN_RUSTC_VERSION = 1.83
 
+# rust's std for this target links against glibc 2.9 wrappers the 2.8 sysroot lacks:
+#   undefined reference to `epoll_create1', undefined reference to `pipe2'
+MIN_GLIBC_VERSION = 2.9
+
 CARGO_BUILD_ARGS = --locked
 
 HOMEPAGE = https://lib.rs/crates/dua-cli
