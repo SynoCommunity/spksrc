@@ -5,9 +5,6 @@ SPK_ICON = src/mosquitto.png
 
 DEPENDS = cross/mosquitto
 
-# C++17 required by mosquittopp, GCC < 7 not supported
-REQUIRED_MIN_DSM = 7.0
-REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Eclipse Mosquitto is an open source \(EPL/EDL licensed\) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
