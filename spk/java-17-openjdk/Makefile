@@ -9,7 +9,6 @@ SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-17-openjdk
 
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
 
