@@ -7,7 +7,6 @@ DEPENDS = cross/stockfish
 BUILD_DEPENDS = native/nodejs_22
 SPK_DEPENDS = "Node.js_v18"
 
-
 MAINTAINER = mayweed
 DISPLAY_NAME = Stockfish
 DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
