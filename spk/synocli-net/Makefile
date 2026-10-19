@@ -40,8 +40,8 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # tools of cross/bind (v9.16, v9.18, v9.20)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
 ifeq ($(call version_ge,${TCVERSION},7.0),1)
-# DSM 7
-ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+# DSM 7 -- cross/bind_9.20 needs gcc >= 8, which leaves out DSM 7.0 and comcerto2k
+ifeq ($(call version_ge,$(TC_GCC),8),1)
 DEPENDS += cross/bind_9.20
 else
 DEPENDS += cross/bind_9.18
