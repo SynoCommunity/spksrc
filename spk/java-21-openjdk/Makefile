@@ -7,7 +7,6 @@ SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-21-openjdk
 
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 21 is the open-source reference implementation of version 21 of the Java SE Platform as specified by JSR 396 in the Java Community Process.
 
