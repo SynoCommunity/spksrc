@@ -21,7 +21,9 @@ DEPENDS += cross/libcap
 
 # needs C11 with some C17 features (gcc >= 7; comcerto2k is the only
 # DSM-7 arch below that and every older DSM is too)
-MIN_GCC_VERSION = 7
+# gcc folds a const int into a static initializer only from 8; 7.5 refuses:
+#   opensslrsa_link.c:53: error: initializer element is not constant
+MIN_GCC_VERSION = 8
 
 
 HOMEPAGE = https://www.isc.org/
