@@ -8,8 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Dwarf Error: found dwarf version '4', this reader only handles version 2 and 3 information.
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# rust's std for this target links against glibc 2.9 wrappers the 2.8 sysroot lacks:
+#   undefined reference to `epoll_create1', undefined reference to `pipe2'
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://github.com/dalance/procs#readme
 COMMENT  = A modern replacement for ps written in Rust.

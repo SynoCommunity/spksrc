@@ -13,7 +13,7 @@ DEPENDS += cross/cpulimit
 DEPENDS += cross/net-snmp
 DEPENDS += cross/lm-sensors
 
-OPTIONAL_DEPENDS  = cross/bandwhich cross/bottom cross/bottom_0.10 cross/procs
+OPTIONAL_DEPENDS  = cross/bandwhich cross/procs
 OPTIONAL_DEPENDS += cross/btop
 
 include ../../mk/spksrc.common.mk
@@ -30,11 +30,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
 DEPENDS += cross/bandwhich cross/procs
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bottom_0.10
-else
-DEPENDS += cross/bottom
-endif
+$(call depend,cross/bottom,nop)
 endif
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
