@@ -12,8 +12,10 @@ DEPENDS += cross/tcp_wrappers
 DEPENDS += cross/libcap
 DEPENDS += cross/libev
 
-# compiler must support -std=c11
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# -D_DEFAULT_SOURCE below is what makes netdb.h expose NI_MAXHOST; glibc only honours
+# that macro from 2.19, and below it the build stops on
+#   common.h:144: error: 'NI_MAXHOST' undeclared here (not in a function)
+MIN_GLIBC_VERSION = 2.19
 
 HOMEPAGE = https://www.rutschle.net/tech/sslh/README.html
 COMMENT  = Applicative Protocol Multiplexer (e.g. share SSH and HTTPS on the same port).
