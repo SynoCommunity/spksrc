@@ -20,7 +20,9 @@ DEPENDS += cross/nghttp2
 DEPENDS += cross/libcap
 
 # lacking support for atomics:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# netmgr/udp.c uses the C11 _Atomic qualifier, which gcc has from 4.9:
+#   udp.c:813: error: expected declaration specifiers before 'last_udpsends_log'
+MIN_GCC_VERSION = 4.9
 
 
 HOMEPAGE = https://www.isc.org/

@@ -19,7 +19,7 @@ DEPENDS += cross/nmap
 
 OPTIONAL_DEPENDS  = cross/screen
 OPTIONAL_DEPENDS += cross/ser2net
-OPTIONAL_DEPENDS += cross/bind_9.20 cross/bind_9.18 cross/bind_9.16
+OPTIONAL_DEPENDS += cross/bind
 OPTIONAL_DEPENDS += cross/aria2
 
 include ../../mk/spksrc.common.mk
@@ -32,23 +32,7 @@ DEPENDS += cross/screen
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # tools of cross/bind (v9.16, v9.18, v9.20)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
-ifeq ($(call version_ge,${TCVERSION},7.0),1)
-# DSM 7 -- cross/bind_9.20 needs gcc >= 8, which leaves out DSM 7.0 and comcerto2k
-ifeq ($(call version_ge,$(TC_GCC),8),1)
-DEPENDS += cross/bind_9.20
-else
-DEPENDS += cross/bind_9.18
-endif
-else
-# DSM 6
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/bind_9.16
-else ifeq ($(ARCH)-$(TCVERSION),x86-5.2)
-DEPENDS += cross/bind_9.16
-else
-DEPENDS += cross/bind_9.18
-endif
-endif
+DEPENDS += cross/bind
 endif
 
 
