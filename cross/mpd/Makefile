@@ -13,10 +13,7 @@ LICENSE  = GPLv2
 # with mpd ver 0.24 (2025/03/11)
 # - switch to C++20 (GCC 12 or clang 14)
 # - removed Boost dependency
-# GCC version is too old. You need at least version 12.
-REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+MIN_GCC_VERSION = 12
 
 DEPENDS  = cross/glib
 DEPENDS += cross/alsa-lib
