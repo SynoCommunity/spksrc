@@ -312,9 +312,7 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          # TEMP (revert before merge): activate DSM 5.2 so this branch's floors are
-          # exercised on ppc853x-5.2, the only toolchain pair $(OLD_PPC_ARCHS) refused.
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
