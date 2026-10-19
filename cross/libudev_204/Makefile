@@ -9,6 +9,10 @@ PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libgcrypt cross/dbus cross/libcap
 
+# glibc 2.8 has no inotify_init1 flags (added in 2.9):
+#   src/shared/util.c:1931: error: 'IN_CLOEXEC' undeclared
+MIN_GLIBC_VERSION = 2.9
+
 HOMEPAGE = https://github.com/systemd/systemd
 COMMENT = The systemd System and Service Manager provides an array of system components for Linux operating systems.
 # we take libraries only (tools are GPLv2)

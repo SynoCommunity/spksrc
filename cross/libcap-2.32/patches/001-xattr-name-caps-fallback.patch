@@ -1,0 +1,31 @@
+Backport of the fallback libcap added upstream in 2.37: the DSM 5.2 sys-roots
+carry kernel headers predating XATTR_NAME_CAPS in linux/xattr.h, and 2.32 takes
+it from there with no fallback of its own.
+
+  cap_file.c:204: error: 'XATTR_NAME_CAPS' undeclared (first use in this function)
+
+--- libcap/cap_file.c.orig
++++ libcap/cap_file.c
+@@ -25,6 +25,22 @@
+ extern int removexattr(const char *, const char *);
+ extern int fremovexattr(int, const char *);
+ 
++/*
++ * This public API was moved to include/uapi/linux/xattr.h . For just
++ * these definitions, it isn't really worth managing this in our build
++ * system with yet another copy of a header file. We just, provide
++ * fallback definitions here.
++ */
++#ifndef XATTR_CAPS_SUFFIX
++#define XATTR_CAPS_SUFFIX "capability"
++#endif
++#ifndef XATTR_SECURITY_PREFIX
++#define XATTR_SECURITY_PREFIX "security."
++#endif
++#ifndef XATTR_NAME_CAPS
++#define XATTR_NAME_CAPS XATTR_SECURITY_PREFIX XATTR_CAPS_SUFFIX
++#endif
++
+ #include "libcap.h"
+ 
+ #ifdef VFS_CAP_U32
