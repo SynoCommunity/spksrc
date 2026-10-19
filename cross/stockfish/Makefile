@@ -38,14 +38,6 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 	BUILD_ARCH=ppc-32
 endif
-# Only for an arch this file has not already refused: $(error) is evaluated at parse
-# time, so an unguarded one pre-empts pre-check and turns a refusal into a build failure.
-ifeq ($(BUILD_ARCH),)
-ifeq ($(filter $(ARCH),$(UNSUPPORTED_ARCHS)),)
-$(error "ARCH $(ARCH) not expected.")
-endif
-endif
-
 COMPILE_ARGS = build ARCH=$(BUILD_ARCH)
 ifeq (g++,$(CXX))
 # workaround for: CXX not fully qualified when building in cross folder
