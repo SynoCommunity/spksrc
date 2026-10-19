@@ -17,7 +17,7 @@ DEPENDS += cross/imapfilter
 DEPENDS += cross/sshfs
 DEPENDS += cross/nmap
 
-OPTIONAL_DEPENDS  = cross/screen cross/screen5
+OPTIONAL_DEPENDS  = cross/screen
 OPTIONAL_DEPENDS += cross/ser2net
 OPTIONAL_DEPENDS += cross/bind_9.20 cross/bind_9.18 cross/bind_9.16
 OPTIONAL_DEPENDS += cross/aria2
@@ -26,14 +26,7 @@ include ../../mk/spksrc.common.mk
 
 OPTIONAL_DESC =
 
-# cross/screen5 needs gcc >= 8, so anything below DSM 7.1 takes cross/screen.
-ifeq ($(call version_lt,${TCVERSION},7.1),1)
 DEPENDS += cross/screen
-else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/screen
-else
-DEPENDS += cross/screen5
-endif
 
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
