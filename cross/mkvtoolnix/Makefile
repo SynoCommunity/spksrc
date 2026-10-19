@@ -5,7 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-REQUIRED_MIN_DSM = 7.1
 # mkvtoolnix > 22.x require C++14 (DSM 7 only)
 # no further updates possible:
 # mkvtoolnix > 46.x need some features of C++17
@@ -15,9 +14,10 @@ REQUIRED_MIN_DSM = 7.1
 #  The Qt library is now required for building all applications, even the
 #  command-line ones, as they use Qt's MIME type detection capabilities
 
-# comcerto2k has older toolchain than other DSM 7.1 archs
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# configure wants -std=c++17, and 58.0.0 also wants the C++17 filesystem
+# library, which libstdc++ carries complete from 8:
+#   checking for support for the "-std=c++17" flag... no
+MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support

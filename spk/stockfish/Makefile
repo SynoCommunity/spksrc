@@ -7,10 +7,6 @@ DEPENDS = cross/stockfish
 BUILD_DEPENDS = native/nodejs_22
 SPK_DEPENDS = "Node.js_v18"
 
-# C++17 requires GCC 8+ (comcerto2k has GCC 4.9.3)
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-
 MAINTAINER = mayweed
 DISPLAY_NAME = Stockfish
 DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
