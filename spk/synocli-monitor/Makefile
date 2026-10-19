@@ -13,7 +13,7 @@ DEPENDS += cross/cpulimit
 DEPENDS += cross/net-snmp
 DEPENDS += cross/lm-sensors
 
-OPTIONAL_DEPENDS  = cross/bandwhich cross/bottom cross/bottom_0.10 cross/procs
+OPTIONAL_DEPENDS  = cross/bandwhich cross/procs
 OPTIONAL_DEPENDS += cross/btop
 
 include ../../mk/spksrc.common.mk
@@ -30,13 +30,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
 DEPENDS += cross/bandwhich cross/procs
-# bottom 0.11.4 needs cargo >= 1.85 for edition2024; the overlay-rust archs are
-# pinned at 1.82 and take 0.10.2, the last release that builds below 1.81.
-ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
-DEPENDS += cross/bottom
-else
-DEPENDS += cross/bottom_0.10
-endif
+$(call depend,cross/bottom,nop)
 endif
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
