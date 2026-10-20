@@ -22,7 +22,7 @@ HOMEPAGE = https://numpy.org/
 COMMENT  = NumPy is the fundamental package for scientific computing with Python.
 LICENSE  = NumPy Developers
 
-# Requires gcc >= 8.4 to build successfully.
+# meson.build errors below it: "NumPy requires GCC >= 8.4".
 MIN_GCC_VERSION = 8.4
 
 include ../../mk/spksrc.common.mk

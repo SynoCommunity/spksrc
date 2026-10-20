@@ -13,18 +13,16 @@ LICENSE  = 3-Clause BSD license
 
 # Documentation: https://pandas.pydata.org/docs/dev/development/contributing_environment.html
 
-# Numpy dependency requires gcc >= 8.4, and it is optional below, so its floor
-# does not reach here.
-MIN_GCC_VERSION = 8.4
-
+# No floor of its own: python/numpy is a required dependency below and its
+# gcc 8.4 propagates.
 OPTIONAL_DEPENDS  = python/numpy
-OPTIONAL_DEPENDS  = python/numpy-latest
+OPTIONAL_DEPENDS += python/numpy-latest
 
 # On older python 3.10/3.11 keep using numpy 2.2.x
 ifneq ($(filter %310 %311,$(PYTHON_PACKAGE)),)
-DEPENDS  = python/numpy
+DEPENDS += python/numpy
 else
-DEPENDS  = python/numpy-latest
+DEPENDS += python/numpy-latest
 endif
 
 include ../../mk/spksrc.python-wheel-meson.mk
