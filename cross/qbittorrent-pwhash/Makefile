@@ -6,7 +6,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Match qbittorrent's unsupported architectures plus 88f6281 (glibc 2.15 < required 2.16)
+# Match qbittorrent's unsupported architectures (no static qbittorrent-nox binary)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc
