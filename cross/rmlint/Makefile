@@ -18,7 +18,6 @@ HOMEPAGE = https://rmlint.readthedocs.io
 COMMENT = rmlint finds space waste and other broken things on your filesystem and offers to remove it.
 LICENSE = GPLv3
 
-# missing some features due to glib-2.58.3 (and pcre instead of pcre2)
 # rmlint needs glib >= 2.64, i.e. cross/glib-2.66, which itself needs gcc 4.6;
 # below that the glib virtual can only offer 2.58:
 #   Checking for glib-2.0 >= 2.64... Error: glib-2.0 >= 2.64 not found.
