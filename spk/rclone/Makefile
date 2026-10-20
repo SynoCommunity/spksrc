@@ -1,18 +1,19 @@
 SPK_NAME = rclone
-SPK_VERS = 1.74.2
-SPK_REV = 5
+SPK_VERS = 1.75.2
+SPK_REV = 6
 SPK_ICON = src/rclone.png
 
 DEPENDS = cross/rclone
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+# rclone requires go >= 1.24, whose binaries need a Linux kernel >= 3.2
+MIN_KERNEL_VERSION = 3.2
 
 MAINTAINER = dotwee
 DESCRIPTION = Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendors' web storage interfaces.
 DISPLAY_NAME = rclone
 STARTABLE = no
 
-CHANGELOG = "Update to v1.74.2."
+CHANGELOG = "Update to v1.75.2."
 
 HOMEPAGE = https://rclone.org/
 HELPURL = https://rclone.org/docs/
