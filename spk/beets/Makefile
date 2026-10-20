@@ -5,7 +5,6 @@ SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
 
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59
