@@ -120,13 +120,16 @@ concurrency:
 
 jobs:
   # Decide whether the build should run at all.
-  #  - workflow_dispatch always builds, wherever it is started: it is an explicit
-  #    request, and a fork needs that escape hatch.
-  #  - no automatic event builds on a fork. A fork's Actions minutes are the
-  #    contributor's own, and nothing upstream reads what they produce.
-  #  - upstream, pull_request always builds: it is the authoritative CI, covering
-  #    the whole branch (origin/master...HEAD).
-  #  - push to master always builds (a merge, or a release push).
+  # The rule: CI follows the pull request, and a push only builds upstream.
+  #  - workflow_dispatch always builds, wherever it is started.
+  #  - pull_request always builds, in whichever repository the PR lives -- and it
+  #    fires only there, so a PR inside a fork is tested on that fork and a PR
+  #    against upstream is tested upstream, never both. It is the authoritative
+  #    run, covering the whole branch (origin/master...HEAD).
+  #  - a push never builds on a fork. Pushing the branch of an upstream PR would
+  #    only duplicate that PR's run, and syncing a fork's master would rebuild
+  #    what upstream already validated -- both on the contributor's own quota.
+  #  - push to master upstream always builds (a merge, or a release push).
   #  - push to a non-master branch upstream is only the latest commit
   #    (git diff-tree), so it is skipped once an open PR covers the branch. A push
   #    carries no PR context, hence the API lookup (fail-open on error).
@@ -140,28 +143,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # An explicit manual run is honoured anywhere, forks included.
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "Manual run -> build."
+          # A manual run, and a pull request wherever it lives, always build. The
+          # pull_request event fires only in the repository holding the PR, so a
+          # fork's own PR is tested on the fork and nowhere else.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || \
+             [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "${{ github.event_name }} -> build."
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Every other event is automatic, and none of them build on a fork --
-          # neither a push nor a pull request opened inside the fork itself. The
-          # runs that matter happen upstream on upstream's runners; a fork's
-          # Actions minutes are the contributor's own.
+          # push event from here on, and a push never builds on a fork: pushing the
+          # branch of an upstream PR duplicates that PR's run, and syncing master
+          # rebuilds what upstream already validated.
           if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ]; then
-            echo "Automatic ${{ github.event_name }} on a fork -> skip; use workflow_dispatch to build here."
+            echo "Push on a fork (${{ github.ref_name }}) -> skip; open a PR or use workflow_dispatch."
             echo "should_build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Upstream from here on. The pull_request run is the authoritative CI.
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "Pull request -> build."
-            echo "should_build=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # push event. A push to master (merge / release) always builds.
+          # A push to master upstream (merge / release) always builds.
           if [ "${{ github.ref_name }}" = "master" ]; then
             echo "Push to master -> build."
             echo "should_build=true" >> "$GITHUB_OUTPUT"

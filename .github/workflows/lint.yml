@@ -7,12 +7,14 @@ on:
   push:
     paths-ignore:
       - "**.md"
+  workflow_dispatch:
 
 jobs:
   lint:
-    # Automatic runs are upstream-only: a fork push would lint the same tree the
-    # pull_request run already lints, on the contributor's own Actions quota.
-    if: github.repository == 'SynoCommunity/spksrc'
+    # Same rule as build.yml: a pull request lints wherever it lives, and a
+    # manual run lints anywhere, but a push only lints upstream -- on a fork it
+    # would repeat the PR's lint on the contributor's own Actions quota.
+    if: github.event_name != 'push' || github.repository == 'SynoCommunity/spksrc'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
