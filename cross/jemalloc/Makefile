@@ -7,7 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# gcc 4.3.7 rejects the C11 typedef redefinitions the headers rely on:
+#   include/jemalloc/internal/san_bump.h:12: redefinition of typedef 'ehooks_t'
+MIN_GCC_VERSION = 4.6
 
 # jemalloc is a development tool, replacing standard allocator to diagnose memory leaks.
 # It is not included in any package, except to produce test packages for troubleshooting.

@@ -8,8 +8,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS += cross/mariadb-connector-c
 
-# powerpc archs (except qoriq) are not supported
-UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
+# cross/mariadb-connector-c falls back to 3.3.11, which needs gcc 4.6:
+#   plugins/pvio/pvio_socket.c:186: error: missing initializer (-Werror)
+MIN_GCC_VERSION = 4.6
+
+# a transitive crate needs edition 2024, which cargo parses from 1.85:
+#   feature `edition2024` is required ... not stabilized in this version of Cargo
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://diesel.rs/
 COMMENT  = A safe, extensible ORM and Query Builder for Rust.
