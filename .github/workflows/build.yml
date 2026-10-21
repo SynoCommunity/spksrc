@@ -127,8 +127,9 @@ jobs:
   #    branch already has an open PR, the pull_request build covers the whole branch,
   #    so this narrow push build is redundant:
   #      * upstream-hosted branch -> skip it (it only duplicates the PR build);
-  #      * fork branch -> skip only while the PR is a draft (its push build is
-  #        complementary and kept for non-draft, per #7238), to silence dev noise.
+  #      * fork branch -> skip it too. Automatic builds never run on a fork; the
+  #        pull_request run upstream covers the branch, and workflow_dispatch is
+  #        still available there for a deliberate build.
   # A push carries no PR context, hence the API lookup here (fail-open on error).
   gate:
     name: Gate
@@ -153,35 +154,30 @@ jobs:
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Push to a non-master branch. Look up an open PR for it upstream (a push
-          # carries no PR context); fail-open to building on any lookup error.
+          # Push to a non-master branch on a fork: never build automatically. The
+          # pull_request run upstream is authoritative and covers the whole branch,
+          # so a fork build of the latest commit only duplicates it -- on the
+          # contributor's own Actions quota. workflow_dispatch still works there.
+          if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ]; then
+            echo "Fork push (${{ github.ref_name }}) -> skip; use workflow_dispatch to build here."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Upstream-hosted branch: the pull_request build already runs the whole
+          # branch, so skip this redundant push build whenever an open PR covers it.
+          # A push carries no PR context, hence the API lookup; fail-open to building
+          # on any lookup error. (Draft supersede-cancellation is handled on the
+          # pull_request side by the concurrency group.)
           prs=$(gh api \
             "/repos/SynoCommunity/spksrc/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
             2>/dev/null || echo '[]')
-          if [ "${{ github.repository }}" = "SynoCommunity/spksrc" ]; then
-            # Upstream-hosted branch: the pull_request build already runs the whole
-            # branch, so skip this redundant push build whenever an open PR covers it.
-            # (Draft supersede-cancellation is handled on the pull_request side by the
-            # concurrency group.)
-            count=$(echo "$prs" | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo 0)
-            if [ "${count:-0}" -gt 0 ]; then
-              echo "Upstream push for a branch with an open PR -> skip (pull_request build covers it)."
-              echo "should_build=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "Upstream push, no open PR -> build."
-              echo "should_build=true" >> "$GITHUB_OUTPUT"
-            fi
+          count=$(echo "$prs" | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo 0)
+          if [ "${count:-0}" -gt 0 ]; then
+            echo "Upstream push for a branch with an open PR -> skip (pull_request build covers it)."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
           else
-            # Fork push: the fork build is complementary (latest commit only); skip it
-            # only while its PR is a draft, to silence noise during development.
-            draft=$(echo "$prs" | jq -r '[.[].draft] | first // false' 2>/dev/null || echo false)
-            if [ "$draft" = "true" ]; then
-              echo "Fork push for a draft PR (${{ github.ref_name }}) -> skip build."
-              echo "should_build=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "Fork push, PR not draft (or none) -> build."
-              echo "should_build=true" >> "$GITHUB_OUTPUT"
-            fi
+            echo "Upstream push, no open PR -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
           fi
 
   prepare:

@@ -10,6 +10,9 @@ on:
 
 jobs:
   lint:
+    # Automatic runs are upstream-only: a fork push would lint the same tree the
+    # pull_request run already lints, on the contributor's own Actions quota.
+    if: github.repository == 'SynoCommunity/spksrc'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

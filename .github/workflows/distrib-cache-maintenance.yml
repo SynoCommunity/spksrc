@@ -19,6 +19,9 @@ on:
 
 jobs:
   maintain-distrib-cache:
+    # The schedule fires on every fork too, where it would groom a cache nothing
+    # reads. Upstream only; workflow_dispatch stays available everywhere.
+    if: github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -191,6 +194,7 @@ jobs:
           key: distrib-${{ steps.distrib-hash.outputs.hash }}
 
   cleanup-stale-caches:
+    if: github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: maintain-distrib-cache
     permissions:
