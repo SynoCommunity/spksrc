@@ -10,8 +10,9 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
 DEPENDS =
 
-# libmount/src/context_umount.c:290: error: 'O_PATH' undeclared
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has no O_PATH (added in 2.14):
+#   libmount/src/context_umount.c:294: 'O_PATH' undeclared
+MIN_GLIBC_VERSION = 2.14
 
 HOMEPAGE = https://github.com/util-linux/util-linux/
 COMMENT  = Random collection of Linux utilities. We use this only to build libmount out of util-linux.
