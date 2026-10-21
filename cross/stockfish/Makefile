@@ -14,7 +14,6 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-
 # src/Makefile compiles with -std=c++17, which gcc takes from 7.
 MIN_GCC_VERSION = 7
 
