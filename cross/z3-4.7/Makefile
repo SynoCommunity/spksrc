@@ -9,10 +9,6 @@ HOMEPAGE = https://github.com/Z3Prover/z3
 COMMENT  = Theorem prover from Microsoft Research.
 LICENSE  = MIT
 
-# C++11 beyond what gcc 4.7 parses; builds from 4.8:
-#   src/ast/ast.h:1521: error: expected unqualified-id before '[' token
-MIN_GCC_VERSION = 4.8
-
 POST_INSTALL_TARGET = z3_post_install
 
 include ../../mk/spksrc.cross-cmake.mk
