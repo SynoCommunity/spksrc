@@ -50,7 +50,9 @@ jobs:
         with:
           path: ./site
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # Guarded in its own right, not only through build: publishing Pages is the
+    # one step that must never happen anywhere but upstream.
+    if: github.repository == 'SynoCommunity/spksrc' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     environment:
