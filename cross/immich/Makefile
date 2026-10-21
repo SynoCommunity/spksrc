@@ -1,5 +1,5 @@
 PKG_NAME = immich
-PKG_VERS = 3.3.1
+PKG_VERS = 3.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
@@ -10,6 +10,9 @@ BUILD_DEPENDS = native/nodejs_22 native/pnpm native/extism-js native/binaryen
 
 DEPENDS = cross/libvips
 
+# Node.js native dependencies (sharp, etc.) are only published for x64 and arm64
+REQUIRE_64BIT = 1
+
 HOMEPAGE = https://immich.app
 COMMENT  = Self-hosted photo and video backup solution.
 LICENSE  = GPLv3
@@ -19,9 +22,6 @@ POST_INSTALL_TARGET = immich_post_install
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-ENV += HUSKY=0
-ENV += HUSKY_SKIP_INSTALL=1
-ENV += SKIP_GIT_INSTALL_HOOKS=1
 
 include ../../mk/spksrc.cross-install.mk
 
@@ -68,8 +68,6 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) cp -a web/build immich-deploy/web
 	$(RUN) cp package.json immich-deploy/
-	# Remove "type": "module" from deployed package.json (server dist is CommonJS)
-	$(RUN) sed -i '/"type": "module"/d' immich-deploy/package.json
 
 	# ------------------------------------------------------------
 	# 6. Remove non-runtime files from deploy
