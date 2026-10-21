@@ -5,9 +5,6 @@ SPK_ICON = src/curaengine.png
 
 DEPENDS = cross/curaengine
 
-# C++11 compiler required (excludes legacy ARM and PPC)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = CuraEngine is a powerful, fast and robust engine for processing 3D models into 3D printing instruction for Ultimaker and other GCode based 3D printers.
 DISPLAY_NAME = CuraEngine
