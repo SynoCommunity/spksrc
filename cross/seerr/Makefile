@@ -23,9 +23,6 @@ INSTALL_TARGET = seerr_install
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-ENV += HUSKY=0
-ENV += HUSKY_SKIP_INSTALL=1
-ENV += SKIP_GIT_INSTALL_HOOKS=1
 
 include ../../mk/spksrc.cross-install.mk
 
