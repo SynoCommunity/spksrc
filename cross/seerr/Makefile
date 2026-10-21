@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.5.0
+PKG_VERS = 3.5.1
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -7,6 +7,9 @@ PKG_DIST_FILE = seerr-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = seerr-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs_22
+
+# Node.js optional dependencies are only installed for x64 and arm64
+REQUIRE_64BIT = 1
 
 HOMEPAGE = https://github.com/seerr-team/seerr
 COMMENT  = Media request management with Jellyfin, Plex, and Emby integration.
@@ -20,9 +23,6 @@ INSTALL_TARGET = seerr_install
 ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-ENV += HUSKY=0
-ENV += HUSKY_SKIP_INSTALL=1
-ENV += SKIP_GIT_INSTALL_HOOKS=1
 
 include ../../mk/spksrc.cross-install.mk
 

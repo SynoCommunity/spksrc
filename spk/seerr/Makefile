@@ -1,18 +1,20 @@
 SPK_NAME = seerr
-SPK_VERS = 3.5.0
-SPK_REV = 9
+SPK_VERS = 3.5.1
+SPK_REV = 10
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
 BUILD_DEPENDS = native/nodejs_22
 
+SPK_DEPENDS = "Node.js_v22"
+
+# Node.js_v22 (Synology package) declares os_min_ver="7.2-60085"
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Media request management for Jellyfin, Plex, and Emby with automation integrations."
 DISPLAY_NAME = Seerr
-CHANGELOG = "1. Update to v3.5.0"
+CHANGELOG = "1. Update to v3.5.1"
 HOMEPAGE = https://github.com/seerr-team/seerr
 LICENSE = MIT
 
@@ -25,8 +27,6 @@ SERVICE_PORT_TITLE = Seerr (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 USE_ALTERNATE_TMPDIR = 1
-
-SPK_DEPENDS = "Node.js_v22"
 
 POST_STRIP_TARGET += seerr_install
 
