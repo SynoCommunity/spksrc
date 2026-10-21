@@ -5,8 +5,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# compiler too old, gcc >= 4.9.x required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# its configure refuses anything below 4.9:
+#   configure: error: support for required C++11/C++14 features incomplete
+MIN_GCC_VERSION = 4.9
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support
