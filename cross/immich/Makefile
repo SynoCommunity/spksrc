@@ -68,8 +68,6 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) cp -a web/build immich-deploy/web
 	$(RUN) cp package.json immich-deploy/
-	# Remove "type": "module" from deployed package.json (server dist is CommonJS)
-	$(RUN) sed -i '/"type": "module"/d' immich-deploy/package.json
 
 	# ------------------------------------------------------------
 	# 6. Remove non-runtime files from deploy
