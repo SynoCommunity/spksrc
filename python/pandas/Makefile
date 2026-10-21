@@ -13,8 +13,6 @@ LICENSE  = 3-Clause BSD license
 
 # Documentation: https://pandas.pydata.org/docs/dev/development/contributing_environment.html
 
-# No floor of its own: python/numpy is a required dependency below and its
-# gcc 8.4 propagates.
 OPTIONAL_DEPENDS  = python/numpy
 OPTIONAL_DEPENDS += python/numpy-latest
 
