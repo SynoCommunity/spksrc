@@ -1,5 +1,5 @@
 PKG_NAME = ruby
-PKG_VERS = 3.4.5
+PKG_VERS = 4.0.7
 PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
