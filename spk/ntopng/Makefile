@@ -6,6 +6,7 @@ SPK_ICON = src/ntopng.png
 DEPENDS = cross/ntopng
 
 SPK_DEPENDS = "redis"
+
 REQUIRED_MIN_DSM = 6
 
 MAINTAINER = hgy59

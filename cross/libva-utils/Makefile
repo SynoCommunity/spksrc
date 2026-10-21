@@ -12,7 +12,6 @@ HOMEPAGE = https://01.org/linuxmedia
 COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration API).
 LICENSE = MIT
 
-
 ADDITIONAL_CFLAGS  = -Wno-missing-field-initializers
 ADDITIONAL_CFLAGS += -Wno-maybe-uninitialized
 ADDITIONAL_CFLAGS += -Wno-memset-elt-size

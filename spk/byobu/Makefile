@@ -6,7 +6,6 @@ SPK_ICON = src/byobu.png
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "synocli-net"
 
-
 DEPENDS = cross/byobu
 DEPENDS += cross/newt
 
