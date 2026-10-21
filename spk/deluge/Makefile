@@ -39,7 +39,6 @@ POST_SERVICE_TARGET = deluge_extra_install
 include ../../mk/spksrc.common.mk
 
 # [libtorrent]
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl3
 DEPENDS += cross/libiconv
 DEPENDS += cross/boost_1.92
