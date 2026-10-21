@@ -6,8 +6,6 @@ SPK_ICON = src/ntopng.png
 DEPENDS = cross/ntopng
 
 SPK_DEPENDS = "redis"
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 REQUIRED_MIN_DSM = 6
 
 MAINTAINER = hgy59

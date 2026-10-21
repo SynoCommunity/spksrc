@@ -6,8 +6,6 @@ SPK_ICON = src/byobu.png
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "synocli-net"
 
-# Python 3.12 not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 DEPENDS = cross/byobu
 DEPENDS += cross/newt

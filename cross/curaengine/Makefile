@@ -8,8 +8,9 @@ PKG_DIR = CuraEngine-$(PKG_VERS)
 
 DEPENDS = cross/libarcus
 
-# c++11 compiler required
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# variadic templates gcc parses from 4.9; 4.8 already has libstdc++ sleep_for:
+#   src/utils/LazyInitialization.h:34: error: expected ',' before '...' token
+MIN_GCC_VERSION = 4.9
 
 HOMEPAGE = https://ultimaker.com/software/ultimaker-cura
 COMMENT  = CuraEngine is a Powerful, fast and robust engine for converting 3D models into g-code instructions for 3D printers. It is part of the larger open source project Cura.

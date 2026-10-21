@@ -11,8 +11,10 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# compiler too old
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# __builtin_bswap16 arrived in gcc 4.8:
+#   C/SwapBytes.c:674: error: implicit declaration of function
+#   '__builtin_bswap16' [-Werror=implicit-function-declaration]
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://www.7-zip.org/
 COMMENT  = 7-Zip is a file archiver with a high compression ratio.

@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/smartmontools
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = smartmontools contains two utility programs \(smartctl and smartd\) to control and monitor storage systems using the Self-Monitoring, Analysis and Reporting Technology System \(SMART\).
 STARTABLE = no

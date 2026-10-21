@@ -6,8 +6,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.gnome.org/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# support for c++11 language features is required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# C++11 alias templates, which gcc parses from 4.7:
+#   ../sigc++/type_traits.h:63: error: expected unqualified-id before 'using'
+MIN_GCC_VERSION = 4.7
 
 DEPENDS =
 

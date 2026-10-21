@@ -11,8 +11,9 @@ HOMEPAGE = https://rarlab.com
 COMMENT  = Extract files from rar archives.
 LICENSE  = freeware
 
-# Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# unrar compiles with -std=c++11, which gcc accepts from 4.7:
+#   cc1plus: error: unrecognized command line option '-std=c++11'
+MIN_GCC_VERSION = 4.7
 
 CONFIGURE_TARGET = nop
 INSTALL_ARGS = install DESTDIR=$(STAGING_INSTALL_PREFIX)

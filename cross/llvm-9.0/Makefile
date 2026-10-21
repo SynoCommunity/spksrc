@@ -9,7 +9,7 @@ HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
 LICENSE = Apache v2.0 with LLVM Exceptions
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# No floor of its own: cross/z3 resolves to z3-4.7, which declares gcc 4.8.
 
 # -----------------------------------------------------------------------------
 # Dependencies
