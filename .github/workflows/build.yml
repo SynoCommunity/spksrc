@@ -120,17 +120,16 @@ concurrency:
 
 jobs:
   # Decide whether the build should run at all.
-  #  - pull_request and workflow_dispatch always build (the pull_request run is the
-  #    authoritative CI: the whole branch, origin/master...HEAD).
+  #  - workflow_dispatch always builds, wherever it is started: it is an explicit
+  #    request, and a fork needs that escape hatch.
+  #  - no automatic event builds on a fork. A fork's Actions minutes are the
+  #    contributor's own, and nothing upstream reads what they produce.
+  #  - upstream, pull_request always builds: it is the authoritative CI, covering
+  #    the whole branch (origin/master...HEAD).
   #  - push to master always builds (a merge, or a release push).
-  #  - push to a non-master branch is only the latest commit (git diff-tree); if the
-  #    branch already has an open PR, the pull_request build covers the whole branch,
-  #    so this narrow push build is redundant:
-  #      * upstream-hosted branch -> skip it (it only duplicates the PR build);
-  #      * fork branch -> skip it too. Automatic builds never run on a fork; the
-  #        pull_request run upstream covers the branch, and workflow_dispatch is
-  #        still available there for a deliberate build.
-  # A push carries no PR context, hence the API lookup here (fail-open on error).
+  #  - push to a non-master branch upstream is only the latest commit
+  #    (git diff-tree), so it is skipped once an open PR covers the branch. A push
+  #    carries no PR context, hence the API lookup (fail-open on error).
   gate:
     name: Gate
     runs-on: ubuntu-latest
@@ -141,33 +140,37 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # pull_request and workflow_dispatch: always build.
-          if [ "${{ github.event_name }}" = "pull_request" ] || \
-             [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "PR or manual run -> build."
+          # An explicit manual run is honoured anywhere, forks included.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual run -> build."
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # push event from here on. A push to master (merge / release) always builds.
+          # Every other event is automatic, and none of them build on a fork --
+          # neither a push nor a pull request opened inside the fork itself. The
+          # runs that matter happen upstream on upstream's runners; a fork's
+          # Actions minutes are the contributor's own.
+          if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ]; then
+            echo "Automatic ${{ github.event_name }} on a fork -> skip; use workflow_dispatch to build here."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Upstream from here on. The pull_request run is the authoritative CI.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Pull request -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # push event. A push to master (merge / release) always builds.
           if [ "${{ github.ref_name }}" = "master" ]; then
             echo "Push to master -> build."
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Push to a non-master branch on a fork: never build automatically. The
-          # pull_request run upstream is authoritative and covers the whole branch,
-          # so a fork build of the latest commit only duplicates it -- on the
-          # contributor's own Actions quota. workflow_dispatch still works there.
-          if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ]; then
-            echo "Fork push (${{ github.ref_name }}) -> skip; use workflow_dispatch to build here."
-            echo "should_build=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Upstream-hosted branch: the pull_request build already runs the whole
-          # branch, so skip this redundant push build whenever an open PR covers it.
-          # A push carries no PR context, hence the API lookup; fail-open to building
-          # on any lookup error. (Draft supersede-cancellation is handled on the
-          # pull_request side by the concurrency group.)
+          # A non-master branch upstream: the pull_request build already runs the
+          # whole branch, so skip this push build whenever an open PR covers it.
+          # Fail-open to building on any lookup error. (Draft supersede-cancellation
+          # is handled on the pull_request side by the concurrency group.)
           prs=$(gh api \
             "/repos/SynoCommunity/spksrc/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
             2>/dev/null || echo '[]')
