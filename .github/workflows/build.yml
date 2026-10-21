@@ -120,19 +120,17 @@ concurrency:
 
 jobs:
   # Decide whether the build should run at all.
-  # The rule: CI follows the pull request, and a push only builds upstream.
+  # The rule: a build needs a pull request, and CI follows it.
   #  - workflow_dispatch always builds, wherever it is started.
   #  - pull_request always builds, in whichever repository the PR lives -- and it
   #    fires only there, so a PR inside a fork is tested on that fork and a PR
   #    against upstream is tested upstream, never both. It is the authoritative
   #    run, covering the whole branch (origin/master...HEAD).
-  #  - a push never builds on a fork. Pushing the branch of an upstream PR would
-  #    only duplicate that PR's run, and syncing a fork's master would rebuild
-  #    what upstream already validated -- both on the contributor's own quota.
-  #  - push to master upstream always builds (a merge, or a release push).
-  #  - push to a non-master branch upstream is only the latest commit
-  #    (git diff-tree), so it is skipped once an open PR covers the branch. A push
-  #    carries no PR context, hence the API lookup (fail-open on error).
+  #  - a push to master upstream builds: the merge that confirms the result.
+  #  - every other push is skipped. A branch push carries only the latest commit
+  #    (git diff-tree) and no PR context, so with no PR there is nothing to
+  #    confirm, and with one the PR's own run already covers the whole branch.
+  #    A fork's master sync is skipped the same way: upstream validated it.
   gate:
     name: Gate
     runs-on: ubuntu-latest
@@ -140,8 +138,6 @@ jobs:
       should_build: ${{ steps.check.outputs.should_build }}
     steps:
       - id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # A manual run, and a pull request wherever it lives, always build. The
           # pull_request event fires only in the repository holding the PR, so a
@@ -152,35 +148,18 @@ jobs:
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # push event from here on, and a push never builds on a fork: pushing the
-          # branch of an upstream PR duplicates that PR's run, and syncing master
-          # rebuilds what upstream already validated.
-          if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ]; then
-            echo "Push on a fork (${{ github.ref_name }}) -> skip; open a PR or use workflow_dispatch."
-            echo "should_build=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # A push to master upstream (merge / release) always builds.
-          if [ "${{ github.ref_name }}" = "master" ]; then
-            echo "Push to master -> build."
+          # push event from here on. Only the upstream master push builds -- the
+          # merge that confirms the result.
+          if [ "${{ github.repository }}" = "SynoCommunity/spksrc" ] && \
+             [ "${{ github.ref_name }}" = "master" ]; then
+            echo "Push to master upstream -> build."
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # A non-master branch upstream: the pull_request build already runs the
-          # whole branch, so skip this push build whenever an open PR covers it.
-          # Fail-open to building on any lookup error. (Draft supersede-cancellation
-          # is handled on the pull_request side by the concurrency group.)
-          prs=$(gh api \
-            "/repos/SynoCommunity/spksrc/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
-            2>/dev/null || echo '[]')
-          count=$(echo "$prs" | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo 0)
-          if [ "${count:-0}" -gt 0 ]; then
-            echo "Upstream push for a branch with an open PR -> skip (pull_request build covers it)."
-            echo "should_build=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "Upstream push, no open PR -> build."
-            echo "should_build=true" >> "$GITHUB_OUTPUT"
-          fi
+          # Any other push: a branch (its PR's run covers it, and without a PR
+          # there is nothing to confirm) or a fork's master sync.
+          echo "Push to ${{ github.repository }} ${{ github.ref_name }} -> skip; a build needs a PR, or workflow_dispatch."
+          echo "should_build=false" >> "$GITHUB_OUTPUT"
 
   prepare:
     name: Prepare for Build
