@@ -12,7 +12,6 @@ HOMEPAGE = https://01.org/linuxmedia
 COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration API).
 LICENSE = MIT
 
-# No floor of its own: cross/libva declares MIN_KERNEL_VERSION = 3.10.
 
 ADDITIONAL_CFLAGS  = -Wno-missing-field-initializers
 ADDITIONAL_CFLAGS += -Wno-maybe-uninitialized

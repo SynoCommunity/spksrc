@@ -7,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/glib cross/pango cross/groff cross/lua
 
-# No floor of its own: cross/harfbuzz declares gcc 4.8, through cross/pango.
 
 HOMEPAGE = https://www.rrdtool.org
 COMMENT  = RRDtool 1.x - Round Robin Database

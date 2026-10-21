@@ -15,7 +15,6 @@ DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 DEPENDS += cross/hiredis
 
-# No floor of its own: cross/harfbuzz declares gcc 4.8, through cross/rrdtool.
 
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
