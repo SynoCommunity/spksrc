@@ -7,8 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libexpat cross/zlib cross/openssl3 cross/libssh2 cross/curl cross/pcre2
 
-# fsmonitor daemon requires inotify_init1 (glibc >= 2.9)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has no inotify_init1 (added in 2.9):
+#   fsm-listen-linux.c: undefined reference to `inotify_init1'
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://git-scm.com
 COMMENT  = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.

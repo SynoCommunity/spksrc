@@ -5,9 +5,6 @@ SPK_ICON = src/ruby.png
 
 DEPENDS = cross/ruby
 
-# even it compiles with older cross/gdbm, ruby crashes at runtime
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 CHANGELOG = "1. Update to v3.4.5."
 
 MAINTAINER = SynoCommunity

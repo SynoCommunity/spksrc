@@ -9,8 +9,9 @@ BUILD_DEPENDS = native/ruby
 DEPENDS = cross/openssl3 cross/readline cross/gdbm cross/berkeleydb cross/libffi cross/libyaml
 
 # Ruby 3.1.2 is the latest version that compiles without std=c++11 support (ARMv5_ARCHS)
-# even it compiles with older cross/gdbm, ruby crashes at runtime
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has no epoll_create1 (added in 2.9):
+#   thread_pthread_mn.c:874: 'EPOLL_CLOEXEC' undeclared
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = http://www.ruby-lang.org/
 COMMENT  = Ruby Programming Language.
