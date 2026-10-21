@@ -13,21 +13,20 @@ LICENSE  = 3-Clause BSD license
 
 # Documentation:  https://docs.scipy.org/doc/scipy/building/cross_compilation.html
 
-# Requires gcc>=8.4 to build sucesfully
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# meson.build asks for gcc >= 9.1 and 001-define-min-gcc-85.patch lowers that to
+# 8.5, which is what it then errors below: "SciPy requires GCC >= 8.5".
+MIN_GCC_VERSION = 8.5
 
 OPTIONAL_DEPENDS  = python/numpy
-OPTIONAL_DEPENDS  = python/numpy-latest
+OPTIONAL_DEPENDS += python/numpy-latest
 
 DEPENDS += cross/openblas
 # On older python 3.11 keep using numpy 2.2.x
 # Python 3.10 is no longer supported 
 ifneq ($(filter %311,$(PYTHON_PACKAGE)),)
-DEPENDS  = python/numpy
+DEPENDS += python/numpy
 else
-DEPENDS  = python/numpy-latest
+DEPENDS += python/numpy-latest
 endif
 
 CONFIGURE_ARGS  = --cross-file=$(WORK_DIR)/$(PKG_DIR)/scipy.meson
