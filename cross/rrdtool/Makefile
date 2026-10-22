@@ -7,9 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/glib cross/pango cross/groff cross/lua
 
-# cross/pango:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
-
 HOMEPAGE = https://www.rrdtool.org
 COMMENT  = RRDtool 1.x - Round Robin Database
 LICENSE  = GPLv2

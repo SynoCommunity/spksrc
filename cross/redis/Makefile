@@ -7,8 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Unable to determine atomic operations for your platform
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# needs the gcc 4.7 atomics hdr_histogram probes, and -ffat-lto-objects:
+#   deps/hdr_histogram/hdr_atomic.h:142: #error "Unable to determine atomic
+#   operations for your platform"
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = https://redis.io
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.

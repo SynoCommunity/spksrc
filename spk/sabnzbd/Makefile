@@ -8,11 +8,6 @@ PYTHON_PACKAGE = python314
 DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
 OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
 
-# python311 not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# unrar not supported
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-
 # Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
 MIN_GCC_VERSION = 7
 

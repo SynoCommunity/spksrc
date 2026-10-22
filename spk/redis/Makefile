@@ -5,9 +5,6 @@ SPK_ICON = src/redis.png
 
 DEPENDS = cross/redis
 
-# Unable to determine atomic operations for your platform
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
-
 MAINTAINER = hgy59
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 

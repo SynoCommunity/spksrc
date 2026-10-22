@@ -7,8 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libcap-ng
 
-# archs lacking std=c++11
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# configure finds no C++11 option below gcc 4.7, which has -std=c++11:
+#   configure: error: This script was unable to determine a compiler option
+#   to accept C++11.
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = https://www.smartmontools.org/
 COMMENT = smartmontools contains two utility programs (smartctl and smartd) to control and monitor storage systems using the Self-Monitoring, Analysis and Reporting Technology System (SMART).

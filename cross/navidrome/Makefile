@@ -7,7 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go native/nodejs
-# No floor of its own: cross/taglib2 declares MIN_GCC_VERSION = 7
 DEPENDS = cross/taglib2
 
 HOMEPAGE = https://www.navidrome.org/
