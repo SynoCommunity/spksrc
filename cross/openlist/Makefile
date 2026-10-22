@@ -8,18 +8,14 @@ PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
+MIN_GO_VERSION = 1.24.0
 DEPENDS = cross/openlist-frontend
-
-# lacking support for atomics
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://docs.oplist.org/
 COMMENT  = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
 LICENSE = AGPL-3.0
 
 PRE_COMPILE_TARGET = openlist_pre_compile
-
 
 BUILT_AT = $(shell date +'%F %T %z')
 # set SynoCommunity as git author

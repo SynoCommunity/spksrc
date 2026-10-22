@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/restic/restic/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)
 
-BUILD_DEPENDS = native/go
+MIN_GO_VERSION = 1.25.8
 
 HOMEPAGE = https://restic.net/
 COMMENT  = Restic is a fast and secure backup program.

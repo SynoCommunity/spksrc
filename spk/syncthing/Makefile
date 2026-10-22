@@ -6,11 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/syncthing
 
-# syncthing 2.x requires go >= 1.24, which no longer runs on ARMv5
-# (1.30 was the last release that did, see #6762).
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-UNSUPPORTED_ARCHS_REASON = syncthing 2.x requires go >= 1.24 (no ARMv5)
-
 MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.

@@ -3,8 +3,6 @@ SPK_VERS = 0.10.45
 SPK_REV = 1
 SPK_ICON = src/gickup.png
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 DEPENDS = cross/gickup
 
 SPK_DEPENDS = git

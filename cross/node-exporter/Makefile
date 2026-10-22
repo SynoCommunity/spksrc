@@ -6,16 +6,7 @@ PKG_DIST_SITE = https://github.com/prometheus/node_exporter/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-include ../../mk/spksrc.common.mk
-
-OPTIONAL_DEPENDS = native/go native/go_1.23
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/go_1.23
-NATIVE_GO = native/go_1.23
-else
-BUILD_DEPENDS = native/go
-NATIVE_GO = native/go
-endif
+MIN_GO_VERSION = 1.24.0
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
 COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.

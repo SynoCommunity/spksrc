@@ -5,9 +5,6 @@ SPK_ICON = src/cloudflared.png
 
 DEPENDS = cross/cloudflared
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-UNSUPPORTED_ARCHS_REASON = ARMv5 kernel 2.6.32 is below go 1.24's Linux 3.2 minimum
-
 MAINTAINER = karasevm
 DISPLAY_NAME = Cloudflare Tunnel
 DESCRIPTION = "Cloudflare Tunnel provides you with a secure way to connect your resources to Cloudflare without a publicly routable IP address. With Tunnel, you do not send traffic to an external IP - instead, a lightweight daemon in your infrastructure \('cloudflared'\) creates outbound-only connections to Cloudflare\'s global network. Cloudflare Tunnel can connect HTTP web servers, SSH servers, remote desktops, and other protocols safely to Cloudflare. This way, your origins can serve traffic through Cloudflare without being vulnerable to attacks that bypass Cloudflare."

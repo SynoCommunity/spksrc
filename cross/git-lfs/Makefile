@@ -8,8 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
-BUILD_DEPENDS = native/go
-
 HOMEPAGE = https://git-lfs.com/
 COMMENT  = Git extension for versioning large files.
 LICENSE  = MIT

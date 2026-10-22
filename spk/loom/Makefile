@@ -5,9 +5,6 @@ SPK_ICON = src/loom.png
 
 DEPENDS = cross/loom
 
-# Go 1.26 cannot target these legacy architectures.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 MAINTAINER = Ebenderooock
 HOMEPAGE = https://loom.deroock.co.za
 LICENSE = AGPL-3.0
