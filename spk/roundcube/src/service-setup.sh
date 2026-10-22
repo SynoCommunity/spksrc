@@ -17,7 +17,7 @@ CFG_FILE="${WEB_ROOT}/config/config.inc.php"
 # Escape a value for a single-quoted PHP string, then for a sed replacement.
 sed_escape ()
 {
-    printf '%s' "$1" | sed -e "s/'/\\\\'/g" -e 's/[\\&|]/\\&/g'
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e "s/'/\\\\'/g" -e 's/[\\&|]/\\&/g'
 }
 
 # Roundcube rawurldecodes the DSN password, so encode '%' to round-trip it.
