@@ -16,8 +16,6 @@ HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring.
 LICENSE  = MIT
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 COMPILE_ARGS = build-hub
 
 INSTALL_TARGET = install_beszel

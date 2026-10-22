@@ -7,7 +7,6 @@ DEPENDS = cross/dnsacme
 
 REQUIRED_MIN_DSM = 7.0
 REQUIRED_MIN_SRM = 3.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = mritd
 DESCRIPTION = DNS-01 ACME certificate manager with Synology DSM certificate deployment.

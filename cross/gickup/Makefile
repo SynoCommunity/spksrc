@@ -8,9 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # go > 1.23 not supported:
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://gickup.dev/
 COMMENT = Backup your Git repositories with ease.

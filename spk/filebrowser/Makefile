@@ -5,8 +5,6 @@ SPK_ICON = src/filebrowser.png
 
 DEPENDS = cross/filebrowser
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 MAINTAINER = publicarray
 DISPLAY_NAME = File Browser
 DESCRIPTION = File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview and edit your files.

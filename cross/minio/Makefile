@@ -10,7 +10,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_DIST_PREFIX)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS = native/go native/go_1.23

@@ -11,8 +11,6 @@ DEPENDS = cross/dnscrypt-proxy
 # DSM 6 only: the service needs root (bind port 53, modify /etc/cron.d and
 # /etc/dhcpd), which DSM 7's privilege model does not allow (see src/conf/privilege).
 REQUIRED_MAX_DSM = 6.999
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-UNSUPPORTED_ARCHS_REASON = go has no 32-bit PowerPC target
 SPK_CONFLICT = DNSServer
 
 # Package metadata

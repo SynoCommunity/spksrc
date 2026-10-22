@@ -6,7 +6,6 @@ PKG_DIST_SITE = https://github.com/AlexxIT/go2rtc/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS = native/go native/go_1.23

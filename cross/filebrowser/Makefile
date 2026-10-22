@@ -6,7 +6,6 @@ PKG_DIST_SITE = https://github.com/filebrowser/filebrowser/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS = native/go native/go_1.23

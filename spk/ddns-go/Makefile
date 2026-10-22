@@ -6,8 +6,6 @@ SPK_ICON = src/ddns-go.png
 DEPENDS = cross/ddns-go
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# not supported by go:
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 MAINTAINER = GrandDuke1106
 DESCRIPTION = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service. Supported domain service providers are: Aliyun, Aliyun ESA, Tencent, Dnspod, Cloudflare, Huawei, Callback, Baidu, Porkbun, GoDaddy, Namecheap, NameSilo, Name.com, Dynadot, DNSLA, Nowcn, Eranet, Tnethk, Gcore, EdgeOne, IBM NS1 Connect, Rainyun.

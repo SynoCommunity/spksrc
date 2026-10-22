@@ -11,8 +11,6 @@ BUILD_DEPENDS = native/go
 
 # lacking support for atomics
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# not supported by go
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://github.com/jeessy2/ddns-go
 COMMENT  = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service.

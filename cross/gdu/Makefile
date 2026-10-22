@@ -5,7 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dundee/gdu/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS = native/go native/go_1.23

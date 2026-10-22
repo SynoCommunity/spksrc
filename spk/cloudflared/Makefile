@@ -5,8 +5,8 @@ SPK_ICON = src/cloudflared.png
 
 DEPENDS = cross/cloudflared
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
-UNSUPPORTED_ARCHS_REASON = go has no 32-bit PowerPC target; ARMv5 kernel 2.6.32 is below go 1.24's Linux 3.2 minimum
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS_REASON = ARMv5 kernel 2.6.32 is below go 1.24's Linux 3.2 minimum
 
 MAINTAINER = karasevm
 DISPLAY_NAME = Cloudflare Tunnel

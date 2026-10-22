@@ -13,8 +13,6 @@ DEPENDS = cross/openlist-frontend
 
 # lacking support for atomics
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# not supported by go
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://docs.oplist.org/
 COMMENT  = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
