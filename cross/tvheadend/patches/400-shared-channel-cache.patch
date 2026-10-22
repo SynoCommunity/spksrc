@@ -4,9 +4,9 @@ timeshift through that same cache, recording a programme still held in it,
 RAM-then-disk storage, keeping an idle channel tuned so its cache survives a
 channel change, a DVR-driven cache warmup, and our fixes on top.
 
-tvheadend/tvheadend#2249, the whole of it: the 28 commits of th0ma7/tvheadend
+tvheadend/tvheadend#2249, the whole of it: the 29 commits of th0ma7/tvheadend
 branch record-from-buffer, rebased onto the package base as
-a87be591f..371869305.
+51ec612fa..07db38f0c.
 
 Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
 upstream as of this base.  `git rebase` dropped its three commits on its own,
@@ -49,6 +49,9 @@ report and to two review passes:
     the ordinary shared-cache case -- a cache older than the subscription --
     advertised no seekable range at all while svcts_skip() would have accepted
     the seek.  Reported by CodeRabbit.
+  - the epg genre-list fix is gone from this patch: #2160 is merged, so that
+    commit left the branch on its own at the next rebase, and 200 is dropped
+    with it.
   - two of LiBe-net's own, cherry-picked from his pr2249-warmup-fixes branch:
     a scheduled warmup stays reschedulable after a higher-priority
     subscription takes its tuner, and scheduled warmups sit above EPG, scan
@@ -1718,7 +1721,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  } htsp_subscription_t;
  
  
-@@ -376,6 +385,102 @@
+@@ -374,6 +383,102 @@
    return ret;
  }
  
@@ -1821,7 +1824,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   *
   */
-@@ -384,6 +489,11 @@
+@@ -382,6 +487,11 @@
  {
    th_subscription_t *ts = hs->hs_s;
  
@@ -1833,7 +1836,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    hs->hs_s = NULL;
    mtimer_disarm(&hs->hs_s_bytes_out_timer);
  
-@@ -1445,6 +1555,8 @@
+@@ -1443,6 +1553,8 @@
      LIST_FOREACH(de, &e->channel->ch_dvrs, de_channel_link) {
        if (de->de_bcast != e)
          continue;
@@ -1842,7 +1845,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        if (dvr_entry_verify(de, htsp->htsp_granted_access, 1))
          continue;
        htsmsg_add_u32(out, "dvrId", idnode_get_short_uuid(&de->de_id));
-@@ -1721,17 +1833,20 @@
+@@ -1719,17 +1831,20 @@
  
    /* Send all autorecs */
    TAILQ_FOREACH(dae, &autorec_entries, dae_link)
@@ -1866,7 +1869,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        htsp_send_message(htsp, htsp_build_dvrentry(htsp, de, "dvrEntryAdd", htsp->htsp_language, 0), NULL);
  
    /* Send EPG updates */
-@@ -1997,7 +2112,7 @@
+@@ -1995,7 +2110,7 @@
    l = htsmsg_create_list();
  
    LIST_FOREACH(cfg, &dvrconfigs, config_link)
@@ -1875,7 +1878,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
        uuid = idnode_uuid_as_str(&cfg->dvr_id, ubuf);
        if (htsp->htsp_granted_access->aa_dvrcfgs) {
          HTSMSG_FOREACH(f, htsp->htsp_granted_access->aa_dvrcfgs) {
-@@ -2023,6 +2138,134 @@
+@@ -2021,6 +2136,134 @@
    return out;
  }
  
@@ -2010,7 +2013,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  /**
   * add a Dvrentry
   */
-@@ -2039,19 +2282,60 @@
+@@ -2037,19 +2280,60 @@
    int64_t start, stop;
    uint32_t u32;
    channel_t *ch = NULL;
@@ -2079,7 +2082,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
    /* Options */
    conf = htsmsg_create_map();
-@@ -2111,11 +2395,43 @@
+@@ -2109,11 +2393,43 @@
        htsmsg_add_u32(conf, "age_rating", u32);
    }
  
@@ -2123,7 +2126,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    dvr_status = de != NULL ? de->de_sched_state : DVR_NOSTATE;
  
    /* Create response */
-@@ -2151,7 +2467,8 @@
+@@ -2149,7 +2465,8 @@
      return NULL;
    }
  
@@ -2133,7 +2136,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
      *out = htsp_error(htsp, N_("DVR entry not found"));
      return NULL;
    }
-@@ -2896,6 +3213,10 @@
+@@ -2894,6 +3211,10 @@
    memset(&skip, 0, sizeof(skip));
    skip.type = SMT_SKIP_LIVE;
    tvhtrace(LS_HTSP_SUB, "live");
@@ -2144,7 +2147,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    subscription_set_skip(hs->hs_s, &skip);
  
    htsp_reply(htsp, in, htsmsg_create_map());
-@@ -3918,6 +4239,9 @@
+@@ -3916,6 +4237,9 @@
  void
  htsp_dvr_entry_add(dvr_entry_t *de)
  {
@@ -2154,7 +2157,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_dvr_entry_update(de, "dvrEntryAdd", NULL);
  }
  
-@@ -3927,6 +4251,11 @@
+@@ -3925,6 +4249,11 @@
  void
  htsp_dvr_entry_update(dvr_entry_t *de)
  {
@@ -2166,7 +2169,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_dvr_entry_update(de, "dvrEntryUpdate", NULL);
  }
  
-@@ -3937,6 +4266,9 @@
+@@ -3935,6 +4264,9 @@
  htsp_dvr_entry_update_stats(dvr_entry_t *de)
  {
    htsp_connection_t *htsp;
@@ -2176,7 +2179,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    LIST_FOREACH(htsp, &htsp_async_connections, htsp_async_link) {
      if (htsp->htsp_async_mode & HTSP_ASYNC_ON){
        if (!dvr_entry_verify(de, htsp->htsp_granted_access, 1)) {
-@@ -3984,6 +4316,9 @@
+@@ -3982,6 +4314,9 @@
  void
  htsp_autorec_entry_add(dvr_autorec_entry_t *dae)
  {
@@ -2186,7 +2189,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_autorec_entry_update(dae, "autorecEntryAdd", NULL);
  }
  
-@@ -3993,6 +4328,11 @@
+@@ -3991,6 +4326,11 @@
  void
  htsp_autorec_entry_update(dvr_autorec_entry_t *dae)
  {
@@ -2198,7 +2201,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_autorec_entry_update(dae, "autorecEntryUpdate", NULL);
  }
  
-@@ -4038,6 +4378,9 @@
+@@ -4036,6 +4376,9 @@
  void
  htsp_timerec_entry_add(dvr_timerec_entry_t *dte)
  {
@@ -2208,7 +2211,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_timerec_entry_update(dte, "timerecEntryAdd", NULL);
  }
  
-@@ -4047,6 +4390,11 @@
+@@ -4045,6 +4388,11 @@
  void
  htsp_timerec_entry_update(dvr_timerec_entry_t *dte)
  {
@@ -2220,7 +2223,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
    _htsp_timerec_entry_update(dte, "timerecEntryUpdate", NULL);
  }
  
-@@ -4591,6 +4939,9 @@
+@@ -4589,6 +4937,9 @@
  static void
  htsp_subscription_timeshift_status(htsp_subscription_t *hs, timeshift_status_t *status)
  {

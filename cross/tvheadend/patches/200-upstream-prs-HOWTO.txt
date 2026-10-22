@@ -11,7 +11,8 @@ patches we add on top of it follow within that hundred.
              even QSV scaler width, 360 as the default profile height and the
              output geometry into his branch -- and 101 is now reused for the
              patch above, which is unrelated to the one that held the number.
-  200      tvheadend#2160, imagecache fetch rework
+  200      gone: tvheadend#2160, the imagecache fetch rework, is merged as
+           88767c865 and comes with the tarball
   400      tvheadend#2249, the whole of it: LiBe-net's shared per-channel
            cache and our fixes on top
   300      gone.  tvheadend#2206, the stable stream/PID mapping 400 used to
@@ -29,7 +30,7 @@ One patch per PR: 400 is the whole of #2249 rather than one patch per commit,
 because that PR carries the series as a unit -- its own commits, LiBe-net's
 shared cache reworked from them, and the fixes on top.
 
-400 is now the entire branch: `a87be591f..53f37b29b`, the 29 commits of
+400 is now the entire branch: `51ec612fa..07db38f0c`, the 29 commits of
 th0ma7/tvheadend record-from-buffer.  It used to be only what the branch added
 on top of #2206, with 300 carrying #2206 itself; rebasing onto this base
 dropped #2206's three commits on its own ("patch contents already upstream"),
