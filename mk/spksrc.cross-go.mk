@@ -6,7 +6,8 @@
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
 #
 # prerequisites:
-# - cross/module depends on native/go or native/go_1.23 only
+# - cross/module needs no BUILD_DEPENDS for go: env-go.mk adds the native go it picks
+# - MIN_GO_VERSION holds the go directive of go.mod when it asks for more than 1.23
 # - module does not require kernel (REQUIRE_KERNEL)
 #
 # remarks:
@@ -34,6 +35,11 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
+
+# Go 1.24 and later need Linux 3.2 (accept4 lost its fallback; ARM 2.6.32 lacks it). Recursive:
+# tc-capability.mk expands it after macros.mk, and env-go.mk gives older kernels go 1.23.
+GO_NEEDS_LINUX_3_2 = $(if $(MIN_GO_VERSION),$(call version_ge,$(MIN_GO_VERSION),1.24))
+MIN_KERNEL_VERSION ?= $(if $(GO_NEEDS_LINUX_3_2),3.2)
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
