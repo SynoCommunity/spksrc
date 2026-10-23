@@ -1,0 +1,16 @@
+# Uncomment and change to override the defaults, then restart the package
+
+# Minutes between the speed tests
+#export SPEEDKETCHUP_INTERVAL=10
+
+# Speedtest server host[:port] to always test against, unset picks the
+# server with the lowest latency for every test
+#export SPEEDKETCHUP_SERVER=
+
+# Seconds to test the download and upload speed, 0 skips the test
+#export SPEEDKETCHUP_DOWNLOAD_DURATION=10
+#export SPEEDKETCHUP_UPLOAD_DURATION=10
+
+# Parallel connections for the download and upload tests
+#export SPEEDKETCHUP_DOWNLOAD_CONNECTIONS=8
+#export SPEEDKETCHUP_UPLOAD_CONNECTIONS=8
