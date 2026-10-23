@@ -8,6 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
 BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas native/go-latest
+# The go.d plugin's go.mod asks for go 1.26.2; listed here, as env-go.mk comes after the dependency rules
+NATIVE_GO = native/go-latest
 
 HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
