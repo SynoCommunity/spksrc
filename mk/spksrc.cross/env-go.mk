@@ -59,14 +59,17 @@ ifeq ($(strip $(GOPATH)),)
   GOPATH=$(DISTRIB_DIR)/go
 endif
 
-# A kernel older than 3.2 runs go 1.23 at most; a package needing newer is refused there by
-# MIN_GO_VERSION (spksrc.cross-go.mk). A Makefile can still set NATIVE_GO itself.
+# A kernel older than 3.2 gets go 1.23, unless MIN_GO_VERSION asks for more: such a package is
+# refused there (spksrc.cross-go.mk) or, clearing MIN_KERNEL_VERSION, built with the latest go.
 ifeq ($(strip $(NATIVE_GO)),)
 ifneq ($(and $(TC_KERNEL),$(call version_lt,$(TC_KERNEL),3.2)),)
+ifeq ($(strip $(GO_NEEDS_LINUX_3_2)),)
 NATIVE_GO = native/go_1.23
-else
-NATIVE_GO = native/go
 endif
+endif
+endif
+ifeq ($(strip $(NATIVE_GO)),)
+NATIVE_GO = native/go
 endif
 BUILD_DEPENDS += $(NATIVE_GO)
 # Without an arch, go 1.23 is listed too wherever a package can use it.
