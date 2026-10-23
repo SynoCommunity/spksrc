@@ -12,10 +12,11 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
   workflow_dispatch:
+# Only deploy needs the Pages permissions; build just reads the tree. A pull
+# request from a fork cannot be granted write scopes, so asking for them at
+# workflow level applies to every job, build included.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -50,8 +51,14 @@ jobs:
         with:
           path: ./site
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # Guarded in its own right, not only through build: publishing Pages is the
+    # one step that must never happen anywhere but upstream.
+    if: github.repository == 'SynoCommunity/spksrc' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
     environment:
       name: github-pages
