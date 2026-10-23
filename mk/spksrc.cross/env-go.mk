@@ -76,7 +76,9 @@ BUILD_DEPENDS += $(NATIVE_GO)
 ifeq ($(strip $(GO_NEEDS_LINUX_3_2)),)
 OPTIONAL_DEPENDS += native/go-1.23
 endif
-ENV += PATH=$(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin:$$PATH
+# The selected go's bin directory, as PYTHON_NATIVE_PATH is python's
+GO_NATIVE_PATH = $(abspath $(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin)
+ENV += PATH=$(GO_NATIVE_PATH):$$PATH
 
 ENV += GOPATH=$(GOPATH)
 ENV += CGO_ENABLED=$(CGO_ENABLED)

@@ -23,7 +23,7 @@ INSTALL_TARGET = install_beszel
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin):$(PATH)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(GO_NATIVE_PATH):$(PATH)
 
 .PHONY: install_beszel
 install_beszel:
