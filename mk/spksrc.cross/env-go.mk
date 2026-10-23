@@ -64,17 +64,17 @@ endif
 ifeq ($(strip $(NATIVE_GO)),)
 ifneq ($(and $(TC_KERNEL),$(call version_lt,$(TC_KERNEL),3.2)),)
 ifeq ($(strip $(GO_NEEDS_LINUX_3_2)),)
-NATIVE_GO = native/go_1.23
+NATIVE_GO = native/go-1.23
 endif
 endif
 endif
 ifeq ($(strip $(NATIVE_GO)),)
-NATIVE_GO = native/go
+NATIVE_GO = native/go-latest
 endif
 BUILD_DEPENDS += $(NATIVE_GO)
 # Without an arch, go 1.23 is listed too wherever a package can use it.
 ifeq ($(strip $(GO_NEEDS_LINUX_3_2)),)
-OPTIONAL_DEPENDS += native/go_1.23
+OPTIONAL_DEPENDS += native/go-1.23
 endif
 ENV += PATH=$(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin:$$PATH
 
