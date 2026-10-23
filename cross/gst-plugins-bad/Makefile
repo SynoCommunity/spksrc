@@ -114,6 +114,14 @@ CONFIGURE_ARGS += -Dsvtav1=disabled
 PLIST_TRANSFORM_SED_ARGS += -e '/libgstsvtav1\.so/d'
 endif
 
+# Linux 3.2 headers carry DVB API 5.4, and the dvb plugin wants a newer one
+ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
+CONFIGURE_ARGS += -Ddvb=enabled
+else
+CONFIGURE_ARGS += -Ddvb=disabled
+PLIST_TRANSFORM_SED_ARGS += -e '/libgstdvb\.so/d'
+endif
+
 # libdrm and libva come from the synocli-videodriver meta
 ifneq ($(and $(VIDEODRV_ON),$(filter $(ARCH),$(x64_ARCHS)),$(filter 1,$(call version_ge, $(TCVERSION), 6))),)
 CONFIGURE_ARGS += -Dva=enabled
