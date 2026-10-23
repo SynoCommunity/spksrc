@@ -1,11 +1,9 @@
 SPK_NAME = speedketchup
-SPK_VERS = 0.3.0
+SPK_VERS = 0.4.0
 SPK_REV = 1
 SPK_ICON = src/speedketchup.png
 
 DEPENDS = cross/speedketchup
-
-MIN_GLIBC_VERSION = 2.9
 
 MAINTAINER = gatispei
 DISPLAY_NAME = SpeedKetchup

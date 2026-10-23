@@ -14,3 +14,15 @@
 # Parallel connections for the download and upload tests
 #export SPEEDKETCHUP_DOWNLOAD_CONNECTIONS=8
 #export SPEEDKETCHUP_UPLOAD_CONNECTIONS=8
+
+# InfluxDB line protocol write url to also write every result to, http
+# only, eg http://influxdb:8086/api/v2/write?org=home&bucket=speedketchup,
+# and its token
+#export SPEEDKETCHUP_INFLUX_URL=
+#export SPEEDKETCHUP_INFLUX_TOKEN=
+
+# MQTT broker host[:port] to also publish every result to, with Home
+# Assistant discovery, plain mqtt only, and its user name and password
+#export SPEEDKETCHUP_MQTT=
+#export SPEEDKETCHUP_MQTT_USER=
+#export SPEEDKETCHUP_MQTT_PASSWORD=
