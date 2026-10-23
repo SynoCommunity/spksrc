@@ -1,5 +1,5 @@
 PKG_NAME = OpenList
-PKG_VERS = 4.2.2
+PKG_VERS = 4.2.7
 # must match PKG_VERS of cross/openlist-frontend (adjust if different)
 WEB_VERSION = $(PKG_VERS)
 PKG_EXT = tar.gz
@@ -8,7 +8,7 @@ PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.24.0
+MIN_GO_VERSION = 1.26.0
 DEPENDS = cross/openlist-frontend
 
 HOMEPAGE = https://docs.oplist.org/
