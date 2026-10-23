@@ -1,5 +1,5 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.63.2
+PKG_VERS = 0.64.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs
-MIN_GO_VERSION = 1.26
+MIN_GO_VERSION = 1.27
 DEPENDS = cross/taglib2
 
 HOMEPAGE = https://www.navidrome.org/
