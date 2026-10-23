@@ -11,7 +11,9 @@ HOMEPAGE = https://gitlab.freedesktop.org/gstreamer/orc
 COMMENT  = Optimized Inner Loop Runtime Compiler, used by GStreamer to accelerate audio and video processing.
 LICENSE  = BSD-2-Clause
 
-CONFIGURE_ARGS  = -Dbenchmarks=disabled
+# orc sets no c_std, and gcc older than 5 defaults to gnu89 (no for-loop declarations)
+CONFIGURE_ARGS  = -Dc_std=gnu99
+CONFIGURE_ARGS += -Dbenchmarks=disabled
 CONFIGURE_ARGS += -Dexamples=disabled
 CONFIGURE_ARGS += -Dhotdoc=disabled
 CONFIGURE_ARGS += -Dorc-test=disabled
