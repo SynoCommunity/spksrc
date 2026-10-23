@@ -5,8 +5,6 @@ SPK_ICON = src/node-exporter.png
 
 DEPENDS = cross/node-exporter
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 MAINTAINER = chiehmin
 DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 STARTABLE = yes

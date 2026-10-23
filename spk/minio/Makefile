@@ -6,8 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/minio cross/minio-client
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package includes the 'minio-client' \(mc\).
 DISPLAY_NAME = MinIO

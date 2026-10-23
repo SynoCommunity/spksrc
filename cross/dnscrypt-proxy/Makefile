@@ -7,16 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-include ../../mk/spksrc.common.mk
-
-OPTIONAL_DEPENDS = native/go native/go_1.23
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/go_1.23
-NATIVE_GO = native/go_1.23
-else
-BUILD_DEPENDS = native/go
-NATIVE_GO = native/go
-endif
+MIN_GO_VERSION = 1.25.8
 
 HOMEPAGE = https://github.com/DNSCrypt/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.

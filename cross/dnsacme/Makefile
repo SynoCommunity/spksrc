@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/mritd/dnsacme/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
+MIN_GO_VERSION = 1.26
 
 HOMEPAGE = https://github.com/mritd/dnsacme
 COMMENT  = DNS-01 ACME certificate manager with Synology DSM certificate deployment.

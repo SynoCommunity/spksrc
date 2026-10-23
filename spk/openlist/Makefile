@@ -5,10 +5,6 @@ SPK_ICON = src/openlist.png
 
 DEPENDS = cross/openlist
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# not supported by go:
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
-
 MAINTAINER = GrandDuke1106
 DESCRIPTION = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
 DISPLAY_NAME = OpenList

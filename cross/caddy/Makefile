@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/caddyserver/caddy/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
+MIN_GO_VERSION = 1.26.0
 
 HOMEPAGE = https://caddyserver.com/
 COMMENT  = Fast, multi-platform web server with automatic HTTPS

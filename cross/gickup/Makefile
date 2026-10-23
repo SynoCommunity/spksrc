@@ -6,11 +6,7 @@ PKG_DIST_SITE = https://github.com/cooperspencer/gickup/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# go > 1.23 not supported:
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+MIN_GO_VERSION = 1.26
 
 HOMEPAGE = https://gickup.dev/
 COMMENT = Backup your Git repositories with ease.

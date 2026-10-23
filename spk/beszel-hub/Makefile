@@ -3,8 +3,6 @@ SPK_VERS = 0.21.0
 SPK_REV = 2
 SPK_ICON = src/beszel.png
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 DEPENDS = cross/beszel-hub
 
 MAINTAINER = hgy59

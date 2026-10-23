@@ -10,13 +10,12 @@ PKG_DIST_FILE = $(REAL_PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)/$(REAL_PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
-BUILD_DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/nodejs
+MIN_GO_VERSION = 1.27.1
 
 HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring.
 LICENSE  = MIT
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 COMPILE_ARGS = build-hub
 
@@ -24,7 +23,7 @@ INSTALL_TARGET = install_beszel
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin):$(PATH)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(GO_NATIVE_PATH):$(PATH)
 
 .PHONY: install_beszel
 install_beszel:

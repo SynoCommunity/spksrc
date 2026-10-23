@@ -7,12 +7,7 @@ PKG_DIST_SITE = https://github.com/jeessy2/ddns-go/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
-
-# lacking support for atomics
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# not supported by go
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+MIN_GO_VERSION = 1.25.0
 
 HOMEPAGE = https://github.com/jeessy2/ddns-go
 COMMENT  = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service.

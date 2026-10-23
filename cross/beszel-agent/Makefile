@@ -9,13 +9,11 @@ PKG_DIST_FILE = $(REAL_PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)/$(REAL_PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
-BUILD_DEPENDS = native/go
+MIN_GO_VERSION = 1.27.1
 
 HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring agent.
 LICENSE  = MIT
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 COMPILE_ARGS = OS=$(GOOS) ARCH=$(GO_ARCH) build-agent
 INSTALL_TARGET = install_beszel

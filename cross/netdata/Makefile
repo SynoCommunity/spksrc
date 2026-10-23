@@ -7,7 +7,9 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
-BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas native/go
+BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas native/go-latest
+# The go.d plugin's go.mod asks for go 1.26.2; listed here, as env-go.mk comes after the dependency rules
+NATIVE_GO = native/go-latest
 
 HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
@@ -53,7 +55,7 @@ POST_PATCH_TARGET = netdata_post_patch
 COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
-# GOOS/GOARCH/GOARM + CGO_ENABLED=0 + native/go PATH for the go.d plugin build.
+# GOOS/GOARCH/GOARM + CGO_ENABLED=0 + native go PATH for the go.d plugin build.
 include ../../mk/spksrc.cross/env-go.mk
 
 .PHONY: netdata_post_patch

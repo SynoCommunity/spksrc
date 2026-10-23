@@ -6,7 +6,8 @@
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
 #
 # prerequisites:
-# - cross/module depends on native/go or native/go_1.23 only
+# - cross/module needs no BUILD_DEPENDS for go: env-go.mk adds the native go it picks
+# - MIN_GO_VERSION holds the go directive of go.mod when it asks for more than 1.23
 # - module does not require kernel (REQUIRE_KERNEL)
 #
 # remarks:
@@ -34,6 +35,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
+
+# Go 1.24 and later need Linux 3.2 (accept4 lost its fallback; ARM 2.6.32 lacks it). Recursive:
+# tc-capability.mk expands it after macros.mk, and env-go.mk gives older kernels go 1.23.
+GO_NEEDS_LINUX_3_2 = $(if $(MIN_GO_VERSION),$(call version_ge,$(MIN_GO_VERSION),$(GO_LINUX_3_2_FROM)))
+GO_LINUX_3_2_FROM = 1.24
+MIN_KERNEL_VERSION ?= $(if $(GO_NEEDS_LINUX_3_2),3.2)
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -65,6 +72,23 @@ ifneq ($(REQUIRE_KERNEL),)
 endif
 
 ###
+
+# The floor is decided before download, so MIN_GO_VERSION is declared; this checks it against
+# go.mod once the source is patched, nearest go.mod above GO_SRC_DIR (none: nothing to check).
+configure_msg: go_mod_check
+.PHONY: go_mod_check
+go_mod_check:
+	@d=$(or $(GO_SRC_DIR),$(WORK_DIR)/$(PKG_DIR)) ; \
+	while [ ! -f "$$d/go.mod" ] && [ "$$d" != "$(WORK_DIR)" ] && [ "$$d" != "/" ] ; do d=$$(dirname "$$d") ; done ; \
+	v=$$(sed -n 's/^go[[:space:]]\{1,\}\([0-9][0-9.]*\).*/\1/p' "$$d/go.mod" 2>/dev/null | head -1) ; \
+	[ -n "$$v" ] || exit 0 ; \
+	if printf '%s\n' $(GO_LINUX_3_2_FROM) "$$v" | sort -VC ; then \
+	  if [ -z "$(GO_NEEDS_LINUX_3_2)" ] ; then \
+	    echo "ERROR: $$d/go.mod asks for go $$v: add MIN_GO_VERSION = $$v to $(CURDIR)/Makefile" ; exit 1 ; \
+	  fi ; \
+	elif [ -n "$(GO_NEEDS_LINUX_3_2)" ] ; then \
+	  echo "WARNING: $$d/go.mod asks for go $$v only: MIN_GO_VERSION = $(MIN_GO_VERSION) is not needed" ; \
+	fi
 
 # Go specific targets
 .PHONY: go_build_target
