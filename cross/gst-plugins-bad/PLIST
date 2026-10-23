@@ -53,7 +53,6 @@ lib:lib/gstreamer-1.0/libgstivfparse.so
 lib:lib/gstreamer-1.0/libgstivtc.so
 lib:lib/gstreamer-1.0/libgstjp2kdecimator.so
 lib:lib/gstreamer-1.0/libgstjpegformat.so
-lib:lib/gstreamer-1.0/libgstkms.so
 lib:lib/gstreamer-1.0/libgstlegacyrawparse.so
 lib:lib/gstreamer-1.0/libgstmidi.so
 lib:lib/gstreamer-1.0/libgstmpegpsdemux.so

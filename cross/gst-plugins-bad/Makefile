@@ -33,6 +33,7 @@ CONFIGURE_ARGS += -Dgpl=enabled
 CONFIGURE_ARGS += -Ddirectfb=disabled
 CONFIGURE_ARGS += -Dgl=disabled
 CONFIGURE_ARGS += -Dgtk3=disabled
+CONFIGURE_ARGS += -Dkms=disabled
 CONFIGURE_ARGS += -Dvulkan=disabled
 CONFIGURE_ARGS += -Dwayland=disabled
 CONFIGURE_ARGS += -Dwpe=disabled
