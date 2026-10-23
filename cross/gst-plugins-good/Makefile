@@ -6,6 +6,7 @@ PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-good
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/gst-plugins-base
+OPTIONAL_DEPENDS = cross/taglib
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer Good Plugins, a set of plugins considered to have good quality code, correct functionality and the preferred LGPL license.
@@ -13,6 +14,8 @@ LICENSE  = LGPLv2.1
 
 # meson project default c_std=gnu11
 MIN_GCC_VERSION = 4.9
+
+include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --wrap-mode=nodownload
 CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
@@ -70,14 +73,24 @@ CONFIGURE_ARGS += -Dpng=enabled
 DEPENDS += cross/speex
 CONFIGURE_ARGS += -Dspeex=enabled
 
+# the taglib plugin is built as C++17
+ifeq ($(call version_ge, $(TC_GCC), 7),1)
 DEPENDS += cross/taglib
 CONFIGURE_ARGS += -Dtaglib=enabled
+else
+CONFIGURE_ARGS += -Dtaglib=disabled
+PLIST_TRANSFORM_SED_ARGS += -e '/libgsttaglib\.so/d'
+endif
 
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += -Dtwolame=enabled
 
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += -Dvpx=enabled
+
+ifneq ($(strip $(PLIST_TRANSFORM_SED_ARGS)),)
+PLIST_TRANSFORM = sed $(PLIST_TRANSFORM_SED_ARGS)
+endif
 
 # let it find glib-mkenums
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
