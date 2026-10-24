@@ -1,0 +1,15 @@
+--- gst/gstsystemclock.c.orig
++++ gst/gstsystemclock.c
+@@ -197,6 +197,12 @@
+ #include <unistd.h>
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
++#include <linux/version.h>
++
++/* __kernel_long_t appeared in the Linux 3.4 headers; it is long everywhere but x32 */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
++typedef long __kernel_long_t;
++#endif
+ 
+ #if !defined(__NR_futex) && !defined(__NR_futex_time64)
+ #error "Neither __NR_futex nor __NR_futex_time64 are defined but were found by meson"

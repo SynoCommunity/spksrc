@@ -1,0 +1,11 @@
+--- gst/isomp4/meson.build.orig
++++ gst/isomp4/meson.build
+@@ -63,7 +63,7 @@
+   link_args : noseh_link_args,
+   include_directories : [configinc, libsinc],
+   dependencies : [gst_dep, gstriff_dep, gstaudio_dep, gstvideo_dep,
+-                  gstrtp_dep, gsttag_dep, gstpbutils_dep, zlib_dep],
++                  gstrtp_dep, gsttag_dep, gstpbutils_dep, zlib_dep, libm],
+   install : true,
+   install_dir : plugins_install_dir,
+ )
