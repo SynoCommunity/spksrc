@@ -10,6 +10,8 @@ DEPENDS += cross/gst-plugins-good
 DEPENDS += cross/gst-plugins-bad
 DEPENDS += cross/gst-plugins-ugly
 DEPENDS += cross/gst-rtsp-server
+DEPENDS += cross/gst-libav
+FFMPEG_PACKAGE = ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
 
 MAINTAINER = th0ma7
