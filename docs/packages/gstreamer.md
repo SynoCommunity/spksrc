@@ -17,8 +17,9 @@ tags:
 
 GStreamer is a library for constructing graphs of media-handling components.
 This package provides the GStreamer core along with the `base`, `good`, `bad`
-and `ugly` plugin sets and the RTSP server library, for use from the command
-line or by other packages.
+and `ugly` plugin sets, the `libav` plugin and the RTSP server library, for use
+from the command line or by other packages. The `libav` plugin uses the FFmpeg
+of the [FFmpeg 8](ffmpeg.md) package, which is installed alongside.
 
 Commands are located in `/var/packages/gstreamer/target/bin` and linked into
 `/usr/local/bin`:
