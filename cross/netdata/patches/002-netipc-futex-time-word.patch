@@ -1,0 +1,22 @@
+# netipc sizes the legacy futex timespec words with __kernel_long_t, but the
+# i686 kernel headers in the DSM 7.1 toolchain predate that typedef
+# (asm/posix_types_32.h only defines __kernel_time_t). __kernel_time_t is the
+# same __kernel_long_t alias on every architecture, so use it instead.
+--- src/libnetdata/netipc/src/transport/posix/netipc_shm.c.orig
++++ src/libnetdata/netipc/src/transport/posix/netipc_shm.c
+@@ -140,13 +140,13 @@
+ /* Use the kernel ABI, not libc's timespec (which can use time64 on a
+  * legacy 32-bit syscall ABI). All receive budgets are uint32_t milliseconds,
+  * so their relative seconds fit even the legacy signed 32-bit field.
+- * __kernel_long_t also preserves the 64-bit syscall words on x32. */
++ * __kernel_time_t also preserves the 64-bit syscall words on x32. */
+ #if defined(SYS_futex_time64) && (!defined(SYS_futex) || SYS_futex == SYS_futex_time64)
+ #define NIPC_SYS_FUTEX SYS_futex_time64
+ typedef int64_t nipc_futex_time_word_t;
+ #else
+ #define NIPC_SYS_FUTEX SYS_futex
+-typedef __kernel_long_t nipc_futex_time_word_t;
++typedef __kernel_time_t nipc_futex_time_word_t;
+ #endif
+ static int futex_wake(uint32_t *addr, int count)
+ {
