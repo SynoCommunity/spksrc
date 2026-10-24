@@ -1,5 +1,5 @@
 SPK_NAME = advanced-acme
-SPK_VERS = 0.1.10
+SPK_VERS = 0.1.11
 SPK_REV = 1
 SPK_ICON = src/advanced-acme.png
 
@@ -36,7 +36,7 @@ DESCRIPTION_SPN = Certificados SSL automáticos para DSM de IONOS SSL \(ACME con
 DESCRIPTION_SVE = Automatiska SSL-certifikat för DSM från IONOS SSL \(ACME med External Account Binding\), Let\'s Encrypt, ZeroSSL eller valfri ACME-server. Guidad installation, DNS-validering för över 200 DNS-leverantörer inklusive IONOS, automatisk förnyelse och installation i DSM:s certifikathantering. Bygger på acme.sh, körs utan root och klarar DSM-uppdateringar.
 DESCRIPTION_THA = ใบรับรอง SSL อัตโนมัติสำหรับ DSM จาก IONOS SSL \(ACME พร้อม External Account Binding\), Let\'s Encrypt, ZeroSSL หรือเซิร์ฟเวอร์ ACME ใดก็ได้ ตั้งค่าแบบมีตัวช่วย ยืนยันผ่าน DNS กับผู้ให้บริการ DNS กว่า 200 รายรวมถึง IONOS ต่ออายุอัตโนมัติและติดตั้งลงในตัวจัดการใบรับรองของ DSM พัฒนาบน acme.sh ทำงานโดยไม่ต้องใช้ root และยังคงทำงานหลังอัปเดต DSM
 DESCRIPTION_TRK = IONOS SSL \(External Account Binding ile ACME\), Let\'s Encrypt, ZeroSSL veya herhangi bir ACME sunucusundan DSM için otomatik SSL sertifikaları. Rehberli kurulum, IONOS dahil 200\'den fazla DNS sağlayıcısı için DNS doğrulaması, otomatik yenileme ve DSM sertifika yöneticisine yükleme. acme.sh tabanlıdır, root olmadan çalışır ve DSM güncellemelerinden etkilenmez.
-CHANGELOG = "Initial SynoCommunity release. acme.sh 3.1.6 with longer certificate polling for IONOS SSL, updated with the package."
+CHANGELOG = "Initial SynoCommunity release (Advanced ACME 0.1.11). acme.sh 3.1.6 with longer certificate polling for IONOS SSL, updated with the package."
 BETA = 1
 
 HOMEPAGE = https://github.com/SoulInfernoDE/synology-advanced-acme

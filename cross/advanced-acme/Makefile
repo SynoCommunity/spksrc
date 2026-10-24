@@ -1,5 +1,5 @@
 PKG_NAME = advanced-acme
-PKG_VERS = 0.1.10
+PKG_VERS = 0.1.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SoulInfernoDE/synology-advanced-acme/archive/refs/tags
