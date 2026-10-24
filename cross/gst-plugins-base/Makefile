@@ -1,5 +1,5 @@
 PKG_NAME = gst-plugins-base
-PKG_VERS = 1.28.7
+PKG_VERS = 1.28.8
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-base

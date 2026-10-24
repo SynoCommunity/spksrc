@@ -1,5 +1,5 @@
 SPK_NAME = gstreamer
-SPK_VERS = 1.28.7
+SPK_VERS = 1.28.8
 SPK_REV = 1
 SPK_ICON = src/gstreamer.png
 CHANGELOG = "1. Initial package release."
