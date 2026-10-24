@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
 PKG_DIST_FILE = seerr-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = seerr-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 
 # Node.js optional dependencies are only installed for x64 and arm64
 REQUIRE_64BIT = 1
@@ -20,7 +20,7 @@ INSTALL_TARGET = seerr_install
 # ------------------------------------------------------------
 # Build environment
 # ------------------------------------------------------------
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 

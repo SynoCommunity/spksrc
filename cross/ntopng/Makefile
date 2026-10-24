@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Remarks: BUILD_DEPENDS variable is additionally used to add native node and npm to PATH
-BUILD_DEPENDS = native/nodejs_16
+BUILD_DEPENDS = native/nodejs-16
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
 DEPENDS += cross/libmaxminddb cross/sqlite cross/mariadb-connector-c

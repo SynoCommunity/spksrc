@@ -106,10 +106,10 @@ endif  # x64
 endif  # VIDEODRV_ON
 
 # Enable building of new UI
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 CONFIGURE_ARGS += --enable-vue_build
 # Build environment - use native Node.js from spksrc
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$$PATH
 
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
 CONFIGURE_ARGS += --nowerror
