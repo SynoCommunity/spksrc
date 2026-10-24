@@ -13,6 +13,9 @@ HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.
 LICENSE  = GPLv2
 
+# .NET 10 runtime is 64-bit only
+REQUIRE_64BIT = 1
+
 DOTNET_VERSION = 10.0
 BUILD_DEPENDS = native/dotnet-sdk-10.0
 
