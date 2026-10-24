@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Advanced ACME verwijderen",
+    "items": [
+      {
+        "desc": "De in DSM geïnstalleerde certificaten blijven behouden, maar worden niet meer vernieuwd. Als u de gegevens verwijdert, wordt ook de door Advanced ACME aangemaakte DSM-gebruiker ‘advanced-acme’ verwijderd."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Opgeslagen toegangsgegevens en certificaatgegevens van Advanced ACME verwijderen (DSM-account, DNS-sleutels, ACME-accounts)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

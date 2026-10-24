@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "解除安裝 Advanced ACME",
+    "items": [
+      {
+        "desc": "已安裝到 DSM 的憑證會保留，但不再更新。如果刪除資料，由 Advanced ACME 建立的 DSM 使用者「advanced-acme」也會一併移除。"
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "刪除 Advanced ACME 儲存的存取資訊和憑證資料（DSM 帳號、DNS 金鑰、ACME 帳號）",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]
