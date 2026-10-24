@@ -1,0 +1,7 @@
+# Wheels with compiled extensions, cross-compiled by spksrc.
+# Keep in sync with the dependencies of homeward[icloud] (see requirements-pure.txt).
+
+cffi==2.1.1
+charset_normalizer==3.5.2
+cryptography==48.0.1
+pydantic_core==2.50.1
