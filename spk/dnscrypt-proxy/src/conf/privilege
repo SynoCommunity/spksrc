@@ -1,5 +1,5 @@
 {
-    "_comment": "Root privileges required for: (1) binding to privileged port 53/DNS, (2) modifying /etc/cron.d for blocklist updates, (3) modifying /etc/dhcpd for DNS forwarding",
+    "_comment": "Root privileges required for: (1) binding to privileged port 53/DNS, (2) modifying /etc/cron.d for blocklist updates, (3) modifying /etc/dhcpd for DNS forwarding, (4) checking the status while the daemon is still root",
     "defaults": {
         "run-as": "package"
     },
@@ -12,6 +12,7 @@
         { "action": "preupgrade", "run-as": "root" },
         { "action": "postupgrade", "run-as": "root" },
         { "action": "start", "run-as": "root" },
-        { "action": "stop", "run-as": "root" }
+        { "action": "stop", "run-as": "root" },
+        { "action": "status", "run-as": "root" }
     ]
 }
