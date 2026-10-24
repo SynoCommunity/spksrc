@@ -11,6 +11,36 @@ tags:
 
 This guide covers requirements and best practices for submitting pull requests to SynoCommunity.
 
+## Open It as a Draft
+
+**Create every PR as a draft and mark it ready only once CI is green.**
+
+```bash
+gh pr create --draft          # while you are still iterating
+gh pr ready <number>          # once every job passes
+```
+
+This is not just etiquette — the CI is wired around it in
+`.github/workflows/build.yml`:
+
+- **A draft cancels its own superseded runs.** Draft PRs share one concurrency group with
+  `cancel-in-progress: true`, so each push stops the build the previous push started. A
+  non-draft PR gets a unique per-run group with `cancel-in-progress: false`: nothing is
+  cancelled, and every push you make queues behind the last.
+- **A draft avoids a duplicate build.** Pushing to your own fork normally starts a second,
+  narrower build; it is skipped while the branch has an open draft PR upstream, because the
+  authoritative build already runs on the PR.
+
+A full matrix build costs hours of runner time. Iterating on a non-draft PR pays that price
+again for every push, and the runs are shared with everyone else waiting.
+
+If you do need to push after marking it ready, cancel the superseded run yourself:
+
+```bash
+gh run list --branch <your-branch> --limit 5
+gh run cancel <run-id>
+```
+
 ## PR Requirements
 
 ### Title Format
