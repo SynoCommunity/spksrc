@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
 BUILD_DEPENDS = native/protoc-33 cross/aclk-schemas native/go-latest
-# The go.d plugin's go.mod asks for go 1.26.2; listed here, as env-go.mk comes after the dependency rules
+# The go.d plugin's go.mod asks for go 1.27.0; set here as env-go.mk is included after the dependency rules
 NATIVE_GO = native/go-latest
 
 HOMEPAGE = https://www.netdata.cloud
@@ -31,7 +31,6 @@ CONFIGURE_ARGS += -DENABLE_DBENGINE=ON
 # Features disabled to avoid cross-compilation issues
 CONFIGURE_ARGS += -DENABLE_PLUGIN_SCRIPTS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_OTEL=OFF
-CONFIGURE_ARGS += -DENABLE_PLUGIN_OTEL_SIGNAL_VIEWER=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_CUPS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_FREEIPMI=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_EBPF=OFF
