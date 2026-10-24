@@ -29,6 +29,10 @@ CONFIGURE_ARGS += -Dexamples=disabled
 CONFIGURE_ARGS += -Dintrospection=disabled
 CONFIGURE_ARGS += -Dtests=disabled
 CONFIGURE_ARGS += -Dgpl=enabled
+# no cpp_std is set, and g++ older than 5 defaults to gnu++98 (gst-libs/gst/cuda uses <mutex>)
+ifeq ($(call version_lt, $(TC_GCC), 5),1)
+CONFIGURE_ARGS += -Dcpp_std=gnu++14
+endif
 # headless: no display
 CONFIGURE_ARGS += -Ddirectfb=disabled
 CONFIGURE_ARGS += -Dgl=disabled
