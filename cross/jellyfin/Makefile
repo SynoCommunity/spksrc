@@ -13,8 +13,9 @@ HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.
 LICENSE  = GPLv2
 
-# x64 and armv8 only. 32-bit was dropped in #5585: armada370 is incompatible with
-# .NET, the other ARMv7 models cannot transcode, and PPC/ARMv5/i686 have no runtime.
+# x64 and armv8 only: no .NET 10 runtime for PPC/ARMv5/i686/ARMv7L; .NET 10 arm32 needs
+# glibc >= 2.35 + full VFPv3 (excludes armada370, comcerto2k, DSM <= 7.1); and the ARMv7
+# models cannot transcode (#5585). It does cross-build for arm32 — this is a support call.
 REQUIRE_64BIT = 1
 
 DOTNET_VERSION = 10.0
