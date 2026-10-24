@@ -28,17 +28,9 @@
 #
 ###############################################################################
 
-# Available toolchains formatted as '{ARCH}-{TC}'
-#
-# A toolchain OVERLAY CONSUMER (syno-<arch>-<dsm>_<component>-<vers>) lives beside the
-# base toolchains but is not one: it installs a compiler component, and nothing can be
-# built "for" it. It is told apart by the '_' in its name, which no base toolchain has --
-# the same rule the consumer generators use. The '%-rust' filter this replaces was
-# written for an earlier naming and matches none of the current directories, so every
-# consumer was reaching SUPPORTED_ARCHS and 'make all-supported' was emitting a
-# supported-arch-<consumer-dir> target for each.
-_AVAILABLE_TC_DIRS = $(sort $(notdir $(wildcard $(BASEDIR)/toolchain/syno-*)))
-AVAILABLE_TOOLCHAINS = $(subst syno-,,$(foreach d,$(_AVAILABLE_TC_DIRS),$(if $(findstring _,$(d)),,$(d))))
+# Available toolchains formatted as '{ARCH}-{TC}'. Every directory here is a base
+# toolchain: the overlay consumers beside them live in overlay/.
+AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)/toolchain/syno-*))))
 # The DSM version of each '<arch>-<vers>' directory name. Split in make: a $(shell) here
 # would fork once per toolchain, and the list is read on every parse.
 AVAILABLE_TCVERSIONS := $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(word 2,$(subst -, ,$(arch)))))
