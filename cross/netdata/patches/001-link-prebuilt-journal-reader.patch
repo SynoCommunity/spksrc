@@ -1,10 +1,9 @@
---- CMakeLists.txt.orig	2026-08-25 13:43:04.883060765 +0000
-+++ CMakeLists.txt	2026-08-25 13:45:47.870661493 +0000
-@@ -284,101 +284,16 @@
- mark_as_advanced(FORCE_LEGACY_LIBBPF)
+--- CMakeLists.txt.orig	2026-10-24 11:59:18.977038669 +0000
++++ CMakeLists.txt	2026-10-24 11:59:18.989038389 +0000
+@@ -327,112 +327,13 @@
  
  cmake_dependent_option(ENABLE_NETDATA_JOURNAL_FILE_READER "Enable netdata's journal file reader implementation" False "ENABLE_PLUGIN_SYSTEMD_JOURNAL" False)
--
+ 
 -# Setup Rust/Corrosion for plugins that need it
 -if(ENABLE_NETDATA_JOURNAL_FILE_READER OR ENABLE_PLUGIN_OTEL OR ENABLE_PLUGIN_NETFLOW)
 -    include(FetchContent)
@@ -39,11 +38,21 @@
 -                               CRATES ${_WORKSPACE_CRATES})
 -    endif()
 -
+-    # Cargo links the Rust executables through the bare compiler driver, so CMAKE_EXE_LINKER_FLAGS never reach those
+-    # links. When the build asks for the Cortex-A53 erratum workarounds (static aarch64), have the linker apply them to
+-    # the Rust code too: 843419 and 835769 can both be fixed at link time, and rustc has no -mfix-cortex-a53-* flags.
+-    # 8-byte function alignment stops ld.bfd's 843419 fix stubs from shifting code it has already scanned.
+-    set(_nd_rust_link_flags "")
+-    if(CMAKE_EXE_LINKER_FLAGS MATCHES "--fix-cortex-a53-843419")
+-        list(APPEND _nd_rust_link_flags "-Clink-arg=-Wl,--fix-cortex-a53-835769" "-Clink-arg=-Wl,--fix-cortex-a53-843419")
+-        list(APPEND _nd_rust_link_flags "-Cllvm-args=-align-all-functions=3")
+-    endif()
+-
 -    if(ENABLE_PLUGIN_OTEL)
 -      if(STATIC_BUILD)
--        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable "-C" "target-feature=+crt-static")
+-        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable "-C" "target-feature=+crt-static" ${_nd_rust_link_flags})
 -      else()
--        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable)
+-        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable ${_nd_rust_link_flags})
 -      endif()
 -
 -      # The workspace release profile propagates fat LTO, single-codegen-unit,
@@ -91,12 +100,16 @@
 -        list(APPEND NETFLOW_PLUGIN_RUSTFLAGS "-C" "target-feature=+crt-static")
 -      endif()
 -
+-      list(APPEND NETFLOW_PLUGIN_RUSTFLAGS ${_nd_rust_link_flags})
+-
 -      if(NETFLOW_PLUGIN_RUSTFLAGS)
 -        corrosion_add_target_rustflags(netflow-plugin ${NETFLOW_PLUGIN_RUSTFLAGS})
 -      endif()
 -
 -      corrosion_set_env_vars(netflow-plugin ${NETFLOW_PLUGIN_ENV_VARS})
 -    endif()
+-
+-    unset(_nd_rust_link_flags)
 +# The journal reader is cross-compiled as a static library by the spksrc build
 +# (see the netdata_compile target in cross/netdata/Makefile), so the Corrosion
 +# cmake integration and its network fetch are not needed.
@@ -106,7 +119,4 @@
 +        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libjournal_reader_ffi.a")
  endif()
  
-+
  option(ENABLE_MIMALLOC "Enable mimalloc allocator" OFF)
- 
- if(ENABLE_MIMALLOC)

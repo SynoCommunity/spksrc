@@ -1,5 +1,5 @@
 PKG_NAME = netdata
-PKG_VERS = 2.11.1
+PKG_VERS = 2.12.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/netdata/netdata/archive/refs/tags
@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
-BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas native/go-latest
+BUILD_DEPENDS = native/protoc-33 cross/aclk-schemas native/go-latest
 # The go.d plugin's go.mod asks for go 1.26.2; listed here, as env-go.mk comes after the dependency rules
 NATIVE_GO = native/go-latest
 
@@ -79,7 +79,7 @@ netdata_compile:
 		cp -a $(WORK_DIR)/$(ACLK_SCHEMAS_DIR)/proto/. $$ACLK_DIR/proto/; \
 	fi
 	@$(MSG) Patching protobuf rules for native protoc
-	@PROTOC=$$(realpath $(WORK_DIR)/../../../native/protoc_33/work-native/bin/protoc 2>/dev/null); \
+	@PROTOC=$$(realpath $(WORK_DIR)/../../../native/protoc-33/work-native/bin/protoc 2>/dev/null); \
 	NINJA=$(BUILD_DIR)/build.ninja; \
 	if [ -n "$$PROTOC" ] && [ -f "$$NINJA" ]; then \
 		sed -i "s|protobuf::protoc|$$PROTOC|g" $$NINJA; \
