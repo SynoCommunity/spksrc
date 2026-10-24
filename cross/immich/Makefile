@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22 native/pnpm native/extism-js native/binaryen
+BUILD_DEPENDS = native/nodejs-22 native/pnpm native/extism-js native/binaryen
 
 DEPENDS = cross/libvips
 
@@ -19,7 +19,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = immich_install
 POST_INSTALL_TARGET = immich_post_install
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
