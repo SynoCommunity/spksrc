@@ -17,6 +17,8 @@ LICENSE  = LGPLv2.1+
 # fallback define, so a consumer compiled without __has_attribute (gcc < 5) fails on
 # glib's own header -- json-glib does, under -Werror=undef.
 MIN_GCC_VERSION = 7.5
+# gio-launch-desktop uses SOCK_CLOEXEC, which glibc has from 2.9 (ppc853x-5.2 has 2.8)
+MIN_GLIBC_VERSION = 2.9
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
