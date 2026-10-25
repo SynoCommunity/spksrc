@@ -83,8 +83,7 @@ call_func "initialize_variables"
 #
 syno_sync_var_folder () {
     # take all files that do not alredy exist and rename the other files to *.new to avoid overwriting
-    # existing configuration files.
-    # finally remove the target/var folder that is not used under DSM 7.
+    # existing configuration files.  Finally remove the target/var folder that is not used under DSM 7.
     _var=$(package_dir "${SYNOPKG_PKGDEST}/var") || return 0
     if [ -n "$(ls -A "${_var}" 2>/dev/null)" ] && [ -n "${SYNOPKG_PKGVAR}" ]; then
 
