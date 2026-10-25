@@ -83,25 +83,25 @@ call_func "initialize_variables"
 #
 syno_sync_var_folder () {
     # take all files that do not alredy exist and rename the other files to *.new to avoid overwriting
-    # existing configuration files.
-    # finally remove the target/var folder that is not used under DSM 7.
-    if [ -d ${SYNOPKG_PKGDEST}/var -a "$(ls -A ${SYNOPKG_PKGDEST}/var 2>/dev/null)" ]; then
-    
+    # existing configuration files.  Finally remove the target/var folder that is not used under DSM 7.
+    _var=$(package_dir "${SYNOPKG_PKGDEST}/var") || return 0
+    if [ -n "$(ls -A "${_var}" 2>/dev/null)" ] && [ -n "${SYNOPKG_PKGVAR}" ]; then
+
         echo "Install files from var folder"
-    
+
         # Move all files except existing
-        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
-        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
+        echo "$RSYNC --ignore-existing --remove-source-files ${_var}/ ${SYNOPKG_PKGVAR}"
+        $RSYNC --ignore-existing --remove-source-files "${_var}/" "${SYNOPKG_PKGVAR}"
 
         # Rename any remaining (thus pre-existing) files with .new suffix
-        find ${SYNOPKG_PKGDEST}/var -type f -exec sh -c 'x="{}"; mv "$x" "${x}.new"' \;
+        find "${_var}" -type f -exec sh -c 'x="{}"; mv "$x" "${x}.new"' \;
 
         # Move .new files (overwrite existing)
-        echo "$RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
-        $RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
+        echo "$RSYNC --remove-source-files ${_var}/ ${SYNOPKG_PKGVAR}"
+        $RSYNC --remove-source-files "${_var}/" "${SYNOPKG_PKGVAR}"
 
         # Remove var folder extraced from spk
-        $RM ${SYNOPKG_PKGDEST}/var
+        $RM "${_var}"
     fi
 }
 
@@ -185,18 +185,13 @@ postuninst ()
 
     if [ "$wizard_delete_data" = "true" ]; then
         echo "Removing files..." | install_log
-        if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
-            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete | install_log
-        fi
-
-        if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
-            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete | install_log
-        fi
-
-        _etc_path=$(realpath /var/packages/${SYNOPKG_PKGNAME}/etc)
-        if [ "$(ls -A ${_etc_path})" != "" ]; then
-            find ${_etc_path} -mindepth 1 -delete | install_log
-        fi
+        for _path in "${SYNOPKG_PKGHOME}" "${SYNOPKG_PKGVAR}" "${INST_ETC}"; do
+            if _dir=$(package_dir "${_path}"); then
+                find "${_dir}" -mindepth 1 -delete 2>&1 | install_log
+            else
+                echo "Skip '${_path}': not an existing package directory" | install_log
+            fi
+        done
     fi
 
     exit 0
@@ -208,16 +203,16 @@ preupgrade ()
     call_func "validate_preupgrade"
 
     # dsm6 -> dsm7
-    if [ -d ${SYNOPKG_PKGDEST}/var ]; then
-        if [ ! -d ${SYNOPKG_PKGVAR} -o $(realpath ${SYNOPKG_PKGVAR}) = $(realpath ${SYNOPKG_PKGDEST}/var) ]; then
+    if _var=$(package_dir "${SYNOPKG_PKGDEST}/var"); then
+        if [ ! -d "${SYNOPKG_PKGVAR}" ] || [ "$(realpath "${SYNOPKG_PKGVAR}")" = "${_var}" ]; then
             # Copy to temporary directory if upgrading from DSM6 -> DSM7
             # Then restore once to permanent storage at postupgrade
-            if [ -d ${SYNOPKG_PKGDEST}/var -a "$(ls -A ${SYNOPKG_PKGDEST}/var 2>/dev/null)" ]; then
+            if [ -n "${TMP_DIR}" ] && [ -n "$(ls -A "${_var}" 2>/dev/null)" ]; then
                 echo "Backup target/var folder used under DSM6" | install_log
-                echo "$RSYNC ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR}" | install_log
-                $RSYNC ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR} 2>&1 | install_log
+                echo "$RSYNC ${_var}/ ${TMP_DIR}" | install_log
+                $RSYNC "${_var}/" "${TMP_DIR}" 2>&1 | install_log
                 # remove DSM6 target/var folder
-                rm -rf ${SYNOPKG_PKGDEST}/var 2>&1 | install_log
+                rm -rf "${_var}" 2>&1 | install_log
             fi
         fi
     fi
@@ -235,11 +230,11 @@ postupgrade ()
     call_func "service_restore" install_log
 
     # dsm6 -> dsm7
-    if [ -d ${TMP_DIR} -a "$(ls -A ${TMP_DIR} 2>/dev/null)" ]; then
+    if [ -n "${TMP_DIR}" ] && [ -n "${SYNOPKG_PKGVAR}" ] && [ -n "$(ls -A "${TMP_DIR}" 2>/dev/null)" ]; then
         # Restore once to permanent storage at postupgrade
         echo "Resore var folder from DSM6" | install_log
         echo "$RSYNC ${TMP_DIR}/ ${SYNOPKG_PKGVAR}" | install_log
-        $RSYNC ${TMP_DIR}/ ${SYNOPKG_PKGVAR} 2>&1 | install_log
+        $RSYNC "${TMP_DIR}/" "${SYNOPKG_PKGVAR}" 2>&1 | install_log
     fi
 
     # dsm7: Now sync in any new files to permanent storage
