@@ -1,0 +1,15 @@
+--- gst/tensordecoders/gstfacedetectortensordecoder.c.orig
++++ gst/tensordecoders/gstfacedetectortensordecoder.c
+@@ -55,6 +55,12 @@
+ #include <gst/gst.h>
+ #include <gst/video/video.h>
+ #include <gst/analytics/analytics.h>
++#include <string.h>
++
++/* g_alloca0 is glib 2.72; this is its definition, for the older glib this plugin accepts */
++#ifndef g_alloca0
++#define g_alloca0(size) ((size) == 0 ? NULL : memset (g_alloca (size), 0, (size)))
++#endif
+ 
+ /* Face detection tensor id strings */
+ #define BOXES_TENSOR_ID "ssd-mobilenet-v1-variant-1-out-boxes"
