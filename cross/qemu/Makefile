@@ -18,6 +18,6 @@ COMMENT  = Support for QMP commands and events that terminate and originate resp
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --target-list=x86_64-softmmu
+CONFIGURE_ARGS = --disable-system --disable-user --enable-tools
 
 include ../../mk/spksrc.cross-cc.mk
