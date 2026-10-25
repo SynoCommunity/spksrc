@@ -1,0 +1,6 @@
+rsc:bin/darkmode-regen
+rsc:lib/
+rsc:share/
+rsc:ui/
+rsc:LICENSE
+rsc:VERSION
