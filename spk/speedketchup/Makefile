@@ -1,5 +1,5 @@
 SPK_NAME = speedketchup
-SPK_VERS = 0.4.0
+SPK_VERS = 0.5.0
 SPK_REV = 1
 SPK_ICON = src/speedketchup.png
 
