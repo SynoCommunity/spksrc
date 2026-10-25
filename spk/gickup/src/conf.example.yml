@@ -7,6 +7,7 @@ source:
       # token_file: token.txt
       user: some-user # the user you want to clone the repositories from.
       # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # url: https://example.ghe.com # optional: GitHub Enterprise Server base URL; defaults to https://github.com
       # for the clone process, either use:
       # - username + password
       # - sshkey
@@ -211,6 +212,19 @@ source:
       wiki: true # includes wiki too
       filter:
         lastactivity: 1y # only clone repos which had activity during the last year
+  opengist:
+    - url: http(s)://url-to-opengist # required, base url of your Opengist instance, e.g. https://gist.example.com
+      token: some-token # Opengist personal access token (og_...); used for the API and to clone private gists
+      # token_file: token.txt # alternatively, specify token in a file
+      # user: some-user # optional: back up this user's gists (GET /api/users/<user>/gists).
+      # leave user out and set a token to back up the token owner's own gists (GET /api/gists).
+      # leave out both user and token to back up only public gists (GET /api/gists/public).
+      # note: Opengist's git-over-http must be enabled on the server to clone (OG_HTTP_GIT_ENABLED=true).
+      exclude: # this excludes the gists with these slugs/ids
+        - foo
+        - bar
+      include: # this only includes the gists with these slugs/ids
+        - foobar
   any:
     - url: url-to-any-repo # can be https, http or ssh
       user: your-preferred-user # the user to want to associate with this repo, default: git
@@ -262,10 +276,12 @@ destination:
         repositories: private # private, public, default: private
       force: false # force push to destination
     # alternatively, authenticate with a GitHub App:
+    # requires Contents: write, plus Administration: write to create repositories
     # - app_id: 123456                              # GitHub App ID (numeric)
-    #   app_installation_id: 78901234               # Installation ID of the App
+    #   app_installation_id: 78901234               # installation on the destination organization, including for enterprise-owned Apps
     #   app_private_key_file: /path/to/private.pem  # path to the App's RSA private key PEM file
-    #   organization: whatever                      # org to back up into (leave empty for personal account)
+    #   organization: whatever                      # destination organization; required for App authentication
+    #   url: https://github.example.com             # GitHub Enterprise Server base URL; omit for github.com
     #   visibility:
     #     repositories: private
     #   force: false
@@ -293,6 +309,14 @@ destination:
       bare: true # clone the repositories as bare
       mirror: true # create mirror clones
       lfs: true # clone lfs repos, !! ATTENTION !! git and git-lfs must be installed on the system!
+  radicle:
+    # rad reads the environment itself: RAD_HOME selects which radicle profile to
+    # mirror into (defaults to ~/.radicle), and RAD_PASSPHRASE unlocks its key if
+    # it has a passphrase. Export them before running gickup.
+    - force: true # if set to true, refs that diverged from upstream are overwritten (non-fast-forward updates)
+      prune: true # if set to true, refs that no longer exist upstream are deleted from the mirror
+      visibility: source # public, private or source, source follows the visibility of the source repository. default: source
+      issues: false # [COMING SOON] recreate the source repo's issues as radicle issues (the source must also have issues: true).
   s3:
    - endpoint: somewhere:9000 # whatever your s3 endpoint is
      structured: true # checks repos out like hostersite/user|organization/repo
@@ -307,6 +331,7 @@ destination:
      storageclass: "" # storage class for all repos to be uploaded to this S3 bucket. E.g. for AWS: STANDARD, STANDARD_IA, GLACIER, etc.
      src_repo_url_tag_key: "" # if set, tag each uploaded object with this key and the source repo URL as value. Leave unset to disable tagging.
      datecreatedir: false # if true, gickup will create a directory for backup with the creation date
+     lfs: true # clone lfs repos, !! ATTENTION !! git and git-lfs must be installed on the system!
   azureblob:
     - url: https://yourstorageaccount.blob.core.windows.net # blob storage endpoint for your storage account, can be a SAS url
       container: name of your blob container
@@ -314,6 +339,14 @@ destination:
       tenantid: your-tenant-id # required if using clientId and clientSecret to authenticate
       clientid: your-client-id # clientId of your app registration if you want to authenticate that way
       clientsecret: your-client-secret # client secret of your app registration
+      structured: true # checks repos out like hostersite/user|organization/repo
+      zip: false # if true, will zip the entire git repo into a single zip file and upload that instead
+      datecreatedir: false # if true, gickup will create a directory for backup with the creation date
+  webdav:
+    - url: https://webdav.example.com/dav # the WebDAV endpoint to upload the backups to (e.g. Nextcloud, Apache mod_dav, rclone serve webdav)
+      username: your-username # HTTP Basic auth username
+      password: your-password # HTTP Basic auth password
+      path: repos # subdirectory on the WebDAV server to store the backups under (repos end up under url/path/<repo>)
       structured: true # checks repos out like hostersite/user|organization/repo
       zip: false # if true, will zip the entire git repo into a single zip file and upload that instead
       datecreatedir: false # if true, gickup will create a directory for backup with the creation date
@@ -339,6 +372,8 @@ metrics:
     urls:
       - http(s)://url-to-make-request-to
       - http(s)://another-url-to-make-request-to
+    failure_urls: # optional - if the backup run encountered any errors, these URLs are pinged instead of the ones above. Useful with services like healthchecks.io that expose a dedicated failure endpoint (e.g. https://hc-ping.com/uuid/fail)
+      - http(s)://url-to-ping-on-failure
   push:
     ntfy:
     - url: http(s)://url-to-ntfy/your-topic
