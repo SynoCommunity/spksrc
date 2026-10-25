@@ -10,6 +10,9 @@ ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 UNSUPPORTED_ARCHS = $(ARCH)
 endif
 
+# QEMU requires GCC 7.4 or newer; DSM 7.1 ships GCC 8.5.
+MIN_GCC_VERSION = 7.4
+
 DEPENDS  = cross/glib
 
 HOMEPAGE = https://wiki.qemu.org/Features/GuestAgent
