@@ -11,7 +11,6 @@ UNSUPPORTED_ARCHS = $(ARCH)
 endif
 
 DEPENDS  = cross/glib
-DEPENDS += cross/pixman
 
 HOMEPAGE = https://wiki.qemu.org/Features/GuestAgent
 COMMENT  = Support for QMP commands and events that terminate and originate respectively within the guest using an agent built as part of QEMU.
