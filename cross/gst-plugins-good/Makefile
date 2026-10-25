@@ -40,6 +40,8 @@ CONFIGURE_ARGS += -Dwavpack=disabled
 CONFIGURE_ARGS += -Dximagesrc=disabled
 # libsoup is loaded at runtime by adaptivedemux2, not needed to build
 CONFIGURE_ARGS += -Dsoup=disabled
+# libgudev (hotplug) and libv4l2 (v4l-utils, obscure formats) are not packaged;
+# the v4l2 plugin itself is built and still probes /dev/video* when loaded
 CONFIGURE_ARGS += -Dv4l2-gudev=disabled
 CONFIGURE_ARGS += -Dv4l2-libv4l2=disabled
 
