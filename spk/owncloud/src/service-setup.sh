@@ -86,25 +86,6 @@ setup_owncloud_instance()
             fi
         done
 
-        APACHE_CONF="${WEB_ROOT}/.htaccess"
-        # Configure HTTP to HTTPS redirect
-        if [ -f "${APACHE_CONF}" ]; then
-            {
-                echo "RewriteEngine On"
-                echo "RewriteCond %{HTTPS} off"
-                echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
-            } >> "${APACHE_CONF}"
-        fi
-
-        # Configure HTTP Strict Transport Security
-        if [ -f "${APACHE_CONF}" ]; then
-            {
-                echo "<IfModule mod_headers.c>"
-                echo "Header always set Strict-Transport-Security \"max-age=15552000; includeSubDomains\""
-                echo "</IfModule>"
-            } >> "${APACHE_CONF}"
-        fi
-
         # Configure background jobs
         exec_occ system:cron
 
@@ -178,7 +159,7 @@ service_postinst ()
             tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
 
             # Restore configuration files and directories
-            rsync -aX -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/configs/root/.user.ini" "${WEB_ROOT}/" 2>&1
             rsync -aX -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
 
             # Restore user data
@@ -283,7 +264,7 @@ service_preuninst ()
         # Backup Directories
         echo "Copying previous configuration from ${WEB_ROOT}"
         ${MKDIR} "${TEMPDIR}/configs/root"
-        rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+        rsync -aX "${WEB_ROOT}/.user.ini" "${TEMPDIR}/configs/root/" 2>&1
         rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
 
         # Backup user data
@@ -417,9 +398,6 @@ service_restore ()
     
     if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" ]; then
         rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" "${WEB_ROOT}/" 2>&1
-    fi
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess" ]; then
-        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess" "${WEB_ROOT}/" 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
