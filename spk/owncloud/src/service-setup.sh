@@ -420,6 +420,10 @@ validate_preupgrade ()
         fi
     done
 
+    if [ ! -s "${DISABLED_APPS}" ]; then
+        echo "(none)" > "${DISABLED_APPS}"
+    fi
+
     # Step 3: backup the database with the application credentials.
     DB_NAME=$(config_get dbname)
     DB_USER=$(config_get dbuser)
@@ -526,7 +530,9 @@ service_restore ()
     fi
 
     # Disable maintenance mode after a successful upgrade.
-    exec_occ maintenance:mode --off
+    if ! exec_occ maintenance:mode --off; then
+        echo "WARNING: could not disable maintenance mode; run 'occ maintenance:mode --off' manually"
+    fi
 
     # Re-apply the HTTPS redirect and HSTS rules to the new .htaccess.
     configure_htaccess
@@ -546,4 +552,16 @@ service_restore ()
 
     # Remove upgrade backup files
     ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+
+    # Keep the two newest backup sets per type (the stamp is the last 14 digits).
+    for pattern in "owncloud-*.sql.gz" "htaccess-*" "user.ini-*" "disabled-apps-*"; do
+        ls -1 "${SYNOPKG_PKGVAR}/backup"/${pattern} 2>/dev/null \
+            | sed 's/.*-\([0-9]\{14\}\)[^0-9]*$/\1 &/' \
+            | sort -rn \
+            | cut -d' ' -f2- \
+            | tail -n +3 \
+            | while IFS= read -r old; do
+                [ -n "${old}" ] && ${RM} "${old}"
+            done
+    done
 }
