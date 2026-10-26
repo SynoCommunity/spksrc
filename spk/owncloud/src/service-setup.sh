@@ -473,7 +473,7 @@ validate_preupgrade ()
             echo "ERROR: cannot determine the data share for the pre-upgrade backup; aborting upgrade"
             exit 1
         fi
-        FULL_BACKUP="${SHARE_PATH}/owncloud_backup_v${OC_VER}_$(date +%Y%m%d).tar.gz"
+        FULL_BACKUP="${SHARE_PATH}/owncloud_backup_v${OC_VER}_$(date +%Y%m%d%H%M%S).tar.gz"
         FULL_TMP="${SYNOPKG_PKGTMP}/owncloud_backup_${STAMP}"
         echo "Creating pre-upgrade backup at ${FULL_BACKUP}" >&2
         ${MKDIR} "${FULL_TMP}/configs/root" "${FULL_TMP}/database"
