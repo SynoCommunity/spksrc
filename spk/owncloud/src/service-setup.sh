@@ -349,7 +349,7 @@ validate_preupgrade ()
     previous=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
     
     # Check against valid versions
-    for version in "8.2.11" "9.0.9" "9.1." "10."; do
+    for version in "8.2.11" "9.0.9" "9.1." "10." "11."; do
         if echo "$previous" | grep -q "^$version"; then
             is_upgrade_possible="yes"
             break

@@ -29,7 +29,7 @@ page_append ()
 is_upgrade_possible ()
 {
 	# ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
-	valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
+	valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*" "11.*.*")
 	previous=${OC_OLD_VER}
 	for version in "${valid_versions[@]}"; do
 		if echo "$previous" | grep -q "$version"; then
