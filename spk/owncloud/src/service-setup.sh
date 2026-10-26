@@ -28,6 +28,15 @@ config_get() {
 configure_htaccess() {
     local conf="${WEB_ROOT}/.htaccess"
     [ -f "${conf}" ] || return 0
+    # ownCloud writes its integrity marker and dynamic rules through occ. The
+    # marker is what lets the integrity check ignore our appends.
+    if ! grep -q "DO NOT CHANGE ANYTHING ABOVE THIS LINE" "${conf}" 2>/dev/null; then
+        exec_occ maintenance:update:htaccess >/dev/null 2>&1 || true
+    fi
+    if ! grep -q "DO NOT CHANGE ANYTHING ABOVE THIS LINE" "${conf}" 2>/dev/null; then
+        echo "WARNING: .htaccess has no integrity marker; not adding HTTPS/HSTS rules" >&2
+        return 0
+    fi
     grep -q "Strict-Transport-Security" "${conf}" 2>/dev/null && return 0
     {
         echo ""
@@ -299,7 +308,7 @@ service_preuninst ()
         # Backup Directories
         echo "Copying previous configuration from ${WEB_ROOT}"
         ${MKDIR} "${TEMPDIR}/configs/root"
-        rsync -aX "${WEB_ROOT}/.user.ini" "${TEMPDIR}/configs/root/" 2>&1
+        rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
         rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
 
         # Backup user data
