@@ -24,6 +24,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 VIDEODRV_DEPENDS  = cross/libva
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
+# oneVPL builds with gcc 4.9; ffmpeg keeps libmfx (the two cannot be enabled together),
+# libvpl is there for consumers that look for it, such as tvheadend's QSV
+VIDEODRV_DEPENDS += cross/intel-libvpl
 
 # Each set where the packages behind it build, by their own MIN_GCC_VERSION.
 # media-driver-latest and level-zero need C++14 (gcc 5).
@@ -31,11 +34,6 @@ ifeq ($(call version_ge, $(TC_GCC), 5),1)
 
 # Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
-
-# Intel libVPL
-# -->> can not use libmfx and libvpl together in ffmpeg
-#      Jellyfin requires QSV provided by libmfx
-VIDEODRV_DEPENDS += cross/intel-libvpl
 
 endif
 

@@ -1,0 +1,41 @@
+--- configure.orig
++++ configure
+@@ -801,16 +801,18 @@
+ # qsv
+ #
+ if enabled_or_auto qsv; then
+-  if [ "${CONFIG_FFMPEG_VER:-8}" = "5" ]; then
+-    qsv_pkg="libmfx"; qsv_ver=">=1.28"
+-  else
+-    qsv_pkg="vpl"; qsv_ver=">=2.0"
+-  fi
+-  if check_pkg $qsv_pkg "$qsv_ver"; then
++  # oneVPL from ffmpeg 6; the legacy MediaSDK (libmfx) for ffmpeg 5, and wherever
++  # oneVPL is missing: ffmpeg 6 to 8 still build with --enable-libmfx, and it is
++  # what drives QSV on the Gen6 to Gen11 GPUs
++  if [ "${CONFIG_FFMPEG_VER:-8}" != "5" ] && check_pkg vpl ">=2.0"; then
++    enable qsv
++    enable hwaccels
++  elif check_pkg libmfx ">=1.28"; then
+     enable qsv
++    enable qsv_libmfx
+     enable hwaccels
+   elif enabled qsv; then
+-    die "Intel Quick Sync Video: $qsv_pkg not found (required for ffmpeg ${CONFIG_FFMPEG_VER:-8})"
++    die "Intel Quick Sync Video: neither vpl >= 2.0 nor libmfx >= 1.28 found"
+   fi
+ fi
+ 
+--- Makefile.ffmpeg.orig
++++ Makefile.ffmpeg
+@@ -659,8 +659,8 @@
+ 
+ ifeq (yes,$(CONFIG_QSV))
+ 
+-# libvpl was introduced in ffmpeg6
+-ifeq ($(CONFIG_FFMPEG_VER),5)
++# libvpl was introduced in ffmpeg6; libmfx where configure settled on it
++ifeq ($(CONFIG_QSV_LIBMFX),yes)
+ EXTLIBS  += libmfx
+ else
+ EXTLIBS  += libvpl
