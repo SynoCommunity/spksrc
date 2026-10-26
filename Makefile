@@ -65,8 +65,8 @@ all-noarch:  ## Build every noarch (override ARCH) SPK
 ##@ Clean
 
 ifneq ($(firstword $(MAKECMDGOALS)),test)
-clean: $(addsuffix -clean,$(SUPPORTED_SPKS))  ## Clean all SPK, native and cross work dirs
-clean: native-clean cross-clean
+clean: $(addsuffix -clean,$(SUPPORTED_SPKS))  ## Clean all SPK, native, cross and driver work dirs
+clean: native-clean cross-clean driver-clean
 endif
 
 dist-clean: clean  ## Clean everything, including kernel/toolchain/toolkit
@@ -102,6 +102,12 @@ cross-clean:  ## Clean all cross/ work dirs
 	    $(MAKE) -C $${cross} clean ; \
 	done
 
+driver-clean:  ## Clean all driver/ work dirs
+	@for driver in $(dir $(wildcard driver/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${driver} clean ; \
+	done
+
 spk-clean:  ## Clean all spk/ work dirs
 	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)) $(dir $(wildcard spk/*/DISABLED)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
@@ -133,8 +139,8 @@ prepare: downloads  ## Download sources and build all toolchains
 	    $(MAKE) -C $${tc} ; \
 	done
 
-downloads:  ## Download all cross/ package sources
-	@for dl in $(dir $(wildcard cross/*/Makefile)) ; \
+downloads:  ## Download all cross/ and driver/ package sources
+	@for dl in $(dir $(wildcard cross/*/Makefile driver/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${dl} download ; \
 	done
@@ -175,6 +181,12 @@ cross-digests:  ## Regenerate digests for all cross/ packages
 	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${cross} digests ; \
+	done
+
+driver-digests:  ## Regenerate digests for all driver/ packages
+	@for driver in $(dir $(wildcard driver/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${driver} digests ; \
 	done
 
 ##@ Lint

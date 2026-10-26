@@ -172,6 +172,34 @@ modules
                     └── ftdi_sio.ko
 ```
 
+### Out-of-tree drivers
+
+A driver that is not part of the kernel tree lives in `driver/<name>` and includes
+`spksrc.driver.mk`. Listed in the spk `DEPENDS`, it is built right after each kernel the
+spk prepares, against that kernel's source (`$(KERNEL_ROOT)`), and installs its modules
+in `$(DRIVER_MODULE_DIR)` next to those of `REQUIRE_KERNEL_MODULE`:
+
+```makefile
+# driver/<name>/Makefile
+DRIVER_KERNEL_MIN = 3.10    # skipped on older kernels
+DRIVER_GCC_MIN    = 4.9     # and with an older gcc
+
+include ../../mk/spksrc.driver.mk
+```
+
+Where one version of a driver cannot serve every kernel, `spksrc.driver-virtual.mk`
+builds the first of its `DEPENDS` that is not skipped, kernel by kernel.
+`driver/linuxtv` does so for [SynoKernel LinuxTV](synokernel-linuxtv.md):
+
+```makefile
+# driver/linuxtv/Makefile
+DEPENDS  = driver/linuxtv-4.4
+DEPENDS += driver/linuxtv-3.10
+DEPENDS += driver/linuxtv-3.2
+
+include ../../mk/spksrc.driver-virtual.mk
+```
+
 ### Installation Wizard with Module Selection
 
 The `synokernel-usbserial` package demonstrates an installation wizard for module selection. Configuration files:

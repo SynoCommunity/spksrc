@@ -124,6 +124,37 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 26th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#PRNUM)"
+
+    - **A kernel module spk carries the modules of every kernel of its arch**:
+      `kernel-depend` prepares `kernel/syno-<arch>-<version>` for each sub-arch, in the
+      `WORK_DIR` of the spk, and builds the in-tree modules of `REQUIRE_KERNEL_MODULE`
+      there. An out-of-tree driver had no place in that walk: as a regular dependency it
+      was built once, for the generic arch, with no kernel to build against.
+
+    - **`driver/<pkg>` is that place.** `kernel-depend` builds every `driver/*` of the
+      spk `DEPENDS` right after each kernel, with its `ARCH` and `TCVERSION`; the regular
+      walk leaves them out. `spksrc.driver.mk` is cross-cc with, per kernel, its own
+      cookies and extracted source (every kernel of the arch shares the `WORK_DIR`),
+      `KERNEL_ROOT` for the prepared kernel source, and `DRIVER_MODULE_DIR`, the
+      `lib/modules/<arch>/<kernel>` of the in-tree modules.
+
+    - **A driver states the kernel and gcc it needs** -- `DRIVER_KERNEL_MIN`,
+      `DRIVER_GCC_MIN` -- and is skipped below them. `spksrc.driver-virtual.mk` builds,
+      per kernel, the first of several versions that is not skipped: the counterpart of
+      `$(call depend,a|b|c)` for a choice that depends on each sub-arch rather than on the
+      generic arch. `driver/linuxtv` picks media_build frozen for kernels 4.4+, 3.10+
+      or 3.2+ this way, a 4.4 kernel on gcc 4.9 taking the 3.10 one.
+
+    - **`kernel-depend` only runs where `REQUIRE_KERNEL` listed kernels.** A regular
+      dependency of a kernel module spk inherited `REQUIRE_KERNEL_MODULE` through `ENV`
+      and ran the walk in its own directory, failing on the tc_vars backup of a work
+      directory it does not have: a synokernel spk could not have a cross dependency.
+
+    - **Kernel modules are stripped with `--strip-debug`.** The plain strip of
+      `strip_target` would leave a `*.ko` without the symbol table the module loader links
+      it with, so every synokernel package replaced the target with its own `find`. The
+      framework now does it: `cdrom.ko` goes from 377 KB to 43 KB, `.symtab` kept.
 ??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
 
     - **Kernel modules are stripped with `--strip-debug`** by `strip.mk`: the plain strip
