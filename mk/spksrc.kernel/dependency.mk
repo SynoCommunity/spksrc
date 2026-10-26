@@ -39,6 +39,9 @@
 #  - Only non-generic sub-architectures are built
 #  - Each KERNEL_DRIVERS entry is built right after the kernel of a sub-arch,
 #    with that ARCH and TCVERSION (spksrc.driver.mk)
+#  - With more than one kernel, the kernel and driver sources of a sub-arch are
+#    removed once its modules are installed; its cookies stay, so a later run
+#    resumes at the first kernel not built
 #  - Each sub-arch build occurs in its own WORK_DIR
 #  - Build logs are written to build-<arch>-<tcversion>.log
 #  - tc_vars* files are backed up/restored for generic architectures
@@ -111,6 +114,11 @@ kernel-depend:
 	          exit 1 ; \
 	        fi ; \
 	      done ; \
+	      if [ $(words $(KERNEL_DEPEND)) -gt 1 ]; then \
+	        $(MSG) "Removing the kernel and driver sources of $${depend}, its modules installed" ; \
+	        rm -rf $(CURDIR)/work$(ARCH_SUFFIX)/linux-$$(echo $${depend} | cut -f1 -d-) ; \
+	        find $(CURDIR)/work$(ARCH_SUFFIX) -mindepth 1 -maxdepth 1 -type d -name "*-$${depend}" -exec rm -rf {} + ; \
+	      fi ; \
 	    } > >(tee --append build-$${depend}.log) 2>&1 ; \
 	  done ; \
 	  rsync -ah work$(ARCH_SUFFIX)/tc_vars-backup/tc_vars* work$(ARCH_SUFFIX)/. ; \
