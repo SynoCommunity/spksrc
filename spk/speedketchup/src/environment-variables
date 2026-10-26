@@ -1,0 +1,28 @@
+# Uncomment and change to override the defaults, then restart the package
+
+# Minutes between the speed tests
+#export SPEEDKETCHUP_INTERVAL=10
+
+# Speedtest server host[:port] to always test against, unset picks the
+# server with the lowest latency for every test
+#export SPEEDKETCHUP_SERVER=
+
+# Seconds to test the download and upload speed, 0 skips the test
+#export SPEEDKETCHUP_DOWNLOAD_DURATION=10
+#export SPEEDKETCHUP_UPLOAD_DURATION=10
+
+# Parallel connections for the download and upload tests
+#export SPEEDKETCHUP_DOWNLOAD_CONNECTIONS=8
+#export SPEEDKETCHUP_UPLOAD_CONNECTIONS=8
+
+# InfluxDB line protocol write url to also write every result to, http
+# only, eg http://influxdb:8086/api/v2/write?org=home&bucket=speedketchup,
+# and its token
+#export SPEEDKETCHUP_INFLUX_URL=
+#export SPEEDKETCHUP_INFLUX_TOKEN=
+
+# MQTT broker host[:port] to also publish every result to, with Home
+# Assistant discovery, plain mqtt only, and its user name and password
+#export SPEEDKETCHUP_MQTT=
+#export SPEEDKETCHUP_MQTT_USER=
+#export SPEEDKETCHUP_MQTT_PASSWORD=

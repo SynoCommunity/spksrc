@@ -1,0 +1,41 @@
+# glibc only grew the endian.h conversion macros in 2.9; the shim backfills the 64-bit
+# ones but assumes 16/32 are always there. On glibc 2.8 (ppc853x-5.2, qoriq-5.2) they
+# are not, and a compiler that rejects implicit declarations stops the build.
+#
+--- contrib/endian-shim.h.orig	2026-08-21 17:02:11.531560074 +0000
++++ contrib/endian-shim.h	2026-08-21 17:02:11.539483065 +0000
+@@ -47,6 +47,34 @@
+ 
+ #elif defined(__linux__) || defined(__GNU__)
+ # include <endian.h>
++# if !defined(htobe16)
++#  if __BYTE_ORDER == __LITTLE_ENDIAN
++#   define htobe16(x) __bswap_16(x)
++#  else
++#   define htobe16(x) (x)
++#  endif
++# endif
++# if !defined(be16toh)
++#  if __BYTE_ORDER == __LITTLE_ENDIAN
++#   define be16toh(x) __bswap_16(x)
++#  else
++#   define be16toh(x) (x)
++#  endif
++# endif
++# if !defined(htobe32)
++#  if __BYTE_ORDER == __LITTLE_ENDIAN
++#   define htobe32(x) __bswap_32(x)
++#  else
++#   define htobe32(x) (x)
++#  endif
++# endif
++# if !defined(be32toh)
++#  if __BYTE_ORDER == __LITTLE_ENDIAN
++#   define be32toh(x) __bswap_32(x)
++#  else
++#   define be32toh(x) (x)
++#  endif
++# endif
+ # if !defined(htobe64)
+ #  if __BYTE_ORDER == __LITTLE_ENDIAN
+ #   define htobe64(x) __bswap_64(x)

@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 12.2
-SPK_REV = 42
+SPK_VERS = 12.3
+SPK_REV = 43
 SPK_ICON = src/jellyfin.png
 
 DEPENDS = cross/jellyfin cross/jellyfin-web
@@ -11,13 +11,10 @@ MIN_GLIBC_VERSION = 2.27
 REQUIRED_MIN_DSM = 7.2
 SPK_DEPENDS = "ffmpeg8"
 
-# x64 and armv8 archs are supported only.
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
-CHANGELOG = "1. Update Jellyfin Server and Web to 12.2. <br/>2. Built with dotnet 10.0.400 and nodejs 24.20.0."
+CHANGELOG = "1. Update Jellyfin Server and Web to 12.3. <br/>2. Built with dotnet 10.0.402 and nodejs 24.22.1."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html

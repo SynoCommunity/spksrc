@@ -1,5 +1,5 @@
 PKG_NAME = gickup
-PKG_VERS = 0.10.45
+PKG_VERS = 0.10.47
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cooperspencer/gickup/archive

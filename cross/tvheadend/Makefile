@@ -93,23 +93,17 @@ ifeq ($(call version_ge,$(TC_KERNEL),3.10),1)
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 
-# qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0: mediasdk alone is
-# enough, which is what the published x64-6.2.4 build (gcc 4.9) links.
-DEPENDS += cross/intel-mediasdk
-CONFIGURE_ARGS += --enable-qsv
-# intel-libvpl comes with the videodriver meta from gcc 5 (videodriver-depends.mk)
-ifeq ($(call version_ge, $(TC_GCC), 5),1)
-DEPENDS += cross/intel-libvpl
-endif  # TC_GCC >= 5
+# qsv takes oneVPL (vpl >= 2.0) or MediaSDK (libmfx >= 1.28), patches/102
+$(call depend,cross/intel-mediasdk|cross/intel-libvpl,--enable-qsv)
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
 
 # Enable building of new UI
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 CONFIGURE_ARGS += --enable-vue_build
 # Build environment - use native Node.js from spksrc
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$$PATH
 
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
 CONFIGURE_ARGS += --nowerror

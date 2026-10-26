@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/actual-budget.png
 
 DEPENDS = cross/actual-budget
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 
 SPK_DEPENDS = "Node.js_v22"
 

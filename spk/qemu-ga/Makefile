@@ -1,6 +1,6 @@
 SPK_NAME = qemu-ga
-SPK_VERS = 9.2.0
-SPK_REV = 1
+SPK_VERS = 10.2.4
+SPK_REV = 2
 SPK_ICON = src/qemu.png
 
 DEPENDS = cross/qemu
@@ -14,7 +14,7 @@ endif
 MAINTAINER = hgy59
 DISPLAY_NAME = QEMU Guest Agent
 DESCRIPTION = Support for QMP commands and events that terminate and originate respectively within the guest using an agent built as part of QEMU.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update to v10.2.4."
 
 HOMEPAGE = https://wiki.qemu.org/Features/GuestAgent
 LICENSE  = GPLv2

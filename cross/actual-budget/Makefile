@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/actualbudget/actual/archive/refs/tags
 PKG_DIST_FILE = actual-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = actual-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 BUILD_DEPENDS += cross/actual-budget-translations
 
 # better-sqlite3 ships prebuilds for 64-bit Linux only
@@ -18,7 +18,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = actual_budget_install
 
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$$PATH
 # Upstream pins its Yarn (yarnPath in .yarnrc.yml) and ships the bundle in
 # .yarn/releases. Run it with node: a yarn shim in the native install is not
 # guaranteed (CI builds lack it) and corepack would re-download it anyway.

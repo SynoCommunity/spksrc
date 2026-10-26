@@ -4,7 +4,7 @@ SPK_GIT_HASH = 51ec612f
 SPK_GIT_DATE = 20261022
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 50
+SPK_REV = 51
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -36,6 +36,7 @@ CHANGELOG  = "1. Update to latest git version 51ec612f of October 22nd 2026<br/>
 CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding \(TVH-\#2117\)<br/>"
 CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP timeshift and keep tuned channels \(TVH-\#2249\)<br/>"
 CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
+CHANGELOG += "5. Intel Quick Sync Video (QSV) with MediaSDK or oneVPL, on DSM 6 too<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/

@@ -4,7 +4,7 @@ SPK_REV = 10
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 
 SPK_DEPENDS = "Node.js_v22"
 

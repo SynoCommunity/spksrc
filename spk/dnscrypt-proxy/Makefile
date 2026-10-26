@@ -1,7 +1,7 @@
 # Package identity
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.1.18
-SPK_REV = 7
+SPK_VERS = 2.1.20
+SPK_REV = 8
 SPK_ICON = src/dnscrypt-proxy.png
 
 # Dependencies
@@ -17,7 +17,7 @@ SPK_CONFLICT = DNSServer
 MAINTAINER = publicarray
 DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS.
 DISPLAY_NAME = dnscrypt-proxy
-CHANGELOG = "Update to 2.1.18."
+CHANGELOG = "Update to 2.1.20."
 HOMEPAGE = https://github.com/DNSCrypt/dnscrypt-proxy
 HELPURL = https://github.com/DNSCrypt/dnscrypt-proxy/wiki
 LICENSE = ISC
