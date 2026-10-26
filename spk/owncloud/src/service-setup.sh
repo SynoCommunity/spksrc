@@ -65,21 +65,11 @@ occ_php() {
 }
 
 exec_occ() {
-    local php owner current cmd
+    local php
     php=$(occ_php)
-    # occ must run as the user that owns config/config.php
-    owner=$(ls -ld "${WEB_ROOT}/config/config.php" 2>/dev/null | awk '{print $3}')
-    if [ -z "$owner" ]; then
-        owner=$(ls -ld "${WEB_ROOT}" 2>/dev/null | awk '{print $3}')
-    fi
-    current=$(id -un 2>/dev/null)
-    if [ -n "$owner" ] && [ -n "$current" ] && [ "$owner" != "$current" ] && [ "$(id -u)" -eq 0 ]; then
-        cmd="${php} ${WEB_ROOT}/occ $*"
-        cmd=$(printf '%s' "$cmd" | sed 's/\\/\\\\/g')
-        /bin/su "$owner" -s /bin/sh -c "$cmd"
-    else
-        "$php" "${WEB_ROOT}/occ" "$@"
-    fi
+    # DSM 7 runs the package scripts as the package user, which owns
+    # config/config.php, so occ can be called directly (no su needed).
+    "$php" "${WEB_ROOT}/occ" "$@"
 }
 
 setup_owncloud_instance()
