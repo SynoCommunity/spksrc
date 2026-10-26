@@ -42,12 +42,4 @@ STARTABLE = no
 # TMPDIR is used for owncloud built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
-POST_STRIP_TARGET = owncloud_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: owncloud_extra_install
-owncloud_extra_install:
-	install -m 755 -d $(STAGING_DIR)/web
-	install -m 644 src/web/owncloud.conf $(STAGING_DIR)/web/owncloud.conf
-	install -m 644 src/web/owncloud.json $(STAGING_DIR)/web/owncloud.json
