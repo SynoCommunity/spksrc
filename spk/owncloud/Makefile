@@ -42,4 +42,11 @@ STARTABLE = no
 # TMPDIR is used for owncloud built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
+POST_STRIP_TARGET = owncloud_rollback_template
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: owncloud_rollback_template
+owncloud_rollback_template:
+	install -m 755 -d $(STAGING_DIR)/templates
+	install -m 644 src/templates/ROLLBACK.txt $(STAGING_DIR)/templates/ROLLBACK.txt

@@ -336,12 +336,10 @@ service_preuninst ()
         echo "Dropping database: ${MYSQL_DATABASE}"
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE};"
 
-        # Fetch users matching MYSQL_USER and drop them
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SELECT User, Host FROM mysql.user;" | grep "${MYSQL_USER}" | while read -r user host; do
-            # Construct the DROP USER command
-            drop_command="DROP USER '${user}'@'${host}';"
-            echo "Dropping user: ${user}@${host}"
-            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "$drop_command"
+        # Drop the database user (exact match, all hosts)
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -N -B -e "SELECT Host FROM mysql.user WHERE User = '${MYSQL_USER}';" | while read -r host; do
+            echo "Dropping user: ${MYSQL_USER}@${host}"
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP USER '${MYSQL_USER}'@'${host}';"
         done
     fi
 }
@@ -517,36 +515,7 @@ service_restore ()
         OLD_CONF="${TMP_BACKUP}/config/config.php"
         [ -f "${OLD_CONF}" ] || OLD_CONF="${WEB_ROOT}/config/config.php"
         [ -f "${OLD_CONF}" ] && cp -p "${OLD_CONF}" "${ROLLBACK_DIR}/config.php" 2>/dev/null || true
-        cat > "${ROLLBACK_DIR}/ROLLBACK.txt" <<EOF
-ownCloud upgrade failed.
-=======================
-
-The previous database dump, config.php and .htaccess/.user.ini are kept in this
-folder. The ownCloud data directory was not modified.
-
-Option 1 - retry the upgrade (preferred)
-----------------------------------------
-Most failures can be fixed and retried on the new tree:
-
-  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ maintenance:mode --off
-  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ upgrade
-  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ maintenance:repair
-
-See the troubleshooting section of the upstream manual upgrade guide.
-
-Option 2 - roll back to 10.16.3
--------------------------------
-1. Copy this folder somewhere safe: uninstalling the package removes
-   /var/packages/owncloud (including its var/backup folder).
-2. Uninstall ownCloud 11.0.1 from Package Center, keeping the data share.
-3. Install owncloud 10.16.3-25: it restores the previous code and re-applies
-   the PHP 7.4 WebStation profile.
-4. Restore the database from the dump in this folder:
-     zcat owncloud-*.sql.gz | mysql -u <dbuser> -p <dbname>
-   The credentials are in the config.php copy in this folder.
-5. Copy config.php from this folder to ${WEB_ROOT}/config/config.php.
-6. The data directory was not touched and needs no restore.
-EOF
+        cp -p "${SYNOPKG_PKGDEST}/templates/ROLLBACK.txt" "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
         chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
         chmod 0644 "${ROLLBACK_DIR}"/* 2>/dev/null || true
         echo "ERROR: occ upgrade failed; maintenance mode stays on"

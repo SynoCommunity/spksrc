@@ -1,0 +1,28 @@
+ownCloud upgrade failed.
+=======================
+
+The previous database dump, config.php and .htaccess/.user.ini are kept in this
+folder. The ownCloud data directory was not modified.
+
+Option 1 - retry the upgrade (preferred)
+----------------------------------------
+Most failures can be fixed and retried on the new tree:
+
+  sudo -u sc-owncloud /usr/local/bin/php83 /var/services/web_packages/owncloud/occ maintenance:mode --off
+  sudo -u sc-owncloud /usr/local/bin/php83 /var/services/web_packages/owncloud/occ upgrade
+  sudo -u sc-owncloud /usr/local/bin/php83 /var/services/web_packages/owncloud/occ maintenance:repair
+
+See the troubleshooting section of the upstream manual upgrade guide.
+
+Option 2 - roll back to 10.16.3
+-------------------------------
+1. Copy this folder somewhere safe: uninstalling the package removes
+   /var/packages/owncloud (including its var/backup folder).
+2. Uninstall ownCloud 11.0.1 from Package Center, keeping the data share.
+3. Install owncloud 10.16.3-25: it restores the previous code and re-applies
+   the PHP 7.4 WebStation profile.
+4. Restore the database from the dump in this folder:
+     zcat owncloud-*.sql.gz | mysql -u <dbuser> -p <dbname>
+   The credentials are in the config.php copy in this folder.
+5. Copy config.php from this folder to /var/services/web_packages/owncloud/config/config.php.
+6. The data directory was not touched and needs no restore.
