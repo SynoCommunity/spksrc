@@ -1,0 +1,103 @@
+===>  20261026-003326 MAKELEVEL: 03, PARALLEL_MAKE: max, ARCH: evansport-7.1, NAME: toolchain
+===>  Downloading files for syno-evansport
+===>    File evansport-gcc850_glibc226_i686-GPL.txz already downloaded
+===>  Verifying files for syno-evansport
+===>    Checking sha1sum of file evansport-gcc850_glibc226_i686-GPL.txz
+===>    Checking sha256sum of file evansport-gcc850_glibc226_i686-GPL.txz
+===>    Checking md5sum of file evansport-gcc850_glibc226_i686-GPL.txz
+===>  Extracting for syno-evansport
+===>  Normalizing libtool files for syno-evansport
+===>  Patching for syno-evansport
+patch -p0 < /home/spksrc/synokernel-linuxtv-v2/toolchain/syno-evansport-7.1/patches/define_scsi_ioctl_tagged_enable_disable.patch
+patching file ./i686-pc-linux-gnu/sys-root/usr/include/scsi/scsi.h
+Hunk #1 succeeded at 521 (offset 4 lines).
+===>  Installing rustc toolchain for syno-evansport
+===>  - rustup installation PATH: /home/spksrc/synokernel-linuxtv-v2/distrib/rustup
+===>  - cargo installation PATH: /home/spksrc/synokernel-linuxtv-v2/distrib/cargo
+===>  - default PATH: /home/spksrc/synokernel-linuxtv-v2/distrib/cargo/bin:/home/spksrc/.local/bin:/home/spksrc/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+===>  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q --no-modify-path --default-toolchain stable
+warn: It looks like you have an existing installation of Rust at:
+warn: /home/spksrc/synokernel-linuxtv-v2/distrib/cargo/bin
+warn: This could mean one of the following:
+warn: - You have already installed rustup: you can quit the installer right now.
+warn: - You haven't installed rustup yet, but have Rust installed from elsewhere.
+warn: In the latter case, rustup can coexist with and adopt your existing Rust.
+warn: To adopt, please reply `yes`, or set RUSTUP_INIT_SKIP_PATH_CHECK to yes,
+warn: or pass `-y` to ignore all ignorable checks, then follow the instructions at:
+warn: <https://rust-lang.github.io/rustup/installation/already-installed-rust.html>
+error: cannot install while Rust is installed
+warn: continuing (because the -y flag is set and the error is ignorable)
+warn: it looks like you have an existing rustup settings file at:
+warn: /home/spksrc/synokernel-linuxtv-v2/distrib/rustup/settings.toml
+warn: rustup will install the default toolchain as specified in the settings file,
+warn: instead of the one inferred from the default host tuple.
+warn: Updating existing toolchain, profile choice will be ignored
+
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+
+Rust is installed now. Great!
+
+To get started you need Cargo's bin directory 
+(/home/spksrc/synokernel-linuxtv-v2/distrib/cargo/bin) in your PATH
+environment variable. This has not been done automatically.
+
+To configure your current shell, you need to source
+the corresponding env file under 
+/home/spksrc/synokernel-linuxtv-v2/distrib/cargo.
+
+Consider running the right command for your shell (note the leading DOT):
+. "/home/spksrc/synokernel-linuxtv-v2/distrib/cargo/env" # For 
+sh/ash/dash/pdksh/bash
+cargo:rerun-if-env-changed=CC_x86_64-unknown-linux-gnu
+CC_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=CC_x86_64_unknown_linux_gnu
+CC_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_unknown_linux_gnu
+CFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+CFLAGS_x86_64-unknown-linux-gnu = None
+===>  rustup -q toolchain install stable
+
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+===>  rustup default stable
+info: using existing install for stable-x86_64-unknown-linux-gnu
+info: default toolchain set to stable-x86_64-unknown-linux-gnu
+
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+===>  Installing Rust target i686-unknown-linux-gnu for stable
+info: override toolchain for /home/spksrc/synokernel-linuxtv-v2/toolchain/syno-evansport-7.1 set to stable-x86_64-unknown-linux-gnu
+info: downloading component rust-std
+rust-std-i686-unknown-linux-gnu downloading [               ]         0 B (0 B/s, ETA: 0s)                                                                      [1Arust-std-i686-unknown-linux-gnu downloading [               ]   28.66 MiB (0 B/s, ETA: 0s)                                                                      [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (3.59 MiB/s, ETA: 8s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (3.93 MiB/s, ETA: 7s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.01 MiB/s, ETA: 7s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.14 MiB/s, ETA: 7s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.27 MiB/s, ETA: 7s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.41 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.42 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.59 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.72 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.84 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (4.86 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.09 MiB/s, ETA: 6s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.19 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.33 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.34 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.60 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.72 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.89 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (5.91 MiB/s, ETA: 5s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [#              ]   28.66 MiB (7.90 MiB/s, ETA: 4s)                                                                 [1Arust-std-i686-unknown-linux-gnu downloading [##             ]   28.66 MiB (14.60 MiB/s, ETA: 2s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [###            ]   28.66 MiB (20.94 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [######         ]   28.66 MiB (28.04 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [########       ]   28.66 MiB (34.42 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [##########     ]   28.66 MiB (39.17 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [############   ]   28.66 MiB (42.87 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu downloading [############## ]   28.66 MiB (45.85 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu pending installation            28.66 MiB       rust-std-i686-unknown-linux-gnu pending installation            28.66 MiB       rust-std-i686-unknown-linux-gnu unpacking   [#              ]   28.66 MiB (0 B/s, ETA: 0s)                                                                      [1Arust-std-i686-unknown-linux-gnu unpacking   [#              ]   28.66 MiB (19.89 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [##             ]   28.66 MiB (19.92 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [##             ]   28.66 MiB (20.40 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###            ]   28.66 MiB (20.49 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###            ]   28.66 MiB (20.69 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [####           ]   28.66 MiB (20.81 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#####          ]   28.66 MiB (20.97 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#####          ]   28.66 MiB (21.02 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [######         ]   28.66 MiB (21.07 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#######        ]   28.66 MiB (21.12 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#######        ]   28.66 MiB (21.12 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#######        ]   28.66 MiB (21.14 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [########       ]   28.66 MiB (21.15 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [########       ]   28.66 MiB (21.15 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#########      ]   28.66 MiB (21.14 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#########      ]   28.66 MiB (21.15 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [##########     ]   28.66 MiB (21.14 MiB/s, ETA: 1s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###########    ]   28.66 MiB (21.13 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###########    ]   28.66 MiB (21.13 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [############   ]   28.66 MiB (21.13 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [############   ]   28.66 MiB (21.14 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#############  ]   28.66 MiB (21.15 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [#############  ]   28.66 MiB (21.16 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [############## ]   28.66 MiB (21.18 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###############]   28.66 MiB (21.20 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu unpacking   [###############]   28.66 MiB (21.22 MiB/s, ETA: 0s)                                                                [1Arust-std-i686-unknown-linux-gnu installing |                    28.66 MiB       rust-std-i686-unknown-linux-gnu installing |                    28.66 MiB       rust-std-i686-unknown-linux-gnu installed                       28.66 MiB       Default host: x86_64-unknown-linux-gnu
+rustup home:  /home/spksrc/synokernel-linuxtv-v2/distrib/rustup
+
+installed toolchains
+--------------------
+stable-x86_64-unknown-linux-gnu (active, default)
+1.82.0-armv5te-synology-linux-gnueabi-88f6281-6.2.4-gcc4.6.4
+1.82.0-x86_64-unknown-linux-gnu
+1.97.1-x86_64-unknown-linux-gnu
+
+active toolchain
+----------------
+name: stable-x86_64-unknown-linux-gnu
+active because: directory override for '/home/spksrc/synokernel-linuxtv-v2/toolchain/syno-evansport-7.1'
+installed targets:
+  aarch64-unknown-linux-gnu
+  armv7-unknown-linux-gnueabihf
+  i686-unknown-linux-gnu
+  x86_64-unknown-linux-gnu
+===>  Processing dependencies of syno-evansport
