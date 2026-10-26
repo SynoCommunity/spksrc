@@ -93,14 +93,8 @@ ifeq ($(call version_ge,$(TC_KERNEL),3.10),1)
 DEPENDS += cross/libva
 CONFIGURE_ARGS += --enable-vaapi
 
-# qsv wants libmfx >= 1.28 from intel-mediasdk or oneVPL >= 2.0: mediasdk alone is
-# enough, which is what the published x64-6.2.4 build (gcc 4.9) links.
-DEPENDS += cross/intel-mediasdk
-CONFIGURE_ARGS += --enable-qsv
-# intel-libvpl comes with the videodriver meta from gcc 5 (videodriver-depends.mk)
-ifeq ($(call version_ge, $(TC_GCC), 5),1)
-DEPENDS += cross/intel-libvpl
-endif  # TC_GCC >= 5
+# qsv takes oneVPL (vpl >= 2.0) or MediaSDK (libmfx >= 1.28), patches/102
+$(call depend,cross/intel-mediasdk|cross/intel-libvpl,--enable-qsv)
 endif  # kernel >= 3.10
 endif  # x64
 endif  # VIDEODRV_ON
