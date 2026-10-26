@@ -521,8 +521,63 @@ service_restore ()
     # Run the upgrade while maintenance mode is on (vendor procedure). occ
     # turns maintenance mode on itself and off again at the end.
     if ! exec_occ upgrade; then
-        echo "ERROR: occ upgrade failed; maintenance mode stays on and the rollback backup is kept at ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-        echo "ERROR: database backup and disabled-apps list are in ${SYNOPKG_PKGVAR}/backup"
+        # Build a persistent rollback kit on the data share so it survives an
+        # uninstall of the package (which removes /var/packages/owncloud).
+        ROLLBACK_STAMP=$(date +%Y%m%d%H%M%S)
+        ROLLBACK_DIR="${SHARE_PATH}/owncloud-rollback-${ROLLBACK_STAMP}"
+        if ! ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null; then
+            ROLLBACK_DIR="${SYNOPKG_PKGVAR}/backup/rollback-${ROLLBACK_STAMP}"
+            ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null || true
+        fi
+        DB_DUMP=$(ls -1t "${SYNOPKG_PKGVAR}/backup"/owncloud-*.sql.gz 2>/dev/null | head -1)
+        if [ -n "${DB_DUMP}" ]; then
+            cp -p "${DB_DUMP}" "${ROLLBACK_DIR}/" 2>/dev/null || true
+            STAMP_SUFFIX="${DB_DUMP##*/owncloud-}"
+            STAMP_SUFFIX="${STAMP_SUFFIX%.sql.gz}"
+            for f in "${SYNOPKG_PKGVAR}/backup/htaccess-${STAMP_SUFFIX}" "${SYNOPKG_PKGVAR}/backup/user.ini-${STAMP_SUFFIX}"; do
+                [ -f "$f" ] && cp -p "$f" "${ROLLBACK_DIR}/" 2>/dev/null || true
+            done
+        fi
+        OLD_CONF="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/config.php"
+        [ -f "${OLD_CONF}" ] || OLD_CONF="${WEB_ROOT}/config/config.php"
+        [ -f "${OLD_CONF}" ] && cp -p "${OLD_CONF}" "${ROLLBACK_DIR}/config.php" 2>/dev/null || true
+        cat > "${ROLLBACK_DIR}/ROLLBACK.txt" <<EOF
+ownCloud upgrade failed.
+=======================
+
+The previous database dump, config.php and .htaccess/.user.ini are kept in this
+folder. The ownCloud data directory was not modified.
+
+Option 1 - retry the upgrade (preferred)
+----------------------------------------
+Most failures can be fixed and retried on the new tree:
+
+  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ maintenance:mode --off
+  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ upgrade
+  sudo -u sc-owncloud /usr/local/bin/php83 ${WEB_ROOT}/occ maintenance:repair
+
+See the troubleshooting section of the upstream manual upgrade guide.
+
+Option 2 - roll back to 10.16.3
+-------------------------------
+1. Copy this folder somewhere safe: uninstalling the package removes
+   /var/packages/owncloud (including its var/backup folder).
+2. Uninstall ownCloud 11.0.1 from Package Center, keeping the data share.
+3. Install owncloud 10.16.3-25: it restores the previous code and re-applies
+   the PHP 7.4 WebStation profile.
+4. Restore the database from the dump in this folder:
+     zcat owncloud-*.sql.gz | mysql -u <dbuser> -p <dbname>
+   The credentials are in the config.php copy in this folder.
+5. Copy config.php from this folder to ${WEB_ROOT}/config/config.php.
+6. The data directory was not touched and needs no restore.
+EOF
+        chown -R sc-owncloud "${ROLLBACK_DIR}" 2>/dev/null || true
+        chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
+        chmod 0644 "${ROLLBACK_DIR}"/* 2>/dev/null || true
+        echo "ERROR: occ upgrade failed; maintenance mode stays on"
+        echo "ERROR: rollback kit (database dump, config.php, .htaccess/.user.ini) at ${ROLLBACK_DIR}"
+        echo "ERROR: retry with 'occ maintenance:mode --off' and 'occ upgrade' after fixing the cause, or follow ROLLBACK.txt to return to 10.16.3"
+        echo "ERROR: the pre-upgrade web root is kept at ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
         # service functions run in a subshell (piped through install_log), so
         # exit only leaves the subshell; terminate the installer to fail the upgrade.
         kill -TERM "$PPID" 2>/dev/null
