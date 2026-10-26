@@ -1,0 +1,20 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -2192,7 +2192,7 @@
+ #endif
+ #endif
+ 
+-#ifdef NEED_KEY_APPSELECT
++#ifndef KEY_APPSELECT
+ #define KEY_APPSELECT         0x244   /* AL Select Task/Application */
+ #endif
+ 
+@@ -2469,7 +2469,7 @@
+ }
+ #endif
+ 
+-#ifdef NEED_KEY_SCREENSAVER
++#ifndef KEY_SCREENSAVER
+ #define KEY_SCREENSAVER     0x245   /* AL Screen Saver */
+ #endif
+ 
