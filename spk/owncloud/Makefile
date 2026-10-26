@@ -49,4 +49,4 @@ include ../../mk/spksrc.spk.mk
 .PHONY: owncloud_rollback_template
 owncloud_rollback_template:
 	install -m 755 -d $(STAGING_DIR)/templates
-	install -m 644 src/templates/ROLLBACK.txt $(STAGING_DIR)/templates/ROLLBACK.txt
+	install -m 644 src/templates/ROLLBACK.txt src/templates/ROLLBACK-full.txt $(STAGING_DIR)/templates/

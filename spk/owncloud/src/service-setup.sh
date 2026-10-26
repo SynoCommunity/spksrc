@@ -22,6 +22,26 @@ config_get() {
     sed -n "s/^[[:space:]]*'$1'[[:space:]]*=>[[:space:]]*'\([^']*\)'.*/\1/p" "${WEB_ROOT}/config/config.php" 2>/dev/null | head -1
 }
 
+# Data share root. The wizard variable is only set on install; on upgrade fall
+# back to the package's share link, then to the data directory's parent.
+share_path() {
+    if [ -n "${SHARE_PATH}" ] && [ -d "${SHARE_PATH}" ]; then
+        echo "${SHARE_PATH}"
+        return 0
+    fi
+    local share datadir
+    for share in /var/packages/${SYNOPKG_PKGNAME}/shares/*; do
+        [ -e "${share}" ] || continue
+        share=$(realpath "${share}" 2>/dev/null)
+        if [ -n "${share}" ]; then
+            echo "${share}"
+            return 0
+        fi
+    done
+    datadir=$(config_get datadirectory)
+    [ -n "${datadir}" ] && dirname "${datadir}"
+}
+
 # ownCloud version from version.php.
 occ_version() {
     sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1
@@ -444,6 +464,39 @@ validate_preupgrade ()
     [ -f "${WEB_ROOT}/.htaccess" ] && cp -p "${WEB_ROOT}/.htaccess" "${BACKUP_DIR}/htaccess-${OC_VER}-${STAMP}"
     [ -f "${WEB_ROOT}/.user.ini" ] && cp -p "${WEB_ROOT}/.user.ini" "${BACKUP_DIR}/user.ini-${OC_VER}-${STAMP}"
 
+    # Major upgrades: keep a full pre-upgrade backup in the wizard-export
+    # format so the built-in restore wizard can use it.
+    if [ "${previous%%.*}" != "${new%%.*}" ]; then
+        SHARE_PATH=$(share_path)
+        if [ -z "${SHARE_PATH}" ] || [ ! -d "${SHARE_PATH}" ]; then
+            exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+            echo "ERROR: cannot determine the data share for the pre-upgrade backup; aborting upgrade"
+            exit 1
+        fi
+        FULL_BACKUP="${SHARE_PATH}/owncloud_backup_v${OC_VER}_$(date +%Y%m%d).tar.gz"
+        FULL_TMP="${SYNOPKG_PKGTMP}/owncloud_backup_${STAMP}"
+        echo "Creating pre-upgrade backup at ${FULL_BACKUP}" >&2
+        ${MKDIR} "${FULL_TMP}/configs/root" "${FULL_TMP}/database"
+        for d in config apps apps-external; do
+            if [ -d "${WEB_ROOT}/${d}" ]; then
+                rsync -aX "${WEB_ROOT}/${d}" "${FULL_TMP}/configs/" >&2
+            else
+                ${MKDIR} "${FULL_TMP}/configs/${d}"
+            fi
+        done
+        [ -f "${WEB_ROOT}/.htaccess" ] && cp -p "${WEB_ROOT}/.htaccess" "${FULL_TMP}/configs/root/"
+        [ -f "${WEB_ROOT}/.user.ini" ] && cp -p "${WEB_ROOT}/.user.ini" "${FULL_TMP}/configs/root/"
+        zcat "${DB_DUMP}" > "${FULL_TMP}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>/dev/null
+        if ! rsync -aX "${DATADIR}" "${FULL_TMP}/" >&2 || ! tar -C "${FULL_TMP}" -czf "${FULL_BACKUP}" . 2>&1; then
+            ${RM} "${FULL_TMP}"
+            exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+            echo "ERROR: could not create the pre-upgrade backup; free space and retry"
+            exit 1
+        fi
+        ${RM} "${FULL_TMP}"
+        echo "${FULL_BACKUP}" > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.fullbackup"
+    fi
+
     # Data directory marker and rollback backup of the distribution.
     DATADIR_REAL=$(realpath "$DATADIR")
     WEBROOT_REAL=$(realpath "${WEB_ROOT}")
@@ -463,6 +516,8 @@ validate_preupgrade ()
 service_restore ()
 {
     TMP_BACKUP="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    FULL_BACKUP=""
+    [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.fullbackup" ] && FULL_BACKUP=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.fullbackup")
 
     # Restore a data directory that lived inside the web root.
     if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory" ]; then
@@ -494,6 +549,7 @@ service_restore ()
 
     # Run the upgrade while maintenance mode is on (vendor procedure). As it is
     # already enabled, occ leaves it on; disable it afterwards.
+    SHARE_PATH=$(share_path)
     if ! exec_occ upgrade; then
         # Build a persistent rollback kit on the data share so it survives an
         # uninstall of the package (which removes /var/packages/owncloud).
@@ -515,11 +571,14 @@ service_restore ()
         OLD_CONF="${TMP_BACKUP}/config/config.php"
         [ -f "${OLD_CONF}" ] || OLD_CONF="${WEB_ROOT}/config/config.php"
         [ -f "${OLD_CONF}" ] && cp -p "${OLD_CONF}" "${ROLLBACK_DIR}/config.php" 2>/dev/null || true
-        cp -p "${SYNOPKG_PKGDEST}/templates/ROLLBACK.txt" "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
+        ROLLBACK_TEMPLATE="ROLLBACK.txt"
+        [ -n "${FULL_BACKUP}" ] && ROLLBACK_TEMPLATE="ROLLBACK-full.txt"
+        sed "s|@FULL_BACKUP@|${FULL_BACKUP}|g" "${SYNOPKG_PKGDEST}/templates/${ROLLBACK_TEMPLATE}" > "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
         chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
         chmod 0644 "${ROLLBACK_DIR}"/* 2>/dev/null || true
         echo "ERROR: occ upgrade failed; maintenance mode stays on"
         echo "ERROR: rollback kit (database dump, config.php, .htaccess/.user.ini) at ${ROLLBACK_DIR}"
+        [ -n "${FULL_BACKUP}" ] && echo "ERROR: pre-upgrade backup kept at ${FULL_BACKUP}"
         echo "ERROR: retry with 'occ maintenance:mode --off' and 'occ upgrade' after fixing the cause, or follow ROLLBACK.txt to return to 10.16.3"
         echo "ERROR: the pre-upgrade web root is kept at ${TMP_BACKUP}"
         # service functions run in a subshell (piped through install_log), so
@@ -541,6 +600,11 @@ service_restore ()
     exec_occ app:list
 
     echo "Third-party apps disabled before the upgrade are listed in ${SYNOPKG_PKGVAR}/backup/disabled-apps-*.txt; re-enable compatible ones with 'occ app:enable <app>'."
+
+    if [ -n "${FULL_BACKUP}" ]; then
+        echo "Pre-upgrade backup kept at ${FULL_BACKUP}"
+        ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.fullbackup"
+    fi
 
     # Remove upgrade backup files
     ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
