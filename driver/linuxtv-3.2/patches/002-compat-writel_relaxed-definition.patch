@@ -1,0 +1,12 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1675,7 +1675,8 @@
+ #define netdev_dbg(__dev, format, args...)
+ #endif
+ 
+-#ifdef NEED_WRITEL_RELAXED
++#include <linux/io.h>
++#ifndef writel_relaxed
+ #define writel_relaxed writel
+ #endif
+ 
