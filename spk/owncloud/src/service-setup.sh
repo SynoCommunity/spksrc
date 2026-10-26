@@ -344,17 +344,21 @@ service_preuninst ()
 
 validate_preupgrade ()
 {
-    # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
+    # Mirrors ownCloud's version.php OC_VersionCanBeUpgradedFrom
+    # [[8,2,11],[9,0,9],[9,1]] and Updater::isUpgradePossible(): the previous
+    # version must be >= one of the allowed entries and <= the new one.
     is_upgrade_possible="no"
     previous=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
-    
-    # Check against valid versions
-    for version in "8.2.11" "9.0.9" "9.1." "10." "11."; do
-        if echo "$previous" | grep -q "^$version"; then
+    new=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
+    if version_greater_equal "${new}" "${previous}"; then
+        if echo "${previous}" | grep -q '^8\.2\.' && version_greater_equal "${previous}" "8.2.11"; then
             is_upgrade_possible="yes"
-            break
+        elif echo "${previous}" | grep -q '^9\.0\.' && version_greater_equal "${previous}" "9.0.9"; then
+            is_upgrade_possible="yes"
+        elif version_greater_equal "${previous}" "9.1"; then
+            is_upgrade_possible="yes"
         fi
-    done
+    fi
 
     # No matching upgrade paths found
     if [ "$is_upgrade_possible" = "no" ]; then
