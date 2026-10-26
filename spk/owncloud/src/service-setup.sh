@@ -17,17 +17,26 @@ version_greater_equal() {
     [ "$v1" -ge "$v2" ]
 }
 
-exec_occ() {
-    # oC10 only runs on PHP 7.4 and oC11 requires PHP 8.3. Pick the interpreter
-    # from the deployed tree so pre-upgrade steps work on the old code and
-    # post-upgrade steps on the new one.
-    OC_MAJOR=$(sed -n 's/.*OC_Version = \[\([0-9][0-9]*\).*/\1/p' "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
-    if [ -n "${OC_MAJOR}" ] && [ "${OC_MAJOR}" -lt 11 ] && [ -x /usr/local/bin/php74 ]; then
-        PHP="/usr/local/bin/php74"
+# Read a scalar from config/config.php without running PHP.
+config_get() {
+    sed -n "s/^[[:space:]]*'$1'[[:space:]]*=>[[:space:]]*'\([^']*\)'.*/\1/p" "${WEB_ROOT}/config/config.php" 2>/dev/null | head -1
+}
+
+# oC10 only runs on PHP 7.4 and oC11 requires PHP 8.3. Pick the interpreter
+# from the deployed tree so pre-upgrade steps work on the old code and
+# post-upgrade steps on the new one.
+occ_php() {
+    local major
+    major=$(sed -n 's/.*OC_Version = \[\([0-9][0-9]*\).*/\1/p' "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
+    if [ -n "${major}" ] && [ "${major}" -lt 11 ] && [ -x /usr/local/bin/php74 ]; then
+        echo /usr/local/bin/php74
     else
-        PHP="/usr/local/bin/php83"
+        echo /usr/local/bin/php83
     fi
-    "${PHP}" "${WEB_ROOT}/occ" "$@"
+}
+
+exec_occ() {
+    "$(occ_php)" "${WEB_ROOT}/occ" "$@"
 }
 
 setup_owncloud_instance()
@@ -238,7 +247,7 @@ validate_preuninst ()
                 exit 1
             fi
             # Ensure the configured data directory exists before attempting a backup
-            DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+            DATADIR="$(config_get datadirectory)"
             if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
                 echo "Expected data directory missing; aborting uninstall backup"
                 exit 1
@@ -251,7 +260,7 @@ service_preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
         # Get data directory
-        DATADIR="$(exec_occ config:system:get datadirectory)"
+        DATADIR="$(config_get datadirectory)"
         # Data directory fail-safe
         if [ ! -d "$DATADIR" ]; then
             echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
@@ -259,7 +268,7 @@ service_preuninst ()
         fi
 
         # Prepare archive structure
-        OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
+        OCC_VER=$(sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
         TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
         ${MKDIR} "${TEMPDIR}"
 
@@ -338,14 +347,14 @@ validate_preupgrade ()
     fi
 
     # ownCloud upgrades only possible from MySQL instances
-    DATABASE_TYPE="$(exec_occ config:system:get dbtype)"
+    DATABASE_TYPE="$(config_get dbtype)"
     if [ "$DATABASE_TYPE" != "mysql" ]; then
         echo "Please migrate your previous database from ${DATABASE_TYPE} to mariadb (mysql) before performing upgrade."
         exit 1
     fi
 
     # Ensure data directory is present before proceeding
-    DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+    DATADIR="$(config_get datadirectory)"
     if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
         echo "Expected data directory missing; aborting upgrade"
         exit 1
@@ -354,11 +363,12 @@ validate_preupgrade ()
 
 service_save ()
 {
-    # Place server in maintenance mode
-    exec_occ maintenance:mode --on
+    # Place server in maintenance mode (best effort: the old oC10 tree needs
+    # PHP 7.4, which may no longer be installed)
+    exec_occ maintenance:mode --on >/dev/null 2>&1 || echo "Warning: could not enable maintenance mode"
 
     # Identify data directory for restore
-    DATADIR="$(exec_occ config:system:get datadirectory)"
+    DATADIR="$(config_get datadirectory)"
     # data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
