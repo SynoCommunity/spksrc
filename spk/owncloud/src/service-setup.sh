@@ -26,9 +26,8 @@ config_get() {
 # from the deployed tree so pre-upgrade steps work on the old code and
 # post-upgrade steps on the new one.
 occ_php() {
-    local major
-    major=$(sed -n 's/.*OC_Version = \[\([0-9][0-9]*\).*/\1/p' "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
-    if [ -n "${major}" ] && [ "${major}" -lt 11 ] && [ -x /usr/local/bin/php74 ]; then
+    # oC10's lib/base.php refuses PHP 8; oC11 requires PHP 8.3.
+    if [ -f "${WEB_ROOT}/lib/base.php" ] && grep -q "not compatible with PHP 8.0" "${WEB_ROOT}/lib/base.php" 2>/dev/null; then
         echo /usr/local/bin/php74
     else
         echo /usr/local/bin/php83
@@ -354,18 +353,20 @@ validate_preupgrade ()
         echo "Expected data directory missing; aborting upgrade"
         exit 1
     fi
-}
 
-service_save ()
-{
+    # ------------------------------------------------------------------
+    # Vendor upgrade procedure (11.0 manual upgrade). These steps run here
+    # because validate_preupgrade is called without the install_log pipe, so
+    # exit aborts the package upgrade before any files are replaced.
+    # ------------------------------------------------------------------
     BACKUP_DIR="${SYNOPKG_PKGVAR}/backup"
     ${MKDIR} "${BACKUP_DIR}"
     OC_VER=$(sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
     OC_VER="${OC_VER:-unknown}"
     STAMP=$(date +%Y%m%d%H%M%S)
 
-    # Vendor upgrade procedure, step 1: maintenance mode. (The package has no
-    # DSM cron job to disable; background jobs run via occ system:cron.)
+    # Step 1: maintenance mode. (The package has no DSM cron job to disable;
+    # background jobs run via occ system:cron.)
     if ! exec_occ maintenance:mode --on; then
         echo "ERROR: could not enable maintenance mode; aborting upgrade"
         exit 1
@@ -411,25 +412,20 @@ service_save ()
     [ -f "${WEB_ROOT}/.htaccess" ] && cp -p "${WEB_ROOT}/.htaccess" "${BACKUP_DIR}/htaccess-${OC_VER}-${STAMP}"
     [ -f "${WEB_ROOT}/.user.ini" ] && cp -p "${WEB_ROOT}/.user.ini" "${BACKUP_DIR}/user.ini-${OC_VER}-${STAMP}"
 
-    # Identify data directory for restore
-    DATADIR="$(config_get datadirectory)"
-    # data directory fail-safe
-    if [ ! -d "$DATADIR" ]; then
-        echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-        DATADIR="${WEB_ROOT}/data"
-    fi
-    # Check if data directory inside owncloud directory and flag for restore if true
+    # Data directory marker and rollback backup of the distribution.
     DATADIR_REAL=$(realpath "$DATADIR")
     WEBROOT_REAL=$(realpath "${WEB_ROOT}")
     if echo "$DATADIR_REAL" | grep -q "^$WEBROOT_REAL"; then
         echo "${DATADIR_REAL#"$WEBROOT_REAL/"}" > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     fi
-
-    # Backup configuration and data
     [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" ] && ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" 2>&1
+    if ! rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" 2>&1; then
+        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+        echo "ERROR: distribution backup failed; aborting upgrade"
+        exit 1
+    fi
 }
 
 service_restore ()
@@ -491,6 +487,9 @@ service_restore ()
     if ! exec_occ upgrade; then
         echo "ERROR: occ upgrade failed; maintenance mode stays on and the rollback backup is kept at ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
         echo "ERROR: database backup and disabled-apps list are in ${SYNOPKG_PKGVAR}/backup"
+        # service functions run in a subshell (piped through install_log), so
+        # exit only leaves the subshell; terminate the installer to fail the upgrade.
+        kill -TERM "$PPID" 2>/dev/null
         exit 1
     fi
 
