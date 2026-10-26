@@ -22,6 +22,27 @@ config_get() {
     sed -n "s/^[[:space:]]*'$1'[[:space:]]*=>[[:space:]]*'\([^']*\)'.*/\1/p" "${WEB_ROOT}/config/config.php" 2>/dev/null | head -1
 }
 
+# Append the HTTPS redirect and HSTS rules. The integrity check ignores
+# everything after the "DO NOT CHANGE ANYTHING ABOVE THIS LINE" marker, so this
+# does not affect code signing.
+configure_htaccess() {
+    local conf="${WEB_ROOT}/.htaccess"
+    [ -f "${conf}" ] || return 0
+    grep -q "Strict-Transport-Security" "${conf}" 2>/dev/null && return 0
+    {
+        echo ""
+        echo "# Added by the SynoCommunity package: HTTPS redirect and HSTS"
+        echo "<IfModule mod_rewrite.c>"
+        echo "RewriteEngine On"
+        echo "RewriteCond %{HTTPS} off"
+        echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
+        echo "</IfModule>"
+        echo "<IfModule mod_headers.c>"
+        echo "Header always set Strict-Transport-Security \"max-age=15552000; includeSubDomains\""
+        echo "</IfModule>"
+    } >> "${conf}"
+}
+
 # oC10 only runs on PHP 7.4 and oC11 requires PHP 8.3. Pick the interpreter
 # from the deployed tree so pre-upgrade steps work on the old code and
 # post-upgrade steps on the new one.
@@ -172,7 +193,6 @@ service_postinst ()
             tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
 
             # Restore configuration files and directories
-            rsync -aX -I "${TEMPDIR}/configs/root/.user.ini" "${WEB_ROOT}/" 2>&1
             rsync -aX -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
 
             # Restore user data
@@ -218,6 +238,8 @@ service_postinst ()
             echo "Run ownCloud installer"
             setup_owncloud_instance
         fi
+
+        configure_htaccess
 
     fi
 }
@@ -367,7 +389,7 @@ validate_preupgrade ()
 
     # Step 1: maintenance mode. (The package has no DSM cron job to disable;
     # background jobs run via occ system:cron.)
-    if ! exec_occ maintenance:mode --on; then
+    if ! exec_occ maintenance:mode --on >&2; then
         echo "ERROR: could not enable maintenance mode; aborting upgrade"
         exit 1
     fi
@@ -405,7 +427,7 @@ validate_preupgrade ()
         echo "ERROR: database backup is corrupt; aborting upgrade"
         exit 1
     fi
-    echo "Database backup: ${DB_DUMP}"
+    echo "Database backup: ${DB_DUMP}" >&2
 
     # Step 4: keep .htaccess/.user.ini for manual re-application. The vendor
     # recreates these files on upgrade, so they are not restored.
@@ -419,9 +441,9 @@ validate_preupgrade ()
         echo "${DATADIR_REAL#"$WEBROOT_REAL/"}" > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     fi
     [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" ] && ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" >&2
     ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    if ! rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" 2>&1; then
+    if ! rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" >&2 2>&1; then
         exec_occ maintenance:mode --off >/dev/null 2>&1 || true
         echo "ERROR: distribution backup failed; aborting upgrade"
         exit 1
@@ -455,9 +477,6 @@ service_restore ()
         fi
     done
     
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" ]; then
-        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" "${WEB_ROOT}/" 2>&1
-    fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     # Migrate manually installed apps from source to destination directories
@@ -495,6 +514,9 @@ service_restore ()
 
     # Disable maintenance mode after a successful upgrade.
     exec_occ maintenance:mode --off
+
+    # Re-apply the HTTPS redirect and HSTS rules to the new .htaccess.
+    configure_htaccess
 
     # Check the upgrade: version and app list.
     exec_occ status
