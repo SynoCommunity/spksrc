@@ -36,7 +36,21 @@ occ_php() {
 }
 
 exec_occ() {
-    "$(occ_php)" "${WEB_ROOT}/occ" "$@"
+    local php owner current cmd
+    php=$(occ_php)
+    # occ must run as the user that owns config/config.php
+    owner=$(ls -ld "${WEB_ROOT}/config/config.php" 2>/dev/null | awk '{print $3}')
+    if [ -z "$owner" ]; then
+        owner=$(ls -ld "${WEB_ROOT}" 2>/dev/null | awk '{print $3}')
+    fi
+    current=$(id -un 2>/dev/null)
+    if [ -n "$owner" ] && [ -n "$current" ] && [ "$owner" != "$current" ]; then
+        cmd="${php} ${WEB_ROOT}/occ $*"
+        cmd=$(printf '%s' "$cmd" | sed 's/\\/\\\\/g')
+        /bin/su "$owner" -s /bin/sh -c "$cmd"
+    else
+        "$php" "${WEB_ROOT}/occ" "$@"
+    fi
 }
 
 setup_owncloud_instance()
@@ -344,9 +358,58 @@ validate_preupgrade ()
 
 service_save ()
 {
-    # Place server in maintenance mode (best effort: the old oC10 tree needs
-    # PHP 7.4, which may no longer be installed)
-    exec_occ maintenance:mode --on >/dev/null 2>&1 || echo "Warning: could not enable maintenance mode"
+    BACKUP_DIR="${SYNOPKG_PKGVAR}/backup"
+    ${MKDIR} "${BACKUP_DIR}"
+    OC_VER=$(sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
+    OC_VER="${OC_VER:-unknown}"
+    STAMP=$(date +%Y%m%d%H%M%S)
+
+    # Vendor upgrade procedure, step 1: maintenance mode. (The package has no
+    # DSM cron job to disable; background jobs run via occ system:cron.)
+    if ! exec_occ maintenance:mode --on; then
+        echo "ERROR: could not enable maintenance mode; aborting upgrade"
+        exit 1
+    fi
+
+    # Step 2: disable third-party apps (not shipped by ownCloud).
+    DISABLED_APPS="${BACKUP_DIR}/disabled-apps-${OC_VER}-${STAMP}.txt"
+    : > "${DISABLED_APPS}"
+    for dir in "${WEB_ROOT}/apps"/* "${WEB_ROOT}/apps-external"/*; do
+        [ -d "$dir" ] || continue
+        app=$(basename "$dir")
+        if [ ! -d "${SYNOPKG_PKGDEST}/share/owncloud/apps/${app}" ]; then
+            if exec_occ app:disable "$app" >/dev/null 2>&1; then
+                echo "$app" >> "${DISABLED_APPS}"
+            fi
+        fi
+    done
+
+    # Step 3: backup the database with the application credentials.
+    DB_NAME=$(config_get dbname)
+    DB_USER=$(config_get dbuser)
+    DB_PASS=$(config_get dbpassword)
+    if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ]; then
+        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+        echo "ERROR: cannot read database settings from config.php; aborting upgrade"
+        exit 1
+    fi
+    DB_DUMP="${BACKUP_DIR}/owncloud-${OC_VER}-${STAMP}.sql.gz"
+    if ! MYSQL_PWD="$DB_PASS" ${MYSQLDUMP} --single-transaction --quick -u "$DB_USER" "$DB_NAME" | gzip > "$DB_DUMP"; then
+        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+        echo "ERROR: database backup failed; aborting upgrade"
+        exit 1
+    fi
+    if ! gzip -t "$DB_DUMP"; then
+        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+        echo "ERROR: database backup is corrupt; aborting upgrade"
+        exit 1
+    fi
+    echo "Database backup: ${DB_DUMP}"
+
+    # Step 4: keep .htaccess/.user.ini for manual re-application. The vendor
+    # recreates these files on upgrade, so they are not restored.
+    [ -f "${WEB_ROOT}/.htaccess" ] && cp -p "${WEB_ROOT}/.htaccess" "${BACKUP_DIR}/htaccess-${OC_VER}-${STAMP}"
+    [ -f "${WEB_ROOT}/.user.ini" ] && cp -p "${WEB_ROOT}/.user.ini" "${BACKUP_DIR}/user.ini-${OC_VER}-${STAMP}"
 
     # Identify data directory for restore
     DATADIR="$(config_get datadirectory)"
@@ -423,11 +486,20 @@ service_restore ()
         fi
     done
 
-    # Disable maintenance mode
+    # Run the upgrade while maintenance mode is on (vendor procedure). occ
+    # turns maintenance mode on itself and off again at the end.
+    if ! exec_occ upgrade; then
+        echo "ERROR: occ upgrade failed; maintenance mode stays on and the rollback backup is kept at ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+        echo "ERROR: database backup and disabled-apps list are in ${SYNOPKG_PKGVAR}/backup"
+        exit 1
+    fi
+
+    # Disable maintenance mode after a successful upgrade.
     exec_occ maintenance:mode --off
 
-    # Finalize upgrade
-    exec_occ upgrade
+    # Check the upgrade: version and app list.
+    exec_occ status
+    exec_occ app:list
 
     DATADIR=$(exec_occ config:system:get datadirectory)
     # Data directory fail-safe
@@ -435,7 +507,9 @@ service_restore ()
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
         DATADIR="${WEB_ROOT}/data"
     fi
-    
+
+    echo "Third-party apps disabled before the upgrade are listed in ${SYNOPKG_PKGVAR}/backup/disabled-apps-*.txt; re-enable compatible ones with 'occ app:enable <app>'."
+
     # Remove upgrade backup files
     ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
 }
