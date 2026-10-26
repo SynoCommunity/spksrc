@@ -21,8 +21,7 @@
 #   REQUIRE_KERNEL_MODULE    list of modules to compile, each
 #                            CONFIG_<option>:<source dir>:<module>[:CONFIG_<needed>]
 #                            the module being skipped on a kernel without the
-#                            optional CONFIG_<needed>=y it relies on, and on a
-#                            kernel that does not offer CONFIG_<option>
+#                            optional CONFIG_<needed>=y it relies on
 #   STAGING_INSTALL_PREFIX   full install path for compiled modules
 #   WORK_DIR                 base directory for compilation
 #   PKG_DIR                  extracted kernel source directory
@@ -96,48 +95,25 @@ endif
 	  echo "all:" > $(WORK_DIR)/$(PKG_DIR)/tools/objtool/Makefile ; \
 	fi
 	@$(RUN) $(MAKE) modules_prepare
-	@# powerpc links every module with crtsavres.o, which older modules_prepare skip
-	@if grep -q "^CONFIG_PPC=y" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
-	  $(RUN) $(MAKE) arch/powerpc/lib/crtsavres.o ; \
-	fi
 
 .PHONY: kernel_module_target
 kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
 	@$(MSG) Compile kernel modules $(REQUIRE_KERNEL_MODULE)
-	@wanted="" ; \
-	for module in $(REQUIRE_KERNEL_MODULE); \
+	@for module in $(REQUIRE_KERNEL_MODULE); \
 	do \
-	  option=$${module%%:*} ; \
-	  if ! grep -q "^$$option=m" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
-	    $(MSG) "Skip kernel module $$(echo $$module | cut -d: -f3): this kernel has no $$option, or not what it needs" ; \
-	    continue ; \
-	  fi ; \
 	  needed=$$(echo $$module | cut -s -d: -f4) ; \
 	  if [ -n "$$needed" ] && ! grep -q "^$$needed=y" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
 	    $(MSG) "Skip kernel module $$(echo $$module | cut -d: -f3): the kernel has no $$needed" ; \
 	    continue ; \
 	  fi ; \
-	  wanted="$$wanted $$module" ; \
-	done ; \
-	for dir in $$(for module in $$wanted; do echo $$module | cut -d: -f2; done | awk '!seen[$$0]++'); \
-	do \
-	  $(MAKE) kernel_module_compile moddir=$$dir || exit 1 ; \
-	done ; \
-	for module in $$wanted; \
-	do \
-	  $(MAKE) kernel_module_install module=$$module || exit 1 ; \
+	  $(MAKE) kernel_module_compile module=$$module ; \
 	done
 
-# Once per directory: kernel_module_prepare enabled every option in .config, so a
-# single build makes all the modules of a directory
 .PHONY: kernel_module_compile
 kernel_module_compile:
-	@$(MSG) Compile kernel modules in $(moddir)
-	@$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) M=$(moddir) OBJECT_FILES_NON_STANDARD=y modules
-	@$(RUN) cat $(moddir)/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
-
-.PHONY: kernel_module_install
-kernel_module_install:
+	@$(MSG) Compile kernel module module=$(module)
+	@$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m OBJECT_FILES_NON_STANDARD=y modules
+	@$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
 	install -d $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(word 2,$(subst :, ,$(module)))/$(word 3,$(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 
