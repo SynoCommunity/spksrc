@@ -1,4 +1,4 @@
-PKG_NAME = linux-media
+PKG_NAME = linux-media-$(PKG_VERS)
 PKG_VERS = 2022.06.05
 PKG_EXT = tar.gz
 PKG_GIT_HASH = f2906aa863381afb0015a9eb7fefad885d4e5a56

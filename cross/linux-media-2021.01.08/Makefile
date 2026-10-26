@@ -1,4 +1,4 @@
-PKG_NAME = linux-media
+PKG_NAME = linux-media-$(PKG_VERS)
 PKG_VERS = 2021.01.08
 PKG_EXT = tar.gz
 PKG_GIT_HASH = 321af22a3d2f6ed1fb1737c8588c01f6fec8a7b8
