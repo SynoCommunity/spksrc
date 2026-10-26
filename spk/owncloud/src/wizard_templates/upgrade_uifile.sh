@@ -3,12 +3,7 @@
 OC_NEW_VER=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
 OC_OLD_VER=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
 
-WEB_DIR="/var/services/web_packages"
-# for backwards compatability
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ];then
-	WEB_DIR="/var/services/web"
-fi
-WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
+WEB_ROOT="/var/services/web_packages/${SYNOPKG_PKGNAME}"
 
 quote_json ()
 {
@@ -63,9 +58,9 @@ is_database_mysql ()
 {
 	config_file="${WEB_ROOT}/config/config.php"
 	if [ -f "$config_file" ] && grep -q "'dbtype' => 'mysql'" "$config_file"; then
-		return 0  # Database type is MySQL
+		return 0
 	else
-		return 1  # Database type is not MySQL
+		return 1
 	fi
 }
 

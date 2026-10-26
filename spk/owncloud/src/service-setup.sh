@@ -56,7 +56,6 @@ configure_htaccess() {
 # from the deployed tree so pre-upgrade steps work on the old code and
 # post-upgrade steps on the new one.
 occ_php() {
-    # oC10's lib/base.php refuses PHP 8; oC11 requires PHP 8.3.
     if [ -f "${WEB_ROOT}/lib/base.php" ] && grep -q "not compatible with PHP 8.0" "${WEB_ROOT}/lib/base.php" 2>/dev/null; then
         echo /usr/local/bin/php74
     else
@@ -159,7 +158,7 @@ validate_preinst ()
             # Check backup file prefix
             filename=$(basename "${wizard_backup_file}")
             expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
-            
+
             if [ "${filename#"$expected_prefix"}" = "$filename" ]; then
                 echo "The backup filename does not start with the expected prefix."
                 exit 1
@@ -199,8 +198,8 @@ service_postinst ()
             rsync -aX -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
 
             # Restore the Database
-            db_user=$(grep "'dbuser'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbuser' => '\(.*\)'.*/\1/p")
-            db_password=$(grep "'dbpassword'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbpassword' => '\(.*\)'.*/\1/p")
+            db_user=$(config_get dbuser)
+            db_password=$(config_get dbpassword)
 
             echo "Creating database ${MYSQL_DATABASE} and access"
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${db_user}'@'localhost' IDENTIFIED BY '${db_password}';" 2>&1
@@ -330,7 +329,7 @@ service_preuninst ()
 
         echo "Dropping database: ${MYSQL_DATABASE}"
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE};"
-        
+
         # Fetch users matching MYSQL_USER and drop them
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SELECT User, Host FROM mysql.user;" | grep "${MYSQL_USER}" | while read -r user host; do
             # Construct the DROP USER command
@@ -361,7 +360,7 @@ validate_preupgrade ()
 
     # No matching upgrade paths found
     if [ "$is_upgrade_possible" = "no" ]; then
-        echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br/>Remember to save your ${WEB_ROOT}/data files before uninstalling."
+        echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}. Remember to save your data files before uninstalling."
         exit 1
     fi
 
@@ -390,8 +389,8 @@ validate_preupgrade ()
     OC_VER="${OC_VER:-unknown}"
     STAMP=$(date +%Y%m%d%H%M%S)
 
-    # Step 1: maintenance mode. (The package has no DSM cron job to disable;
-    # background jobs run via occ system:cron.)
+    # Step 1: maintenance mode. (The package creates no cron job, so there is
+    # nothing to disable.)
     if ! exec_occ maintenance:mode --on >&2; then
         echo "ERROR: could not enable maintenance mode; aborting upgrade"
         exit 1
@@ -450,7 +449,7 @@ validate_preupgrade ()
     [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" ] && ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" >&2
     ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    if ! rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" >&2 2>&1; then
+    if ! rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" >&2; then
         exec_occ maintenance:mode --off >/dev/null 2>&1 || true
         echo "ERROR: distribution backup failed; aborting upgrade"
         exit 1
@@ -473,7 +472,7 @@ service_restore ()
     source="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config"
     patterns="*config.php *.json"
     target="${WEB_ROOT}/config"
-    
+
     # Process each pattern of files in the source directory
     for pattern in $patterns; do
         files=$(find "$source" -type f -name "$pattern")
@@ -483,18 +482,18 @@ service_restore ()
             done
         fi
     done
-    
+
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     # Migrate manually installed apps from source to destination directories
     dirs="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
     dest="${WEB_ROOT}"
-    
+
     # Process the subdirectories in each of the source directories
     for dir in $dirs; do
         dir_name=$(basename "$dir")
         sub_dirs=$(find "$dir" -mindepth 1 -maxdepth 1 -type d)
-        
+
         if [ ! -d "$dest/$dir_name" ]; then
             rsync -aX "$dir" "$dest/" 2>&1
         elif [ -n "$sub_dirs" ]; then
@@ -508,8 +507,8 @@ service_restore ()
         fi
     done
 
-    # Run the upgrade while maintenance mode is on (vendor procedure). occ
-    # turns maintenance mode on itself and off again at the end.
+    # Run the upgrade while maintenance mode is on (vendor procedure). As it is
+    # already enabled, occ leaves it on; disable it afterwards.
     if ! exec_occ upgrade; then
         # Build a persistent rollback kit on the data share so it survives an
         # uninstall of the package (which removes /var/packages/owncloud).
@@ -561,7 +560,6 @@ Option 2 - roll back to 10.16.3
 5. Copy config.php from this folder to ${WEB_ROOT}/config/config.php.
 6. The data directory was not touched and needs no restore.
 EOF
-        chown -R sc-owncloud "${ROLLBACK_DIR}" 2>/dev/null || true
         chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
         chmod 0644 "${ROLLBACK_DIR}"/* 2>/dev/null || true
         echo "ERROR: occ upgrade failed; maintenance mode stays on"
@@ -585,13 +583,6 @@ EOF
     # Check the upgrade: version and app list.
     exec_occ status
     exec_occ app:list
-
-    DATADIR=$(exec_occ config:system:get datadirectory)
-    # Data directory fail-safe
-    if [ ! -d "$DATADIR" ]; then
-        echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-        DATADIR="${WEB_ROOT}/data"
-    fi
 
     echo "Third-party apps disabled before the upgrade are listed in ${SYNOPKG_PKGVAR}/backup/disabled-apps-*.txt; re-enable compatible ones with 'occ app:enable <app>'."
 
