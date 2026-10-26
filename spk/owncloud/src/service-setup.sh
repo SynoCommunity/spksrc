@@ -61,7 +61,15 @@ set_owncloud_permissions ()
 }
 
 exec_occ() {
-    PHP="/usr/local/bin/php74"
+    # oC10 only runs on PHP 7.4 and oC11 requires PHP 8.3. Pick the interpreter
+    # from the deployed tree so pre-upgrade steps work on the old code and
+    # post-upgrade steps on the new one.
+    OC_MAJOR=$(sed -n 's/.*OC_Version = \[\([0-9][0-9]*\).*/\1/p' "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
+    if [ -n "${OC_MAJOR}" ] && [ "${OC_MAJOR}" -lt 11 ] && [ -x /usr/local/bin/php74 ]; then
+        PHP="/usr/local/bin/php74"
+    else
+        PHP="/usr/local/bin/php83"
+    fi
     OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
