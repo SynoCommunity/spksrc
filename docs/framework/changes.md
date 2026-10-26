@@ -124,7 +124,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "October 26th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#PRNUM)"
+??? note "October 26th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
 
     - **A kernel module spk carries the modules of every kernel of its arch**:
       `kernel-depend` prepares `kernel/syno-<arch>-<version>` for each sub-arch, in the
