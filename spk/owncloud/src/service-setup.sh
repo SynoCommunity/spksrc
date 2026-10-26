@@ -22,6 +22,16 @@ config_get() {
     sed -n "s/^[[:space:]]*'$1'[[:space:]]*=>[[:space:]]*'\([^']*\)'.*/\1/p" "${WEB_ROOT}/config/config.php" 2>/dev/null | head -1
 }
 
+# ownCloud version from version.php.
+occ_version() {
+    sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1
+}
+
+# ownCloud version from a <name>_backup_v<version>_<date>.tar.gz archive name.
+backup_version() {
+    echo "$1" | sed -n "s/.*${SYNOPKG_PKGNAME}_backup_v\([0-9][0-9.]*\)_.*/\1/p"
+}
+
 # Append the HTTPS redirect and HSTS rules. The integrity check ignores
 # everything after the "DO NOT CHANGE ANYTHING ABOVE THIS LINE" marker, so this
 # does not affect code signing.
@@ -164,9 +174,9 @@ validate_preinst ()
                 exit 1
             fi
             # Check the minimum required version
-            backup_version=$(echo "$filename" | sed -n "s/${expected_prefix}\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p")
+            file_version=$(backup_version "$filename")
             min_version="10.15.0"
-            if ! version_greater_equal "$backup_version" "$min_version"; then
+            if ! version_greater_equal "$file_version" "$min_version"; then
                 echo "The backup version is too old. Minimum required version is $min_version."
                 exit 1
             fi
@@ -213,13 +223,9 @@ service_postinst ()
             # Disable maintenance mode
             exec_occ maintenance:mode --off
 
-            # Set backup filename and expected prefix
-            filename=$(basename "${wizard_backup_file}")
-            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
-            # Extract the version number using awk and cut
-            file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
+            # Compare the archive version with the package version.
+            file_version=$(backup_version "$(basename "${wizard_backup_file}")")
             package_version=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
-            # Compare the extracted version with package_version using the version_greater_equal function
             if [ -n "$file_version" ]; then
                 if ! version_greater_equal "$file_version" "$package_version"; then
                     echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
@@ -282,8 +288,8 @@ service_preuninst ()
         fi
 
         # Prepare archive structure
-        OCC_VER=$(sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
-        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
+        OC_VER=$(occ_version)
+        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OC_VER}_$(date +"%Y%m%d")"
         ${MKDIR} "${TEMPDIR}"
 
         # Place server in maintenance mode
@@ -385,7 +391,7 @@ validate_preupgrade ()
     # ------------------------------------------------------------------
     BACKUP_DIR="${SYNOPKG_PKGVAR}/backup"
     ${MKDIR} "${BACKUP_DIR}"
-    OC_VER=$(sed -n "s/.*OC_VersionString = '\([^']*\)'.*/\1/p" "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
+    OC_VER=$(occ_version)
     OC_VER="${OC_VER:-unknown}"
     STAMP=$(date +%Y%m%d%H%M%S)
 
@@ -458,53 +464,34 @@ validate_preupgrade ()
 
 service_restore ()
 {
-    # Validate data directory for restore
+    TMP_BACKUP="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+
+    # Restore a data directory that lived inside the web root.
     if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory" ]; then
         DATAPATH=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory")
-        # Data directory inside owncloud directory and needs to be restored
-        echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}" "${WEB_ROOT}/" 2>&1
+        echo "Restore previous data directory from ${TMP_BACKUP}/${DATAPATH}"
+        rsync -aX -I "${TMP_BACKUP}/${DATAPATH}" "${WEB_ROOT}/" 2>&1
         ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     fi
 
-    # Restore the configuration files
-    echo "Restore previous configuration from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    source="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config"
-    patterns="*config.php *.json"
-    target="${WEB_ROOT}/config"
+    # Restore the configuration files (config.php and any *.json).
+    echo "Restore previous configuration from ${TMP_BACKUP}"
+    find "${TMP_BACKUP}/config" -maxdepth 1 -type f \
+        \( -name '*config.php' -o -name '*.json' \) \
+        -exec rsync -aX -I {} "${WEB_ROOT}/config/" \; 2>&1
 
-    # Process each pattern of files in the source directory
-    for pattern in $patterns; do
-        files=$(find "$source" -type f -name "$pattern")
-        if [ -n "$files" ]; then
-            for file in $files; do
-                rsync -aX -I "$file" "$target/" 2>&1
-            done
+    # Restore manually installed apps that the new tree does not ship.
+    echo "Restore manually installed apps from ${TMP_BACKUP}"
+    for dir in apps apps-external; do
+        [ -d "${TMP_BACKUP}/${dir}" ] || continue
+        if [ ! -d "${WEB_ROOT}/${dir}" ]; then
+            rsync -aX "${TMP_BACKUP}/${dir}" "${WEB_ROOT}/" 2>&1
+            continue
         fi
-    done
-
-
-    echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    # Migrate manually installed apps from source to destination directories
-    dirs="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
-    dest="${WEB_ROOT}"
-
-    # Process the subdirectories in each of the source directories
-    for dir in $dirs; do
-        dir_name=$(basename "$dir")
-        sub_dirs=$(find "$dir" -mindepth 1 -maxdepth 1 -type d)
-
-        if [ ! -d "$dest/$dir_name" ]; then
-            rsync -aX "$dir" "$dest/" 2>&1
-        elif [ -n "$sub_dirs" ]; then
-            for sub_dir in $sub_dirs; do
-                sub_dir_name=$(basename "$sub_dir")
-                # Check if the subdirectory is missing from the destination
-                if [ ! -d "$dest/$dir_name/$sub_dir_name" ]; then
-                    rsync -aX "$sub_dir" "$dest/$dir_name/" 2>&1
-                fi
-            done
-        fi
+        for app in "${TMP_BACKUP}/${dir}"/*; do
+            [ -d "$app" ] || continue
+            [ -d "${WEB_ROOT}/${dir}/$(basename "$app")" ] || rsync -aX "$app" "${WEB_ROOT}/${dir}/" 2>&1
+        done
     done
 
     # Run the upgrade while maintenance mode is on (vendor procedure). As it is
@@ -527,7 +514,7 @@ service_restore ()
                 [ -f "$f" ] && cp -p "$f" "${ROLLBACK_DIR}/" 2>/dev/null || true
             done
         fi
-        OLD_CONF="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/config.php"
+        OLD_CONF="${TMP_BACKUP}/config/config.php"
         [ -f "${OLD_CONF}" ] || OLD_CONF="${WEB_ROOT}/config/config.php"
         [ -f "${OLD_CONF}" ] && cp -p "${OLD_CONF}" "${ROLLBACK_DIR}/config.php" 2>/dev/null || true
         cat > "${ROLLBACK_DIR}/ROLLBACK.txt" <<EOF
@@ -565,7 +552,7 @@ EOF
         echo "ERROR: occ upgrade failed; maintenance mode stays on"
         echo "ERROR: rollback kit (database dump, config.php, .htaccess/.user.ini) at ${ROLLBACK_DIR}"
         echo "ERROR: retry with 'occ maintenance:mode --off' and 'occ upgrade' after fixing the cause, or follow ROLLBACK.txt to return to 10.16.3"
-        echo "ERROR: the pre-upgrade web root is kept at ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+        echo "ERROR: the pre-upgrade web root is kept at ${TMP_BACKUP}"
         # service functions run in a subshell (piped through install_log), so
         # exit only leaves the subshell; terminate the installer to fail the upgrade.
         kill -TERM "$PPID" 2>/dev/null
