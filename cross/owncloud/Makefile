@@ -1,9 +1,9 @@
 PKG_NAME = owncloud
-PKG_VERS = 10.16.3
-PKG_DATE = 20260522
+PKG_VERS = 10.16.6
+PKG_DATE = 20261006
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-complete-$(PKG_DATE).$(PKG_EXT)
-PKG_DIST_SITE = https://download.owncloud.com/server/stable
+PKG_DIST_SITE = https://github.com/owncloud/core/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
