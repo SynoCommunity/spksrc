@@ -8,7 +8,7 @@ DEPENDS = cross/dsm-dark-mode
 # Python and shell scripts only (python3 and curl from DSM)
 override ARCH = noarch
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.2
 # Not for SRM: the package themes the DSM desktop.
 REQUIRED_MIN_SRM = 3.0
 
