@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.2
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/synokernel-usbserial.png
 
 DEPENDS =
@@ -16,7 +16,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_505
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1"
+CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # we only have ipq806x for SRM 1.2, but this fails with:
@@ -34,15 +34,9 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = usbserial_strip
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: usbserial_strip
-usbserial_strip:
-	@$(MSG) Strip debug symbols in kernel modules
-	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
 
 .PHONY: usbserial_extra_install
 usbserial_extra_install:
