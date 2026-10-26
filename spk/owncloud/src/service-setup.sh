@@ -44,7 +44,7 @@ exec_occ() {
         owner=$(ls -ld "${WEB_ROOT}" 2>/dev/null | awk '{print $3}')
     fi
     current=$(id -un 2>/dev/null)
-    if [ -n "$owner" ] && [ -n "$current" ] && [ "$owner" != "$current" ]; then
+    if [ -n "$owner" ] && [ -n "$current" ] && [ "$owner" != "$current" ] && [ "$(id -u)" -eq 0 ]; then
         cmd="${php} ${WEB_ROOT}/occ $*"
         cmd=$(printf '%s' "$cmd" | sed 's/\\/\\\\/g')
         /bin/su "$owner" -s /bin/sh -c "$cmd"
