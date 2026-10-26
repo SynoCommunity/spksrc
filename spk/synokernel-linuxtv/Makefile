@@ -7,7 +7,8 @@ DEPENDS  = driver/linuxtv
 DEPENDS += cross/dvb-firmwares
 
 REQUIRE_KERNEL ?= 1
-REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c
+# regmap-i2c builds on the regmap core, which some kernels do not have
+REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c:CONFIG_REGMAP
 
 MAINTAINER = th0ma7
 DESCRIPTION = LinuxTV media drivers for USB TV tuners and capture devices, with their firmware, built for each Synology kernel.
