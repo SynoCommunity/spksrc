@@ -346,7 +346,7 @@ _why_arch_list       = $(call comma_append,\
 _why_dsm_window      = $(strip \
   $(if $(and $(REQUIRED_MIN_DSM),$(call version_ge,$(TCVERSION),3.0),$(call version_lt,$(TCVERSION),$(REQUIRED_MIN_DSM))),DSM $(TCVERSION) < $(REQUIRED_MIN_DSM)) \
   $(if $(and $(REQUIRED_MAX_DSM),$(call version_ge,$(TCVERSION),3.0),$(call version_gt,$(TCVERSION),$(REQUIRED_MAX_DSM))),DSM $(TCVERSION) > $(REQUIRED_MAX_DSM)) \
-  $(if $(and $(TCVERSION),$(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
+  $(if $(and $(REQUIRED_MIN_SRM),$(call version_lt,$(TCVERSION),3.0),$(call version_lt,$(TCVERSION),$(REQUIRED_MIN_SRM))),SRM $(TCVERSION) < $(REQUIRED_MIN_SRM)))
 
 _why_unsupported     = $(call comma_append,$(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),$(_why_arch_list)),$(_why_dsm_window))
 
