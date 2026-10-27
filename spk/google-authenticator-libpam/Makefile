@@ -9,7 +9,7 @@ MAINTAINER = Soraxas
 DESCRIPTION = google-authenticator PAM module for two-factor authentication for logging into servers via SSH, etc. To activate this module you have to manually configure the pam module and related configurations. Please follow the instructions on the SynoCommunity documentation page.
 DISPLAY_NAME = Google Authenticator for libpam
 STARTABLE = no
-CHANGELOG = "1. Update to v1.11."
+CHANGELOG = "Update to v1.11."
 
 HOMEPAGE = https://github.com/google/google-authenticator-libpam
 SUPPORTURL = https://docs.synocommunity.com/packages/google-authenticator/
