@@ -23,6 +23,11 @@ on:
         description: 'Package to build'
         required: true
         default: 'adminer'
+      add_dsm74_builds:
+        description: 'Include DSM 7.4 archs'
+        required: false
+        default: false
+        type: boolean
       add_dsm73_builds:
         description: 'Include DSM 7.3 archs'
         required: false
@@ -72,6 +77,11 @@ on:
         description: 'Include noarch packages'
         required: false
         default: true
+        type: boolean
+      add_noarch_dsm74_builds:
+        description: 'Include noarch DSM 7.4 packages'
+        required: false
+        default: false
         type: boolean
       add_noarch_dsm73_builds:
         description: 'Include noarch DSM 7.3 packages'
@@ -304,6 +314,9 @@ jobs:
 
           # Dynamic logic for automatic builds
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            # Enable DSM 7.4 builds if arch packages require minimum DSM 7.4
+            add_dsm74_builds=$([ "$has_arch_min_dsm74_packages" == "true" ] && echo "true" || echo "false")
+
             # Enable DSM 7.3 builds if arch packages require minimum DSM 7.3
             add_dsm73_builds=$([ "$has_arch_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
 
@@ -318,6 +331,9 @@ jobs:
 
             # Enable noarch builds if noarch packages exist
             add_noarch_builds=$([ "$has_noarch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable noarch DSM 7.4 builds if noarch packages require minimum DSM 7.4
+            add_noarch_dsm74_builds=$([ "$has_noarch_min_dsm74_packages" == "true" ] && echo "true" || echo "false")
 
             # Enable noarch DSM 7.3 builds if noarch packages require minimum DSM 7.3
             add_noarch_dsm73_builds=$([ "$has_noarch_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
@@ -347,9 +363,21 @@ jobs:
             add_to_matrix "noarch-7.2"
           fi
 
+          # Add noarch DSM 7.4 builds
+          if [ "$add_noarch_dsm74_builds" == "true" ]; then
+            add_to_matrix "noarch-7.4"
+          fi
+
           # Add noarch DSM 7.3 builds
           if [ "$add_noarch_dsm73_builds" == "true" ]; then
             add_to_matrix "noarch-7.3"
+          fi
+
+          # Add DSM 7.4 builds
+          if [ "$add_dsm74_builds" == "true" ]; then
+            add_to_matrix "x64-7.4"
+            add_to_matrix "aarch64-7.4"
+            add_to_matrix "armv7-7.4"
           fi
 
           # Add DSM 7.3 builds
