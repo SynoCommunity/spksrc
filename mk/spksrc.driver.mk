@@ -108,8 +108,9 @@ driver-stage2: install plist
 
 .PHONY: all
 ifeq ($(strip $(DRIVER_SKIP)),)
+# Once installed, the kernel source may be gone: a multi-kernel build removes it
 all:
-	@test -f $(KERNEL_ROOT)/Makefile || { $(MSG) "$(NAME): no kernel source in $(KERNEL_ROOT), build it from an spk" ; exit 1 ; }
+	@test -f $(WORK_DIR)/.$(COOKIE_PREFIX)install_done -o -f $(KERNEL_ROOT)/Makefile || { $(MSG) "$(NAME): no kernel source in $(KERNEL_ROOT), build it from an spk" ; exit 1 ; }
 	@mkdir -p $(WORK_DIR)
 	$(call RUNLOG,driver-stage1)
 	$(call RUNLOG,driver-stage2)
