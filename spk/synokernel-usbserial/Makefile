@@ -64,12 +64,14 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_VIVOPAY_SERIAL:drivers/usb/serial:viv
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WHITEHEAT:drivers/usb/serial:whiteheat
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WISHBONE:drivers/usb/serial:wishbone-serial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WWAN:drivers/usb/serial:usb_wwan
+# The copy of usb_wwan the GSM modem driver of some Synology kernels uses
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WWAN_SYNO:drivers/usb/serial:usb_wwan_syno
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_XSENS_MT:drivers/usb/serial:xsens_mt
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ZIO:drivers/usb/serial:zio
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ZTE:drivers/usb/serial:zte_ev
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides the USB serial drivers of the Linux kernel: usbserial, cdc-acm, and every USB serial adapter driver the kernel of the NAS offers (ch341, cp210x, ftdi_sio, pl2303, option and others)."
+DESCRIPTION = "Provides the USB serial drivers of the Linux kernel: usbserial, cdc-acm, and every USB serial adapter driver the kernel of the NAS offers: ch341, cp210x, ftdi_sio, pl2303, option and others."
 CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4<br/>5. Add every USB serial driver of the kernel<br/>6. Modules loaded by device profile with synocli-kernelmodule"
 
 STARTABLE = no
