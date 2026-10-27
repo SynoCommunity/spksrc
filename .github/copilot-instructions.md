@@ -2,7 +2,7 @@
 
 spksrc is a cross-compilation framework for building software packages (SPK) for Synology NAS devices. It supports multiple CPU architectures (x64, ARM, PPC) and DSM versions (5.2, 6.2, 7.1, 7.2) as well as SRM (Synology Router Manager).
 
-> **Note:** DSM 7.3 is the latest Synology release but toolchains/toolkits are not yet available. DSM 7.1 is the SynoCommunity default and is compatible with DSM 7.1 through 7.3.
+> **Note:** DSM 7.4 is the latest Synology release and toolchains/toolkits are fully available. DSM 7.1 is the SynoCommunity default and is compatible with DSM 7.1 through 7.4.
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information.
 
