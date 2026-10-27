@@ -1,0 +1,10 @@
+{
+  "name": "navman",
+  "description": "Navman GPS device",
+  "modules": [
+    "navman"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

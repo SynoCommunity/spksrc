@@ -1,0 +1,10 @@
+{
+  "name": "hp4x",
+  "description": "HP4x Calculators support",
+  "modules": [
+    "hp4x"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "belkin_sa",
+  "description": "Belkin and Peracom Single Port Serial Driver",
+  "modules": [
+    "belkin_sa"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

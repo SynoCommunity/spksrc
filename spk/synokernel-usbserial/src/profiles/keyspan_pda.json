@@ -1,0 +1,10 @@
+{
+  "name": "keyspan_pda",
+  "description": "Keyspan PDA Single Port Serial Driver",
+  "modules": [
+    "keyspan_pda"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

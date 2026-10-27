@@ -1,0 +1,10 @@
+{
+  "name": "cyberjack",
+  "description": "REINER SCT cyberJack pinpad/e-com chipcard reader",
+  "modules": [
+    "cyberjack"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

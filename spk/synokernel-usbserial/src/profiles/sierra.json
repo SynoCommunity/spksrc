@@ -1,0 +1,10 @@
+{
+  "name": "sierra",
+  "description": "Sierra Wireless Driver",
+  "modules": [
+    "sierra"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

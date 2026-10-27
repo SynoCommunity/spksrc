@@ -1,0 +1,10 @@
+{
+  "name": "f81232",
+  "description": "Fintek F81232 Single Port Serial Driver",
+  "modules": [
+    "f81232"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

@@ -6,17 +6,71 @@ SPK_ICON = src/synokernel-usbserial.png
 DEPENDS =
 
 REQUIRE_KERNEL ?= 1
-REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
-REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
+# The USB serial core, ACM devices, then every USB serial driver: a kernel
+# builds those it offers
+REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL:drivers/usb/serial:usbserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_ACM:drivers/usb/class:cdc-acm
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_AIRCABLE:drivers/usb/serial:aircable
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ARK3116:drivers/usb/serial:ark3116
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_BELKIN:drivers/usb/serial:belkin_sa
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CP210X:drivers/usb/serial:cp210x
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CYBERJACK:drivers/usb/serial:cyberjack
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CYPRESS_M8:drivers/usb/serial:cypress_m8
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_DIGI_ACCELEPORT:drivers/usb/serial:digi_acceleport
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_EDGEPORT:drivers/usb/serial:io_edgeport
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_EDGEPORT_TI:drivers/usb/serial:io_ti
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_EMPEG:drivers/usb/serial:empeg
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_F81232:drivers/usb/serial:f81232
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_F8153X:drivers/usb/serial:f81534
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_FTDI_SIO:drivers/usb/serial:ftdi_sio
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_FUNSOFT:drivers/usb/serial:funsoft
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_GARMIN:drivers/usb/serial:garmin_gps
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_HP4X:drivers/usb/serial:hp4x
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_IPAQ:drivers/usb/serial:ipaq
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_IPW:drivers/usb/serial:ipw
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_IR:drivers/usb/serial:ir-usb
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_IUU:drivers/usb/serial:iuu_phoenix
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_KEYSPAN:drivers/usb/serial:keyspan
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_KEYSPAN_PDA:drivers/usb/serial:keyspan_pda
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_KLSI:drivers/usb/serial:kl5kusb105
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_KOBIL_SCT:drivers/usb/serial:kobil_sct
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_MCT_U232:drivers/usb/serial:mct_u232
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_METRO:drivers/usb/serial:metro-usb
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_MOS7720:drivers/usb/serial:mos7720
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_MOS7840:drivers/usb/serial:mos7840
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_MOTOROLA:drivers/usb/serial:moto_modem
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_MXUPORT:drivers/usb/serial:mxuport
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_NAVMAN:drivers/usb/serial:navman
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_OMNINET:drivers/usb/serial:omninet
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_OPTICON:drivers/usb/serial:opticon
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:option
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_OTI6858:drivers/usb/serial:oti6858
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_PL2303:drivers/usb/serial:pl2303
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_QCAUX:drivers/usb/serial:qcaux
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_QT2:drivers/usb/serial:quatech2
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_QUALCOMM:drivers/usb/serial:qcserial
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SAFE:drivers/usb/serial:safe_serial
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SIEMENS_MPI:drivers/usb/serial:siemens_mpi
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SIERRAWIRELESS:drivers/usb/serial:sierra
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SIMPLE:drivers/usb/serial:usb-serial-simple
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SPCP8X5:drivers/usb/serial:spcp8x5
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SSU100:drivers/usb/serial:ssu100
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_SYMBOL:drivers/usb/serial:symbolserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_5052
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_UPD78F0730:drivers/usb/serial:upd78f0730
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_VISOR:drivers/usb/serial:visor
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_VIVOPAY_SERIAL:drivers/usb/serial:vivopay-serial
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WHITEHEAT:drivers/usb/serial:whiteheat
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WISHBONE:drivers/usb/serial:wishbone-serial
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_WWAN:drivers/usb/serial:usb_wwan
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_XSENS_MT:drivers/usb/serial:xsens_mt
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ZIO:drivers/usb/serial:zio
+REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ZTE:drivers/usb/serial:zte_ev
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4"
+DESCRIPTION = "Provides the USB serial drivers of the Linux kernel: usbserial, cdc-acm, and every USB serial adapter driver the kernel of the NAS offers (ch341, cp210x, ftdi_sio, pl2303, option and others)."
+CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4<br/>5. Add every USB serial driver of the kernel<br/>6. Modules loaded by device profile with synocli-kernelmodule"
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
@@ -34,5 +88,5 @@ include ../../mk/spksrc.spk.mk
 usbserial_extra_install:
 	install -m 755 -d $(STAGING_DIR)/rules.d
 	install -m 644 src/60-$(SPK_NAME).rules $(STAGING_DIR)/rules.d/60-$(SPK_NAME).rules
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/$(SPK_NAME).cfg $(STAGING_DIR)/etc/$(SPK_NAME).cfg
+	install -m 755 -d $(STAGING_DIR)/etc/profiles
+	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/

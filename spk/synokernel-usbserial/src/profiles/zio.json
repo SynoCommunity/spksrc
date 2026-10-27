@@ -1,0 +1,10 @@
+{
+  "name": "zio",
+  "description": "ZIO Motherboard USB serial interface driver",
+  "modules": [
+    "zio"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

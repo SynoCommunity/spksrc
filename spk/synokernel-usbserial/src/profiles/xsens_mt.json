@@ -1,0 +1,10 @@
+{
+  "name": "xsens_mt",
+  "description": "Xsens motion tracker serial interface driver",
+  "modules": [
+    "xsens_mt"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

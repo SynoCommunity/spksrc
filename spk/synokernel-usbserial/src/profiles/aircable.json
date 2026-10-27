@@ -1,0 +1,10 @@
+{
+  "name": "aircable",
+  "description": "AIRcable Bluetooth Dongle Driver",
+  "modules": [
+    "aircable"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

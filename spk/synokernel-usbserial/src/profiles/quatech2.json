@@ -1,0 +1,10 @@
+{
+  "name": "quatech2",
+  "description": "Quatech Serial Driver for USB 2 devices",
+  "modules": [
+    "quatech2"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

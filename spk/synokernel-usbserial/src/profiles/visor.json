@@ -1,0 +1,10 @@
+{
+  "name": "visor",
+  "description": "Handspring Visor / Palm m50x / Sony Clie Driver",
+  "modules": [
+    "visor"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

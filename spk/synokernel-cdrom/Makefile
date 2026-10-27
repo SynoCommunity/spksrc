@@ -27,5 +27,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: synokernel-cdrom_extra_install
 synokernel-cdrom_extra_install:
-	install -m 755 -d $(STAGING_DIR)/etc/
-	install -m 644 src/synokernel-cdrom.cfg $(STAGING_DIR)/etc/
+	install -m 755 -d $(STAGING_DIR)/etc/profiles
+	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/

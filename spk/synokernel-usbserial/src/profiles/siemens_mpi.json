@@ -1,0 +1,10 @@
+{
+  "name": "siemens_mpi",
+  "description": "Siemens MPI driver",
+  "modules": [
+    "siemens_mpi"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

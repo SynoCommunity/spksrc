@@ -1,0 +1,10 @@
+{
+  "name": "f81534",
+  "description": "Fintek F81532/534 Multi-Ports Serial Driver",
+  "modules": [
+    "f81534"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

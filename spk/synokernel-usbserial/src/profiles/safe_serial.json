@@ -1,0 +1,10 @@
+{
+  "name": "safe_serial",
+  "description": "Safe Serial (Encapsulated) Driver",
+  "modules": [
+    "safe_serial"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

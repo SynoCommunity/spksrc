@@ -1,0 +1,10 @@
+{
+  "name": "whiteheat",
+  "description": "ConnectTech WhiteHEAT Serial Driver",
+  "modules": [
+    "whiteheat"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

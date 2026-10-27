@@ -1,0 +1,10 @@
+{
+  "name": "ipaq",
+  "description": "PocketPC PDA Driver",
+  "modules": [
+    "ipaq"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

@@ -21,28 +21,40 @@ Provides kernel modules for USB serial device support on Synology NAS devices.
 
 ## Included Drivers
 
+The USB serial core (`usbserial`), `cdc-acm` for ACM devices (modems, Arduino,
+Z-Wave sticks), and every USB serial adapter driver the kernel of the NAS
+offers: the list grows with the kernel, `f81534` and `upd78f0730` coming with
+5.10 for instance. Among them:
+
 | Module | Devices |
-|--------|---------|  
-| usbserial.ko | Base USB serial support |
-| ch341.ko | CH340/CH341 USB-UART adapters |
-| cp210x.ko | Silicon Labs CP210x adapters |
-| pl2303.ko | Prolific PL2303 adapters |
-| ftdi_sio.ko | FTDI USB-serial adapters |
-| ti_usb3410_5052.ko | Texas Instruments USB serial |
+|--------|---------|
+| `ch341` | WinChipHead CH340/CH341 adapters |
+| `cp210x` | Silicon Labs CP210x adapters (many Zigbee sticks) |
+| `ftdi_sio` | FTDI adapters |
+| `pl2303` | Prolific PL2303 adapters |
+| `option`, `qcserial`, `sierra` | 3G/4G USB modems |
+| `ti_usb_3410_5052` | Texas Instruments TUSB3410/5052 adapters |
+| `mos7720`, `mos7840`, `f81534` | multi-port adapters |
 
-## Installation
-
-1. Install SynoKernel USB Serial from Package Center
-2. Modules are loaded automatically
-3. Connect your USB serial device
+Some drivers need a firmware file the package does not provide (`keyspan`,
+`io_edgeport`, `whiteheat`).
 
 ## Usage
 
-### Verify Module Loading
+The modules are not loaded on installation: load those of your adapter, as
+root, with the `synocli-kernelmodule` helper of
+[SynoCli Kernel Tools](synocli-kernel.md). Each driver has a profile of its
+name, which also installs the udev rule that opens `/dev/ttyUSB*` and
+`/dev/ttyACM*` to every user:
 
 ```bash
-lsmod | grep -E "usbserial|ch341|cp210x|pl2303|ftdi"
+synocli-kernelmodule list
+sudo synocli-kernelmodule --profile cp210x start
+sudo synocli-kernelmodule --profile ch341,cdc-acm status
 ```
+
+`usb-devices` (SynoCli Kernel Tools) gives the USB id of an adapter, and `dmesg`, once
+it is plugged in, the driver that claimed it.
 
 ### Find Connected Devices
 
@@ -68,12 +80,13 @@ For [Home Assistant](homeassistant.md), USB serial devices appear at `/dev/ttyUS
 ### Device Not Detected
 
 1. Check kernel messages: `dmesg | tail -50`
-2. Verify module is loaded: `lsmod | grep usbserial`
-3. Try reloading modules after package install
+2. Check the profile is loaded: `sudo synocli-kernelmodule --profile <driver> status`
+3. Find the driver of the adapter from its USB id (`usb-devices`)
 
 ### Permission Denied
 
-Service accounts need access to `/dev/ttyUSB*` devices. Add appropriate udev rules or run services with elevated permissions.
+Load the profile of the driver: it installs the udev rule of the package, which
+opens `/dev/ttyUSB*` and `/dev/ttyACM*` to every user.
 
 ## Related Packages
 

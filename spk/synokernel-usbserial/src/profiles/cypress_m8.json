@@ -1,0 +1,10 @@
+{
+  "name": "cypress_m8",
+  "description": "Cypress M8 USB Serial Driver",
+  "modules": [
+    "cypress_m8"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

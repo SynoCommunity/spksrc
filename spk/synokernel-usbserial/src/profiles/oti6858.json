@@ -1,0 +1,10 @@
+{
+  "name": "oti6858",
+  "description": "Ours Technology Inc. OTi-6858 USB To RS232 Bridge Controller",
+  "modules": [
+    "oti6858"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "mos7840",
+  "description": "Moschip 7840/7820 USB Serial Driver",
+  "modules": [
+    "mos7840"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

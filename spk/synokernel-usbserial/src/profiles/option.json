@@ -1,0 +1,10 @@
+{
+  "name": "option",
+  "description": "Driver for GSM and CDMA modems",
+  "modules": [
+    "option"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

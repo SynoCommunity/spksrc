@@ -1,0 +1,10 @@
+{
+  "name": "ipw",
+  "description": "IPWireless (3G UMTS TDD) Driver",
+  "modules": [
+    "ipw"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

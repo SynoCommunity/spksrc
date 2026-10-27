@@ -1,0 +1,10 @@
+{
+  "name": "metro-usb",
+  "description": "Metrologic Instruments USB-POS Barcode Scanner Driver",
+  "modules": [
+    "metro-usb"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

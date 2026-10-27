@@ -1,0 +1,10 @@
+{
+  "name": "kl5kusb105",
+  "description": "KL5KUSB105 (Palmconnect) Driver",
+  "modules": [
+    "kl5kusb105"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

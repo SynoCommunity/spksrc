@@ -1,0 +1,10 @@
+{
+  "name": "ir-usb",
+  "description": "IR Dongle Serial Driver",
+  "modules": [
+    "ir-usb"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "iuu_phoenix",
+  "description": "Infinity USB Unlimited Phoenix Driver",
+  "modules": [
+    "iuu_phoenix"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

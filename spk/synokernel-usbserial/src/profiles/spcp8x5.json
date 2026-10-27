@@ -1,0 +1,10 @@
+{
+  "name": "spcp8x5",
+  "description": "SPCP8x5 USB To Serial Driver",
+  "modules": [
+    "spcp8x5"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}

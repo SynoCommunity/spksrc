@@ -1,0 +1,10 @@
+{
+  "name": "io_edgeport",
+  "description": "Inside Out Edgeport Serial Driver",
+  "modules": [
+    "io_edgeport"
+  ],
+  "udev": [
+    "60-synokernel-usbserial.rules"
+  ]
+}
