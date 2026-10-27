@@ -31,7 +31,7 @@ set -o pipefail
 # DSM versions above the default builds (6.2.4, 7.1) that require special handling.
 # Packages declaring REQUIRED_MIN_DSM equal to one of these will only be built
 # for the corresponding toolchain, not for the standard ones.
-min_dsm_versions=(7.2 7.3)
+min_dsm_versions=(7.2 7.3 7.4)
 
 # The videodriver meta and its tools: heavy builds that almost never change. Automatic runs
 # build them only when change detection named one; manual runs always do (see section 1).

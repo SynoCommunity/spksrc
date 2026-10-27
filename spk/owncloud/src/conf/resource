@@ -26,7 +26,7 @@
 			"display_name": "ownCloud",
 			"icon": "app/images/owncloud-{0}.png",
 			"php": {
-				"backend": 8,
+				"backend": 12,
 				"connect_timeout": 120,
 				"extensions": [
 					"apcu",

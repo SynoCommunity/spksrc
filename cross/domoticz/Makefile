@@ -1,10 +1,10 @@
 PKG_NAME = domoticz
-PKG_VERS = 2026.3
+PKG_VERS = 2026.4
 PKG_EXT = tar.gz
 # The domoticz_src_* release asset bundles all git submodules (jsoncpp, minizip, jwtcpp, sqlite).
 # Plain tag archives do not contain the submodules and will not build. There is no .git in the
 # archive; the build revision is resolved from History.txt (see patches/002-fix-history-revision-path.patch).
-PKG_DIST_NAME = domoticz_src_2026.18157.$(PKG_EXT)
+PKG_DIST_NAME = domoticz_src_2026.18387.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/domoticz/domoticz/releases/download/$(PKG_VERS)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = domoticz

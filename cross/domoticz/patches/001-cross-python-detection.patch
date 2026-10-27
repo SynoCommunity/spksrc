@@ -1,6 +1,6 @@
---- CMakeLists.txt.orig	2026-08-07 13:14:33.606542463 +0000
-+++ CMakeLists.txt	2026-08-07 13:14:33.614542319 +0000
-@@ -505,14 +505,18 @@
+--- CMakeLists.txt.orig
++++ CMakeLists.txt
+@@ -507,14 +507,18 @@
  ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
  
  IF(USE_PYTHON)

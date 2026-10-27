@@ -3,12 +3,7 @@
 OC_NEW_VER=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
 OC_OLD_VER=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
 
-WEB_DIR="/var/services/web_packages"
-# for backwards compatability
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ];then
-	WEB_DIR="/var/services/web"
-fi
-WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
+WEB_ROOT="/var/services/web_packages/${SYNOPKG_PKGNAME}"
 
 quote_json ()
 {
@@ -26,26 +21,46 @@ page_append ()
 	fi
 }
 
+version_number ()
+{
+	echo "$1" | awk -F. '{ printf "%d%03d%03d\n", $1, $2, $3 }'
+}
+
+version_greater_equal ()
+{
+	[ "$(version_number "$1")" -ge "$(version_number "$2")" ]
+}
+
+version_less_equal ()
+{
+	[ "$(version_number "$1")" -le "$(version_number "$2")" ]
+}
+
 is_upgrade_possible ()
 {
-	# ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
-	valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
+	# Mirrors ownCloud's version.php OC_VersionCanBeUpgradedFrom
+	# [[8,2,11],[9,0,9],[9,1]] and Updater::isUpgradePossible():
+	# the previous version must be >= one of the allowed entries and <= the new one.
 	previous=${OC_OLD_VER}
-	for version in "${valid_versions[@]}"; do
-		if echo "$previous" | grep -q "$version"; then
-			return 0  # Success or true
-		fi
-	done
-	return 1  # Failure or false
+	new=${OC_NEW_VER}
+	version_less_equal "${previous}" "${new}" || return 1
+	if echo "${previous}" | grep -q '^8\.2\.' && version_greater_equal "${previous}" "8.2.11"; then
+		return 0
+	fi
+	if echo "${previous}" | grep -q '^9\.0\.' && version_greater_equal "${previous}" "9.0.9"; then
+		return 0
+	fi
+	version_greater_equal "${previous}" "9.1" && return 0
+	return 1
 }
 
 is_database_mysql ()
 {
 	config_file="${WEB_ROOT}/config/config.php"
 	if [ -f "$config_file" ] && grep -q "'dbtype' => 'mysql'" "$config_file"; then
-		return 0  # Database type is MySQL
+		return 0
 	else
-		return 1  # Database type is not MySQL
+		return 1
 	fi
 }
 
