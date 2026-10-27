@@ -86,7 +86,12 @@ configure_htaccess() {
 # from the deployed tree so pre-upgrade steps work on the old code and
 # post-upgrade steps on the new one.
 occ_php() {
-    if [ -f "${WEB_ROOT}/lib/base.php" ] && grep -q "not compatible with PHP 8.0" "${WEB_ROOT}/lib/base.php" 2>/dev/null; then
+    local major
+    major=$(sed -n \
+        -e 's/.*OC_Version[[:space:]]*=[[:space:]]*\[[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
+        -e 's/.*OC_Version[[:space:]]*=[[:space:]]*array[[:space:]]*([[:space:]]*\([0-9][0-9]*\).*/\1/p' \
+        "${WEB_ROOT}/version.php" 2>/dev/null | head -1)
+    if [ -n "${major}" ] && [ "${major}" -lt 11 ] && [ -x /usr/local/bin/php74 ]; then
         echo /usr/local/bin/php74
     else
         echo /usr/local/bin/php83
@@ -318,7 +323,13 @@ service_preuninst ()
         # Backup the Database
         echo "Copying previous database from ${MYSQL_DATABASE}"
         ${MKDIR} "${TEMPDIR}/database"
-        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>&1
+        if ! MYSQL_PWD="${wizard_mysql_password_root}" ${MYSQLDUMP} -u root "${MYSQL_DATABASE}" > "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql"; then
+            echo "ERROR: database backup failed; leaving the database in place"
+            exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+            ${RM} "${TEMPDIR}"
+            # Skip the database drop below; never drop it without a backup.
+            return 1
+        fi
 
         # Backup Directories
         echo "Copying previous configuration from ${WEB_ROOT}"
@@ -402,6 +413,25 @@ validate_preupgrade ()
         exit 1
     fi
 
+    # Read the application credentials early and refuse a read-only database.
+    # occ upgrade would fail later in postupgrade, which DSM treats as a
+    # corrupted package; aborting here leaves the old package intact.
+    DB_NAME=$(config_get dbname)
+    DB_USER=$(config_get dbuser)
+    DB_PASS=$(config_get dbpassword)
+    if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ]; then
+        echo "ERROR: cannot read database settings from config.php; aborting upgrade"
+        exit 1
+    fi
+    if ! read_only=$(MYSQL_PWD="$DB_PASS" ${MYSQL} -N -B -u "$DB_USER" "$DB_NAME" -e "SELECT @@global.read_only"); then
+        echo "ERROR: cannot query the database with the ownCloud credentials"
+        exit 1
+    fi
+    if [ "${read_only}" = "1" ]; then
+        echo "ERROR: MariaDB is running in read-only mode; disable read_only before upgrading"
+        exit 1
+    fi
+
     # ------------------------------------------------------------------
     # Vendor upgrade procedure (11.0 manual upgrade). These steps run here
     # because validate_preupgrade is called without the install_log pipe, so
@@ -438,18 +468,18 @@ validate_preupgrade ()
     fi
 
     # Step 3: backup the database with the application credentials.
-    DB_NAME=$(config_get dbname)
-    DB_USER=$(config_get dbuser)
-    DB_PASS=$(config_get dbpassword)
-    if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ]; then
-        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
-        echo "ERROR: cannot read database settings from config.php; aborting upgrade"
-        exit 1
-    fi
     DB_DUMP="${BACKUP_DIR}/owncloud-${OC_VER}-${STAMP}.sql.gz"
-    if ! MYSQL_PWD="$DB_PASS" ${MYSQLDUMP} --single-transaction --quick -u "$DB_USER" "$DB_NAME" | gzip > "$DB_DUMP"; then
+    DB_DUMP_TMP="${DB_DUMP%.gz}"
+    if ! MYSQL_PWD="$DB_PASS" ${MYSQLDUMP} --single-transaction --quick -u "$DB_USER" "$DB_NAME" > "$DB_DUMP_TMP"; then
+        ${RM} -f "$DB_DUMP_TMP"
         exec_occ maintenance:mode --off >/dev/null 2>&1 || true
         echo "ERROR: database backup failed; aborting upgrade"
+        exit 1
+    fi
+    if ! gzip "$DB_DUMP_TMP"; then
+        ${RM} -f "$DB_DUMP_TMP" "$DB_DUMP"
+        exec_occ maintenance:mode --off >/dev/null 2>&1 || true
+        echo "ERROR: could not compress the database backup; aborting upgrade"
         exit 1
     fi
     if ! gzip -t "$DB_DUMP"; then
@@ -466,6 +496,7 @@ validate_preupgrade ()
 
     # Major upgrades: keep a full pre-upgrade backup in the wizard-export
     # format so the built-in restore wizard can use it.
+    ${RM} -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.fullbackup" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     if [ "${previous%%.*}" != "${new%%.*}" ]; then
         SHARE_PATH=$(share_path)
         if [ -z "${SHARE_PATH}" ] || [ ! -d "${SHARE_PATH}" ]; then
@@ -553,42 +584,45 @@ service_restore ()
 
     # Run the upgrade while maintenance mode is on (vendor procedure). As it is
     # already enabled, occ leaves it on; disable it afterwards.
-    SHARE_PATH=$(share_path)
     if ! exec_occ upgrade; then
-        # Build a persistent rollback kit on the data share so it survives an
-        # uninstall of the package (which removes /var/packages/owncloud).
-        ROLLBACK_STAMP=$(date +%Y%m%d%H%M%S)
-        ROLLBACK_DIR="${SHARE_PATH}/owncloud-rollback-${ROLLBACK_STAMP}"
-        if ! ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null; then
-            ROLLBACK_DIR="${SYNOPKG_PKGVAR}/backup/rollback-${ROLLBACK_STAMP}"
-            ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null || true
-        fi
-        DB_DUMP=$(ls -1t "${SYNOPKG_PKGVAR}/backup"/owncloud-*.sql.gz 2>/dev/null | head -1)
-        if [ -n "${DB_DUMP}" ]; then
-            cp -p "${DB_DUMP}" "${ROLLBACK_DIR}/" 2>/dev/null || true
-            STAMP_SUFFIX="${DB_DUMP##*/owncloud-}"
-            STAMP_SUFFIX="${STAMP_SUFFIX%.sql.gz}"
-            for f in "${SYNOPKG_PKGVAR}/backup/htaccess-${STAMP_SUFFIX}" "${SYNOPKG_PKGVAR}/backup/user.ini-${STAMP_SUFFIX}"; do
-                [ -f "$f" ] && cp -p "$f" "${ROLLBACK_DIR}/" 2>/dev/null || true
-            done
-        fi
-        OLD_CONF="${TMP_BACKUP}/config/config.php"
-        [ -f "${OLD_CONF}" ] || OLD_CONF="${WEB_ROOT}/config/config.php"
-        [ -f "${OLD_CONF}" ] && cp -p "${OLD_CONF}" "${ROLLBACK_DIR}/config.php" 2>/dev/null || true
-        ROLLBACK_TEMPLATE="ROLLBACK.txt"
-        [ -n "${FULL_BACKUP}" ] && ROLLBACK_TEMPLATE="ROLLBACK-full.txt"
-        sed "s|@FULL_BACKUP@|${FULL_BACKUP}|g" "${SYNOPKG_PKGDEST}/templates/${ROLLBACK_TEMPLATE}" > "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
-        chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
-        chmod 0644 "${ROLLBACK_DIR}"/* 2>/dev/null || true
         echo "ERROR: occ upgrade failed; maintenance mode stays on"
-        echo "ERROR: rollback kit (database dump, config.php, .htaccess/.user.ini) at ${ROLLBACK_DIR}"
-        [ -n "${FULL_BACKUP}" ] && echo "ERROR: pre-upgrade backup kept at ${FULL_BACKUP}"
-        echo "ERROR: retry with 'occ maintenance:mode --off' and 'occ upgrade' after fixing the cause, or follow ROLLBACK.txt to return to 10.16.3"
         echo "ERROR: the pre-upgrade web root is kept at ${TMP_BACKUP}"
-        # service functions run in a subshell (piped through install_log), so
-        # exit only leaves the subshell; terminate the installer to fail the upgrade.
-        kill -TERM "$PPID" 2>/dev/null
-        exit 1
+        if [ -n "${FULL_BACKUP}" ]; then
+            # Build a persistent rollback kit on the data share so it survives
+            # an uninstall of the package.
+            SHARE_PATH=$(share_path)
+            ROLLBACK_STAMP=$(date +%Y%m%d%H%M%S)
+            ROLLBACK_DIR="${SHARE_PATH}/owncloud-rollback-${ROLLBACK_STAMP}"
+            if ! ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null; then
+                ROLLBACK_DIR="${SYNOPKG_PKGVAR}/backup/rollback-${ROLLBACK_STAMP}"
+                ${MKDIR} -p "${ROLLBACK_DIR}" 2>/dev/null || true
+            fi
+            OLD_PKGVER="${SYNOPKG_OLD_PKGVER}"
+            [ -n "${OLD_PKGVER}" ] || OLD_PKGVER=$(backup_version "$(basename "${FULL_BACKUP}")")
+            sed -e "s|@FULL_BACKUP@|${FULL_BACKUP}|g" -e "s|@OLD_PKGVER@|${OLD_PKGVER}|g" \
+                "${SYNOPKG_PKGDEST}/templates/ROLLBACK.txt" > "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
+            chmod 0755 "${ROLLBACK_DIR}" 2>/dev/null || true
+            chmod 0644 "${ROLLBACK_DIR}/ROLLBACK.txt" 2>/dev/null || true
+            echo "ERROR: rollback instructions at ${ROLLBACK_DIR}"
+            echo "ERROR: pre-upgrade backup kept at ${FULL_BACKUP}"
+            echo "ERROR: follow ROLLBACK.txt to return to ${OLD_PKGVER}"
+            ROLLBACK_MSG="Roll back using ${ROLLBACK_DIR}/ROLLBACK.txt."
+        else
+            echo "ERROR: no rollback kit was created for this minor upgrade"
+            ROLLBACK_MSG="No rollback kit was created for this minor upgrade."
+        fi
+        # DSM marks the package corrupted when postupgrade returns non-zero,
+        # and this function runs in a subshell, so a non-zero exit would not
+        # propagate anyway. Keep the package healthy: leave maintenance mode
+        # on for the operator to handle.
+        if [ -n "${SYNOPKG_TEMP_LOGFILE}" ]; then
+            {
+                echo "ownCloud upgrade failed."
+                echo "ownCloud is in maintenance mode; the database was not upgraded."
+                echo "${ROLLBACK_MSG}"
+            } >> "${SYNOPKG_TEMP_LOGFILE}"
+        fi
+        return 0
     fi
 
     # Disable maintenance mode after a successful upgrade.
