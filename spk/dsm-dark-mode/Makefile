@@ -1,5 +1,5 @@
 SPK_NAME = dsm-dark-mode
-SPK_VERS = 1.0.1
+SPK_VERS = 1.0.2
 SPK_REV = 1
 SPK_ICON = src/dsm-dark-mode.png
 
@@ -17,7 +17,7 @@ DISPLAY_NAME = Dark Mode for DSM
 # DESCRIPTION_<LANG> is passed to an unquoted echo: ' ( ) need a backslash.
 DESCRIPTION = Dark theme for the DSM 7 desktop: login page, desktop, Control Panel, Package Center, File Station, Storage Manager, Resource Monitor and other built-in apps. Follows the dark mode of your operating system or can be set per user from the taskbar. The theme is generated on the NAS from DSM's own stylesheets, so it adapts to DSM and package updates by itself. Runs without root.
 DESCRIPTION_GER = Dunkles Design für den DSM-7-Desktop: Anmeldeseite, Desktop, Systemsteuerung, Paket-Zentrum, File Station, Speicher-Manager, Ressourcen-Monitor und weitere integrierte Apps. Folgt dem Dunkelmodus Ihres Betriebssystems oder lässt sich pro Benutzer über die Taskleiste einstellen. Das Design wird auf dem NAS aus den Stylesheets von DSM erzeugt und passt sich so DSM- und Paket-Updates selbst an. Läuft ohne Root.
-CHANGELOG = "Initial SynoCommunity release (Dark Mode for DSM 1.0.1)."
+CHANGELOG = "Initial SynoCommunity release (Dark Mode for DSM 1.0.2)."
 BETA = 1
 
 HOMEPAGE = https://github.com/SoulInfernoDE/synology-dsm-dark-mode
