@@ -27,7 +27,7 @@ set -o pipefail
 
 # DSM versions above the default builds that require filtered package lists.
 # Must match the min_dsm_versions array in prepare.sh.
-min_dsm_versions=(7.2 7.3)
+min_dsm_versions=(7.2 7.3 7.4)
 
 # ===========================================================================
 
