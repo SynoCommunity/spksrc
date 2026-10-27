@@ -21,7 +21,8 @@
 #   REQUIRE_KERNEL_MODULE    list of modules to compile, each
 #                            CONFIG_<option>:<source dir>:<module>[:CONFIG_<needed>]
 #                            the module being skipped on a kernel without the
-#                            optional CONFIG_<needed>=y it relies on
+#                            optional CONFIG_<needed>=y it relies on, and on a
+#                            kernel that does not offer CONFIG_<option>
 #   STAGING_INSTALL_PREFIX   full install path for compiled modules
 #   WORK_DIR                 base directory for compilation
 #   PKG_DIR                  extracted kernel source directory
@@ -95,12 +96,21 @@ endif
 	  echo "all:" > $(WORK_DIR)/$(PKG_DIR)/tools/objtool/Makefile ; \
 	fi
 	@$(RUN) $(MAKE) modules_prepare
+	@# powerpc links every module with crtsavres.o, which older modules_prepare skip
+	@if grep -q "^CONFIG_PPC=y" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
+	  $(RUN) $(MAKE) arch/powerpc/lib/crtsavres.o ; \
+	fi
 
 .PHONY: kernel_module_target
 kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
 	@$(MSG) Compile kernel modules $(REQUIRE_KERNEL_MODULE)
 	@for module in $(REQUIRE_KERNEL_MODULE); \
 	do \
+	  option=$${module%%:*} ; \
+	  if ! grep -q "^$$option=m" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
+	    $(MSG) "Skip kernel module $$(echo $$module | cut -d: -f3): this kernel has no $$option, or not what it needs" ; \
+	    continue ; \
+	  fi ; \
 	  needed=$$(echo $$module | cut -s -d: -f4) ; \
 	  if [ -n "$$needed" ] && ! grep -q "^$$needed=y" $(WORK_DIR)/$(PKG_DIR)/.config ; then \
 	    $(MSG) "Skip kernel module $$(echo $$module | cut -d: -f3): the kernel has no $$needed" ; \
