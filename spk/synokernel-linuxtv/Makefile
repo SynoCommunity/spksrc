@@ -4,7 +4,9 @@ SPK_REV = 13
 SPK_ICON = src/synokernel-linuxtv.png
 
 DEPENDS  = driver/linuxtv
-DEPENDS += cross/dvb-firmwares
+# Firmware: the LinuxTV set, then the newer and larger one of LibreELEC
+DEPENDS += driver/dvb-firmwares
+DEPENDS += driver/dvb-firmwares-libreelec
 
 REQUIRE_KERNEL ?= 1
 # regmap-i2c builds on the regmap core, which some kernels do not have

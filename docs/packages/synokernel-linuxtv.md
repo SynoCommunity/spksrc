@@ -81,7 +81,10 @@ A device without a profile gets one by following
 [Writing a profile](synocli-kernel.md#writing-a-profile).
 
 Firmware files are in `/var/packages/synokernel-linuxtv/target/lib/firmware`,
-which the helper points the kernel firmware loader at.
+which the helper points the kernel firmware loader at: the LinuxTV set of 2018
+(`driver/dvb-firmwares`), then the larger one LibreELEC maintains
+(`driver/dvb-firmwares-libreelec`: si2168, si2157/2158/2141, m88ds3103,
+mn8847x and others), whose files replace those of the same name.
 
 Once loaded, a tuner appears as `/dev/dvb/adapterN`:
 
