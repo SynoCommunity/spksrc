@@ -69,3 +69,10 @@ BLACKLIST += CONFIG_VIDEO_TW686X
 # Camera sensor whose two objects each declare an OF device table: a duplicate
 # symbol in one module on these kernels, wherever CONFIG_OF is set
 BLACKLIST += CONFIG_VIDEO_S5C73M3
+
+# Video codecs and blitter of STMicroelectronics SoCs, enabled on monaco
+# (ARCH_STI): they need the rpmsg and DMA APIs of newer kernels
+BLACKLIST += CONFIG_VIDEO_STI_DELTA
+BLACKLIST += CONFIG_VIDEO_STI_DELTA_DRIVER
+BLACKLIST += CONFIG_VIDEO_STI_HVA
+BLACKLIST += CONFIG_VIDEO_STI_BDISP
