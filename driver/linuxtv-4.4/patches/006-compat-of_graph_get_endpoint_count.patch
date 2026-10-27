@@ -1,0 +1,32 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1352,4 +1352,19 @@
+ #define usb_maxpacket(udev, pipe) usb_maxpacket(udev, pipe, usb_pipeout(pipe))
+ #endif
+ 
++/* of_graph_get_endpoint_count() is not in every 4.4 kernel */
++#ifdef NEED_OF_GRAPH_GET_ENDPOINT_COUNT
++#include <linux/of_graph.h>
++static inline int compat_of_graph_get_endpoint_count(const struct device_node *np)
++{
++	struct device_node *endpoint;
++	int num = 0;
++
++	for_each_endpoint_of_node(np, endpoint)
++		num++;
++	return num;
++}
++#define of_graph_get_endpoint_count compat_of_graph_get_endpoint_count
++#endif
++
+ #endif /*  _COMPAT_H */
+--- v4l/scripts/make_config_compat.pl.orig
++++ v4l/scripts/make_config_compat.pl
+@@ -156,6 +156,7 @@
+ 	check_files_for_func("firmware_request_nowarn", "NEED_FIRMWARE_REQUEST_NOWARN", "include/linux/firmware.h");
+ 	check_files_for_func("lockdep_assert_not_held", "NEED_LOCKDEP_ASSERT_NOT_HELD", "include/linux/lockdep.h");
+ 	check_files_for_func("dev_is_platform", "NEED_DEV_IS_PLATFORM", "include/linux/platform_device.h");
++	check_files_for_func("of_graph_get_endpoint_count", "NEED_OF_GRAPH_GET_ENDPOINT_COUNT", "include/linux/of_graph.h");
+ 
+ 	# For tests for uapi-dependent logic
+ 	check_files_for_func_uapi("usb_endpoint_maxp_mult", "NEED_USB_ENDPOINT_MAXP_MULT", "usb/ch9.h");
