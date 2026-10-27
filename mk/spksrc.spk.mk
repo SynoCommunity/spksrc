@@ -40,11 +40,8 @@ ifneq ($(ARCH),noarch)
 ifneq ($(SPK_PACKAGE_ARCHS),)
 SPK_ARCH = $(SPK_PACKAGE_ARCHS)
 else
-ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
-SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS) $(REMOVE_FROM_GENERIC_ARCHS),$(TC_ARCH))
-else
-SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS),$(TC_ARCH))
-endif
+# GENERIC_ARCHS is only defined further down: tested when SPK_ARCH is expanded
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS) $(if $(filter $(ARCH),$(GENERIC_ARCHS)),$(REMOVE_FROM_GENERIC_ARCHS)),$(TC_ARCH))
 endif
 ifeq ($(SPK_NAME_ARCH),)
 SPK_NAME_ARCH = $(ARCH)
