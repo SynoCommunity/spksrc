@@ -1,11 +1,11 @@
 PKG_NAME = linux-media-$(PKG_VERS)
 PKG_VERS = 2022.06.05
-PKG_EXT = tar.gz
-PKG_GIT_HASH = f2906aa863381afb0015a9eb7fefad885d4e5a56
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/torvalds/linux/archive
-PKG_DIST_FILE = linux-$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = linux-$(PKG_GIT_HASH)
+PKG_EXT = tar.bz2
+# Built by native/linux-media-2022.06.05: the media subsystem of one mainline commit,
+# packed by the media_build of the driver/linuxtv-* that unpacks it
+PKG_DIST_NAME = linux-media-2022-06-05-f2906aa86338.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/linuxtv%2Fmedia_build
+PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
@@ -13,9 +13,8 @@ HOMEPAGE = https://linuxtv.org/
 COMMENT  = Linux media subsystem at v5.19-rc1, the tree media_build released as linux-media-2022-06-05-f2906aa86338.
 LICENSE  = GPLv2
 
-# Source only: the media subsystem and the headers media_build bundles with it
-MEDIA_PATHS = Makefile drivers/media drivers/staging/media drivers/misc/altera-stapl sound/pci/bt87x.c include
-EXTRACT_CMD = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH) $(addprefix $(PKG_DIR)/,$(MEDIA_PATHS))
+# Kept packed: media_build unpacks it into its own tree
+EXTRACT_CMD = install -D -m 644 $(DIST_FILE) $(EXTRACT_PATH)/$(PKG_DIR)/linux-media.tar.bz2
 
 INSTALL_TARGET = nop
 

@@ -18,14 +18,15 @@ LICENSE  = GPLv2
 DRIVER_KERNEL_MIN = 3.10
 DRIVER_GCC_MIN = 4.9
 
-# Extracted in the same WORK_DIR by cross/linux-media-2021.01.08
-MEDIA_TREE = $(WORK_DIR)/linux-321af22a3d2f6ed1fb1737c8588c01f6fec8a7b8
+# Left packed in the same WORK_DIR by cross/linux-media-2021.01.08
+MEDIA_TARBALL = $(WORK_DIR)/linux-media-2021.01.08/linux-media.tar.bz2
 
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET   = linuxtv_compile
 INSTALL_TARGET   = linuxtv_install
 
-# PCI adapters and remote controls left out
+# PCI adapters left out where the platform has no PCIe slot, and drivers these
+# kernels cannot build or load
 include ko-blacklist.mk
 # Adapters allyesconfig leaves out that build on 4.4 kernels
 include ko-whitelist.mk
@@ -34,7 +35,7 @@ include ../../mk/spksrc.driver.mk
 
 .PHONY: linuxtv_configure
 linuxtv_configure:
-	cd $(WORK_DIR)/$(PKG_DIR)/linux && $(MAKE) tar DIR=$(MEDIA_TREE) && $(MAKE) untar
+	cp $(MEDIA_TARBALL) $(WORK_DIR)/$(PKG_DIR)/linux/ && cd $(WORK_DIR)/$(PKG_DIR)/linux && $(MAKE) untar
 	@# GNU make 4.4 no longer remakes the phony .version media_build includes
 	$(RUN) CROSS_COMPILE=y $(MAKE) -C v4l .version DIR=$(KERNEL_ROOT)
 	$(RUN) CROSS_COMPILE=y $(MAKE) allyesconfig
