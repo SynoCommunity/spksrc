@@ -1,6 +1,6 @@
 SPK_NAME = advanced-acme
 SPK_VERS = 0.1.11
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/advanced-acme.png
 
 DEPENDS = cross/advanced-acme
@@ -8,7 +8,7 @@ DEPENDS = cross/advanced-acme
 # Shell scripts only (bash, curl, openssl, jq from DSM)
 override ARCH = noarch
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.2
 # Not for SRM: the package installs certificates into DSM.
 REQUIRED_MIN_SRM = 3.0
 
