@@ -21,10 +21,12 @@ WIZARDS_DIR = src/wizard/
 # As DSM has google-authenticator installed, create a SynoCommunity specific link
 CUSTOM_AUTHENTICATOR_NAME = sc-google-authenticator
 POST_STRIP_TARGET = google-authenticator-libpam_extra_install
-SPK_COMMANDS = bin/$(CUSTOM_AUTHENTICATOR_NAME)
+SPK_COMMANDS = bin/$(CUSTOM_AUTHENTICATOR_NAME) bin/sc-google-authenticator-setup
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: google-authenticator-libpam_extra_install
 google-authenticator-libpam_extra_install:
-	$(RUN) ; cd $(STAGING_DIR)/bin; ln -sf google-authenticator $(CUSTOM_AUTHENTICATOR_NAME)
+	rm -f $(STAGING_DIR)/bin/$(CUSTOM_AUTHENTICATOR_NAME)
+	install -m 755 $(CURDIR)/src/bin/$(CUSTOM_AUTHENTICATOR_NAME) $(STAGING_DIR)/bin/$(CUSTOM_AUTHENTICATOR_NAME)
+	install -m 755 $(CURDIR)/src/bin/sc-google-authenticator-setup $(STAGING_DIR)/bin/sc-google-authenticator-setup

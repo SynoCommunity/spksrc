@@ -1,0 +1,237 @@
+#!/bin/sh
+# sc-google-authenticator-setup - apply or undo the SSH/PAM changes needed by
+# the Google Authenticator PAM package.
+
+PKG_NAME="google-authenticator-libpam"
+PAM_MODULE="/var/packages/${PKG_NAME}/target/lib/security/pam_google_authenticator.so"
+PAM_LINE="auth    required                      ${PAM_MODULE} nullok"
+SSHD_CONFIG="${SSHD_CONFIG:-/etc/ssh/sshd_config}"
+PAM_SSHD="${PAM_SSHD:-/etc/pam.d/sshd}"
+SSHD_BACKUP="${SSHD_CONFIG}.sc-google-authenticator.bak"
+PAM_BACKUP="${PAM_SSHD}.sc-google-authenticator.bak"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [apply|undo|status]
+
+  apply   Back up the SSH/PAM files and apply the Google Authenticator changes.
+  undo    Restore the backups made by apply.
+  status  Show whether the changes are currently applied.
+
+The script prompts for DSM administrator privileges when needed.
+EOF
+}
+
+is_test_mode() {
+    [ "${SSHD_CONFIG}" != "/etc/ssh/sshd_config" ] || [ "${PAM_SSHD}" != "/etc/pam.d/sshd" ]
+}
+
+need_root() {
+    if is_test_mode; then
+        return 0
+    fi
+    if [ "$(id -u)" -ne 0 ]; then
+        echo "Requesting DSM administrator privileges..."
+        exec sudo "$0" "$@"
+    fi
+}
+
+backup_file() {
+    src=$1
+    bak=$2
+    if [ ! -f "$src" ]; then
+        echo "Error: $src not found" >&2
+        return 1
+    fi
+    if [ -f "$bak" ]; then
+        echo "Keeping existing backup: $bak"
+    else
+        cp -p "$src" "$bak"
+        echo "Backed up $src -> $bak"
+    fi
+}
+
+restore_backups() {
+    [ -f "$SSHD_BACKUP" ] && cp -p "$SSHD_BACKUP" "$SSHD_CONFIG" && echo "Restored $SSHD_CONFIG"
+    [ -f "$PAM_BACKUP" ] && cp -p "$PAM_BACKUP" "$PAM_SSHD" && echo "Restored $PAM_SSHD"
+    return 0
+}
+
+validate_sshd() {
+    if is_test_mode; then
+        echo "Test mode: skipping SSH configuration test."
+        return 0
+    fi
+    SSHD_BIN=$(command -v sshd 2>/dev/null || true)
+    if [ -z "$SSHD_BIN" ] && [ -x /usr/sbin/sshd ]; then
+        SSHD_BIN=/usr/sbin/sshd
+    fi
+    if [ -n "$SSHD_BIN" ]; then
+        if ! "$SSHD_BIN" -t -f "$SSHD_CONFIG" >/dev/null 2>&1; then
+            echo "Error: sshd configuration test failed for $SSHD_CONFIG" >&2
+            return 1
+        fi
+        echo "SSH configuration test passed."
+    else
+        echo "Warning: sshd not found; skipping configuration test."
+    fi
+}
+
+restart_sshd() {
+    if is_test_mode; then
+        echo "Test mode: skipping SSH restart."
+        return 0
+    fi
+    if command -v synosystemctl >/dev/null 2>&1; then
+        synosystemctl restart sshd.service
+    elif command -v systemctl >/dev/null 2>&1; then
+        systemctl restart sshd
+    elif command -v synoservice >/dev/null 2>&1; then
+        synoservice --restart sshd
+    else
+        echo "Warning: could not find a service manager; restart SSH manually." >&2
+        return 1
+    fi
+}
+
+apply_sshd_config() {
+    tmp="${SSHD_CONFIG}.tmp.$$"
+    awk '
+    BEGIN {
+        n = split("PasswordAuthentication PermitEmptyPasswords ChallengeResponseAuthentication UsePAM PermitRootLogin", keys, " ")
+        for (i = 1; i <= n; i++) seen[keys[i]] = 0
+        in_match = 0
+    }
+    function emit_missing() {
+        if (!seen["PasswordAuthentication"]) print "PasswordAuthentication yes"
+        if (!seen["PermitEmptyPasswords"]) print "PermitEmptyPasswords no"
+        if (!seen["ChallengeResponseAuthentication"]) print "ChallengeResponseAuthentication yes"
+        if (!seen["UsePAM"]) print "UsePAM yes"
+        if (!seen["PermitRootLogin"]) print "PermitRootLogin no"
+        for (i = 1; i <= n; i++) seen[keys[i]] = 1
+    }
+    /^[[:space:]]*Match[[:space:]]/ {
+        if (!in_match) { emit_missing(); in_match = 1 }
+    }
+    !in_match {
+        line = $0
+        sub(/^[[:space:]]*#?[[:space:]]*/, "", line)
+        split(line, a, /[[:space:]]+/)
+        key = a[1]
+        if (key == "PasswordAuthentication") { print "PasswordAuthentication yes"; seen[key] = 1; next }
+        if (key == "PermitEmptyPasswords") { print "PermitEmptyPasswords no"; seen[key] = 1; next }
+        if (key == "ChallengeResponseAuthentication") { print "ChallengeResponseAuthentication yes"; seen[key] = 1; next }
+        if (key == "UsePAM") { print "UsePAM yes"; seen[key] = 1; next }
+        if (key == "PermitRootLogin") { print "PermitRootLogin no"; seen[key] = 1; next }
+    }
+    { print }
+    END { if (!in_match) emit_missing() }
+    ' "$SSHD_CONFIG" > "$tmp" || { rm -f "$tmp"; return 1; }
+    mv "$tmp" "$SSHD_CONFIG"
+}
+
+apply_pam() {
+    if grep -Eq '^[[:space:]]*auth[[:space:]].*pam_google_authenticator\.so' "$PAM_SSHD" 2>/dev/null; then
+        echo "PAM line already present in $PAM_SSHD"
+        return 0
+    fi
+    tmp="${PAM_SSHD}.tmp.$$"
+    awk -v line="$PAM_LINE" '
+    BEGIN { inserted = 0 }
+    /^[[:space:]]*auth[[:space:]].*pam_syno_ipblocklist\.so/ && !inserted {
+        print
+        print line
+        inserted = 1
+        next
+    }
+    !inserted && /^[[:space:]]*auth[[:space:]].*pam_unix\.so/ {
+        print line
+        inserted = 1
+    }
+    { print }
+    END { if (!inserted) exit 1 }
+    ' "$PAM_SSHD" > "$tmp" || { rm -f "$tmp"; return 1; }
+    mv "$tmp" "$PAM_SSHD"
+}
+
+apply() {
+    need_root "$@"
+    if ! is_test_mode && [ ! -f "$PAM_MODULE" ]; then
+        echo "Error: $PAM_MODULE not found; is the package installed?" >&2
+        exit 1
+    fi
+    echo "This will modify:"
+    echo "  $SSHD_CONFIG"
+    echo "  $PAM_SSHD"
+    echo "Keep an existing SSH session open while testing."
+    echo
+    backup_file "$SSHD_CONFIG" "$SSHD_BACKUP" || exit 1
+    backup_file "$PAM_SSHD" "$PAM_BACKUP" || exit 1
+    apply_sshd_config || { echo "Error: could not update $SSHD_CONFIG" >&2; exit 1; }
+    if ! apply_pam; then
+        echo "Error: could not update $PAM_SSHD; restoring backups..." >&2
+        restore_backups >&2
+        exit 1
+    fi
+    if ! validate_sshd; then
+        echo "Restoring backups..." >&2
+        restore_backups >&2
+        exit 1
+    fi
+    if ! restart_sshd; then
+        echo "Changes applied, but SSH was not restarted. Restart SSH manually." >&2
+    fi
+    echo
+    echo "Changes applied."
+    echo "Next, as the user who will log in (not root):"
+    echo "  sc-google-authenticator"
+    echo "The wrapper sets ~/.google_authenticator permissions to 600."
+    echo
+    echo "To undo: $(basename "$0") undo"
+}
+
+undo() {
+    need_root "$@"
+    if [ ! -f "$SSHD_BACKUP" ] && [ ! -f "$PAM_BACKUP" ]; then
+        echo "No backups found; nothing to undo." >&2
+        exit 1
+    fi
+    restore_backups
+    validate_sshd || true
+    restart_sshd || true
+    echo "Undo complete."
+}
+
+status() {
+    echo "SSH config: $SSHD_CONFIG"
+    echo "PAM config: $PAM_SSHD"
+    echo
+    echo "PAM line:"
+    if grep -Eq '^[[:space:]]*auth[[:space:]].*pam_google_authenticator\.so' "$PAM_SSHD" 2>/dev/null; then
+        grep 'pam_google_authenticator\.so' "$PAM_SSHD"
+    else
+        echo "  not present"
+    fi
+    echo
+    echo "sshd_config settings:"
+    for key in PasswordAuthentication PermitEmptyPasswords ChallengeResponseAuthentication UsePAM PermitRootLogin; do
+        line=$(grep -E "^[[:space:]]*#?[[:space:]]*${key}[[:space:]]" "$SSHD_CONFIG" 2>/dev/null | head -1)
+        if [ -n "$line" ]; then
+            echo "  $line"
+        else
+            echo "  $key: not set"
+        fi
+    done
+    echo
+    echo "Backups:"
+    if [ -f "$SSHD_BACKUP" ]; then echo "  $SSHD_BACKUP"; else echo "  $SSHD_BACKUP: not present"; fi
+    if [ -f "$PAM_BACKUP" ]; then echo "  $PAM_BACKUP"; else echo "  $PAM_BACKUP: not present"; fi
+}
+
+case "${1:-apply}" in
+    apply) apply "$@" ;;
+    undo) undo "$@" ;;
+    status) status ;;
+    -h|--help|help) usage ;;
+    *) usage; exit 1 ;;
+esac
