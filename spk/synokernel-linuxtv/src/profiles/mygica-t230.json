@@ -1,0 +1,6 @@
+{
+  "name": "mygica-t230",
+  "description": "MyGica T230 and other DVBSky-based USB tuners, DVB-T2 and DVB-C",
+  "comments": "Not tested on hardware since the media_build tiers.",
+  "modules": ["si2157", "si2168", "m88ds3103", "rc-dvbsky", "dvb-usb-dvbsky"]
+}

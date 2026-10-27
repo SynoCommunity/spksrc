@@ -46,10 +46,13 @@ Each kernel gets the first row it matches. Kernels 2.6.32 (88f6281, qoriq)
 are not supported: no `media_build` that builds for them still applies to a
 media tree.
 
-On a kernel without DMA-BUF, regmap or rational support, such as the 3.2
-kernel of the armada370, the drivers that need them do not load: analog
-capture, webcams and SDR (videobuf2), and the demodulators that use regmap.
-DVB tuners work.
+On a kernel built without DMA-BUF, videobuf2 gets stubs of it: everything
+works but the sharing of buffers between devices (DMABUF). On a kernel without
+the regmap core, such as the 3.2 kernel of the armada370, the demodulators that
+use regmap do not load.
+
+Drivers of PCIe cards are built for the platforms of which a model has a PCIe
+slot (`KERNEL_PCI_SLOT` of the kernel), and left out elsewhere.
 
 ## Usage
 
@@ -58,10 +61,24 @@ Modules are installed under
 with the `synocli-kernelmodule` helper of SynoCli Kernel Tools, as root:
 
 ```bash
-# Core modules, then the ones of a device
-sudo synocli-kernelmodule --spk synokernel-linuxtv --config synokernel-linuxtv.cfg:default status
-sudo synocli-kernelmodule --spk synokernel-linuxtv --config synokernel-linuxtv.cfg:HAUPPAUGE_WINTV_DUALHD start
+# The device profiles of the package
+synocli-kernelmodule list
+
+# Load the modules of a device, with the modules they depend on
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 ```
+
+| Profile | Device | Tested |
+|---------|--------|--------|
+| `hauppauge-wintv-dualhd-atsc` | Hauppauge WinTV-dualHD 01595, ATSC/QAM (2040:026d) | DS115j, kernel 3.2.101 |
+| `hauppauge-wintv-dualhd-dvb` | Hauppauge WinTV-dualHD, DVB-T2/C (2040:0265) | no |
+| `pctv-461e` | PCTV 461e, DVB-S2 (2013:0258) | no |
+| `mygica-t230` | MyGica T230 and other DVBSky-based tuners | no |
+| `siano-mdtv` | Siano sms1xxx receivers | no |
+
+A device without a profile gets one by following
+[Writing a profile](synocli-kernel.md#writing-a-profile).
 
 Firmware files are in `/var/packages/synokernel-linuxtv/target/lib/firmware`,
 which the helper points the kernel firmware loader at.
@@ -77,8 +94,8 @@ dmesg | grep -i -E 'dvb|em28xx|si2168'
 
 ### A module fails to load
 
-`dmesg` names the cause. `Unknown symbol` means a module it depends on is not
-loaded yet: load the core modules of the `default` profile first. `disagrees
+`dmesg` names the cause. `Unknown symbol` means a module it needs is not loaded:
+a tuner or demodulator chip of the device missing from its profile. `disagrees
 about version of symbol` or `invalid module format` means the package does not
 match the running kernel, typically after a DSM update that changed it.
 
