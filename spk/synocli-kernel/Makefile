@@ -1,15 +1,15 @@
 SPK_NAME = synocli-kernel
 SPK_VERS = 1.3
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
 
 MAINTAINER    = th0ma7
-DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally the synocli-kernelmodule.sh script helps to install kernel modules of synokernel packages."
+DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally the synocli-kernelmodule.sh script loads the kernel modules of synokernel packages, by device profile."
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
-CHANGELOG     = "1. Publish for newer x25 models<br/>2. Updates to libusb 1.0.29 and usbutils 019"
+CHANGELOG     = "1. synocli-kernelmodule loads modules by device profile, with their dependencies<br/>2. Fix the module path of the running kernel"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.
