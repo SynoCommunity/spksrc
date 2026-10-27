@@ -19,6 +19,7 @@
 # Variables:
 #   DRIVER_KERNEL_MIN  oldest kernel the driver builds for
 #   DRIVER_GCC_MIN     oldest gcc it builds with
+#   DRIVER_PCI_SLOT    1 when the platform takes PCIe add-in cards (KERNEL_PCI_SLOT)
 #   DRIVER_SKIP        why this ARCH is skipped, empty when it builds: a generic
 #                      arch has no kernel of its own, and a kernel or gcc below
 #                      the floors is left to another version of the driver
@@ -70,6 +71,10 @@ include ../../mk/spksrc.cross/env-default.mk
 DRIVER_KERNEL     := $(subst +,,$(TC_KERNEL))
 DRIVER_MODULE_DIR := $(STAGING_INSTALL_PREFIX)/lib/modules/$(ARCH)/$(TC_KERNEL)
 KERNEL_ROOT        = $(WORK_DIR)/linux-$(ARCH)
+
+# 1 when a model of this platform takes PCIe add-in cards (KERNEL_PCI_SLOT of its
+# kernel/syno-<arch>-<version>): read with $(file), no shell at every parse
+DRIVER_PCI_SLOT := $(if $(findstring KERNEL_PCI_SLOT = 1,$(file < ../../kernel/syno-$(ARCH)-$(TCVERSION)/Makefile)),1)
 
 include ../../mk/spksrc.rules/dependency.mk
 
