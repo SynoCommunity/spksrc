@@ -108,6 +108,11 @@
 ###############################################################################
 
 # Configure the included makefiles
+# Kernel modules are built with the compiler of the Synology toolchain the kernel
+# was built with: no compiler overlay, whatever local.mk or the command line asks
+override OVERLAY_GCC := 0
+override OVERLAY_BINUTILS := 0
+
 NAME          = $(KERNEL_NAME)
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
