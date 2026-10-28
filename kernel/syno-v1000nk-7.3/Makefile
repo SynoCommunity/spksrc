@@ -7,5 +7,6 @@ KERNEL_URL_VERSION = 7.3
 # configuration do reside in epyc7002 sources
 KERNEL_URL_DIR = epyc7002
 KERNEL_CONFIG = synology/synoconfigs/v1000lk5
+KERNEL_PCI_SLOT = 1
 
 include ../../mk/spksrc.kernel.mk
