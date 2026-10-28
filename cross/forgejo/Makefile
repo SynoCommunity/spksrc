@@ -7,7 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-src-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs
-MIN_GO_VERSION = 1.25.0
 
 HOMEPAGE = https://forgejo.org/
 COMMENT  = Forgejo is a self-hosted lightweight software forge.

@@ -7,7 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs native/pnpm
-MIN_GO_VERSION = 1.27
 
 HOMEPAGE = https://gitea.io/
 COMMENT  = Gitea is a community managed lightweight code hosting solution written in Go.

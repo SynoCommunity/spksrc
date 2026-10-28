@@ -9,8 +9,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # the (rate-limited) GitHub API at build time. Bump together with PKG_VERS.
 PKG_COMMIT = db8e0ab
 
-MIN_GO_VERSION = 1.26
-
 HOMEPAGE = https://loom.deroock.co.za
 COMMENT  = Loom is a unified, self-hosted media automation server (a Radarr/Sonarr/Prowlarr/Overseerr replacement).
 LICENSE  = AGPL-3.0

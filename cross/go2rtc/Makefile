@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/AlexxIT/go2rtc/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/
 
-MIN_GO_VERSION = 1.24.0
-
 HOMEPAGE = https://github.com/AlexxIT/go2rtc/
 COMMENT  = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc.
 LICENSE  = MIT
