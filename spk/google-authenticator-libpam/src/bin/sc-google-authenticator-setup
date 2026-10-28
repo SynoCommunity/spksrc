@@ -57,6 +57,17 @@ restore_backups() {
     return 0
 }
 
+set_file_mode() {
+    src=$1
+    dst=$2
+    mode=$(stat -c '%a' "$src" 2>/dev/null || true)
+    if [ -n "$mode" ]; then
+        chmod "$mode" "$dst" 2>/dev/null || chmod 644 "$dst"
+    else
+        chmod 644 "$dst"
+    fi
+}
+
 validate_sshd() {
     if is_test_mode; then
         echo "Test mode: skipping SSH configuration test."
@@ -127,6 +138,7 @@ apply_sshd_config() {
     { print }
     END { if (!in_match) emit_missing() }
     ' "$SSHD_CONFIG" > "$tmp" || { rm -f "$tmp"; return 1; }
+    set_file_mode "$SSHD_CONFIG" "$tmp"
     mv "$tmp" "$SSHD_CONFIG"
 }
 
@@ -151,6 +163,7 @@ apply_pam() {
     { print }
     END { if (!inserted) exit 1 }
     ' "$PAM_SSHD" > "$tmp" || { rm -f "$tmp"; return 1; }
+    set_file_mode "$PAM_SSHD" "$tmp"
     mv "$tmp" "$PAM_SSHD"
 }
 
@@ -203,6 +216,10 @@ undo() {
 }
 
 status() {
+    if [ ! -r "$SSHD_CONFIG" ] || [ ! -r "$PAM_SSHD" ]; then
+        echo "Cannot read SSH/PAM configuration; run this command with sudo." >&2
+        exit 1
+    fi
     echo "SSH config: $SSHD_CONFIG"
     echo "PAM config: $PAM_SSHD"
     echo
