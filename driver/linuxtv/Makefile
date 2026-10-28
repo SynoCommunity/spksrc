@@ -9,4 +9,4 @@ HOMEPAGE = https://linuxtv.org/
 COMMENT  = LinuxTV media_build, in the version that builds for each kernel.
 LICENSE  = GPLv2
 
-include ../../mk/spksrc.driver-virtual.mk
+include ../../mk/spksrc.driver.mk

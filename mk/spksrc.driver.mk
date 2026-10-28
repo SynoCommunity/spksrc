@@ -14,7 +14,14 @@
 #     lib/modules/<arch>/<kernel>
 #
 # PKG_DIR names the directory inside the archive, as for a cross package: this
-# file prefixes it with the per-kernel directory the archive is extracted to.
+# file prefixes it with the per-kernel directory the archive is extracted to. The
+# driver/* of its own DEPENDS are built first, for the same kernel.
+#
+# A driver without sources (no PKG_DIST_SITE) is a selector: for each kernel it
+# builds the first of its DEPENDS, driver/* in order of preference, that does not
+# skip that kernel -- the counterpart of $(call depend,a|b|c), whose choice is made
+# once for the generic arch. A kernel no version builds for is an error: an arch
+# the driver does not support is excluded from the spk, not shipped without it.
 #
 # Variables:
 #   DRIVER_KERNEL_MIN  oldest kernel the driver builds for
@@ -23,7 +30,6 @@
 #   DRIVER_SKIP        why this ARCH is skipped, empty when it builds: a generic
 #                      arch has no kernel of its own, and a kernel or gcc below
 #                      the floors is left to another version of the driver
-#                      (spksrc.driver-virtual.mk)
 #
 # Main targets:
 #   driver-stage1      toolchain and tc_vars*, already there when kernel-depend
@@ -32,6 +38,52 @@
 #   all                both, or a message naming DRIVER_SKIP
 #   driver-skip        prints DRIVER_SKIP
 ###############################################################################
+
+# Kernel modules are built with the compiler of the Synology toolchain the kernel
+# was built with: no compiler overlay, whatever local.mk or the command line asks
+override OVERLAY_GCC := 0
+override OVERLAY_BINUTILS := 0
+
+ifeq ($(strip $(PKG_DIST_SITE)),)
+### A selector: nothing of its own to fetch, verify or package
+
+NAME = $(PKG_NAME)
+
+.DEFAULT_GOAL := all
+
+include ../../mk/spksrc.common.mk
+
+.PHONY: download checksum cat_PLIST
+download checksum cat_PLIST:
+	@:
+
+.PHONY: all
+ifneq ($(filter $(ARCH),$(GENERIC_ARCHS) noarch),)
+all:
+	@$(MSG) "Skipping $(NAME) for $(ARCH)-$(TCVERSION): $(ARCH) is a generic arch"
+else
+all:
+	@for driver in $(DEPENDS) ; do \
+	  skip=$$($(MAKE) -s --no-print-directory -C ../../$${driver} driver-skip) ; \
+	  if [ -z "$${skip}" ]; then \
+	    $(MSG) "$(NAME): $${driver} for $(ARCH)-$(TCVERSION)" ; \
+	    $(MAKE) --no-print-directory -C ../../$${driver} ; \
+	    exit $$? ; \
+	  fi ; \
+	  $(MSG) "$(NAME): not $${driver}, $${skip}" ; \
+	done ; \
+	$(MSG) "$(NAME): no version builds for $(ARCH)-$(TCVERSION)" ; \
+	exit 1
+endif
+
+.PHONY: driver-skip
+driver-skip:
+	@:
+
+include ../../mk/spksrc.rules/supported.mk
+
+else
+### A driver with sources
 
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -118,6 +170,9 @@ all:
 	@test -f $(WORK_DIR)/.$(COOKIE_PREFIX)install_done -o -f $(KERNEL_ROOT)/Makefile || { $(MSG) "$(NAME): no kernel source in $(KERNEL_ROOT), build it from an spk" ; exit 1 ; }
 	@mkdir -p $(WORK_DIR)
 	$(call RUNLOG,driver-stage1)
+	@for driver in $(filter driver/%,$(DEPENDS)) ; do \
+	  $(MAKE) --no-print-directory -C ../../$${driver} ARCH=$(ARCH) TCVERSION=$(TCVERSION) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) || exit 1 ; \
+	done
 	$(call RUNLOG,driver-stage2)
 else
 all:
@@ -129,3 +184,5 @@ driver-skip:
 	@echo "$(DRIVER_SKIP)"
 
 include ../../mk/spksrc.rules/supported.mk
+
+endif
