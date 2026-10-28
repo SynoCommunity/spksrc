@@ -73,9 +73,17 @@ sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 |---------|--------|--------|
 | `hauppauge-wintv-dualhd-atsc` | Hauppauge WinTV-dualHD 01595, ATSC/QAM (2040:026d) | DS115j, kernel 3.2.101 |
 | `hauppauge-wintv-dualhd-dvb` | Hauppauge WinTV-dualHD, DVB-T2/C (2040:0265) | no |
+| `hauppauge-wintv-solohd` | Hauppauge WinTV-soloHD, PCTV 292e, DVB-T2/C (2040:0264, 2040:8264, 2040:8268, 2013:025f) | no |
+| `hauppauge-wintv-hvr-955q` | Hauppauge WinTV-HVR-955Q, ATSC/QAM (2040:b123, b124, b151) | no |
 | `pctv-461e` | PCTV 461e, DVB-S2 (2013:0258) | no |
-| `mygica-t230` | MyGica T230 and other DVBSky-based tuners | no |
+| `dvbsky-s960` | DVBSky S960/S860, DVB-S2 (0572:6831) | no |
+| `mygica-t230` | MyGica T230/T230C, DVB-T2/C (0572:c688, 0572:c689) | no |
+| `rtl2832u-r820t` | RTL2832U DVB-T sticks with an R820T tuner (0bda:2838) | no |
+| `astrometa-dvb-t2` | Astrometa DVB-T2/C (15f4:0131) | no |
 | `siano-mdtv` | Siano sms1xxx receivers | no |
+
+`synocli-kernelmodule list` tells which this kernel can load: the DVB-S2
+demodulators and the RTL2832U need an I2C multiplexer the 3.2 kernels lack.
 
 A device without a profile gets one by following
 [Writing a profile](synocli-kernel.md#writing-a-profile). To load a device at every

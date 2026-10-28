@@ -1,6 +1,11 @@
 {
   "name": "mygica-t230",
-  "description": "MyGica T230 and other DVBSky-based USB tuners, DVB-T2 and DVB-C",
-  "comments": "Not tested on hardware since the media_build tiers.",
-  "modules": ["si2157", "si2168", "m88ds3103", "rc-dvbsky", "dvb-usb-dvbsky"]
+  "description": "MyGica T230 and T230C, DVB-T2, DVB-T and DVB-C (USB 0572:c688, 0572:c689)",
+  "comments": "Chips and USB ids from the media tree; not tested on hardware.",
+  "modules": [
+    "si2168",
+    "si2157",
+    "rc-total-media-in-hand-02",
+    "dvb-usb-dvbsky"
+  ]
 }

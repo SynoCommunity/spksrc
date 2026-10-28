@@ -1,0 +1,12 @@
+{
+  "name": "astrometa-dvb-t2",
+  "description": "Astrometa DVB-T2, DVB-T and DVB-C (USB 15f4:0131)",
+  "comments": "Chips and USB ids from the media tree; not tested on hardware.",
+  "modules": [
+    "rtl2832",
+    "mn88473",
+    "r820t",
+    "rc-astrometa-t2hybrid",
+    "dvb-usb-rtl28xxu"
+  ]
+}

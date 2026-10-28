@@ -1,0 +1,10 @@
+{
+  "name": "rtl2832u-r820t",
+  "description": "Realtek RTL2832U DVB-T sticks with an R820T tuner (USB 0bda:2838)",
+  "comments": "The common RTL-SDR and DVB-T sticks. With another tuner, list its module in place of r820t: e4000, fc0012, fc0013 or fc2580. Chips and USB ids from the media tree; not tested on hardware.",
+  "modules": [
+    "rtl2832",
+    "r820t",
+    "dvb-usb-rtl28xxu"
+  ]
+}
