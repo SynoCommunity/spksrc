@@ -61,11 +61,11 @@ set_file_mode() {
     src=$1
     dst=$2
     mode=$(stat -c '%a' "$src" 2>/dev/null || true)
-    if [ -n "$mode" ]; then
-        chmod "$mode" "$dst" 2>/dev/null || chmod 644 "$dst"
-    else
-        chmod 644 "$dst"
+    if [ -z "$mode" ]; then
+        echo "Error: cannot determine mode of $src" >&2
+        return 1
     fi
+    chmod "$mode" "$dst"
 }
 
 validate_sshd() {
@@ -138,7 +138,7 @@ apply_sshd_config() {
     { print }
     END { if (!in_match) emit_missing() }
     ' "$SSHD_CONFIG" > "$tmp" || { rm -f "$tmp"; return 1; }
-    set_file_mode "$SSHD_CONFIG" "$tmp"
+    set_file_mode "$SSHD_BACKUP" "$tmp" || { rm -f "$tmp"; return 1; }
     mv "$tmp" "$SSHD_CONFIG"
 }
 
@@ -163,7 +163,7 @@ apply_pam() {
     { print }
     END { if (!inserted) exit 1 }
     ' "$PAM_SSHD" > "$tmp" || { rm -f "$tmp"; return 1; }
-    set_file_mode "$PAM_SSHD" "$tmp"
+    set_file_mode "$PAM_BACKUP" "$tmp" || { rm -f "$tmp"; return 1; }
     mv "$tmp" "$PAM_SSHD"
 }
 
