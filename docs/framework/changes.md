@@ -124,6 +124,35 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 28th 2026 — A fresh tree no longer hangs on its first toolchain bootstrap (#7667)"
+
+    - **`make check` could wait forever on a new tree.** `depend.mk` resolves
+      `OPTIONAL_DEPENDS` in parallel, one `dependency-unsupported` sub-make each. With
+      the toolchain not yet extracted, each of them bootstrapped it (`stage0.mk`) at the
+      same time: the second found the toolchain patch applied, and `patch` asked whether
+      to reverse it, on the terminal `script` gives the build, where no one answers.
+
+    - **The bootstrap holds a lock per toolchain** (`flock $(TC_WORK_DIR).lock`): one
+      sub-make prepares it, the others wait and find its cookies.
+
+    - **`patch` asks no questions** (`--forward --batch`, `spksrc.build/patch.mk`): a
+      patch already applied, or a file it cannot find, fails the build instead of
+      waiting, and a patch is never applied reversed.
+
+??? note "October 26th 2026 — DSM 7.4 toolchains, toolkits and kernels (#7663)"
+
+    - **DSM 7.4 (build 90080) is a target.** `tc-versions.mk`, `tk-versions.mk` and
+      `kernel/versions.mk` map `7.4` to it, and `toolchain/`, `toolkit/` and `kernel/`
+      gain their `syno-<arch>-7.4`: 32 toolchains (with the generic `x64`, `aarch64` and
+      `armv7`), 29 toolkits and 28 kernels.
+
+    - **CI builds DSM 7.4** when a package asks for it: a `MIN_DSM_VERSION` of 7.4 adds
+      `x64-7.4`, `aarch64-7.4` and `armv7-7.4` (or `noarch-7.4`) to the matrix, as 7.2 and
+      7.3 do.
+
+    - **Every 7.4 arch has its kernel but `epyc7003ntb`**, whose sources Synology has
+      not published: kernel module packages can target DSM 7.4 on the others.
+
 ??? note "October 13th 2026 — The Rust build environment is isolated, and DEFAULT_ENV splits in two (#7584)"
 
     - **A bare `CFLAGS` is what cc-rs falls back to for both sides of a cross build.**
