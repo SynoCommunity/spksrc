@@ -70,12 +70,14 @@ patch_msg:
 
 pre_patch_target: patch_msg
 
+# No questions: a build has a terminal (script), and would wait for an answer. A patch
+# already applied or a file it cannot find fails the build instead, never reversed.
 patch_target: $(PRE_PATCH_TARGET)
 ifneq ($(strip $(PATCHES)),)
 	@for patchfile in $(PATCHES) ; \
 	do \
 	  echo "patch -p$(PATCHES_LEVEL) < $${patchfile}" ; \
-	  cat $${patchfile} | ($(RUN) patch -p$(PATCHES_LEVEL)) ; \
+	  cat $${patchfile} | ($(RUN) patch --forward --batch -p$(PATCHES_LEVEL)) ; \
 	done
 endif
 
