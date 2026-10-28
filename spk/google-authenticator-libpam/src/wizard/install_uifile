@@ -3,7 +3,13 @@
         "step_title": "How to use this package",
         "items": [
             {
-                "desc": "For instructions on how to use this package with your device, please visit our <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/google-authenticator/\">Google Authenticator package</a>."
+                "desc": "After installing, run <code style=\"user-select: all\">sc-google-authenticator-setup</code> over SSH. It prompts for your DSM password, backs up the SSH/PAM files, applies the changes, and restarts SSH."
+            },
+            {
+                "desc": "Then run <code style=\"user-select: all\">sc-google-authenticator</code> as the user who will log in to generate the token."
+            },
+            {
+                "desc": "For full instructions and manual steps, see the <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/google-authenticator/\">Google Authenticator documentation</a>."
             }
         ]
     }
