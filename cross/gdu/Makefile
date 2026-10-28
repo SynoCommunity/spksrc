@@ -5,6 +5,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dundee/gdu/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# Builds with go 1.23, so for kernels older than 3.2 (ARMv5) too
+MIN_GO_VERSION = 1.23
+
 HOMEPAGE = https://github.com/dundee/gdu
 COMMENT  = Fast disk usage analyzer with console interface written in Go.
 LICENSE  = MIT

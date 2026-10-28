@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/cooperspencer/gickup/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.26
-
 HOMEPAGE = https://gickup.dev/
 COMMENT = Backup your Git repositories with ease.
 LICENSE = Apache 2.0

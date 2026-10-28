@@ -10,8 +10,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_DIST_PREFIX)
 
-MIN_GO_VERSION = 1.24.0
-
 HOMEPAGE = https://min.io/
 COMMENT  = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 LICENSE  = AGPLv3.0
