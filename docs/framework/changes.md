@@ -124,7 +124,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "October 26th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
+??? note "October 28th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
 
     - **A kernel module spk carries the modules of every kernel of its arch**:
       `kernel-depend` prepares `kernel/syno-<arch>-<version>` for each sub-arch, in the
@@ -173,6 +173,20 @@ If you only read one thing, read this. The details are in the dated log below.
       test ran before `GENERIC_ARCHS` was set), and a sub-arch built directly without a
       kernel stops in pre-check.
 
+    - **`REQUIRE_KERNEL_MODULE` builds each directory once** and skips an option the
+      kernel does not offer, so one list spans kernels: usbserial on braswell-7.3 went
+      from 16 minutes to 36 seconds. An optional fourth field names a feature the kernel
+      must have built in (`...:regmap-i2c:CONFIG_REGMAP`). powerpc modules link with
+      `crtsavres.o`, which older `modules_prepare` skip.
+
+    - **`KERNEL_PCI_SLOT = 1`** marks, in `kernel/syno-<arch>-<version>`, the platforms of
+      which a model takes PCIe add-in cards; a driver reads it as `DRIVER_PCI_SLOT`.
+
+    - **A multi-kernel build drops each kernel's sources once its modules are installed**;
+      cookies stay, so a stopped run resumes.
+
+    - **`native/linux-media-<date>`** rebuilds the media trees `driver/linuxtv-*` unpack,
+      hosted in the `linuxtv/media_build` release (`mk/spksrc.native/linux-media.mk`).
     - **powerpc and SRM 1.2 kernels build modules**: `crtsavres.o`, which older
       `modules_prepare` skip, and the `yylloc` of dtc on ipq806x-1.2.
 
