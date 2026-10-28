@@ -75,6 +75,7 @@ DESCRIPTION = "Provides the USB serial drivers of the Linux kernel: usbserial, c
 CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4<br/>5. Add every USB serial driver of the kernel<br/>6. Modules loaded by device profile with synocli-kernelmodule"
 
 STARTABLE = no
+WIZARDS_DIR = src/wizard/
 DISPLAY_NAME = SynoKernel USB Serial drivers
 
 HOMEPAGE = https://www.kernel.org/

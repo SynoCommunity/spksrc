@@ -22,6 +22,7 @@ CHANGELOG = "1. LinuxTV media_build frozen per kernel version, built for every S
 MIN_KERNEL_VERSION = 3.2
 
 STARTABLE = no
+WIZARDS_DIR = src/wizard/
 DISPLAY_NAME = SynoKernel LinuxTV media drivers
 
 HOMEPAGE = https://linuxtv.org/

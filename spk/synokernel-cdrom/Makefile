@@ -14,6 +14,7 @@ DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
 CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4"
 
 STARTABLE = no
+WIZARDS_DIR = src/wizard/
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
 
 HOMEPAGE = https://www.kernel.org/

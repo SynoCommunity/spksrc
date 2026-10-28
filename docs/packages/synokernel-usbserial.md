@@ -53,6 +53,9 @@ sudo synocli-kernelmodule --profile cp210x start
 sudo synocli-kernelmodule --profile ch341,cdc-acm status
 ```
 
+To load them at every startup, see
+[Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
+
 `usb-devices` (SynoCli Kernel Tools) gives the USB id of an adapter, and `dmesg`, once
 it is plugged in, the driver that claimed it.
 

@@ -66,6 +66,25 @@ Modules are looked for in
 `/var/packages/<package>/target/lib/modules/<platform>/<uname -r>/`, the
 platform being the one `uname -a` names (`synology_<platform>_<model>`).
 
+### Loading modules at boot
+
+The `synokernel-*` packages are not services: DSM loads none of their modules,
+at installation or at boot. To load those of a device at every startup, create
+a task in DSM:
+
+1. *Control Panel* > *Task Scheduler* > *Create* > *Triggered Task* >
+   *User-defined script*
+2. *General*: a name, *User* `root`, *Event* `Boot-up`
+3. *Task Settings* > *Run command*, the profiles of the device:
+   ```bash
+   /usr/local/bin/synocli-kernelmodule --profile cp210x start
+   ```
+4. *OK*, then select the task and *Run* it once to check it, or reboot
+
+The output of each run is in `/var/log/packages/synocli-kernelmodule.log`.
+After a DSM update that changes the kernel, install the build of the packages
+for that DSM version: the task then loads the new modules.
+
 ### Device profiles
 
 A profile is one JSON file per device, in `src/profiles/` of the package,

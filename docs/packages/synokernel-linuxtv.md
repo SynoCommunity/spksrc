@@ -78,7 +78,8 @@ sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 | `siano-mdtv` | Siano sms1xxx receivers | no |
 
 A device without a profile gets one by following
-[Writing a profile](synocli-kernel.md#writing-a-profile).
+[Writing a profile](synocli-kernel.md#writing-a-profile). To load a device at every
+startup, see [Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
 
 Firmware files are in `/var/packages/synokernel-linuxtv/target/lib/firmware`,
 which the helper points the kernel firmware loader at: the LinuxTV set of 2018
