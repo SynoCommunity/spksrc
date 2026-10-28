@@ -94,7 +94,7 @@ _install_tclib_() { \
 }
 endef
 
-# A plist line may be a pattern -- cross/boost_1.92 describes its libraries as
+# A plist line may be a pattern -- cross/boost-1.92 describes its libraries as
 # `lib:lib/libboost_*.so.1.92.0` -- so each one is resolved inside the staging
 # directory before it is read, the way copy.mk resolves them before packing.
 # Handed to objdump as written, a pattern is a path that does not exist and the

@@ -11,10 +11,10 @@ MIN_GCC_VERSION = 4.9
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support
-DEPENDS = cross/libicu cross/boost_1.70 
+DEPENDS = cross/libicu cross/boost-1.70
 DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
-DEPENDS += cross/libmatroska_1.5
+DEPENDS += cross/libmatroska-1.5
 
 HOMEPAGE = https://mkvtoolnix.org/
 COMMENT  = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files.

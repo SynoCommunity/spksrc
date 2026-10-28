@@ -3,7 +3,7 @@ SPK_VERS = 22.0.0
 SPK_REV = 2
 SPK_ICON = src/mkvtoolnix.png
 
-DEPENDS = cross/mkvtoolnix_22
+DEPENDS = cross/mkvtoolnix-22
 
 MAINTAINER = cytec
 DESCRIPTION = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files. MKVToolNix is a powerful tool for editing, merging, and splitting MKV files. Easily manage video, audio, and subtitles, extract tracks, and modify metadata.

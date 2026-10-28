@@ -454,7 +454,7 @@ If you only read one thing, read this. The details are in the dated log below.
 ??? note "September 28th 2026 — A plist pattern is the files it stands for, not a path (#7518)"
 
     - **A package built on demand describes its libraries with a pattern.**
-      `cross/boost_1.92/PLIST` says `lib:lib/libboost_*.so.1.92.0`, because it does not
+      `cross/boost-1.92/PLIST` says `lib:lib/libboost_*.so.1.92.0`, because it does not
       know which libraries the caller asked it to build.
       `include_toolchain_specific_libraries` handed that to `objdump` as written -- a path
       that does not exist -- so the files it stands for were never examined, and the
@@ -1143,7 +1143,7 @@ If you only read one thing, read this. The details are in the dated log below.
       target that ships them.
     - **Also in this PR:** `dependency-list` now keys its output on the package
       **folder** instead of `$(NAME)`. Three packages set `SPK_NAME` to something
-      else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix_22` (`mkvtoolnix`),
+      else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix-22` (`mkvtoolnix`),
       `spk/mono_58` (`mono`) — while every consumer of the list already looked the
       key up as a directory (`.github/actions/prepare.sh`, `spk-meta/base.mk`). The
       three silently fell out of the CI build matrix, and the latter two collided
