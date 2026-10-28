@@ -22,9 +22,9 @@ Provides kernel modules for USB serial device support on Synology NAS devices.
 ## Included Drivers
 
 The USB serial core (`usbserial`), `cdc-acm` for ACM devices (modems, Arduino,
-Z-Wave sticks), and every USB serial adapter driver the kernel of the NAS
-offers: the list grows with the kernel, `f81534` and `upd78f0730` coming with
-5.10 for instance. Among them:
+Z-Wave sticks), and the USB serial drivers of adapters, modems, GPS receivers
+and barcode readers the kernel of the NAS offers: the list grows with the
+kernel, `f81534` coming with 5.10 for instance. Among them:
 
 | Module | Devices |
 |--------|---------|
@@ -36,8 +36,9 @@ offers: the list grows with the kernel, `f81534` and `upd78f0730` coming with
 | `ti_usb_3410_5052` | Texas Instruments TUSB3410/5052 adapters |
 | `mos7720`, `mos7840`, `f81534` | multi-port adapters |
 
-Some drivers need a firmware file the package does not provide (`keyspan`,
-`io_edgeport`, `whiteheat`).
+Drivers of devices a NAS does not serve are left out: PDAs and players, IrDA,
+smart card readers (they go through CCID), and adapters whose firmware the
+package does not provide (`keyspan`, `io_edgeport`, `whiteheat`).
 
 ## Usage
 
