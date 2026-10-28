@@ -54,10 +54,12 @@ PCI_ADAPTERS += CONFIG_VIDEO_SAA7164
 PCI_ADAPTERS += CONFIG_VIDEO_TW5864
 PCI_ADAPTERS += CONFIG_VIDEO_TW68
 PCI_ADAPTERS += CONFIG_VIDEO_TW686X
-BLACKLIST += $(if $(DRIVER_PCI_SLOT),,$(PCI_ADAPTERS))
+PCI_ADAPTERS += CONFIG_DVB_AV7110
+DENYLIST += $(if $(DRIVER_PCI_SLOT),,$(PCI_ADAPTERS))
 
-# Camera interfaces of Microchip ARM SoCs: allyesconfig sets the helper ISC_BASE
-# even with ISC and XISC off, and it needs the COMMON_CLK some kernels lack
-BLACKLIST += CONFIG_VIDEO_ATMEL_ISC_BASE
-BLACKLIST += CONFIG_VIDEO_ATMEL_ISC
-BLACKLIST += CONFIG_VIDEO_ATMEL_XISC
+# videobuf2-dma-sg, and the camera controller of the OLPC XO and the virtual
+# test driver that use it and -dma-contig: they need split_page and
+# ktime_divns, which these kernels do not export
+DENYLIST += CONFIG_VIDEOBUF2_DMA_SG
+DENYLIST += CONFIG_VIDEO_CAFE_CCIC
+DENYLIST += CONFIG_VIDEO_VIVID

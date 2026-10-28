@@ -83,7 +83,8 @@ sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 | `siano-mdtv` | Siano sms1xxx receivers | no |
 
 `synocli-kernelmodule list` tells which this kernel can load: the DVB-S2
-demodulators and the RTL2832U need an I2C multiplexer the 3.2 kernels lack.
+demodulators and the RTL2832U use regmap, which the 3.2 kernel of the armada370
+lacks.
 
 A device without a profile gets one by following
 [Writing a profile](synocli-kernel.md#writing-a-profile). To load a device at every

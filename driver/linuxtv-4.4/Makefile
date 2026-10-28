@@ -27,9 +27,7 @@ INSTALL_TARGET   = linuxtv_install
 
 # PCI adapters left out where the platform has no PCIe slot, and drivers these
 # kernels cannot build or load
-include ko-blacklist.mk
-# Adapters allyesconfig leaves out that build here
-include ko-whitelist.mk
+include ko-denylist.mk
 
 include ../../mk/spksrc.driver.mk
 
@@ -39,8 +37,7 @@ linuxtv_configure:
 	@# GNU make 4.4 no longer remakes the phony .version media_build includes
 	$(RUN) CROSS_COMPILE=y $(MAKE) -C v4l .version DIR=$(KERNEL_ROOT)
 	$(RUN) CROSS_COMPILE=y $(MAKE) allyesconfig
-	$(RUN) sed -i $(foreach k,$(BLACKLIST),-e 's/^$(k)=[my]/# $(k) is not set/') v4l/.config
-	$(RUN) sed -i $(foreach k,$(WHITELIST),-e 's/^# $(k) is not set/$(k)=m/') v4l/.config
+	$(RUN) sed -i $(foreach k,$(DENYLIST),-e 's/^$(k)=[my]/# $(k) is not set/') v4l/.config
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
