@@ -124,6 +124,34 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
+
+    - **Kernel modules are stripped with `--strip-debug`** by `strip.mk`: the plain strip
+      left a `*.ko` without the symbol table the module loader links it with, so every
+      synokernel package replaced the target with its own `find`.
+
+    - **`REQUIRE_KERNEL_MODULE` builds each directory once**, and skips an option the
+      kernel does not offer, so one list spans kernels: `CONFIG_<option>=m` on the command
+      line rebuilt the whole directory for every module (usbserial on braswell-7.3: 16
+      minutes to 36 seconds). An optional fourth field names a feature the kernel must
+      have built in (`...:regmap-i2c:CONFIG_REGMAP`).
+
+    - **A generic build takes the sub-archs that have a kernel**, and leaves the others
+      out of the package arch list: `epyc7003` (a kernel for 7.4 only) no longer needs
+      excluding per package. `REMOVE_FROM_GENERIC_ARCHS` now applies (its generic-arch
+      test ran before `GENERIC_ARCHS` was set), and a sub-arch built directly without a
+      kernel stops in pre-check.
+
+    - **powerpc and SRM 1.2 kernels build modules**: `crtsavres.o`, which older
+      `modules_prepare` skip, and the `yylloc` of dtc on ipq806x-1.2.
+
+    - **`KERNEL_PCI_SLOT = 1`** marks, in `kernel/syno-<arch>-<version>`, the platforms of
+      which a model takes PCIe add-in cards.
+
+    - **`kernel-depend` only runs where `REQUIRE_KERNEL` listed kernels**: a cross
+      dependency of a kernel module spk inherited `REQUIRE_KERNEL_MODULE` and ran the walk
+      in its own directory.
+
 ??? note "October 28th 2026 — A fresh tree no longer hangs on its first toolchain bootstrap (#7667)"
 
     - **`make check` could wait forever on a new tree.** `depend.mk` resolves

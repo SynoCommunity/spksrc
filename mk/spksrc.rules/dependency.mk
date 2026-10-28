@@ -99,7 +99,9 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+# KERNEL_DEPEND is only set for REQUIRE_KERNEL: a dependency that merely inherits
+# REQUIRE_KERNEL_MODULE through ENV has no kernels of its own to walk
+ifneq ($(strip $(KERNEL_DEPEND)),)
 # As depend is also ran at toolchain-time, ensure to skip kernel-depend
 ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
 depend_target: kernel-depend
