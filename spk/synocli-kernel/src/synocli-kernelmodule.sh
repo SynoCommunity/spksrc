@@ -30,9 +30,12 @@ LOG=/var/log/packages/synocli-kernelmodule.log
 usage() {
    cat <<EOF
 
-Usage: $0 [options] <list|start|stop|restart|status> [module ...]
+Usage: $0 [options] <list|modules|start|stop|restart|status> [module ...]
 
-   list                      the profiles of every installed synokernel-* package
+   list                      the profiles of every installed synokernel-* package,
+                             and whether this kernel has all their modules
+   modules                   the modules the profiles and modules given load, in
+                             order, and where each comes from; nothing is loaded
    start|stop|restart|status the modules of the profiles, and of the modules given
 
 Options:
@@ -40,6 +43,7 @@ Options:
                              holding the profiles)
    -p, --profile <p1,p2,...> profiles to use
    -r, --root <dir>          package target directory (default: $PACKAGES/<package>/target)
+   -n, --dry-run             start, stop and restart only tell what they would do
    -v, --verbose             print the modules resolved, and the comments of profiles
    -h, --help                this help
 
@@ -47,6 +51,8 @@ Examples:
    $0 list
    $0 --profile hauppauge-wintv-dualhd-atsc start
    $0 --spk synokernel-usbserial --profile ch341,cp210x status
+   $0 --profile hauppauge-wintv-dualhd-atsc modules
+   $0 --profile hauppauge-wintv-dualhd-atsc --dry-run start
    $0 --spk synokernel-cdrom sr_mod start
 
 EOF
@@ -104,11 +110,25 @@ profile_modules() {
    jq -r '(.modules // []) | join(" ")' "${file}"
 }
 
+# The modules directory of the running kernel in a package target
+kernel_path() { echo "$1/lib/modules/${PLATFORM}/$(uname -r)"; }
+
+# The profiles, available when this kernel has every module they load
 list() {
-   local file spk
+   local file spk root missing state
    for file in $(profile_files); do
       spk=$(profile_spk ${file})
-      printf '%-24s %-32s %s\n' "${spk:-${ROOT}}" "$(basename ${file} .json)" "$(jq -r '.description // ""' ${file})"
+      root=${ROOT:-${PACKAGES}/${spk}/target}
+      KPATH=$(kernel_path ${root})
+      index_modules
+      SEEN="" ; ORDER=""
+      for m in $(profile_modules ${file}); do resolve ${m}; done
+      missing=$(missing_modules)
+      state="available"
+      [ -d "${KPATH}" ] || state="n/a (no modules for this kernel)"
+      [ "${state}" = "available" ] && [ -n "${missing}" ] && state="n/a (missing: ${missing})"
+      printf '%-24s %-32s %-10s %s\n' "${spk:-${ROOT}}" "$(basename ${file} .json)" "${state%% *}" "$(jq -r '.description // ""' ${file})"
+      [ "${state}" = "available" ] || echo "      ${state#n/a }"
       if [ "${VERBOSE}" = "TRUE" ]; then
          jq -r '.comments // empty' ${file} | sed 's/^/      /'
          echo "      modules: $(profile_modules ${file})"
@@ -120,12 +140,45 @@ list() {
 # Modules
 #------------------------------------------------
 
-# The .ko of a module in the package, '-' and '_' being the same
+# "<name> <path>" of every .ko of the kernel directory, '-' and '_' being the
+# same; built in the main shell, once per directory, as ko_file runs in $(...)
+index_modules() {
+   [ "${KO_INDEX_OF}" = "${KPATH}" ] && return
+   KO_INDEX=$(find ${KPATH} -name '*.ko' 2>/dev/null | awk -F/ '{ n = $NF; sub(/\.ko$/, "", n); gsub(/-/, "_", n); print n, $0 }')
+   KO_INDEX_OF=${KPATH}
+}
+
+# The .ko of a module in the package
 ko_file() {
-   local name=$(modname $1) ko
-   for ko in $(find ${KPATH} -name '*.ko'); do
-      [ "$(modname ${ko})" = "${name}" ] && echo ${ko} && return
+   echo "${KO_INDEX}" | awk -v n="$(modname $1)" '$1 == n { print $2; exit }'
+}
+
+# Where a module of ORDER comes from: the package, DSM's /lib/modules, the
+# running kernel (loaded or built in), or nowhere
+module_source() {
+   local name=$(modname $1)
+   if [ -f "$1" ]; then echo "package"
+   elif [ -f /lib/modules/${name}.ko -o -f /lib/modules/${name//_/-}.ko ]; then echo "kernel"
+   elif loaded ${name}; then echo "kernel (loaded)"
+   else echo "missing"
+   fi
+}
+
+# The modules of ORDER no one provides
+missing_modules() {
+   local m out=""
+   for m in ${ORDER}; do
+      [ "$(module_source ${m})" = "missing" ] && out="${out} $(modname ${m})"
    done
+   echo ${out}
+}
+
+modules() {
+   local m
+   for m in ${ORDER}; do
+      printf '%-40s %-16s %s\n' "$(modname ${m})" "$(module_source ${m})" "$([ -f "${m}" ] && echo "${m#${KPATH}/}")"
+   done
+   [ -z "$(missing_modules)" ]
 }
 
 # Appends to ORDER the modules $1 depends on, then $1: a module of the package
@@ -158,6 +211,16 @@ load_kernel_module() {
 
 load() {
    local error=0 m
+   if [ "${DRYRUN}" = "TRUE" ]; then
+      for m in ${ORDER}; do
+         printf '%-40s' "$(modname ${m})"
+         if loaded ${m}; then echo "already loaded"
+         elif [ "$(module_source ${m})" = "missing" ]; then echo "missing"; error=1
+         else echo "OK (simulated, $(module_source ${m}))"
+         fi
+      done
+      return ${error}
+   fi
    firmware_on
    udev_on
    for m in ${ORDER}; do
@@ -184,10 +247,13 @@ unload() {
          echo "not loaded"
       elif [ "$(cat /sys/module/$(modname ${m})/refcnt 2>/dev/null)" != "0" ]; then
          echo "in use, left loaded"
+      elif [ "${DRYRUN}" = "TRUE" ]; then
+         echo "OK (simulated)"
       else
          rmmod $(modname ${m}) && echo "OK" || { echo "ERROR"; error=1; }
       fi
    done
+   [ "${DRYRUN}" = "TRUE" ] && return ${error}
    udev_off
    firmware_off
    return ${error}
@@ -263,15 +329,17 @@ PROFILES=""
 ACTION=""
 MODULES=""
 VERBOSE="FALSE"
+DRYRUN="FALSE"
 
 while [ $# -gt 0 ]; do
    case $1 in
       -s|--spk)     shift; SPK=$1;;
       -p|--profile) shift; PROFILES=$(echo $1 | tr ',' ' ');;
       -r|--root)    shift; ROOT=$1;;
+      -n|--dry-run) DRYRUN="TRUE";;
       -v|--verbose) VERBOSE="TRUE";;
       -h|--help)    usage; exit 0;;
-      list|start|stop|restart|status) ACTION=$1;;
+      list|modules|start|stop|restart|status) ACTION=$1;;
       insmod)       ACTION=start;;
       rmmod)        ACTION=stop;;
       reload)       ACTION=restart;;
@@ -295,7 +363,6 @@ if [ "${ACTION}" = "list" ]; then
 fi
 
 [ -n "${PROFILES}${MODULES}" ] || { usage; die "no profile nor module given"; }
-[ "$(id -u)" = "0" ] || die "must be run as root"
 
 # The package: given, or the one holding the profiles
 if [ -z "${SPK}" -a -z "${ROOT}" ]; then
@@ -323,16 +390,26 @@ done
 WANTED="${WANTED} ${MODULES}"
 UDEV=$(echo ${UDEV})
 
+index_modules
 SEEN=""
 ORDER=""
 for m in ${WANTED}; do
    resolve ${m}
 done
 
-mkdir -p $(dirname ${LOG})
-exec > >(tee -a ${LOG}) 2>&1
-TEE=$!
-echo "--- $(date '+%Y-%m-%d %H:%M:%S') ${ACTION} ${SPK:-${ROOT}} [${PROFILES}${MODULES:+ +${MODULES}}]"
+if [ "${ACTION}" = "modules" ]; then
+   modules
+   exit $?
+fi
+[ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "must be run as root"
+
+# The log needs root: a dry run without it prints only
+if [ "$(id -u)" = "0" ]; then
+   mkdir -p $(dirname ${LOG})
+   exec > >(tee -a ${LOG}) 2>&1
+   TEE=$!
+fi
+echo "--- $(date '+%Y-%m-%d %H:%M:%S') ${ACTION}$([ "${DRYRUN}" = "TRUE" ] && echo " (dry run)") ${SPK:-${ROOT}} [${PROFILES}${MODULES:+ +${MODULES}}]"
 say "kernel ${PLATFORM} $(uname -r): ${KPATH}"
 say "modules: $(for m in ${ORDER}; do echo -n "$(modname ${m}) "; done)"
 
@@ -345,6 +422,8 @@ esac
 rc=$?
 
 # Let tee write the last lines before returning
-exec >&- 2>&-
-wait ${TEE}
+if [ -n "${TEE}" ]; then
+   exec >&- 2>&-
+   wait ${TEE}
+fi
 exit ${rc}

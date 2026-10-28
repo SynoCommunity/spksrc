@@ -30,8 +30,15 @@ SPK_DEPENDS = synocli-kernel
 at a time, through the profile of that device. Run as root:
 
 ```bash
-# Profiles of every installed synokernel-* package
+# Profiles of every installed synokernel-* package, and whether this kernel
+# has all their modules (available, or n/a with the missing ones)
 synocli-kernelmodule list
+
+# The modules a profile loads, in order, and where each comes from
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
+
+# What start would do, without loading anything (no root needed)
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
 
 # Load, check and unload the modules of a device
 sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
@@ -49,6 +56,7 @@ sudo synocli-kernelmodule --spk synokernel-cdrom sr_mod start
 |--------|-----|
 | `-p`, `--profile <p1,p2,...>` | profiles to load; the package is the one holding them |
 | `-s`, `--spk <package>` | package holding the modules, needed for modules by name |
+| `-n`, `--dry-run` | `start`, `stop` and `restart` tell each step (`OK (simulated)`, or `missing`) and change nothing |
 | `-r`, `--root <dir>` | package directory other than `/var/packages/<package>/target`, to try modules before packaging them |
 | `-v`, `--verbose` | modules in load order, and the comments of each profile |
 
