@@ -14,8 +14,8 @@ CHANGELOG     = "1. synocli-kernelmodule loads modules by device profile, with t
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-SPK_LINKS     = /usr/local/bin/synocli-kernelmodule:bin/synocli-kernelmodule.sh
-SPK_COMMANDS  = bin/fuser
+SPK_COMMANDS  = bin/synocli-kernelmodule
+SPK_COMMANDS += bin/fuser
 SPK_COMMANDS += bin/usb-devices
 SPK_COMMANDS += bin/usbhid-dump
 SPK_COMMANDS += bin/lsusb.py
@@ -27,4 +27,4 @@ include ../../mk/spksrc.spk.mk
 .PHONY: synocli-kernel_extra_install
 synocli-kernel_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/synocli-kernelmodule.sh $(STAGING_DIR)/bin/
+	install -m 755 src/synocli-kernelmodule.sh $(STAGING_DIR)/bin/synocli-kernelmodule
