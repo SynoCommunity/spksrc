@@ -138,6 +138,23 @@ POST_STRIP_TARGET = <package>_extra_install
 	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/
 ```
 
+### udev rules
+
+A profile can name rules files of the package (`udev`, from `target/rules.d`): on
+`start` they are linked into `/lib/udev/rules.d` and udev reloads them, on `stop`
+they are removed. `synokernel-usbserial` uses one for every driver,
+`60-synokernel-usbserial.rules`, which opens the serial devices to every user:
+
+```
+KERNEL=="ttyACM*", ACTION=="add", MODE="0666"
+KERNEL=="ttyUSB*", ACTION=="add", MODE="0666"
+```
+
+Without it `/dev/ttyUSB*` and `/dev/ttyACM*` belong to root alone, and a service
+running as its own user (Home Assistant, Zigbee2MQTT, ...) cannot open them. A rule
+applies to the devices that appear once it is in place: plug the device after
+`start`, or unplug and plug it again.
+
 ### Writing a profile
 
 1. Find the driver of the device: its USB id (`usb-devices`) in the driver sources,
@@ -220,9 +237,13 @@ DRIVER_GCC_MIN    = 4.9     # and with an older gcc
 include ../../mk/spksrc.driver.mk
 ```
 
-Where one version of a driver cannot serve every kernel, `spksrc.driver-virtual.mk`
-builds the first of its `DEPENDS` that is not skipped, kernel by kernel.
-`driver/linuxtv` does so for [SynoKernel LinuxTV](synokernel-linuxtv.md):
+The `driver/*` a driver lists in its `DEPENDS` are built first, for the same
+kernel: `driver/linuxtv-*` take their media tree from `driver/linux-media-*`.
+
+Where one version of a driver cannot serve every kernel, a driver without sources
+(no `PKG_DIST_SITE`) is a selector: it builds the first of its `DEPENDS` that is
+not skipped, kernel by kernel. `driver/linuxtv` does so for
+[SynoKernel LinuxTV](synokernel-linuxtv.md):
 
 ```makefile
 # driver/linuxtv/Makefile
@@ -230,7 +251,7 @@ DEPENDS  = driver/linuxtv-4.4
 DEPENDS += driver/linuxtv-3.10
 DEPENDS += driver/linuxtv-3.2
 
-include ../../mk/spksrc.driver-virtual.mk
+include ../../mk/spksrc.driver.mk
 ```
 
 ## Troubleshooting

@@ -140,7 +140,7 @@ If you only read one thing, read this. The details are in the dated log below.
       `lib/modules/<arch>/<kernel>` of the in-tree modules.
 
     - **A driver states the kernel and gcc it needs** -- `DRIVER_KERNEL_MIN`,
-      `DRIVER_GCC_MIN` -- and is skipped below them. `spksrc.driver-virtual.mk` builds,
+      `DRIVER_GCC_MIN` -- and is skipped below them. A driver without sources builds,
       per kernel, the first of several versions that is not skipped: the counterpart of
       `$(call depend,a|b|c)` for a choice that depends on each sub-arch rather than on the
       generic arch. `driver/linuxtv` picks media_build frozen for kernels 4.4+, 3.10+
@@ -152,8 +152,13 @@ If you only read one thing, read this. The details are in the dated log below.
     - **A multi-kernel build drops each kernel's sources once its modules are installed**;
       cookies stay, so a stopped run resumes.
 
-    - **`native/linux-media-<date>`** rebuilds the media trees `driver/linuxtv-*` unpack,
-      hosted in the `linuxtv/media_build` release (`mk/spksrc.native/linux-media.mk`).
+    - **A driver builds the `driver/*` of its own `DEPENDS` first**, for the same
+      kernel: `driver/linuxtv-*` take their media tree from `driver/linux-media-*`,
+      hosted in the `linuxtv/media_build` release and rebuilt by `native/linux-media-*`
+      with the archive step of `spksrc.build/archive.mk`.
+
+    - **Kernel modules and drivers build with the compiler of the Synology
+      toolchain**: `OVERLAY_GCC` and `OVERLAY_BINUTILS` are forced off there.
 
 ??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
 
