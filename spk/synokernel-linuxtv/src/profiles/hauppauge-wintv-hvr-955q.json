@@ -2,9 +2,5 @@
   "name": "hauppauge-wintv-hvr-955q",
   "description": "Hauppauge WinTV-HVR-955Q, ATSC and ClearQAM (USB 2040:b123, 2040:b124, 2040:b151)",
   "comments": "Chips and USB ids from the media tree; not tested on hardware.",
-  "modules": [
-    "lgdt3306a",
-    "si2157",
-    "cx231xx-dvb"
-  ]
+  "modules": ["lgdt3306a", "si2157", "cx231xx-dvb"]
 }

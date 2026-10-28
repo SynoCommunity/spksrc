@@ -1,10 +1,6 @@
 {
   "name": "zte_ev",
   "description": "ZTE USB serial driver",
-  "modules": [
-    "zte_ev"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["zte_ev"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

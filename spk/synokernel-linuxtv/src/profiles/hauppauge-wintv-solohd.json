@@ -2,11 +2,5 @@
   "name": "hauppauge-wintv-solohd",
   "description": "Hauppauge WinTV-soloHD and PCTV 292e, DVB-T2, DVB-T and DVB-C (USB 2040:0264, 2040:8264, 2040:8268, 2013:025f)",
   "comments": "Chips and USB ids from the media tree; not tested on hardware.",
-  "modules": [
-    "si2168",
-    "si2157",
-    "rc-pinnacle-pctv-hd",
-    "em28xx-dvb",
-    "em28xx-rc"
-  ]
+  "modules": ["si2168", "si2157", "rc-pinnacle-pctv-hd", "em28xx-dvb", "em28xx-rc"]
 }

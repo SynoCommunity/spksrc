@@ -1,10 +1,6 @@
 {
   "name": "symbolserial",
   "description": "Symbol Barcode driver (serial mode)",
-  "modules": [
-    "symbolserial"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["symbolserial"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

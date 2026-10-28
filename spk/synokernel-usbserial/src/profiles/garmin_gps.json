@@ -1,10 +1,6 @@
 {
   "name": "garmin_gps",
   "description": "Garmin GPS driver",
-  "modules": [
-    "garmin_gps"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["garmin_gps"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

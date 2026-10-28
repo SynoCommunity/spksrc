@@ -1,10 +1,6 @@
 {
   "name": "qcserial",
   "description": "Qualcomm Serial modem",
-  "modules": [
-    "qcserial"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["qcserial"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

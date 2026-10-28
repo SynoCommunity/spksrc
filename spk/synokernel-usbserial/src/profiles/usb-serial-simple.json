@@ -1,10 +1,6 @@
 {
   "name": "usb-serial-simple",
   "description": "Serial Simple Driver",
-  "modules": [
-    "usb-serial-simple"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["usb-serial-simple"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

@@ -1,10 +1,6 @@
 {
   "name": "digi_acceleport",
   "description": "Digi International AccelePort USB Serial Driver",
-  "modules": [
-    "digi_acceleport"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["digi_acceleport"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

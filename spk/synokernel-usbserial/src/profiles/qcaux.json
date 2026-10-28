@@ -1,10 +1,6 @@
 {
   "name": "qcaux",
   "description": "Qualcomm Auxiliary Serial Port Driver",
-  "modules": [
-    "qcaux"
-  ],
-  "udev": [
-    "60-synokernel-usbserial.rules"
-  ]
+  "modules": ["qcaux"],
+  "udev": ["60-synokernel-usbserial.rules"]
 }

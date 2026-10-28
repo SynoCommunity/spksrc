@@ -2,10 +2,5 @@
   "name": "dvbsky-s960",
   "description": "DVBSky S960 and S860, DVB-S2 (USB 0572:6831)",
   "comments": "Chips and USB ids from the media tree; not tested on hardware.",
-  "modules": [
-    "m88ds3103",
-    "ts2020",
-    "rc-dvbsky",
-    "dvb-usb-dvbsky"
-  ]
+  "modules": ["m88ds3103", "ts2020", "rc-dvbsky", "dvb-usb-dvbsky"]
 }
