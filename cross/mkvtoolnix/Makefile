@@ -1,31 +1,18 @@
 PKG_NAME = mkvtoolnix
-PKG_VERS = 58.0.0
+PKG_VERS = 103.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# mkvtoolnix > 22.x require C++14 (DSM 7 only)
-# no further updates possible:
-# mkvtoolnix > 46.x need some features of C++17
-# mkvtoolnix > 53.x need features file system library (C++17) not supported on DSM 7.0
-# mkvtoolnix > 58.x need features gcc >= 10.x not supported on DSM 7.1
-# Breaking changes with mkvtoolnix >= 59.0
-#  The Qt library is now required for building all applications, even the
-#  command-line ones, as they use Qt's MIME type detection capabilities
+# MKVToolNix 103 requires C++20 and GCC >= 10, hence DSM 7.2+
+MIN_GCC_VERSION = 10
 
-# configure wants -std=c++17, and 58.0.0 also wants the C++17 filesystem
-# library, which libstdc++ carries complete from 8:
-#   checking for support for the "-std=c++17" flag... no
-MIN_GCC_VERSION = 8
-
-BUILD_DEPENDS = native/ruby
-# build cross/libicu before cross/boost to build libboost_regex with unicode support
-DEPENDS = cross/libicu cross/boost
+BUILD_DEPENDS = native/ruby native/qt6base
+DEPENDS = cross/qt6base
+DEPENDS += cross/boost-1.92 cross/gmp
 DEPENDS += cross/libogg cross/libvorbis cross/zlib
-DEPENDS += cross/flac cross/file
-DEPENDS += cross/libebml cross/libmatroska
-DEPENDS += cross/pcre2
+DEPENDS += cross/flac
 
 HOMEPAGE = https://mkvtoolnix.org/
 COMMENT  = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files.
@@ -37,12 +24,18 @@ INSTALL_TARGET = mkvtoolnix_install
 
 CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += --enable-gui=no
+CONFIGURE_ARGS += --with-qmake6=$(CURDIR)/files/qmake6
 
-BOOST_LIBRARIES = regex date_time
+BOOST_LIBRARIES = filesystem system
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 
 NATIVE_RUBY_DIR = $(realpath $(WORK_DIR)/../../../native/ruby/work-native/install/usr/local/bin)
 ENV += PATH=$(NATIVE_RUBY_DIR):$$PATH
+
+NATIVE_QT6_DIR = $(realpath $(WORK_DIR)/../../../native/qt6base/work-native/install/usr/local)
+ENV += QMAKE6_HOST_PREFIX=$(NATIVE_QT6_DIR)
+ENV += QMAKE6_TARGET_PREFIX=$(STAGING_INSTALL_PREFIX)
 
 ADDITIONAL_CXXFLAGS += -Os
 
