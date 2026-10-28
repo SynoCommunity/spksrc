@@ -146,15 +146,15 @@ If you only read one thing, read this. The details are in the dated log below.
       generic arch. `driver/linuxtv` picks media_build frozen for kernels 4.4+, 3.10+
       or 3.2+ this way, a 4.4 kernel on gcc 4.9 taking the 3.10 one.
 
-    - **`kernel-depend` only runs where `REQUIRE_KERNEL` listed kernels.** A regular
-      dependency of a kernel module spk inherited `REQUIRE_KERNEL_MODULE` through `ENV`
-      and ran the walk in its own directory, failing on the tc_vars backup of a work
-      directory it does not have: a synokernel spk could not have a cross dependency.
+    - **A driver reads `KERNEL_PCI_SLOT`** of its kernel as `DRIVER_PCI_SLOT`, to build
+      PCI drivers only where a card can go.
 
-    - **Kernel modules are stripped with `--strip-debug`.** The plain strip of
-      `strip_target` would leave a `*.ko` without the symbol table the module loader links
-      it with, so every synokernel package replaced the target with its own `find`. The
-      framework now does it: `cdrom.ko` goes from 377 KB to 43 KB, `.symtab` kept.
+    - **A multi-kernel build drops each kernel's sources once its modules are installed**;
+      cookies stay, so a stopped run resumes.
+
+    - **`native/linux-media-<date>`** rebuilds the media trees `driver/linuxtv-*` unpack,
+      hosted in the `linuxtv/media_build` release (`mk/spksrc.native/linux-media.mk`).
+
 ??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
 
     - **Kernel modules are stripped with `--strip-debug`** by `strip.mk`: the plain strip
@@ -173,20 +173,6 @@ If you only read one thing, read this. The details are in the dated log below.
       test ran before `GENERIC_ARCHS` was set), and a sub-arch built directly without a
       kernel stops in pre-check.
 
-    - **`REQUIRE_KERNEL_MODULE` builds each directory once** and skips an option the
-      kernel does not offer, so one list spans kernels: usbserial on braswell-7.3 went
-      from 16 minutes to 36 seconds. An optional fourth field names a feature the kernel
-      must have built in (`...:regmap-i2c:CONFIG_REGMAP`). powerpc modules link with
-      `crtsavres.o`, which older `modules_prepare` skip.
-
-    - **`KERNEL_PCI_SLOT = 1`** marks, in `kernel/syno-<arch>-<version>`, the platforms of
-      which a model takes PCIe add-in cards; a driver reads it as `DRIVER_PCI_SLOT`.
-
-    - **A multi-kernel build drops each kernel's sources once its modules are installed**;
-      cookies stay, so a stopped run resumes.
-
-    - **`native/linux-media-<date>`** rebuilds the media trees `driver/linuxtv-*` unpack,
-      hosted in the `linuxtv/media_build` release (`mk/spksrc.native/linux-media.mk`).
     - **powerpc and SRM 1.2 kernels build modules**: `crtsavres.o`, which older
       `modules_prepare` skip, and the `yylloc` of dtc on ipq806x-1.2.
 
