@@ -91,12 +91,13 @@ endif
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(WORK_DIR)/tc_vars.mk
 
-# Keyed on the extracted $(TC_TARGET), the toolchain no longer generating a file to
-# look for. The cookie traces who paid for it; it guards nothing.
+# Keyed on the extracted $(TC_TARGET); the cookie traces who paid for it. Locked: the
+# parallel walks of depend.mk bootstrap the same toolchain at once, the later ones then
+# finding its cookies.
 ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
 ifeq ($(wildcard $(TC_WORK_DIR)/$(TC_TARGET)),)
   $(info ===> Bootstrapping toolchain for $(ARCH)-$(TCVERSION) (stage0))
-  $(shell $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchain >&2 && touch $(WORK_DIR)/.stage0-bootstrap_done)
+  $(shell flock $(TC_WORK_DIR).lock $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchain >&2 && touch $(WORK_DIR)/.stage0-bootstrap_done)
 endif
 endif
 
