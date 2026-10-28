@@ -7,15 +7,15 @@ PKG_DIST_NAME = linux-media-2021-01-08-321af22a3d2f.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/linuxtv%2Fmedia_build
 PKG_DIR = $(PKG_NAME)
 
-DEPENDS =
-
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = Linux media subsystem at the commit media_build released as linux-media-2021-01-08-321af22a3d2f.
 LICENSE  = GPLv2
 
-# Kept packed: media_build unpacks it into its own tree
-EXTRACT_CMD = install -D -m 644 $(DIST_FILE) $(EXTRACT_PATH)/$(PKG_DIR)/linux-media.tar.bz2
+# Kept packed, in the directory of each kernel: media_build unpacks it into its own tree
+EXTRACT_CMD = install -D -m 644 $(DIST_FILE) $(WORK_DIR)/$(PKG_DIR)/linux-media.tar.bz2
 
-INSTALL_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET   = nop
+INSTALL_TARGET   = nop
 
-include ../../mk/spksrc.cross-install.mk
+include ../../mk/spksrc.driver.mk

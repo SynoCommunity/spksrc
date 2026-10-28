@@ -7,7 +7,7 @@ PKG_GIT_HASH = baf45935ffad914f33faf751ad9f4d0dd276c021
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
-DEPENDS = cross/linux-media-2018.08.07
+DEPENDS = driver/linux-media-2018.08.07
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = LinuxTV media_build: the media drivers of Linux 4.19-rc built out of tree, for kernels 3.2 to 3.9.
@@ -18,8 +18,8 @@ LICENSE  = GPLv2
 # and the 2.6.32 backports no longer apply
 DRIVER_KERNEL_MIN = 3.2
 
-# Left packed in the same WORK_DIR by cross/linux-media-2018.08.07
-MEDIA_TARBALL = $(WORK_DIR)/linux-media-2018.08.07/linux-media.tar.bz2
+# Left packed, per kernel, by driver/linux-media-2018.08.07
+MEDIA_TARBALL = $(WORK_DIR)/linux-media-2018.08.07$(ARCH_SUFFIX)/linux-media-2018.08.07/linux-media.tar.bz2
 
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET   = linuxtv_compile

@@ -7,7 +7,7 @@ PKG_GIT_HASH = f6e3542673d19355e8e42be40f5fc78431d611c5
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
-DEPENDS = cross/linux-media-2021.01.08
+DEPENDS = driver/linux-media-2021.01.08
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = LinuxTV media_build: the media drivers of Linux 5.11 built out of tree, for kernels 3.10 to 4.3.
@@ -18,8 +18,8 @@ LICENSE  = GPLv2
 DRIVER_KERNEL_MIN = 3.10
 DRIVER_GCC_MIN = 4.9
 
-# Left packed in the same WORK_DIR by cross/linux-media-2021.01.08
-MEDIA_TARBALL = $(WORK_DIR)/linux-media-2021.01.08/linux-media.tar.bz2
+# Left packed, per kernel, by driver/linux-media-2021.01.08
+MEDIA_TARBALL = $(WORK_DIR)/linux-media-2021.01.08$(ARCH_SUFFIX)/linux-media-2021.01.08/linux-media.tar.bz2
 
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET   = linuxtv_compile
