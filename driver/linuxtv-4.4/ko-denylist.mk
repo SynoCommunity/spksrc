@@ -61,3 +61,9 @@ DENYLIST += $(if $(DRIVER_PCI_SLOT),,$(PCI_ADAPTERS))
 DENYLIST += CONFIG_VIDEO_ATMEL_ISC_BASE
 DENYLIST += CONFIG_VIDEO_ATMEL_ISC
 DENYLIST += CONFIG_VIDEO_ATMEL_XISC
+
+# Camera and video codec of Qualcomm arm64 SoCs (cypress, the one platform with
+# ARCH_QCOM and IOMMU_DMA): they need the interconnect API and SCM calls these
+# kernels lack
+DENYLIST += CONFIG_VIDEO_QCOM_CAMSS
+DENYLIST += CONFIG_VIDEO_QCOM_VENUS
