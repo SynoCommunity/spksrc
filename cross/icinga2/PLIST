@@ -41,9 +41,9 @@ rsc:etc/init.d/icinga2
 rsc:etc/logrotate.d/icinga2
 rsc:etc/sysconfig/icinga2
 lnk:lib/icinga2/libmysql_shim.so
-lib:lib/icinga2/libmysql_shim.so.2.16.6
+lib:lib/icinga2/libmysql_shim.so.*
 lnk:lib/icinga2/libpgsql_shim.so
-lib:lib/icinga2/libpgsql_shim.so.2.16.6
+lib:lib/icinga2/libpgsql_shim.so.*
 rsc:lib/icinga2/prepare-dirs
 rsc:lib/icinga2/safe-reload
 bin:lib/icinga2/sbin/icinga2
