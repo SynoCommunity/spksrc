@@ -10,6 +10,13 @@ tags:
 
 # SynoCli Kernel Tools
 
+!!! warning "Experimental, at your own risk"
+    The kernel modules of SynoCommunity packages are outside of what Synology
+    supports: a module that does not suit the kernel can crash the NAS, and DSM
+    updates may break them. Support is limited: read this documentation, and
+    check the issues already open, before opening one. Do not use them on a NAS
+    you cannot afford to restart or recover.
+
 The `synocli-kernel` package provides lower-level USB helpers and scripts to help with kernel module loading and unloading. This package should normally be a hard dependency for any other kernel module related package.
 
 ## Package Information
@@ -30,8 +37,8 @@ SPK_DEPENDS = synocli-kernel
 at a time, through the profile of that device. Run as root:
 
 ```bash
-# Profiles of every installed synokernel-* package, and whether this kernel
-# has all their modules (available, or n/a with the missing ones)
+# Profiles of every synokernel-* package, and whether the package is installed
+# and this kernel has all their modules (available, or n/a with what is missing)
 synocli-kernelmodule list
 
 # The modules a profile loads, in order, and where each comes from
@@ -110,8 +117,11 @@ for that DSM version: the task then loads the new modules.
 
 ### Device profiles
 
-A profile is one JSON file per device, in `src/profiles/` of the package,
-installed in `target/etc/profiles/`. The file name is the profile name:
+A profile is one JSON file per device. The profiles are part of this package,
+not of the packages of kernel modules: a new device only needs a new release of
+SynoCli Kernel Tools. They are in `spk/synocli-kernel/src/profiles/<package>/`,
+installed in `target/etc/profiles/<package>/`, the directory naming the package
+of the modules. The file name is the profile name:
 
 ```json
 {
@@ -129,7 +139,7 @@ installed in `target/etc/profiles/`. The file name is the profile name:
 | `comments` | optional: quirks, what was tested and where |
 | `modules` | modules of the device, in load order, without `.ko`; `-` and `_` are the same |
 | `kernels` | optional: other module lists for some kernels (below) |
-| `udev` | optional: rules files of `target/rules.d` the device needs |
+| `udev` | optional: rules files of `target/etc/rules.d` the device needs |
 
 Where a kernel needs other modules, `kernels` gives lists by kernel version;
 the first entry whose `min` and `max` bracket the running kernel replaces
@@ -142,22 +152,12 @@ the first entry whose `min` and `max` bracket the running kernel replaces
   ]
 ```
 
-To install the profiles, in `spk/<package>/Makefile`:
-
-```makefile
-POST_STRIP_TARGET = <package>_extra_install
-
-.PHONY: <package>_extra_install
-<package>_extra_install:
-	install -m 755 -d $(STAGING_DIR)/etc/profiles
-	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/
-```
-
 ### udev rules
 
-A profile can name rules files of the package (`udev`, from `target/rules.d`): on
-`start` they are linked into `/lib/udev/rules.d` and udev reloads them, on `stop`
-they are removed. `synokernel-usbserial` uses one for every driver,
+A profile can name rules files (`udev`), from `src/rules.d/` of this package,
+installed in `target/etc/rules.d/`: on `start` they are linked into
+`/lib/udev/rules.d` and udev reloads them, on `stop` they are removed. The
+profiles of `synokernel-usbserial` use one for every driver,
 `60-synokernel-usbserial.rules`, which opens the serial devices to every user:
 
 ```
@@ -182,13 +182,13 @@ applies to the devices that appear once it is in place: plug the device after
 3. Add the bridge and its parts for the device (`em28xx-dvb` for DVB,
    `em28xx-rc` for the remote control, and the keymap module `rc-*` of the
    board).
-4. Try it before packaging it: copy the package `target` to the NAS, the profile
-   in its `etc/profiles/`, and run
-   `sudo synocli-kernelmodule --root <dir> --profile <name> --verbose start`.
+4. Try it before packaging it: put the profile in
+   `/var/packages/synocli-kernel/target/etc/profiles/<package>/` on the NAS,
+   and run `sudo synocli-kernelmodule --profile <name> --verbose start`.
 5. Check `dmesg` and `/dev/dvb`, then `stop`, which must leave no module of
    the profile loaded (`status`).
-6. Put the file in `src/profiles/`, with what was tested and on which NAS in
-   `comments`.
+6. Put the file in `spk/synocli-kernel/src/profiles/<package>/`, with what was
+   tested and on which NAS in `comments`.
 
 ## Building Kernel Module Packages
 

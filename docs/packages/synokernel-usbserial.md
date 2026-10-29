@@ -10,6 +10,13 @@ tags:
 
 # SynoKernel USB Serial
 
+!!! warning "Experimental, at your own risk"
+    The kernel modules of SynoCommunity packages are outside of what Synology
+    supports: a module that does not suit the kernel can crash the NAS, and DSM
+    updates may break them. Support is limited: read this documentation, and
+    check the issues already open, before opening one. Do not use them on a NAS
+    you cannot afford to restart or recover.
+
 Provides kernel modules for USB serial device support on Synology NAS devices.
 
 ## Package Information
@@ -44,9 +51,9 @@ package does not provide (`keyspan`, `io_edgeport`, `whiteheat`).
 
 The modules are not loaded on installation: load those of your adapter, as
 root, with the `synocli-kernelmodule` helper of
-[SynoCli Kernel Tools](synocli-kernel.md). Each driver has a profile of its
-name, which also installs the udev rule that opens `/dev/ttyUSB*` and
-`/dev/ttyACM*` to every user:
+[SynoCli Kernel Tools](synocli-kernel.md), which holds the profiles. Each
+driver has a profile of its name, which also installs the udev rule that opens
+`/dev/ttyUSB*` and `/dev/ttyACM*` to every user:
 
 ```bash
 synocli-kernelmodule list
@@ -89,8 +96,8 @@ For [Home Assistant](homeassistant.md), USB serial devices appear at `/dev/ttyUS
 
 ### Permission Denied
 
-Load the profile of the driver: it installs the udev rule of the package, which
-opens `/dev/ttyUSB*` and `/dev/ttyACM*` to every user.
+Load the profile of the driver: it installs the udev rule of its profiles,
+which opens `/dev/ttyUSB*` and `/dev/ttyACM*` to every user.
 
 ## Related Packages
 

@@ -11,6 +11,13 @@ tags:
 
 # SynoKernel LinuxTV
 
+!!! warning "Experimental, at your own risk"
+    The kernel modules of SynoCommunity packages are outside of what Synology
+    supports: a module that does not suit the kernel can crash the NAS, and DSM
+    updates may break them. Support is limited: read this documentation, and
+    check the issues already open, before opening one. Do not use them on a NAS
+    you cannot afford to restart or recover.
+
 Provides the LinuxTV media drivers -- DVB, ATSC and analog TV tuners, remote
 controls and USB video devices -- built for the kernel of each Synology model,
 with the firmware files many tuners load at startup.

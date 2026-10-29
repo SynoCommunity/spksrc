@@ -3,6 +3,9 @@
         "step_title": "SynoKernel USB CD-ROM",
         "items": [
             {
+                "desc": "<b>Expérimental, à vos risques.</b> Ces modules noyau sortent du cadre pris en charge par Synology : un module qui ne convient pas au noyau peut planter le NAS, et les mises à jour de DSM peuvent les briser. Le soutien est limité : lisez la documentation, et vérifiez les issues déjà ouvertes, avant d'en ouvrir une. Ne les utilisez pas sur un NAS que vous ne pouvez pas vous permettre de redémarrer ou de restaurer."
+            },
+            {
                 "desc": "Les modules noyau de ce paquet ne sont <b>pas chargés</b> à l'installation, ni au démarrage. Chargez ceux de votre périphérique, en root, avec l'outil <b>synocli-kernelmodule</b> de SynoCli Kernel Tools :<br><br><code>synocli-kernelmodule list</code><br><code>sudo synocli-kernelmodule --profile cdrom start</code><br><br>Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/\">documentation du paquet</a> pour les périphériques pris en charge, et <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/#loading-modules-at-boot\">Loading modules at boot</a> pour la tâche planifiée qui les charge à chaque démarrage."
             }
         ]

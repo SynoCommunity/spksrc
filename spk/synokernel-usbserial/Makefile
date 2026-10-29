@@ -61,18 +61,9 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-POST_STRIP_TARGET = usbserial_extra_install
-
 include ../../mk/spksrc.spk.mk
 
 # These use tty flip buffer helpers that 2.6.32 kernels lack (qoriq, 88f6281)
 ifeq ($(call version_lt,$(TC_KERNEL),3.0),1)
 REQUIRE_KERNEL_MODULE := $(filter-out %:cypress_m8 %:digi_acceleport %:spcp8x5,$(REQUIRE_KERNEL_MODULE))
 endif
-
-.PHONY: usbserial_extra_install
-usbserial_extra_install:
-	install -m 755 -d $(STAGING_DIR)/rules.d
-	install -m 644 src/60-$(SPK_NAME).rules $(STAGING_DIR)/rules.d/60-$(SPK_NAME).rules
-	install -m 755 -d $(STAGING_DIR)/etc/profiles
-	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/

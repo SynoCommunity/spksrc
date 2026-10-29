@@ -30,11 +30,4 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-POST_STRIP_TARGET = synokernel-linuxtv_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: synokernel-linuxtv_extra_install
-synokernel-linuxtv_extra_install:
-	install -m 755 -d $(STAGING_DIR)/etc/profiles
-	install -m 644 src/profiles/*.json $(STAGING_DIR)/etc/profiles/

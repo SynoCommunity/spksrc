@@ -19,11 +19,15 @@
 #########################################################################
 
 # Loads the kernel modules of a SynoCommunity synokernel-* package, by profile:
-# one JSON file per device in <package>/target/etc/profiles, listing the modules
-# of that device in load order. The modules each of them depends on are read
-# from the module itself and loaded first.
+# one JSON file per device in etc/profiles/<package> of this package, listing
+# the modules of that device in load order. The modules each of them depends on
+# are read from the module itself and loaded first.
 
 PACKAGES=/var/packages
+# This package: its profiles and udev rules
+TARGET=$(dirname $(dirname $(readlink -f $0)))
+PROFILES_DIR=${TARGET}/etc/profiles
+RULES_DIR=${TARGET}/etc/rules.d
 FPATH_SYS=/sys/module/firmware_class/parameters/path
 LOG=/var/log/packages/synocli-kernelmodule.log
 
@@ -32,15 +36,16 @@ usage() {
 
 Usage: $0 [options] <list|modules|start|stop|restart|status> [module ...]
 
-   list                      the profiles of every installed synokernel-* package,
-                             and whether this kernel has all their modules
+   list                      the profiles of every synokernel-* package, and
+                             whether the package is installed and this kernel
+                             has all their modules
    modules                   the modules the profiles and modules given load, in
                              order, and where each comes from; nothing is loaded
    start|stop|restart|status the modules of the profiles, and of the modules given
 
 Options:
    -s, --spk <package>       package holding the modules (default: the one
-                             holding the profiles)
+                             of the profiles)
    -p, --profile <p1,p2,...> profiles to use
    -r, --root <dir>          package target directory (default: $PACKAGES/<package>/target)
    -n, --dry-run             start, stop and restart only tell what they would do
@@ -55,6 +60,17 @@ Examples:
    $0 --profile hauppauge-wintv-dualhd-atsc --dry-run start
    $0 --spk synokernel-cdrom sr_mod start
 
+EOF
+   warning
+}
+
+# Kernel modules are outside of what Synology supports
+warning() {
+   cat <<EOF >&2
+WARNING: the kernel modules of SynoCommunity packages are experimental, and
+outside of what Synology supports: use them at your own risk. A module can
+crash the NAS, and support is limited. Read the documentation before opening
+an issue: https://docs.synocommunity.com/packages/synocli-kernel/
 EOF
 }
 
@@ -75,14 +91,7 @@ ver_le() { [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -1)" = "$1" ]; }
 
 # The profile files of a package, or of every synokernel-* package
 profile_files() {
-   local dir
-   if [ -n "${ROOT}" ]; then
-      ls ${ROOT}/etc/profiles/*.json 2>/dev/null
-   else
-      for dir in ${PACKAGES}/${SPK:-synokernel-*}/target/etc/profiles; do
-         ls ${dir}/*.json 2>/dev/null
-      done
-   fi
+   ls ${PROFILES_DIR}/${SPK:-synokernel-*}/*.json 2>/dev/null
 }
 
 # The file of profile $1: fails when it is in no package, or in several
@@ -94,8 +103,8 @@ profile_file() {
    echo "${found}"
 }
 
-# The package of a profile file
-profile_spk() { echo "$1" | sed -n "s|^${PACKAGES}/\([^/]*\)/target/.*|\1|p"; }
+# The package of a profile file: its directory
+profile_spk() { basename $(dirname $1); }
 
 # The modules of a profile for the running kernel: those of the first entry of
 # "kernels" whose min and max bracket it, else "modules"
@@ -126,6 +135,7 @@ list() {
       missing=$(missing_modules)
       state="available"
       [ -d "${KPATH}" ] || state="n/a (no modules for this kernel)"
+      [ -n "${ROOT}" -o -d "${PACKAGES}/${spk}/target" ] || state="n/a (install ${spk})"
       [ "${state}" = "available" ] && [ -n "${missing}" ] && state="n/a (missing: ${missing})"
       printf '%-24s %-32s %-10s %s\n' "${spk:-${ROOT}}" "$(basename ${file} .json)" "${state%% *}" "$(jq -r '.description // ""' ${file})"
       [ "${state}" = "available" ] || echo "      ${state#n/a }"
@@ -305,7 +315,7 @@ udev_on() {
    local rule
    [ -n "${UDEV}" ] || return 0
    for rule in ${UDEV}; do
-      ln -sf ${ROOT}/rules.d/${rule} /lib/udev/rules.d/${rule}
+      ln -sf ${RULES_DIR}/${rule} /lib/udev/rules.d/${rule}
    done
    udevadm control --reload-rules
 }
@@ -377,6 +387,7 @@ ROOT=${ROOT:-${PACKAGES}/${SPK}/target}
 FPATH=${ROOT}/lib/firmware
 KPATH=${ROOT}/lib/modules/${PLATFORM}/$(uname -r)
 
+[ -d "${ROOT}" ] || die "${SPK} is not installed"
 [ -d "${KPATH}" ] || die "no modules for this kernel in [${KPATH}]"
 
 # Modules and udev rules of the profiles, then the modules given
@@ -409,6 +420,7 @@ if [ "$(id -u)" = "0" ]; then
    exec > >(tee -a ${LOG}) 2>&1
    TEE=$!
 fi
+[ "${ACTION}" = "status" ] || warning
 echo "--- $(date '+%Y-%m-%d %H:%M:%S') ${ACTION}$([ "${DRYRUN}" = "TRUE" ] && echo " (dry run)") ${SPK:-${ROOT}} [${PROFILES}${MODULES:+ +${MODULES}}]"
 say "kernel ${PLATFORM} $(uname -r): ${KPATH}"
 say "modules: $(for m in ${ORDER}; do echo -n "$(modname ${m}) "; done)"

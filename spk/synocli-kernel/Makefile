@@ -6,10 +6,10 @@ SPK_ICON = src/synocli-kernel.png
 DEPENDS = cross/usbutils cross/psmisc
 
 MAINTAINER    = th0ma7
-DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally the synocli-kernelmodule.sh script loads the kernel modules of synokernel packages, by device profile."
+DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally synocli-kernelmodule loads the kernel modules of synokernel packages, by device profile, and holds the profiles of their devices."
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
-CHANGELOG     = "1. synocli-kernelmodule loads modules by device profile, with their dependencies<br/>2. Fix the module path of the running kernel"
+CHANGELOG     = "1. synocli-kernelmodule loads modules by device profile, with their dependencies<br/>2. The device profiles of the synokernel packages<br/>3. Fix the module path of the running kernel"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -28,3 +28,11 @@ include ../../mk/spksrc.spk.mk
 synocli-kernel_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/synocli-kernelmodule.sh $(STAGING_DIR)/bin/synocli-kernelmodule
+	@# The device profiles, per package of kernel modules, and their udev rules:
+	@# a new device only needs this package
+	for dir in src/profiles/*/; do \
+	  install -m 755 -d $(STAGING_DIR)/etc/profiles/$$(basename $$dir) ; \
+	  install -m 644 $$dir*.json $(STAGING_DIR)/etc/profiles/$$(basename $$dir)/ ; \
+	done
+	install -m 755 -d $(STAGING_DIR)/etc/rules.d
+	install -m 644 src/rules.d/*.rules $(STAGING_DIR)/etc/rules.d/
