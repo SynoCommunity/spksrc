@@ -82,8 +82,14 @@ a task in DSM:
 
 1. *Control Panel* > *Task Scheduler* > *Create* > *Triggered Task* >
    *User-defined script*
+
+   ![Creating a triggered task](../assets/images/synocli-kernel-task-create.png)
+
 2. *General*: *Task* a name such as `synocli-kernelmodule`, *User* `root`,
    *Event* `Boot-up`, *Enabled* checked
+
+   ![The General tab](../assets/images/synocli-kernel-task-general.png)
+
 3. *Task Settings*: optionally *Send run details by email*, with *Send run
    details only when the script terminates abnormally*, to hear of a device
    that failed to load
@@ -93,6 +99,9 @@ a task in DSM:
    synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
    synocli-kernelmodule --profile cdrom start
    ```
+
+   ![The Task Settings tab](../assets/images/synocli-kernel-task-settings.png)
+
 5. *OK*, then select the task and *Run* it once to check it, or reboot
 
 The output of each run is in `/var/log/packages/synocli-kernelmodule.log`.
