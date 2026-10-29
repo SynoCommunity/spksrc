@@ -146,10 +146,15 @@ jobs:
   gate:
     name: Gate
     runs-on: ubuntu-latest
+    # Reads whether a pushed fork branch has an open pull request
+    permissions:
+      pull-requests: read
     outputs:
       should_build: ${{ steps.check.outputs.should_build }}
     steps:
       - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # A manual run, and a pull request wherever it lives, always build. The
           # pull_request event fires only in the repository holding the PR, so a
@@ -168,8 +173,27 @@ jobs:
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Any other push: a branch (its PR's run covers it, and without a PR
-          # there is nothing to confirm) or a fork's master sync.
+          # A branch of a fork builds there until it has a pull request, in the fork
+          # or upstream, whose run then covers it. A fork's master is only synced.
+          if [ "${{ github.repository }}" != "SynoCommunity/spksrc" ] && \
+             [ "${{ github.ref_name }}" != "master" ]; then
+            head="${{ github.repository_owner }}:${{ github.ref_name }}"
+            if ! fork_prs=$(gh api "repos/${{ github.repository }}/pulls?state=open&head=${head}" --jq length) || \
+               ! upstream_prs=$(gh api "repos/SynoCommunity/spksrc/pulls?state=open&head=${head}" --jq length); then
+              echo "Push to ${head} -> skip; its pull requests could not be read, use workflow_dispatch."
+              echo "should_build=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if [ "${fork_prs}" = "0" ] && [ "${upstream_prs}" = "0" ]; then
+              echo "Push to ${head}, no pull request yet -> build on the fork."
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push to ${head} -> skip; its pull request runs where it lives."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Any other push: an upstream branch, or a fork's master sync.
           echo "Push to ${{ github.repository }} ${{ github.ref_name }} -> skip; a build needs a PR, or workflow_dispatch."
           echo "should_build=false" >> "$GITHUB_OUTPUT"
 
