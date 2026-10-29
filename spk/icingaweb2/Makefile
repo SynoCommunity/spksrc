@@ -13,7 +13,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga Web 2 is a powerful PHP framework for web applications that provides the frontend for Icinga 2 monitoring.
 DISPLAY_NAME = Icinga Web 2
-CHANGELOG = "Update to Icinga Web 2.14.1; update Director to 1.12.1, Icinga PHP Library to 1.2.0, and Icinga PHP Thirdparty to 1.1.0."
+CHANGELOG = "Update to Icinga Web 2.14.1; update Director to 1.12.1, Icinga PHP Library to 1.2.0, and Icinga PHP Thirdparty to 1.1.0. Run Director migrations on upgrade."
 
 HOMEPAGE = https://icinga.com/
 LICENSE = GPL-3.0-only

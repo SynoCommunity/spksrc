@@ -209,3 +209,14 @@ service_postinst ()
         fi
     fi
 }
+
+# Post-upgrade: apply Director schema migrations after the package update
+service_postupgrade ()
+{
+    if [ "${SYNOPKG_PKG_STATUS}" = "UPGRADE" ]; then
+        if [ -f "${ICINGAWEB_CONFIGDIR}/modules/director/kickstart.ini" ]; then
+            echo "Running Director database migrations"
+            "${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli" director migration run 2>/dev/null || true
+        fi
+    fi
+}
