@@ -1,0 +1,44 @@
+[
+  {
+    "step_title": "Configuration du Panel",
+    "items": [
+      {
+        "desc": "<b>Important:</b> Entrez l'adresse IP de votre NAS ou un nom de domaine pointant vers celui-ci.<br><i>Ne laissez pas vide sauf si vous accédez uniquement depuis ce NAS.</i>"
+      },
+      {
+        "type": "textfield",
+        "desc": "Adresse IP du NAS ou nom de domaine (ex: 192.168.1.100 ou nas.mondomaine.fr)",
+        "subitems": [
+          {
+            "key": "wizard_host",
+            "desc": "Hôte du Panel",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },
+      {
+        "desc": "<br><b>Port fixe:</b> <code>8080</code> (HTTP) / <code>8444</code> (HTTPS)<br><i>Pour un autre port, utilisez le reverse proxy DSM après installation.</i>"
+      }
+    ]
+  },
+  {
+    "step_title": "Informations importantes",
+    "items": [
+      {
+        "desc": "<b>Prérequis:</b><ul><li><b>Container Manager</b> (Docker) doit être installé</li><li>Connexion Internet pour télécharger l'image Docker (~500 MB)</li></ul>"
+      },
+      {
+        "desc": "<br><b style='color:#e74c3c;'>IMPORTANT - Premier démarrage :</b><br><br>Le premier démarrage prend <b>5 à 10 minutes</b> pour :<ul><li>Télécharger l'image Docker (~500 MB)</li><li>Exécuter les migrations de base de données</li><li>Configurer l'application</li></ul><br>Une <b>page de chargement</b> s'affichera automatiquement pendant l'initialisation."
+      },
+      {
+        "desc": "<br><hr><br><b style='color:#4fc3f7;'>Création du compte administrateur :</b><br><br>Une fois les migrations terminées, vous serez redirigé vers le <b>wizard d'installation Pelican</b> pour créer votre compte administrateur.<br><br><i>Conservez précieusement vos identifiants !</i>"
+      },
+      {
+        "desc": "<br><hr><br><b>Configuration de Wings :</b><br>Après avoir créé votre compte admin, consultez la <b>description du paquet</b> dans le Centre de paquets pour configurer Wings."
+      }
+    ]
+  }
+]
