@@ -1,6 +1,6 @@
 SPK_NAME = mkvtoolnix
 SPK_VERS = 103.0
-SPK_REV = 1
+SPK_REV = 5
 SPK_ICON = src/mkvtoolnix.png
 
 DEPENDS = cross/mkvtoolnix
