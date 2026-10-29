@@ -41,7 +41,7 @@ include ../../mk/spksrc.common.mk
 # [libtorrent]
 DEPENDS += cross/openssl3
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.92
+DEPENDS += cross/boost-1.92
 BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_92_0
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"

@@ -57,6 +57,11 @@ ifneq ($(REQUIRE_KERNEL),)
     ifneq (,$(findstring $(ARCH),$(GENERIC_ARCHS)))
       $(call precheck_fatal,Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set unless using REQUIRE_KERNEL_MODULE)
     endif
+  else ifneq ($(TCVERSION),)
+    # A toolchain may come without its kernel (kernel/syno-<arch>-<version>)
+    ifeq ($(filter $(ARCH),$(GENERIC_ARCHS))$(filter $(ARCH)-$(TCVERSION),$(AVAILABLE_KERNEL)),)
+      $(call precheck_fatal,No kernel source for '$(ARCH)-$(TCVERSION)')
+    endif
   endif
 endif
 

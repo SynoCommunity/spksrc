@@ -9,8 +9,6 @@ PKG_DIST_FILE = $(REAL_PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)/$(REAL_PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
-MIN_GO_VERSION = 1.24
-
 HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring agent.
 LICENSE  = MIT

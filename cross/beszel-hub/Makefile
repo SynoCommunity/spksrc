@@ -12,7 +12,6 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
 BUILD_DEPENDS = native/nodejs
 # native/go is used to install go version defined in go.mod
-MIN_GO_VERSION = 1.24
 
 HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring.

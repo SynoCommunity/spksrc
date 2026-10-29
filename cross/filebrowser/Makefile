@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/filebrowser/filebrowser/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.25.0
-
 BUILD_DEPENDS += native/nodejs native/pnpm
 
 HOMEPAGE = https://github.com/filebrowser/filebrowser

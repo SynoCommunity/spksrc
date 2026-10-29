@@ -138,11 +138,21 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CP210X:drivers/usb/serial:cp210x
 ```
 
-Each configuration option consists of 3 sub-variables:
+Each configuration option consists of 3 sub-variables, and an optional fourth:
 
 1. **Kernel configuration option** - `CONFIG_*` symbol
 2. **Kernel directory tree** - Path where the module source is located
 3. **Module name** - Without `.ko` extension
+4. **Kernel feature it needs** (optional) - a `CONFIG_*` symbol the kernel must
+   have built in (`=y`); on a kernel without it, the module is skipped
+
+A module that builds on a bool feature of the kernel cannot work where the kernel
+lacks that feature: `regmap-i2c` needs the regmap core, which some kernels do not
+have and which cannot be built as a module.
+
+```makefile
+REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c:CONFIG_REGMAP
+```
 
 ### Module Installation Structure
 

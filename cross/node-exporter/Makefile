@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/prometheus/node_exporter/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.25.0
-
 HOMEPAGE = https://github.com/prometheus/node_exporter
 COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 LICENSE  = Apache 2.0

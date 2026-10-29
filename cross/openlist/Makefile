@@ -8,7 +8,6 @@ PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.26.0
 DEPENDS = cross/openlist-frontend
 
 HOMEPAGE = https://docs.oplist.org/

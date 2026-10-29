@@ -1,0 +1,11 @@
+--- src/corelib/io/qstorageinfo_linux.cpp
++++ src/corelib/io/qstorageinfo_linux.cpp
+@@ -314,7 +314,7 @@
+ {
+     if (fd < 0)
+         return 0;
+-#if defined(STATX_BASIC_STATS) && defined(STATX_MNT_ID)
++#if defined(STATX_BASIC_STATS) && defined(STATX_MNT_ID) && defined(__GLIBC__) && __GLIBC_PREREQ(2, 38)
+     // STATX_MNT_ID was added in kernel v5.8
+     struct statx st;
+     int r = statx(fd, "", AT_EMPTY_PATH | AT_NO_AUTOMOUNT, STATX_MNT_ID, &st);

@@ -59,8 +59,8 @@ ifeq ($(strip $(GOPATH)),)
   GOPATH=$(DISTRIB_DIR)/go
 endif
 
-# A kernel older than 3.2 gets go 1.23, unless MIN_GO_VERSION asks for more: such a package is
-# refused there (spksrc.cross-go.mk) or, clearing MIN_KERNEL_VERSION, built with the latest go.
+# A kernel older than 3.2 gets go 1.23 where MIN_GO_VERSION allows it: the default 1.24 refuses
+# such a kernel (spksrc.cross-go.mk), unless MIN_KERNEL_VERSION is cleared to build with go.
 ifeq ($(strip $(NATIVE_GO)),)
 ifneq ($(and $(TC_KERNEL),$(call version_lt,$(TC_KERNEL),3.2)),)
 ifeq ($(strip $(GO_NEEDS_LINUX_3_2)),)
@@ -69,7 +69,7 @@ endif
 endif
 endif
 ifeq ($(strip $(NATIVE_GO)),)
-NATIVE_GO = native/go-latest
+NATIVE_GO = native/go
 endif
 BUILD_DEPENDS += $(NATIVE_GO)
 # Without an arch, go 1.23 is listed too wherever a package can use it.
@@ -87,8 +87,11 @@ ENV += GOOS=$(GOOS)
 
 # Ensure downloaded mod are u+rw
 ENV += GOFLAGS=-modcacherw
-# A go.mod asking for more than NATIVE_GO fails the build instead of fetching a newer go.
+# go 1.23 is the last for kernels older than 3.2: there a go.mod asking for more fails the build
+# instead of fetching a go they cannot run. Elsewhere go fetches the go that go.mod asks for.
+ifeq ($(NATIVE_GO),native/go-1.23)
 ENV += GOTOOLCHAIN=local
+endif
 
 ifneq ($(strip $(GO_BIN_DIR)),)
   GO_BUILD_ARGS := -o $(GO_BIN_DIR) $(GO_BUILD_ARGS)

@@ -15,6 +15,27 @@ GO_BUILD_ARGS = -o myapp ./cmd/myapp
 include ../../mk/spksrc.cross-go.mk
 ```
 
+## Go Version and Older Kernels
+
+Go 1.24 and later need Linux 3.2: built with them, a server cannot accept
+connections on the 2.6.32 kernel of ARMv5 (88f6281). `MIN_GO_VERSION` defaults to
+1.24, so a go package is not built for kernels older than 3.2.
+
+A package whose `go.mod` still asks for go 1.23 or older can be built for them
+too: `MIN_GO_VERSION = 1.23` gives those kernels `native/go-1.23`.
+
+```makefile
+# Builds with go 1.23, so for kernels older than 3.2 (ARMv5) too
+MIN_GO_VERSION = 1.23
+```
+
+Elsewhere the build starts from `native/go`, and go fetches the version `go.mod`
+asks for (`GOTOOLCHAIN` left to its default). With go 1.23 the build is locked to
+it (`GOTOOLCHAIN=local`), as a newer go would not run on those kernels: when
+`go.mod` asks for more, the build warns which `MIN_GO_VERSION` to remove before go
+fails. A `go.mod` asking for 1.23 or older, in a package without
+`MIN_GO_VERSION = 1.23`, gets a note that it could be built for older kernels.
+
 ## CGO Configuration
 
 ```makefile

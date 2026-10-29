@@ -5,7 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/restic/restic/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)
 
-MIN_GO_VERSION = 1.25.8
 # A client: it never calls accept4, which go 1.24 and later need from Linux 3.2, so it runs
 # on the ARMv5 2.6.32 kernel (tested on a DS212j).
 MIN_KERNEL_VERSION =

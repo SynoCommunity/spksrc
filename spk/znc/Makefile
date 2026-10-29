@@ -36,7 +36,7 @@ ADMIN_PORT = ${SERVICE_PORT}
 POST_STRIP_TARGET = znc_extra_install
 
 # Boost must be built from spk
-DEPENDS = cross/boost_1.92
+DEPENDS = cross/boost-1.92
 export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_92_0"
 export BOOST_LIBRARIES="locale"
 ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)

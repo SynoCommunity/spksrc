@@ -1,0 +1,40 @@
+#!/bin/sh
+# Minimal qmake6 replacement for MKVToolNix's configure.
+#
+# MKVToolNix only uses qmake6 to probe a Qt6 installation: it runs a dummy
+# project and parses the generated Makefile for DEFINES/CXXFLAGS/INCPATH/
+# LFLAGS/LIBS.  A real target qmake6 is not installed by Qt's cross build, so
+# emit the flags for the staged target Qt directly.  The host tools (moc, rcc,
+# uic) still come from the native Qt build.
+
+if [ -z "$QMAKE6_TARGET_PREFIX" ] || [ -z "$QMAKE6_HOST_PREFIX" ]; then
+    echo "qmake6 wrapper: QMAKE6_TARGET_PREFIX and QMAKE6_HOST_PREFIX must be set" >&2
+    exit 1
+fi
+
+QT_VERSION=$(sed -n 's/^Version: *//p' "$QMAKE6_TARGET_PREFIX/lib/pkgconfig/Qt6Core.pc" 2>/dev/null | head -n 1)
+[ -n "$QT_VERSION" ] || QT_VERSION=6.12.0
+
+case "$*" in
+    *-query*)
+        cat <<EOF
+QT_VERSION:$QT_VERSION
+QMAKE_XSPEC:linux-g++
+QT_HOST_BINS:$QMAKE6_HOST_PREFIX/bin
+QT_HOST_LIBEXECS:$QMAKE6_HOST_PREFIX/libexec
+EOF
+        ;;
+    *-makefile*)
+        cat > Makefile <<EOF
+DEFINES = -DQT_CORE_LIB
+CXXFLAGS = -fPIC
+INCPATH = -I$QMAKE6_TARGET_PREFIX/include/QtCore -I$QMAKE6_TARGET_PREFIX/include
+LFLAGS = -L$QMAKE6_TARGET_PREFIX/lib
+LIBS = -lQt6Core
+EOF
+        ;;
+    *)
+        echo "qmake6 wrapper: unsupported arguments: $*" >&2
+        exit 1
+        ;;
+esac
