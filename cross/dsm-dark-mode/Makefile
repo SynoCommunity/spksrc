@@ -1,5 +1,5 @@
 PKG_NAME = dsm-dark-mode
-PKG_VERS = 1.0.2
+PKG_VERS = 1.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SoulInfernoDE/synology-dsm-dark-mode/archive/refs/tags
