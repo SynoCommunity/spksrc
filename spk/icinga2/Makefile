@@ -1,6 +1,6 @@
 SPK_NAME = icinga2
-SPK_VERS = 2.16.4
-SPK_REV = 1
+SPK_VERS = 2.16.6
+SPK_REV = 2
 SPK_ICON = src/icinga2.png
 
 DEPENDS = cross/icinga2
@@ -9,7 +9,7 @@ SPK_DEPENDS = MariaDB10
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 is an open source monitoring system which checks the availability of your network resources, notifies users of outages, and generates performance data for reporting.
-CHANGELOG = "Initial release of Icinga 2"
+CHANGELOG = "Update to Icinga 2 v2.16.6."
 
 DISPLAY_NAME = Icinga 2
 
