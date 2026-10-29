@@ -1,0 +1,6 @@
+{
+  "name": "pl2303",
+  "description": "Prolific PL2303 USB serial adapters",
+  "modules": ["pl2303"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

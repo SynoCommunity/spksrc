@@ -1,0 +1,6 @@
+{
+  "name": "hauppauge-wintv-dualhd-atsc",
+  "description": "Hauppauge WinTV-dualHD 01595, ATSC and ClearQAM (USB 2040:026d)",
+  "comments": "Two tuners, /dev/dvb/adapter0 and adapter1, and its remote control. Tested on a DS115j (armada370, kernel 3.2.101).",
+  "modules": ["si2157", "lgdt3306a", "rc-hauppauge", "em28xx-dvb", "em28xx-rc"]
+}

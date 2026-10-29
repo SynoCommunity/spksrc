@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-cdrom
-SPK_VERS = 1.3
-SPK_REV = 7
+SPK_VERS = 2.0
+SPK_REV = 8
 SPK_ICON = src/synokernel-cdrom.png
 
 DEPENDS =
@@ -11,21 +11,16 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4"
+CHANGELOG = "1. Modules loaded by device profile with synocli-kernelmodule 2.0"
 
 STARTABLE = no
+WIZARDS_DIR = src/wizard/
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
 
 HOMEPAGE = https://www.kernel.org/
 LICENSE  = GPLv2
 
-SPK_DEPENDS = synocli-kernel
-
-POST_STRIP_TARGET = synokernel-cdrom_extra_install
+# The device profiles moved to synocli-kernel 2.0
+SPK_DEPENDS = "synocli-kernel>=2.0"
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: synokernel-cdrom_extra_install
-synokernel-cdrom_extra_install:
-	install -m 755 -d $(STAGING_DIR)/etc/
-	install -m 644 src/synokernel-cdrom.cfg $(STAGING_DIR)/etc/

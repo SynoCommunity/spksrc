@@ -1,0 +1,6 @@
+{
+  "name": "mct_u232",
+  "description": "MCT Single Port Serial Driver",
+  "modules": ["mct_u232"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

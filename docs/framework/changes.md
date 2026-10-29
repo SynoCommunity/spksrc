@@ -124,6 +124,42 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 29th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
+
+    - **A kernel module spk carries the modules of every kernel of its arch**:
+      `kernel-depend` prepares `kernel/syno-<arch>-<version>` for each sub-arch, in the
+      `WORK_DIR` of the spk, and builds the in-tree modules of `REQUIRE_KERNEL_MODULE`
+      there. An out-of-tree driver had no place in that walk: as a regular dependency it
+      was built once, for the generic arch, with no kernel to build against.
+
+    - **`driver/<pkg>` is that place.** `kernel-depend` builds every `driver/*` of the
+      spk `DEPENDS` right after each kernel, with its `ARCH` and `TCVERSION`; the regular
+      walk leaves them out. `spksrc.driver.mk` is cross-cc with, per kernel, its own
+      cookies and extracted source (every kernel of the arch shares the `WORK_DIR`),
+      `KERNEL_ROOT` for the prepared kernel source, and `DRIVER_MODULE_DIR`, the
+      `lib/modules/<arch>/<kernel>` of the in-tree modules.
+
+    - **A driver states the kernel and gcc it needs** -- `DRIVER_KERNEL_MIN`,
+      `DRIVER_GCC_MIN` -- and is skipped below them. A driver without sources builds,
+      per kernel, the first of several versions that is not skipped: the counterpart of
+      `$(call depend,a|b|c)` for a choice that depends on each sub-arch rather than on the
+      generic arch. `driver/linuxtv` picks media_build frozen for kernels 4.4+, 3.10+
+      or 3.2+ this way, a 4.4 kernel on gcc 4.9 taking the 3.10 one.
+
+    - **A driver reads `KERNEL_PCI_SLOT`** of its kernel as `DRIVER_PCI_SLOT`, to build
+      PCI drivers only where a card can go.
+
+    - **A multi-kernel build drops each kernel's sources once its modules are installed**;
+      cookies stay, so a stopped run resumes.
+
+    - **A driver builds the `driver/*` of its own `DEPENDS` first**, for the same
+      kernel: `driver/linuxtv-*` take their media tree from `driver/linux-media-*`,
+      hosted in the `linuxtv/media_build` release and rebuilt by `native/linux-media-*`
+      with the archive step of `spksrc.build/archive.mk`.
+
+    - **Kernel modules and drivers build with the compiler of the Synology
+      toolchain**: `OVERLAY_GCC` and `OVERLAY_BINUTILS` are forced off there.
+
 ??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
 
     - **Kernel modules are stripped with `--strip-debug`** by `strip.mk`: the plain strip

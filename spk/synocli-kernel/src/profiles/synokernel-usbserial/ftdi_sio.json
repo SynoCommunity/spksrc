@@ -1,0 +1,6 @@
+{
+  "name": "ftdi_sio",
+  "description": "FTDI USB serial adapters",
+  "modules": ["ftdi_sio"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

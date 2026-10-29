@@ -1,0 +1,6 @@
+{
+  "name": "ti_usb_3410_5052",
+  "description": "Texas Instruments TUSB3410 and TUSB5052 USB serial adapters",
+  "modules": ["ti_usb_3410_5052"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}
