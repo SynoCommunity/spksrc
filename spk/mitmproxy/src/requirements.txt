@@ -1,0 +1,38 @@
+https://github.com/mitmproxy/mitmproxy/archive/v0.18.2.tar.gz
+backports.ssl_match_hostname>=3.5.0.1, <3.6
+blinker>=1.4, <1.5
+click>=6.2, <7.0
+certifi>=2015.11.20.1  # no semver here - this should always be on the last release!
+configargparse>=0.10, <0.12
+construct>=2.5.2, <2.6
+cryptography>=1.3, <1.6
+cssutils>=1.0.1, <1.1
+Flask>=0.10.1, <0.12
+h2>=2.4.1, <2.5
+html2text>=2016.1.8, <=2016.9.19
+hyperframe>=4.0.1, <5
+jsbeautifier>=1.6.3, <1.7
+passlib>=1.6.5, <1.7
+pyasn1>=0.1.9, <0.2
+pyOpenSSL>=16.0, <17.0
+pyparsing>=2.1.3, <2.2
+pyperclip>=1.5.22, <1.6
+requests>=2.9.1, <2.12
+six>=1.10, <1.11
+tornado>=4.3, <4.5
+urwid>=1.3.1, <1.4
+watchdog>=0.8.3, <0.9
+brotlipy>=0.5.1, <0.7
+ruamel.yaml>=0.13.2, <0.14
+hpack==2.3.0
+typing==3.5.2.2
+enum34>=1.0.4, <2
+ipaddress>=1.0.15, <1.1
+backports-abc>=0.4
+itsdangerous==0.24
+singledispatch==3.4.0.3
+argh>=0.24.1
+pathtools>=0.1.1
+editorconfig>=0.12.0
+Jinja2>=2.4
+Werkzeug>=0.7
