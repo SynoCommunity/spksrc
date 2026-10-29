@@ -124,7 +124,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "October 29th 2026 — Kernel options for the modules, and their symbols across directories (#PR)"
+??? note "October 29th 2026 — Kernel options for the modules, and their symbols across directories (#7678)"
 
     - **`REQUIRE_KERNEL_OPTION`** sets `CONFIG_<option>=y|m|n` before the modules of
       `REQUIRE_KERNEL_MODULE`: the menus they sit behind (DSM 7 kernels are built
