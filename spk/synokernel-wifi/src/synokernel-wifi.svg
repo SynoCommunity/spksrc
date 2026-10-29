@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4d4d4d"/>
+      <stop offset="0.5" stop-color="#8a8a8a"/>
+      <stop offset="1" stop-color="#4d4d4d"/>
+    </linearGradient>
+    <linearGradient id="plug" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9a9a9a"/>
+      <stop offset="0.5" stop-color="#e6e6e6"/>
+      <stop offset="1" stop-color="#9a9a9a"/>
+    </linearGradient>
+  </defs>
+  <!-- waves -->
+  <g fill="none" stroke="#1e88e5" stroke-width="30" stroke-linecap="round">
+    <path d="M 120 132 A 190 190 0 0 1 392 132"/>
+    <path d="M 164 180 A 128 128 0 0 1 348 180"/>
+    <path d="M 208 226 A 66 66 0 0 1 304 226"/>
+  </g>
+  <circle cx="256" cy="262" r="20" fill="#1e88e5"/>
+  <!-- dongle -->
+  <rect x="196" y="300" width="120" height="120" rx="18" fill="url(#body)"/>
+  <rect x="214" y="420" width="84" height="60" rx="4" fill="url(#plug)"/>
+  <rect x="232" y="438" width="16" height="12" fill="#4d4d4d"/>
+  <rect x="264" y="438" width="16" height="12" fill="#4d4d4d"/>
+  <circle cx="256" cy="336" r="9" fill="#7fd36b"/>
+  <!-- wordmark -->
+  <text x="256" y="72" text-anchor="middle" font-family="DejaVu Sans, Verdana, sans-serif"
+        font-size="84" font-weight="bold" fill="#1a1a1a" letter-spacing="2">WiFi</text>
+</svg>
