@@ -1,5 +1,5 @@
 SPK_NAME = synocli-kernel
-SPK_VERS = 1.3
+SPK_VERS = 2.0
 SPK_REV = 11
 SPK_ICON = src/synocli-kernel.png
 

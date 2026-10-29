@@ -20,7 +20,7 @@ DISPLAY_NAME = SynoKernel USB CD-ROM drivers
 HOMEPAGE = https://www.kernel.org/
 LICENSE  = GPLv2
 
-# The device profiles moved to synocli-kernel 1.3-11
-SPK_DEPENDS = "synocli-kernel>=1.3-11"
+# The device profiles moved to synocli-kernel 2.0
+SPK_DEPENDS = "synocli-kernel>=2.0"
 
 include ../../mk/spksrc.spk.mk
