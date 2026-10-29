@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-linuxtv
-SPK_VERS = 20220605
-SPK_REV = 13
+SPK_VERS = 1.0
+SPK_REV = 1
 SPK_ICON = src/synokernel-linuxtv.png
 
 DEPENDS  = driver/linuxtv

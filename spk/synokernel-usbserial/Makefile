@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
-SPK_VERS = 1.2
-SPK_REV = 13
+SPK_VERS = 2.0
+SPK_REV = 14
 SPK_ICON = src/synokernel-usbserial.png
 
 DEPENDS =
@@ -50,7 +50,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_ZTE:drivers/usb/serial:zte_ev
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides the USB serial drivers of the Linux kernel: usbserial, cdc-acm, and the USB serial drivers of adapters, modems, GPS and barcode readers the kernel of the NAS offers: ch341, cp210x, ftdi_sio, pl2303, option and others."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4<br/>5. Add the USB serial drivers of adapters, modems, GPS and barcode readers<br/>6. Modules loaded by device profile with synocli-kernelmodule"
+CHANGELOG = "1. Add the USB serial drivers of adapters, modems, GPS and barcode readers<br/>2. Modules loaded by device profile with synocli-kernelmodule 2.0"
 
 STARTABLE = no
 WIZARDS_DIR = src/wizard/

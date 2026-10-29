@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-cdrom
-SPK_VERS = 1.3
-SPK_REV = 7
+SPK_VERS = 2.0
+SPK_REV = 8
 SPK_ICON = src/synokernel-cdrom.png
 
 DEPENDS =
@@ -11,7 +11,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4"
+CHANGELOG = "1. Modules loaded by device profile with synocli-kernelmodule 2.0"
 
 STARTABLE = no
 WIZARDS_DIR = src/wizard/
