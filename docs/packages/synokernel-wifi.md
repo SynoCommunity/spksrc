@@ -1,0 +1,108 @@
+---
+title: SynoKernel WiFi
+description: USB WiFi adapter drivers for Synology NAS
+tags:
+  - kernel
+  - drivers
+  - usb
+  - wifi
+---
+
+# SynoKernel WiFi
+
+!!! warning "Experimental, at your own risk"
+    The kernel modules of SynoCommunity packages are outside of what Synology
+    supports: a module that does not suit the kernel can crash the NAS, and DSM
+    updates may break them. Support is limited: read this documentation, and
+    check the issues already open, before opening one. Do not use them on a NAS
+    you cannot afford to restart or recover.
+
+Provides drivers of USB WiFi adapters for DSM 6 and DSM 7, with the wireless
+stack of the Linux kernel, `cfg80211` and `mac80211`. DSM 7 kernels are built
+without it, as Synology dropped WiFi adapters from DSM 7; on DSM 6 the package
+adds adapters DSM does not support. SRM is not supported: the router has its
+own wireless stack.
+
+## Package Information
+
+| Property | Value |
+|----------|-------|
+| Package Name | synokernel-wifi |
+| License | GPLv2 |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.0-12 or newer (module loading and device profiles) |
+
+## Included Drivers
+
+| Profile | Chips | Adapters |
+|---------|-------|----------|
+| `rtl88x2bu` | Realtek RTL8812BU, RTL8822BU | TP-Link Archer T3U, T3U Plus, T4U v3, ASUS USB-AC55 B1, D-Link DWA-181/182/183, Netgear A6150 |
+| `rt2800usb` | Ralink RT2770 to RT5372 | Panda PAU05/PAU06, Alfa AWUS036NH |
+| `rtl8192cu` | Realtek RTL8188CUS, RTL8192CU | Edimax EW-7811Un and other nano adapters |
+| `rtl8xxxu` | Realtek RTL8188EU, RTL8192EU, RTL8723BU | kernels 4.4 and newer |
+| `mt7601u` | MediaTek MT7601U | 150 Mbps nano adapters, kernels 4.4 and newer |
+| `mt76x0u`, `mt76x2u` | MediaTek MT7610U, MT7612U | Alfa AWUS036ACM, TP-Link Archer T2U v1, kernels 5.10 |
+| `ath9k_htc` | Atheros AR9271, AR7010 | TP-Link TL-WN722N v1, Alfa AWUS036NHA, kernels with LED triggers |
+| `carl9170` | Atheros AR9170 | Netgear WN111 v2, TP-Link TL-WN821N v2 |
+
+`rtl88x2bu` is the [driver of the Linux community](https://github.com/morrownr/88x2bu-20210702)
+for these Realtek chips; the others are the drivers of each kernel, so newer
+kernels offer more of them. `synocli-kernelmodule list` tells which profiles
+the kernel of the NAS can load. The firmware they need comes from
+[linux-firmware](https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git).
+
+Wireless extensions (`iwconfig`) are not available: they are part of the
+kernel itself. Adapters are set up through `nl80211`, with `iw` and
+`wpa_supplicant`.
+
+## Usage
+
+The modules are not loaded on installation: load those of your adapter, as
+root, with the `synocli-kernelmodule` helper of
+[SynoCli Kernel Tools](synocli-kernel.md):
+
+```bash
+synocli-kernelmodule list
+sudo synocli-kernelmodule --profile rtl88x2bu start
+iw dev
+```
+
+`iw dev` names the interface of the adapter, usually `wlan0`.
+
+### Connecting to a network
+
+DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
+the adapters it does not support: the connection is set up from the command line, with the `wpa_supplicant` and `dhclient` of DSM
+and the `iw` of this package.
+
+```bash
+# The network and its passphrase, readable by root only
+wpa_passphrase "MyNetwork" "MyPassphrase" | sudo tee /var/packages/synokernel-wifi/var/wpa_supplicant.conf
+sudo chmod 600 /var/packages/synokernel-wifi/var/wpa_supplicant.conf
+
+# Connect, then get an address
+sudo wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf
+iw dev wlan0 link
+sudo dhclient wlan0
+```
+
+To connect at every startup, add the commands after `synocli-kernelmodule` in
+the task of [Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
+
+!!! warning
+    `dhclient` may replace the default route of the wired interface. Give the
+    WiFi interface a static address with `ip addr add` instead when the NAS
+    stays wired.
+
+### Regulatory domain
+
+The kernel starts in the world regulatory domain, which leaves out most 5 GHz
+channels. Set the country of the NAS, here Canada, before connecting:
+
+```bash
+sudo iw reg set CA
+iw reg get
+```
+
+The rules come from [wireless-regdb](https://wireless.docs.kernel.org/en/latest/en/developers/regulatory/wireless-regdb.html):
+`regulatory.db` on kernels 4.15 and newer, compiled into `cfg80211` on older
+ones, so no CRDA is needed.

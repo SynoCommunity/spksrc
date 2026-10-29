@@ -204,6 +204,7 @@ nav:
     - Kernel:
       - SynoKernel LinuxTV: packages/synokernel-linuxtv.md
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
+      - SynoKernel WiFi: packages/synokernel-wifi.md
     - Media:
       - Beets: packages/beets.md
       - Comskip: packages/comskip.md
