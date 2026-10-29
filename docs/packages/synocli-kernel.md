@@ -82,12 +82,18 @@ a task in DSM:
 
 1. *Control Panel* > *Task Scheduler* > *Create* > *Triggered Task* >
    *User-defined script*
-2. *General*: a name, *User* `root`, *Event* `Boot-up`
-3. *Task Settings* > *Run command*, the profiles of the device:
+2. *General*: *Task* a name such as `synocli-kernelmodule`, *User* `root`,
+   *Event* `Boot-up`, *Enabled* checked
+3. *Task Settings*: optionally *Send run details by email*, with *Send run
+   details only when the script terminates abnormally*, to hear of a device
+   that failed to load
+4. *Task Settings* > *Run command*: one line per package, as the profiles of
+   one command must come from the same package:
    ```bash
-   /usr/local/bin/synocli-kernelmodule --profile cp210x start
+   synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+   synocli-kernelmodule --profile cdrom start
    ```
-4. *OK*, then select the task and *Run* it once to check it, or reboot
+5. *OK*, then select the task and *Run* it once to check it, or reboot
 
 The output of each run is in `/var/log/packages/synocli-kernelmodule.log`.
 After a DSM update that changes the kernel, install the build of the packages
