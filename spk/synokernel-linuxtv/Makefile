@@ -28,6 +28,7 @@ DISPLAY_NAME = SynoKernel LinuxTV media drivers
 HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
 
-SPK_DEPENDS = synocli-kernel
+# The device profiles moved to synocli-kernel 1.3-11
+SPK_DEPENDS = "synocli-kernel>=1.3-11"
 
 include ../../mk/spksrc.spk.mk
