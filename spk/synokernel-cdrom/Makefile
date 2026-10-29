@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-cdrom
 SPK_VERS = 1.3
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/synokernel-cdrom.png
 
 DEPENDS =
@@ -11,15 +11,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
-CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1"
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# we only have ipq806x for SRM 1.2, but this fails with:
-# /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
-REQUIRED_MIN_SRM = 1.3
-
-# epyc7003-7.3 toolchain exists but kernel sources are not provided yet.
-UNSUPPORTED_ARCHS += epyc7003
+CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1<br/>3. Kernel modules stripped by the framework<br/>4. Add qoriq, ipq806x SRM-1.2 and epyc7003 DSM-7.4"
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
@@ -29,15 +21,9 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = synokernel-cdrom_strip
 POST_STRIP_TARGET = synokernel-cdrom_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: synokernel-cdrom_strip
-synokernel-cdrom_strip:
-	@$(MSG) Strip debug symbols in kernel modules
-	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
 
 .PHONY: synokernel-cdrom_extra_install
 synokernel-cdrom_extra_install:

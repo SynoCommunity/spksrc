@@ -8,6 +8,9 @@ PKG_DIST_SITE = https://github.com/zyedidia/micro/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# Builds with go 1.23, so for kernels older than 3.2 (ARMv5) too
+MIN_GO_VERSION = 1.23
+
 HOMEPAGE = https://micro-editor.github.io/
 COMMENT  = A modern and intuitive terminal-based text editor.
 LICENSE  = MIT

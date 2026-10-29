@@ -55,9 +55,11 @@ ENV += REQUIRE_KERNEL_MODULE="$(REQUIRE_KERNEL_MODULE)"
 ifneq ($(findstring $(KO_ARCH),$(GENERIC_ARCHS)),$(KO_ARCH))
 KERNEL_DEPEND = $(KO_ARCH)-$(KO_TCVERSION)
 
-# else only process matching <arch>-<#>
+# else only process matching <arch>-<#> that has both a toolchain and a kernel;
+# the others are left out of the package's arch list too
 else
-KERNEL_DEPEND = $(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(LEGACY_ARCHS))
+KERNEL_DEPEND = $(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(filter $(LEGACY_ARCHS),$(AVAILABLE_KERNEL)))
+REMOVE_FROM_GENERIC_ARCHS += $(filter-out $(patsubst %-$(KO_TCVERSION),%,$(KERNEL_DEPEND)),$(TC_ARCH))
 endif
 
 # end REQUIRE_KERNEL_MODULE

@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-MIN_GO_VERSION = 1.27.3
-
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 COMMENT  = Cloudflare Tunnel provides you with a secure way to connect your resources to Cloudflare without a publicly routable IP address.
 LICENSE  = Apache-2.0

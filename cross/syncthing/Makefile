@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_
 PKG_DIR = src/github.com/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
-MIN_GO_VERSION = 1.26.2
-
 HOMEPAGE = https://www.syncthing.net/
 COMMENT  = Syncthing is a continuous file synchronization program. It synchronizes files between two or more computers.
 LICENSE  = MPL-2.0

@@ -74,6 +74,8 @@
 #   REQUIRE_KERNEL_MODULE     Enables packaging/module mode
 #   KERNEL_ARCH_SUFFIX        Derived arch/version suffix
 #   KERNEL_COOKIE             Build completion marker
+#   KERNEL_PCI_SLOT           1 when a model of the platform has a PCIe slot for
+#                             add-in cards, for what builds PCI drivers
 #
 # Important Behavioral Differences:
 #   - PKG_NAME and PKG_DIR vary depending on REQUIRE_KERNEL_MODULE
