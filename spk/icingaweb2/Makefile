@@ -1,6 +1,6 @@
 SPK_NAME = icingaweb2
-SPK_VERS = 2.14.0
-SPK_REV = 1
+SPK_VERS = 2.14.1
+SPK_REV = 2
 SPK_ICON = src/icingaweb2.png
 
 DEPENDS  = cross/icingaweb2
@@ -13,7 +13,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga Web 2 is a powerful PHP framework for web applications that provides the frontend for Icinga 2 monitoring.
 DISPLAY_NAME = Icinga Web 2
-CHANGELOG = "Initial release of Icinga Web 2"
+CHANGELOG = "Update to Icinga Web 2.14.1; update Director to 1.12.1, Icinga PHP Library to 1.2.0, and Icinga PHP Thirdparty to 1.1.0."
 
 HOMEPAGE = https://icinga.com/
 LICENSE = GPL-3.0-only
