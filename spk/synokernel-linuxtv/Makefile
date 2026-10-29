@@ -20,6 +20,9 @@ CHANGELOG = "1. LinuxTV media_build frozen per kernel version, built for every S
 # The oldest media_build that still builds, driver/linuxtv-3.2, no longer
 # applies its 2.6.32 backports (88f6281, qoriq)
 MIN_KERNEL_VERSION = 3.2
+# SRM 1.2 takes the 3.10 version for its gcc, whose backports miss the
+# get_user_pages of its vanilla 4.4 kernel
+REQUIRED_MIN_SRM = 1.3
 
 STARTABLE = no
 WIZARDS_DIR = src/wizard/

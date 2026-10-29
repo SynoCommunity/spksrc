@@ -51,7 +51,8 @@ outside of the kernel tree, in October 2022. Each Synology kernel gets the last
 
 Each kernel gets the first row it matches. Kernels 2.6.32 (88f6281, qoriq)
 are not supported: no `media_build` that builds for them still applies to a
-media tree.
+media tree. Nor is SRM 1.2: its gcc takes the 3.10 row, whose backports do not
+fit its vanilla 4.4 kernel.
 
 On a kernel built without DMA-BUF, videobuf2 gets stubs of it: everything
 works but the sharing of buffers between devices (DMABUF). On a kernel without
