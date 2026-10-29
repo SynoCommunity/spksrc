@@ -213,7 +213,14 @@ Each configuration option consists of 3 sub-variables, and an optional fourth:
 2. **Kernel directory tree** - Path where the module source is located
 3. **Module name** - Without `.ko` extension
 4. **Kernel feature it needs** (optional) - a `CONFIG_*` symbol the kernel must
-   have built in (`=y`); on a kernel without it, the module is skipped
+   have built in (`=y`), read from the kernel's own config; on a kernel without
+   it, the module is neither enabled nor built
+
+A kernel that does not offer the option, or has no such directory, skips the
+module: a driver that moved between kernels is listed once per directory, as
+`drivers/net/wireless/rt2x00` became `drivers/net/wireless/ralink/rt2x00`. The
+modules of a directory can use those of the directories built before it:
+`depends=` names them, and `synocli-kernelmodule` loads them first.
 
 A module that builds on a bool feature of the kernel cannot work where the kernel
 lacks that feature: `regmap-i2c` needs the regmap core, which some kernels do not
@@ -221,6 +228,20 @@ have and which cannot be built as a module.
 
 ```makefile
 REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c:CONFIG_REGMAP
+```
+
+Where the modules sit behind a menu the kernel is built without,
+`REQUIRE_KERNEL_OPTION` sets options before them, `CONFIG_<option>=y|m|n`. An
+`=n` names a built-in option the modules must not turn on, as it changes the
+structures of the running kernel: it is left as the kernel has it, and the build
+stops if `olddefconfig` turns it on all the same. The build log lists the
+built-in options the modules turned on and off, to check that only menus did:
+
+```makefile
+# The wireless stack, without the wireless extensions that add fields to
+# struct net_device
+REQUIRE_KERNEL_OPTION  = CONFIG_WIRELESS=y CONFIG_WLAN=y
+REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_WEXT=n CONFIG_WIRELESS_EXT=n CONFIG_WEXT_CORE=n
 ```
 
 ### Module Installation Structure
@@ -291,4 +312,5 @@ DSM version. Install the build of the package for that DSM version.
 
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
 - [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
+- [SynoKernel WiFi](synokernel-wifi.md) - USB WiFi adapter drivers
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities
