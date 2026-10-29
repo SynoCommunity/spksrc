@@ -1,0 +1,5 @@
+{
+  "name": "carl9170",
+  "description": "Atheros AR9170 adapters: Netgear WN111 v2, TP-Link TL-WN821N v2, D-Link DWA-160 A1-A2 and others",
+  "modules": ["carl9170"]
+}

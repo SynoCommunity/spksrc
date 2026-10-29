@@ -1,6 +1,6 @@
 SPK_NAME = synocli-kernel
 SPK_VERS = 2.0
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
@@ -9,7 +9,7 @@ MAINTAINER    = th0ma7
 DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally synocli-kernelmodule loads the kernel modules of synokernel packages, by device profile, and holds the profiles of their devices."
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
-CHANGELOG     = "1. synocli-kernelmodule loads modules by device profile, with their dependencies<br/>2. The device profiles of the synokernel packages<br/>3. Fix the module path of the running kernel"
+CHANGELOG     = "1. Profiles of the USB WiFi adapters of synokernel-wifi"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.

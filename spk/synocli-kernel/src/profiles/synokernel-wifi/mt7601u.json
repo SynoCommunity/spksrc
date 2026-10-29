@@ -1,0 +1,5 @@
+{
+  "name": "mt7601u",
+  "description": "MediaTek MT7601U adapters: the 150 Mbps nano adapters sold under many brands",
+  "modules": ["mt7601u"]
+}
