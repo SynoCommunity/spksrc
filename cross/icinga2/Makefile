@@ -1,5 +1,5 @@
 PKG_NAME = icinga2
-PKG_VERS = 2.16.4
+PKG_VERS = 2.16.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icinga2/archive/refs/tags
@@ -14,7 +14,7 @@ MIN_GCC_VERSION = 7
 
 BUILD_DEPENDS = native/icinga2-tools
 
-DEPENDS  = cross/boost_1.86
+DEPENDS  = cross/boost-1.86
 DEPENDS += cross/openssl3
 
 # Optional database backends for IDO
