@@ -298,11 +298,9 @@ jobs:
           add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
-          # TEMP (revert before merge): activate DSM 6.1, 7.0, 7.2, 7.3 and 7.4 so the kernel
-          # modules of synokernel-linuxtv build for every kernel of those versions
-          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'true' }}
+          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
-          add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'true' }}
+          add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
@@ -344,11 +342,6 @@ jobs:
 
             # Enable noarch DSM 7.2 builds if noarch packages require minimum DSM 7.2
             add_noarch_dsm72_builds=$([ "$has_noarch_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
-
-            # TEMP (revert before merge): DSM 7.2, 7.3 and 7.4 for synokernel-linuxtv
-            add_dsm72_builds=true
-            add_dsm73_builds=true
-            add_dsm74_builds=true
           fi
 
           # Build matrix
