@@ -1,0 +1,3 @@
+lnk:lib/libQt6Core.so
+lnk:lib/libQt6Core.so.6
+lib:lib/libQt6Core.so.6.12.0
