@@ -17,7 +17,10 @@ tags:
     check the issues already open, before opening one. Do not use them on a NAS
     you cannot afford to restart or recover.
 
-The `synocli-kernel` package provides lower-level USB helpers and scripts to help with kernel module loading and unloading. This package should normally be a hard dependency for any other kernel module related package.
+The `synocli-kernel` package provides USB and process helpers (`usb-devices`,
+`lsusb.py`, `usbhid-dump`, `fuser`), the `synocli-kernelmodule` helper that loads
+the kernel modules of the `synokernel-*` packages, and the device profiles it
+loads them by. Every kernel module package depends on it.
 
 ## Package Information
 
@@ -26,9 +29,10 @@ The `synocli-kernel` package provides lower-level USB helpers and scripts to hel
 | Package Name | synocli-kernel |
 | License | GPL |
 
-To add as a dependency in `spk/<package>/Makefile`:
+To add as a dependency in `spk/<package>/Makefile`, from the version that
+holds the profiles:
 ```makefile
-SPK_DEPENDS = synocli-kernel
+SPK_DEPENDS = "synocli-kernel>=2.0"
 ```
 
 ## Kernel Module Helper Script
@@ -61,7 +65,7 @@ sudo synocli-kernelmodule --spk synokernel-cdrom sr_mod start
 
 | Option | Use |
 |--------|-----|
-| `-p`, `--profile <p1,p2,...>` | profiles to load; the package is the one holding them |
+| `-p`, `--profile <p1,p2,...>` | profiles to load; the package is the one they are for |
 | `-s`, `--spk <package>` | package holding the modules, needed for modules by name |
 | `-n`, `--dry-run` | `start`, `stop` and `restart` tell each step (`OK (simulated)`, or `missing`) and change nothing |
 | `-r`, `--root <dir>` | package directory other than `/var/packages/<package>/target`, to try modules before packaging them |
@@ -75,7 +79,7 @@ kernel (`modprobe`, or `/lib/modules`).
 `stop` unloads in reverse order and leaves loaded a module still in use, by
 another device for instance. The firmware of the package (`target/lib/firmware`)
 is given to the kernel firmware loader on `start`; the output of every run goes
-to `/var/log/packages/synocli-kernelmodule.log`.
+to `/var/log/packages/synocli-kernelmodule.log`, starting with the warning above.
 
 Modules are looked for in
 `/var/packages/<package>/target/lib/modules/<platform>/<uname -r>/`, the
@@ -198,7 +202,7 @@ Kernel dependency usage is enabled with `REQUIRE_KERNEL = 1`.
 
 Automated building of modules uses `REQUIRE_KERNEL_MODULE`:
 ```makefile
-REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
+REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL:drivers/usb/serial:usbserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CP210X:drivers/usb/serial:cp210x
 ```
@@ -286,4 +290,5 @@ DSM version. Install the build of the package for that DSM version.
 ## Related Packages
 
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
+- [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities

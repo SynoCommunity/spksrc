@@ -28,7 +28,7 @@ with the firmware files many tuners load at startup.
 |----------|-------|
 | Package Name | synokernel-linuxtv |
 | License | GPLv2 |
-| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) (module loading) |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.0 or newer (module loading and device profiles) |
 
 ## Before you start
 
@@ -68,7 +68,7 @@ Modules are installed under
 with the `synocli-kernelmodule` helper of SynoCli Kernel Tools, as root:
 
 ```bash
-# The device profiles of the package
+# The device profiles, and which this kernel can load
 synocli-kernelmodule list
 
 # Load the modules of a device, with the modules they depend on

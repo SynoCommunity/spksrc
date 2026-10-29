@@ -25,6 +25,7 @@ Provides kernel modules for USB serial device support on Synology NAS devices.
 |----------|-------|
 | Package Name | synokernel-usbserial |
 | License | GPL |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.0 or newer (module loading and device profiles) |
 
 ## Included Drivers
 
