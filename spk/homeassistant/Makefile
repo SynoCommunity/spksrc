@@ -6,7 +6,8 @@ SPK_ICON = src/homeassistant.png
 PYTHON_PACKAGE = python314
 
 # unsupported wheels: av, numpy; require glibc >= 2.28 (av), >= 2.27 (numpy)
-MIN_GLIBC_VERSION = 2.28
+REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_SRM = 1.3
 
 # mandatory wheel not available (av):
 UNSUPPORTED_ARCHS = $(ARMv7_ARCHS)
