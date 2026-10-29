@@ -13,7 +13,7 @@ MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = native/icinga2-tools
 
-DEPENDS  = cross/boost-1.86
+DEPENDS  = cross/boost-1.92
 DEPENDS += cross/openssl3
 
 HOMEPAGE = https://icinga.com/

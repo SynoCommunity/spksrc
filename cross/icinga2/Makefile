@@ -14,7 +14,7 @@ MIN_GCC_VERSION = 7
 
 BUILD_DEPENDS = native/icinga2-tools
 
-DEPENDS  = cross/boost-1.86
+DEPENDS  = cross/boost-1.92
 DEPENDS += cross/openssl3
 
 # Optional database backends for IDO
