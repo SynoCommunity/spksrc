@@ -1,6 +1,6 @@
 {
   "name": "rtl88x2bu",
   "description": "Realtek RTL8812BU and RTL8822BU adapters: TP-Link Archer T3U (USB 2357:012d), T3U Plus, T4U v3, ASUS USB-AC55 B1, USB-AC58, D-Link DWA-181/182/183, Netgear A6150, Edimax, TRENDnet and others",
-  "comments": "Driver of the Linux community for the Realtek chips, firmware built in. The interface is wlan0, set up with wpa_supplicant (nl80211).",
+  "comments": "Driver of the Linux community for the Realtek chips, firmware built in. The interface is wlan0, set up with wpa_supplicant (nl80211). Tested on a DS115j (armada370, kernel 3.2.101) with a TP-Link Archer T3U: WPA2 on 5 GHz at 400 Mbit/s, and an address from DHCP.",
   "modules": ["88x2bu"]
 }

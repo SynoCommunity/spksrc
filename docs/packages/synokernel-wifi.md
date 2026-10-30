@@ -79,27 +79,41 @@ iw dev
 ### Connecting to a network
 
 DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
-the adapters it does not support: the connection is set up from the command line, with the `wpa_supplicant` and `dhclient` of DSM
-and the `iw` of this package.
+the adapters it does not support: the connection is set up from the command
+line, with the `wpa_supplicant` and `dhclient` of DSM and the `iw` of this
+package. Set the [regulatory domain](#regulatory-domain) first.
 
 ```bash
-# The network and its passphrase, readable by root only
-wpa_passphrase "MyNetwork" "MyPassphrase" | sudo tee /var/packages/synokernel-wifi/var/wpa_supplicant.conf
-sudo chmod 600 /var/packages/synokernel-wifi/var/wpa_supplicant.conf
+# The networks in range
+sudo ip link set wlan0 up
+sudo iw dev wlan0 scan | grep -E 'SSID|freq|signal'
 
-# Connect, then get an address
+# The network and its passphrase, readable by root only, without the clear-text copy
+sudo sh -c 'umask 077; wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
+
+# Connect, then check the link
 sudo wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf
 iw dev wlan0 link
+```
+
+`wpa_supplicant` reports `rfkill: Cannot open RFKILL control device`, and with
+some drivers `Could not re-add multicast membership for vendor events`: neither
+matters. DSM's `wpa_supplicant` has no `-f` option to log to a file.
+
+Once `iw dev wlan0 link` shows `Connected to`, get an address:
+
+```bash
 sudo dhclient wlan0
 ```
 
+!!! warning
+    DSM's `dhclient` runs its own script, which sets the default route and the
+    DNS servers of the network it gets an address from; an AppArmor profile
+    forbids any other script (`-sf`). On a NAS that stays wired, give the WiFi
+    interface a static address with `ip addr add` instead.
+
 To connect at every startup, add the commands after `synocli-kernelmodule` in
 the task of [Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
-
-!!! warning
-    `dhclient` may replace the default route of the wired interface. Give the
-    WiFi interface a static address with `ip addr add` instead when the NAS
-    stays wired.
 
 ### Regulatory domain
 
