@@ -1,6 +1,6 @@
---- CMakeLists.txt.orig	2026-01-22 17:08:11
-+++ CMakeLists.txt	2026-02-02 16:57:38
-@@ -91,7 +91,15 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -90,7 +90,15 @@
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
  
  # required dependencies
@@ -17,7 +17,7 @@
  find_package(Threads REQUIRED)
  find_package(PCRE2 REQUIRED)
  find_package(OpenSSL REQUIRED)
-@@ -442,16 +450,21 @@
+@@ -465,7 +473,7 @@
    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
  elseif(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
    add_compile_options(
@@ -26,20 +26,3 @@
      "-O2"
    )
    if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-     message("Generating binary with debug symbols")
-     add_compile_options("-g")
-   endif()
--  # IPO/LTO support
--  check_ipo_supported()
--  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-+  # IPO/LTO support (check if supported before enabling)
-+  check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output)
-+  if(ipo_supported)
-+    message(STATUS "IPO is supported")
-+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-+  else()
-+    message(STATUS "IPO is not supported: \${ipo_output}")
-+  endif()
- else()
-   # if CMAKE_BUILD_TYPE is not Debug, Release, RelWithDebInfo or MinSizeRel
-   # do not alter compile options
