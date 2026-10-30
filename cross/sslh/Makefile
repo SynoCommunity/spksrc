@@ -1,5 +1,5 @@
 PKG_NAME = sslh
-PKG_VERS = 2.1.4
+PKG_VERS = 2.3.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/yrutschle/sslh/archive
