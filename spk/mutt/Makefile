@@ -1,6 +1,6 @@
 SPK_NAME = mutt
-SPK_VERS = 2.2.13
-SPK_REV = 9
+SPK_VERS = 2.4.3
+SPK_REV = 10
 SPK_ICON = src/mutt.png
 
 DEPENDS = cross/mutt
@@ -10,7 +10,7 @@ DESCRIPTION = Mutt is a small but very powerful text-based mail client for Unix 
 DISPLAY_NAME = Mutt
 STARTABLE = no
 
-CHANGELOG = "1. Update mutt to v2.2.13.<br/>2. Update openssl to v3.1.7."
+CHANGELOG = "1. Update mutt to v2.4.3. <br/>2. Update openssl to v3.5.9."
 
 HOMEPAGE   = http://www.mutt.org
 LICENSE    = GPLv2
