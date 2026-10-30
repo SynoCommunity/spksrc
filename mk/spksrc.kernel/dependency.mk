@@ -25,6 +25,7 @@
 #   UNSUPPORTED_ARCHS      : toolchain architectures that cannot be built
 #   LEGACY_ARCHS           : fallback list of known architectures
 #   KERNEL_DEPEND          : architectures/sub-archs selected for module build
+#   KERNEL_DRIVERS         : driver/<pkg> dependencies, built against each of them
 #   WORK_DIR               : base working directory
 #   ARCH_SUFFIX            : optional suffix for WORK_DIR
 #   STATUS_LOG             : centralized build log
@@ -36,6 +37,11 @@
 # Behavior:
 #  - Generic architectures are used as anchors to iterate over sub-architectures
 #  - Only non-generic sub-architectures are built
+#  - Each KERNEL_DRIVERS entry is built right after the kernel of a sub-arch,
+#    with that ARCH and TCVERSION (spksrc.driver.mk)
+#  - With more than one kernel, the kernel and driver sources of a sub-arch are
+#    removed once its modules are installed; its cookies stay, so a later run
+#    resumes at the first kernel not built
 #  - Each sub-arch build occurs in its own WORK_DIR
 #  - Build logs are written to build-<arch>-<tcversion>.log
 #  - tc_vars* files are backed up/restored for generic architectures
@@ -68,6 +74,9 @@ endif
 # end REQUIRE_KERNEL
 endif
 
+# Out-of-tree drivers: built per kernel here, never by the regular dependency walk
+KERNEL_DRIVERS = $(filter driver/%,$(BUILD_DEPENDS) $(DEPENDS))
+
 ####
 
 .PHONY: kernel-depend
@@ -90,6 +99,25 @@ kernel-depend:
 	        $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, DEPEND: %s, NAME: %s - FAILED\n" \
 	          "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$${depend}" "kernel-modules") | tee --append $(STATUS_LOG) ; \
 	        exit 1 ; \
+	      fi ; \
+	      for driver in $(KERNEL_DRIVERS); \
+	      do \
+	        $(MSG) "Building $${driver} for $${depend} ARCH" ; \
+	        if ! $(MAKE) LOGGING_ENABLED=1 \
+	            WORK_DIR=$(CURDIR)/work$(ARCH_SUFFIX) \
+	            INSTALL_PREFIX=$(INSTALL_PREFIX) \
+	            ARCH=$$(echo $${depend} | cut -f1 -d-) \
+	            TCVERSION=$$(echo $${depend} | cut -f2 -d-) \
+	            -C ../../$${driver} ; then \
+	          $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, DEPEND: %s, NAME: %s - FAILED\n" \
+	            "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$${depend}" "$${driver}") | tee --append $(STATUS_LOG) ; \
+	          exit 1 ; \
+	        fi ; \
+	      done ; \
+	      if [ $(words $(KERNEL_DEPEND)) -gt 1 ]; then \
+	        $(MSG) "Removing the kernel and driver sources of $${depend}, its modules installed" ; \
+	        rm -rf $(CURDIR)/work$(ARCH_SUFFIX)/linux-$$(echo $${depend} | cut -f1 -d-) ; \
+	        find $(CURDIR)/work$(ARCH_SUFFIX) -mindepth 1 -maxdepth 1 -type d -name "*-$${depend}" -exec rm -rf {} + ; \
 	      fi ; \
 	    } > >(tee --append build-$${depend}.log) 2>&1 ; \
 	  done ; \

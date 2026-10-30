@@ -1,0 +1,41 @@
+--- v4l/scripts/make_kconfig.pl.orig
++++ v4l/scripts/make_kconfig.pl
+@@ -583,8 +583,9 @@
+     $kernopts{BKL} = 2;
+ }
+ 
+-# Kernel < 3.2 is missing the DMA_SHARED_BUFFER option
+-if (!defined $kernopts{DMA_SHARED_BUFFER} && cmp_ver($kernver, '3.2.0') < 0) {
++# Kernels built without dma-buf: videobuf2 selects it, and gets the stubs of
++# compat.h instead
++if (!$kernopts{DMA_SHARED_BUFFER}) {
+     $kernopts{DMA_SHARED_BUFFER} = 2;
+ }
+ 
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1326,4 +1326,24 @@
+ #define dev_is_platform(dev) ((dev)->bus == &platform_bus_type)
+ #endif
+ 
++/*
++ * Kernels built without dma-buf (CONFIG_DMA_SHARED_BUFFER): videobuf2 and
++ * dvb-core get stubs, so everything but DMABUF buffer sharing works
++ */
++#ifndef CONFIG_DMA_SHARED_BUFFER
++#include <linux/dma-buf.h>
++#include <linux/err.h>
++#undef dma_buf_export
++#define dma_buf_attach(...)		ERR_PTR(-ENODEV)
++#define dma_buf_detach(...)		((void)0)
++#define dma_buf_export(...)		ERR_PTR(-ENODEV)
++#define dma_buf_fd(...)			(-ENODEV)
++#define dma_buf_get(...)		ERR_PTR(-ENODEV)
++#define dma_buf_put(...)		((void)0)
++#define dma_buf_map_attachment(...)	ERR_PTR(-ENODEV)
++#define dma_buf_unmap_attachment(...)	((void)0)
++#define dma_buf_vmap(...)		NULL
++#define dma_buf_vunmap(...)		((void)0)
++#endif
++
+ #endif /*  _COMPAT_H */

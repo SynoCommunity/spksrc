@@ -1,0 +1,6 @@
+{
+  "name": "mxuport",
+  "description": "Moxa UPORT Serial Driver",
+  "modules": ["mxuport"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

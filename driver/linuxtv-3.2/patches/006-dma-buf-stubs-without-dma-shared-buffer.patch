@@ -1,0 +1,32 @@
+--- v4l/scripts/make_kconfig.pl.orig
++++ v4l/scripts/make_kconfig.pl
+@@ -583,8 +583,9 @@
+     $kernopts{BKL} = 2;
+ }
+ 
+-# Kernel < 3.2 is missing the DMA_SHARED_BUFFER option
+-if (!defined $kernopts{DMA_SHARED_BUFFER} && cmp_ver($kernver, '3.2.0') < 0) {
++# Kernels without dma-buf (< 3.3, or not selected by any built-in driver): videobuf2
++# selects it, and gets the stubs of v3.1_no_dma_buf_h.patch instead
++if (!$kernopts{DMA_SHARED_BUFFER}) {
+     $kernopts{DMA_SHARED_BUFFER} = 2;
+ }
+ 
+--- backports/backports.txt.orig
++++ backports/backports.txt
+@@ -136,6 +136,7 @@
+ 
+ [3.4.255]
+ add v3.4_i2c_add_mux_adapter.patch
++add v3.1_no_dma_buf_h.patch
+ add v3.4_stk_webcam.patch
+ 
+ [3.3.255]
+@@ -147,7 +148,6 @@
+ 
+ [3.1.255]
+ add v3.1_no_export_h.patch
+-add v3.1_no_dma_buf_h.patch
+ add v3.1_no_pm_qos.patch
+ 
+ [3.0.255]

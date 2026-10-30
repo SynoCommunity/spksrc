@@ -1,0 +1,20 @@
+--- v4l/versions.txt.orig
++++ v4l/versions.txt
+@@ -146,12 +146,14 @@
+ IR_PWM_TX
+ 
+ [4.7.0]
+-# needs i2c_mux_alloc
++# needs struct i2c_mux_core
++DVB_AF9013
++
++[4.4.0]
++# i2c_mux_alloc, which v4.6_i2c_mux.patch replaces with the API of older kernels
+ DVB_RTL2830
+ DVB_RTL2832
+ DVB_M88DS3103
+-# needs struct i2c_mux_core
+-DVB_AF9013
+ 
+ [4.6.0]
+ # needs regmap_write_bits

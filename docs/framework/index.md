@@ -49,6 +49,7 @@ The spksrc repository is organized into functional directories:
 | `native/` | Native (build host) tools and dependencies |
 | `spk/` | Final package definitions |
 | `kernel/` | Kernel modules (for specific packages) |
+| `driver/` | Out-of-tree kernel drivers, built per kernel |
 
 ### Cookie Files
 

@@ -46,7 +46,7 @@ _ODEP_NEW := $(shell mkdir -p $(WORK_DIR) && \
       out=$$(env -u RUN_ID -u DEP_FLAT_STAMP_DIR -u SPK_LIST_STAMP_DIR DEPENDENCY_WALK=1 \
                  $(MAKE) -s --no-print-directory -C $(BASEDIR)/{} dependency-unsupported \
                  ARCH=$(ARCH) TCVERSION=$(TCVERSION) WORK_DIR=$(BASEDIR)/{}/work-$(ARCH)-$(TCVERSION) 2>/dev/null \
-             | grep -E "^(cross|spk|diyspk|native|kernel)/") ; \
+             | grep -E "^(cross|driver|spk|diyspk|native|kernel)/") ; \
       if [ -z "$$out" ] ; then echo "$$v~:=~1" ; else echo "$$v~:=~0" ; fi' | sort)
 $(foreach l,$(_ODEP_NEW),$(eval $(subst ~, ,$(l))))
 $(shell printf '%s\n' $(subst ~, ,$(foreach l,$(_ODEP_NEW),'$(l)')) >> $(_ODEP_CACHE))

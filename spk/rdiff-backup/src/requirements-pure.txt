@@ -1,3 +1,4 @@
-# Generated using the requirements script on March 2, 2025
+# Generated using the requirements script on October 30, 2026
+# Command: generate_requirements.sh "rdiff-backup[meta]==2.2.7" 314
 
-#pip                        ==> py312
+#pip==26.2.1                    ==> python314

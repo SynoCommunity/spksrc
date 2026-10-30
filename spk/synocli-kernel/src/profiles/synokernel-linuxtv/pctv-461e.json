@@ -1,0 +1,6 @@
+{
+  "name": "pctv-461e",
+  "description": "PCTV Systems 461e, DVB-S2 (USB 2013:0258)",
+  "comments": "Not tested on hardware since the media_build tiers.",
+  "modules": ["ts2020", "a8293", "m88ds3103", "rc-pinnacle-pctv-hd", "em28xx-dvb", "em28xx-rc"]
+}

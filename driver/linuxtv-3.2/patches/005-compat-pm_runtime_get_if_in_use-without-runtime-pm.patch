@@ -1,0 +1,24 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -2155,6 +2155,8 @@
+ #endif
+ 
+ #ifdef NEED_PM_RUNTIME_GET
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0) && defined(CONFIG_PM_RUNTIME)) || \
++    (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) && defined(CONFIG_PM))
+ static inline int pm_runtime_get_if_in_use(struct device *dev)
+ {
+ 	unsigned long flags;
+@@ -2167,6 +2169,12 @@
+ 	spin_unlock_irqrestore(&dev->power.lock, flags);
+ 	return retval;
+ }
++#else
++static inline int pm_runtime_get_if_in_use(struct device *dev)
++{
++	return -EINVAL;
++}
++#endif
+ #endif
+ 
+ #ifdef NEED_KEY_APPSELECT

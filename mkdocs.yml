@@ -202,6 +202,7 @@ nav:
       - Home Assistant: packages/homeassistant.md
       - Mosquitto: packages/mosquitto.md
     - Kernel:
+      - SynoKernel LinuxTV: packages/synokernel-linuxtv.md
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
     - Media:
       - Beets: packages/beets.md

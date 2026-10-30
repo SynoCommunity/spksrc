@@ -6,15 +6,7 @@
         "display_name": "AriaNg",
         "type": "static",
         "root": "ariang",
-        "icon": "app/images/ariang-{0}.png",
-        "php": {
-            "profile_name": "ariang profile",
-            "profile_desc": "AriaNg profile desc",
-            "backend": 8,
-            "extensions": [],
-            "user": "sc-ariang",
-            "group": "http"
-        }
+        "icon": "app/images/ariang-{0}.png"
       }
     ],
     "portals": [
