@@ -1,7 +1,7 @@
 # wheels that are not available in index are built and included in the package
 # 
 aiokafka==0.10.0                # downloadable only for python <= 312
-bluetooth_data_tools==1.29.18   # not downloadable for aarch64, x64 downloadable depends on glibc 2.41+
+bluetooth_data_tools==1.29.24   # not downloadable for aarch64, x64 downloadable depends on glibc 2.41+
 crcmod==1.7                     # downloadable only for win32, installs from index as py3-none-any.whl
 ### DTLSSocket==0.1.19          # no wheels in index, source only, pip wheel fails to cross compile, use python/dtlssocket
 ephem==4.1.6                    # downloadable only for python <= 313
