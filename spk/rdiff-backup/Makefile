@@ -7,6 +7,13 @@ PYTHON_PACKAGE = python314
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
+include ../../mk/spksrc.common.mk
+
+# [psutil]
+ifeq ($(call version_lt,$(TC_GCC),5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
+
 DEPENDS = cross/librsync cross/attr cross/acl
 
 # [PyYAML]
