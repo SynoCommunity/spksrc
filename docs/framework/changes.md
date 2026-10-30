@@ -131,7 +131,9 @@ If you only read one thing, read this. The details are in the dated log below.
       without the wireless stack), or, `=n`, a built-in option the modules must not turn
       on as it changes the structures of the running kernel. Such an option is left as
       the kernel has it, and the build stops if `olddefconfig` turns it on all the same.
-      The log lists the built-in options the modules turned on and off.
+      A `def_bool y` hiding it is dropped first: Synology's 3.10 BSP kernels force
+      `WIRELESS_EXT` with `WIRELESS`. The log lists the built-in options the modules
+      turned on and off.
 
     - **The modules of a directory see the symbols of those built before it**:
       `modules.symvers` gathers them, given to the next directories and to the

@@ -28,8 +28,9 @@
 #   REQUIRE_KERNEL_OPTION    CONFIG_<option>=y|m|n set before the modules: the menus
 #                            they sit in, or, =n, a built-in option the modules must
 #                            not turn on, as it changes the running kernel's
-#                            structures: left as the kernel has it, and an error if
-#                            olddefconfig turns it on
+#                            structures: left as the kernel has it (a def_bool y
+#                            hiding it is dropped), and an error if olddefconfig
+#                            turns it on
 #   STAGING_INSTALL_PREFIX   full install path for compiled modules
 #   WORK_DIR                 base directory for compilation
 #   PKG_DIR                  extracted kernel source directory
@@ -93,6 +94,12 @@ kernel_module_prepare:
 	    *) grep -q "^$${option%%=*}=" $(WORK_DIR)/$(PKG_DIR)/.config.kernel && continue ; flag=--disable ;; \
 	  esac ; \
 	  cd $(WORK_DIR)/$(PKG_DIR); scripts/config $$(cat .config.case) $$flag $${option%%=*} ; \
+	  if [ "$$flag" = "--disable" ]; then \
+	    name=$${option%%=*} ; \
+	    for kconfig in $$(grep -rl --include='Kconfig*' "^config $${name#CONFIG_}$$" . ) ; do \
+	      awk -v opt="config $${name#CONFIG_}" '/^(menu)?config /{blk=($$0==opt)} blk && /^[ \t]+def_bool y/{sub(/def_bool y.*/,"bool")} {print}' $$kconfig > $$kconfig.tmp && mv $$kconfig.tmp $$kconfig ; \
+	    done ; \
+	  fi ; \
 	done
 	@for module in $(REQUIRE_KERNEL_MODULE); \
 	do \
