@@ -1,5 +1,5 @@
 PKG_NAME = rrdtool
-PKG_VERS = 1.9.0
+PKG_VERS = 1.11.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/oetiker/rrdtool-1.x/releases/download/v$(PKG_VERS)
