@@ -1,0 +1,6 @@
+{
+  "name": "rtl8821cu",
+  "description": "Realtek RTL8811CU and RTL8821CU adapters",
+  "comments": "Driver of the Linux community for the Realtek chips. Kernels 3.2 and newer.",
+  "modules": ["8821cu"]
+}
