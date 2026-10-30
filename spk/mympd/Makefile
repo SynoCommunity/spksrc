@@ -6,10 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/mympd
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
-
 MAINTAINER = hgy59
 DESCRIPTION = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.
 CHANGELOG = "1. Update myMPD 24.0.2. Major version update with fuzzy search, improved MPD protocol handling, and better UTF-8 support. <br/>2. Configure MPD socket connection for music directory and playlist directory support."

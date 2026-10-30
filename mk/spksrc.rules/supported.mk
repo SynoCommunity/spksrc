@@ -71,7 +71,7 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 # stage0's bootstrap notice is an $(info) from the sub-make's PARSE, outside that pipe.
 _gate_walk = DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
                  ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
-                 | grep -E '^(cross|spk|diyspk|native|kernel)/'
+                 | grep -E '^(cross|driver|spk|diyspk|native|python|kernel)/'
 
 # Package name in a column of its own, reason after it.
 _gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }'
@@ -112,13 +112,22 @@ check-%:
 # Teed here rather than in build-arch-%: one level up also catches make's own
 # "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
 # _runlog's LOGGING_ENABLED guard makes this the only teeing level.
+#
+# pre-build-native for the reason $(TARGET_TYPE)-arch-% carries it: naming more than one
+# goal on a command line -- make -j2 arch-x64-7.2 arch-dakota-1.3 -- forks a walk per goal,
+# and nothing below stops two of them entering the same native/<pkg> at once. depend_target
+# walks native/% without the dep_seen guard its other two loops use, and that guard would
+# not help here anyway: DEPEND_SEEN is $(WORK_DIR)/.DEPEND, one per spk work dir, so two
+# arch goals never share one. A prerequisite is built once per invocation, so the pass runs
+# once ahead of both forks, and a single-arch build pays nothing for it -- with the natives
+# in place native-depend has nothing to do.
 arch-%: SHELL:=/bin/bash
-arch-%:
+arch-%: pre-build-native
 	@set -o pipefail ; \
 	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)),build-$*.log)
 
 arch-noarch-%: SHELL:=/bin/bash
-arch-noarch-%:
+arch-noarch-%: pre-build-native
 	@set -o pipefail ; \
 	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1)),build-noarch-$*.log)
 

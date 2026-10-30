@@ -5,8 +5,6 @@ SPK_ICON = src/go2rtc.png
 
 DEPENDS = cross/go2rtc
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 MAINTAINER = skrashevich
 DESCRIPTION = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc.
 DISPLAY_NAME = go2rtc

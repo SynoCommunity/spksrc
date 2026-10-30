@@ -8,8 +8,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# A compiler with support for C++11 language features is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# its configure still refuses gcc 4.7's partial C++11, and passes from 4.8:
+#   configure: error: *** A compiler with support for C++11 language
+#   features is required.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://github.com/animetosho/par2cmdline-turbo
 COMMENT  = This is a simple fork of par2cmdline which replaces core computation routines with ParPars processing backend, improving par2cmdlines performance on x86/ARM platforms. par2cmdline is a PAR 2.0 compatible file verification and repair tool.

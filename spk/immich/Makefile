@@ -1,18 +1,17 @@
 SPK_NAME = immich
-SPK_VERS = 3.3.1
-SPK_REV = 8
+SPK_VERS = 3.3.5
+SPK_REV = 9
 SPK_ICON = src/immich.png
 
 DEPENDS = cross/immich cross/immich-geodata
 SPK_DEPENDS = "Node.js_v22:postgresql>=17.10-4:redis:Perl:python314:ffmpeg8"
 
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Immich
 DESCRIPTION = Self-hosted photo and video backup solution.
-CHANGELOG = "Update Immich to v3.3.1."
+CHANGELOG = "Update Immich to v3.3.5."
 HOMEPAGE = https://immich.app
 LICENSE = GPLv3
 

@@ -17,6 +17,8 @@
 # Files
 #  $(INSTALL_PLIST)  Pair of type:filepath, type can be bin, lib, lnk, or rsc. Only bin and lib
 #                    files will be stripped.
+#  *.ko              Kernel modules lose their debug sections only (--strip-debug): the module
+#                    loader links them with their symbol table.
 #
 ###############################################################################
 
@@ -94,7 +96,7 @@ _install_tclib_() { \
 }
 endef
 
-# A plist line may be a pattern -- cross/boost_1.92 describes its libraries as
+# A plist line may be a pattern -- cross/boost-1.92 describes its libraries as
 # `lib:lib/libboost_*.so.1.92.0` -- so each one is resolved inside the staging
 # directory before it is read, the way copy.mk resolves them before packing.
 # Handed to objdump as written, a pattern is a path that does not exist and the
@@ -147,12 +149,17 @@ ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 	do \
 	  case $${type} in \
 	    lib|bin) \
+	      case $${file} in *.ko|lib/modules/*) continue ;; esac ; \
 	      echo -n "Stripping $${file}... " ; \
 	      chmod u+w $(STAGING_DIR)/$${file} ; \
 	      $(STRIP) $(STAGING_DIR)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
 	      ;; \
 	  esac ; \
 	done
+	@if [ -n "$$(find $(STAGING_DIR) -type f -name '*.ko' -print -quit)" ]; then \
+	  echo "Stripping debug symbols of kernel modules" ; \
+	  find $(STAGING_DIR) -type f -name '*.ko' -exec chmod u+w {} + -exec $(STRIP) --strip-debug {} + ; \
+	fi
 else
 	@$(MSG) GCC_DEBUG_INFO enabled: Skipping strip_target
 endif

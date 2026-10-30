@@ -1,17 +1,14 @@
 SPK_NAME = icinga2-agent
-SPK_VERS = 2.16.4
-SPK_REV = 1
+SPK_VERS = 2.16.6
+SPK_REV = 2
 SPK_ICON = src/icinga2.png
 
 DEPENDS = cross/icinga2-agent
 DEPENDS += cross/monitoring-plugins
 
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 agent connects to an Icinga 2 master server for distributed monitoring.
-CHANGELOG = "Initial release of Icinga 2 Agent"
+CHANGELOG = "Update to Icinga 2 Agent v2.16.6."
 
 DISPLAY_NAME = Icinga 2 Agent
 

@@ -8,8 +8,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# fails to build src/unix/async.c
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has neither the eventfd2 nor the accept4 flag macros (added in 2.9):
+#   src/unix/async.c:210: 'EFD_CLOEXEC' undeclared
+#   src/unix/tcp.c:482: 'SOCK_CLOEXEC' undeclared
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://libuv.org/
 COMMENT  = libuv is a multi-platform support library with a focus on asynchronous I/O.

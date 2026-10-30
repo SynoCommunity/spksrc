@@ -1,5 +1,5 @@
 PKG_NAME = netdata
-PKG_VERS = 2.11.1
+PKG_VERS = 2.12.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/netdata/netdata/archive/refs/tags
@@ -7,7 +7,9 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
-BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas native/go
+BUILD_DEPENDS = native/protoc-33 cross/aclk-schemas native/go
+# The go.d plugin's go.mod asks for go 1.27.0; set here as env-go.mk is included after the dependency rules
+NATIVE_GO = native/go
 
 HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
@@ -29,7 +31,6 @@ CONFIGURE_ARGS += -DENABLE_DBENGINE=ON
 # Features disabled to avoid cross-compilation issues
 CONFIGURE_ARGS += -DENABLE_PLUGIN_SCRIPTS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_OTEL=OFF
-CONFIGURE_ARGS += -DENABLE_PLUGIN_OTEL_SIGNAL_VIEWER=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_CUPS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_FREEIPMI=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_EBPF=OFF
@@ -53,10 +54,7 @@ POST_PATCH_TARGET = netdata_post_patch
 COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
-# RUST_TARGET / TC_RUSTUP_TOOLCHAIN for cross-compiling the journal reader crate.
-# Not provided by the generated tc_vars.mk, so included explicitly.
-include ../../mk/spksrc.cross/env-rust.mk
-# GOOS/GOARCH/GOARM + CGO_ENABLED=0 + native/go PATH for the go.d plugin build.
+# GOOS/GOARCH/GOARM + CGO_ENABLED=0 + native go PATH for the go.d plugin build.
 include ../../mk/spksrc.cross/env-go.mk
 
 .PHONY: netdata_post_patch
@@ -80,7 +78,7 @@ netdata_compile:
 		cp -a $(WORK_DIR)/$(ACLK_SCHEMAS_DIR)/proto/. $$ACLK_DIR/proto/; \
 	fi
 	@$(MSG) Patching protobuf rules for native protoc
-	@PROTOC=$$(realpath $(WORK_DIR)/../../../native/protoc_33/work-native/bin/protoc 2>/dev/null); \
+	@PROTOC=$$(realpath $(WORK_DIR)/../../../native/protoc-33/work-native/bin/protoc 2>/dev/null); \
 	NINJA=$(BUILD_DIR)/build.ninja; \
 	if [ -n "$$PROTOC" ] && [ -f "$$NINJA" ]; then \
 		sed -i "s|protobuf::protoc|$$PROTOC|g" $$NINJA; \

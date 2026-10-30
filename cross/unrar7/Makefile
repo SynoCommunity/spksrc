@@ -7,9 +7,10 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# unrar builds with -std=c++11 and leans on libstdc++ to declare ptrdiff_t for
+# it, which it does from gcc 5:
+#   cmddata.cpp:1243: 'ptrdiff_t' was not declared in this scope
+MIN_GCC_VERSION = 5
 
 HOMEPAGE = https://rarlab.com
 COMMENT  = Extract files from rar archives.

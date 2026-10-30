@@ -38,6 +38,12 @@ endif
 include ../../mk/spksrc.common.mk
 
 ##### rust specific configurations
+# A cargo build: COMPILE_TARGET is nop and INSTALL_TARGET is rust_install_target below,
+# so install.mk's make-install arguments do not apply.
+ifeq ($(filter none,$(BUILD_SYSTEM)),)
+BUILD_SYSTEM += cargo
+endif
+
 include ../../mk/spksrc.cross/env-rust.mk
 
 # configure is used to install rust targets

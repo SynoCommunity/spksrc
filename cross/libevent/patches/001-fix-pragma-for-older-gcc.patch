@@ -1,0 +1,26 @@
+# libevent 2.1.13 suppresses -Wdangling-pointer with '#pragma GCC diagnostic'
+# placed inside a function. gcc 4.3.7 (used by the OLD_PPC archs, e.g. ppc853x)
+# rejects that: "#pragma GCC diagnostic not allowed inside functions".
+# -Wdangling-pointer only exists on gcc >= 12, so guard the pragma on the
+# compiler that actually has the warning; older gcc then skips the block.
+#
+--- event.c.orig
++++ event.c
+@@ -1354,7 +1354,7 @@
+ event_signal_closure(struct event_base *base, struct event *ev)
+ {
+ #if defined(__clang__)
+-#elif defined(__GNUC__)
++#elif defined(__GNUC__) && (__GNUC__ >= 12)
+ #pragma GCC diagnostic push
+ /* NOTE: it is better to avoid such code all together, by using separate
+  * variable to break the loop in the event structure, but now this code is safe
+@@ -1389,7 +1389,7 @@
+ 	}
+ 
+ #if defined(__clang__)
+-#elif defined(__GNUC__)
++#elif defined(__GNUC__) && (__GNUC__ >= 12)
+ #pragma GCC diagnostic pop
+ #endif
+ }

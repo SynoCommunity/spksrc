@@ -1,0 +1,23 @@
+# dtoa.c probes stdckdint.h with "#elif __has_include(<stdckdint.h>)".
+# GCC before 5 does not know __has_include and fails to parse the skipped
+# #elif branch ("missing binary operator before token '('"), so all DSM 6.2.4
+# toolchains (gcc 4.6.4 / 4.8.3 / 4.9.x) break. Nest the probe inside
+# #ifdef __has_include, which those preprocessors skip without parsing.
+--- missing/dtoa.c.orig
++++ missing/dtoa.c
+@@ -210,9 +210,12 @@
+ #include <locale.h>
+ #endif
+ 
+-#if defined(HAVE_STDCKDINT_H) || !defined(__has_include)
+-#elif __has_include(<stdckdint.h>)
+-# define HAVE_STDCKDINT_H 1
++#ifndef HAVE_STDCKDINT_H
++# ifdef __has_include
++#  if __has_include(<stdckdint.h>)
++#   define HAVE_STDCKDINT_H 1
++#  endif
++# endif
+ #endif
+ #ifdef HAVE_STDCKDINT_H
+ # include <stdckdint.h>

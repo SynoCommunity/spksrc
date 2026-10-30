@@ -1,10 +1,11 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.3
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/ffmpeg8.png
 CHANGELOG  = "1. Update to version 8.1.3<br/>"
-CHANGELOG += "2. Update to jellyfin 8.1.3-1 patchset"
+CHANGELOG += "2. Update to jellyfin 8.1.3-1 patchset<br/>"
+CHANGELOG += "3. Rebuilt with nettle 4.0 and the updated video driver libraries"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver

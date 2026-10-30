@@ -1,0 +1,19 @@
+--- gdb/nat/x86-linux.c.orig
++++ gdb/nat/x86-linux.c
+@@ -33,6 +33,16 @@
+ #include "nat/amd64-linux.h"
+ #endif
+ 
++/* The two TLS requests are declared by <asm/ptrace-abi.h> on every Linux, but glibc's
++   <sys/ptrace.h> enum gained them later.  The DSM 7.1 toolchains ship glibc 2.26 and
++   do not have them (DSM 7.2, glibc 2.36, does), so gdbserver fails to compile there.  */
++#ifndef PTRACE_GET_THREAD_AREA
++#define PTRACE_GET_THREAD_AREA 25
++#endif
++#ifndef PTRACE_SET_THREAD_AREA
++#define PTRACE_SET_THREAD_AREA 26
++#endif
++
+ /* Per-thread arch-specific data we want to keep.  */
+ 
+ struct arch_lwp_info

@@ -14,13 +14,26 @@ SVC_WRITE_PID=y
 # Environment variables passed to the service
 export NODE_ENV=production
 export CONFIG_DIRECTORY="${SEERR_CONFIG}"
-export PORT=${SERVICE_PORT}
+export PORT="${SERVICE_PORT}"
 
-# Source custom environment variables from config file (if it exists)
+# Source custom environment variables from config file (if it exists).
+# Values are captured literally so special characters (e.g. in database
+# passwords) are never interpreted by the shell.
 if [ -f "${SEERR_ENV}" ]; then
-    set -a
-    . "${SEERR_ENV}"
-    set +a
+    while IFS= read -r line || [ -n "${line}" ]; do
+        case "${line}" in
+            ''|'#'*) continue ;;
+            *=*) key=${line%%=*}; value=${line#*=} ;;
+            *) continue ;;
+        esac
+        case "${key}" in
+            ''|[!A-Za-z_]*|*[!A-Za-z0-9_]*) continue ;;
+        esac
+        case "${value}" in
+            \'*\'|\"*\") value=${value#?}; value=${value%?} ;;
+        esac
+        export "${key}=${value}"
+    done < "${SEERR_ENV}"
 fi
 
 service_postinst () {

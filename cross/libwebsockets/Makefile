@@ -8,8 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3
 
-# ppc except qoriq
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# glibc 2.8 has no eventfd2 flag macros (added in 2.9):
+#   lib/plat/unix/unix-pipe.c:37: 'EFD_CLOEXEC' undeclared
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://libwebsockets.org/
 COMMENT  = Libwebsockets (LWS) is a flexible, lightweight pure C library for implementing modern network protocols easily with a tiny footprint, using a nonblocking event loop.

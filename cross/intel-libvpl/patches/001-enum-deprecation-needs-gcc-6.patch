@@ -1,0 +1,15 @@
+--- api/vpl/mfxdefs.h.orig
++++ api/vpl/mfxdefs.h
+@@ -114,7 +114,12 @@
+      #define MFX_DEPRECATED_ENUM_FIELD_OUTSIDE(arg) __pragma(deprecated(arg))
+    #elif defined(__GNUC__)
+      #define MFX_DEPRECATED __attribute__((deprecated))
++     /* attributes on enumerators need gcc 6 */
++     #if __GNUC__ >= 6
+      #define MFX_DEPRECATED_ENUM_FIELD_INSIDE(arg) arg __attribute__((deprecated))
++     #else
++     #define MFX_DEPRECATED_ENUM_FIELD_INSIDE(arg) arg
++     #endif
+      #define MFX_DEPRECATED_ENUM_FIELD_OUTSIDE(arg)
+    #else
+      #define MFX_DEPRECATED

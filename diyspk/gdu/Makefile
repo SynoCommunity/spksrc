@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/gdu
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Fast disk usage analyzer with console interface written in Go.
 STARTABLE = no

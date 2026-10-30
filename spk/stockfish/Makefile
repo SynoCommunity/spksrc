@@ -4,12 +4,8 @@ SPK_REV = 4
 SPK_ICON = src/stockfish.png
 
 DEPENDS = cross/stockfish
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 SPK_DEPENDS = "Node.js_v18"
-
-# C++17 requires GCC 8+ (comcerto2k has GCC 4.9.3)
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = mayweed
 DISPLAY_NAME = Stockfish
@@ -37,5 +33,5 @@ stockfish_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share/webgui
 	cp -a src/webgui/. $(STAGING_DIR)/share/webgui/
 	cd $(STAGING_DIR)/share/webgui && \
-		PATH=$(realpath $(WORK_DIR)/../../../native/nodejs_22/work-native/node)/bin:$$PATH \
+		PATH=$(realpath $(WORK_DIR)/../../../native/nodejs-22/work-native/node)/bin:$$PATH \
 		HOME=$(WORK_DIR) npm install --production --no-audit --no-fund

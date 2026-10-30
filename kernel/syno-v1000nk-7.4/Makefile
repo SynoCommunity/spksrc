@@ -1,0 +1,12 @@
+KERNEL_ARCH = v1000nk
+KERNEL_VERS = 7.4
+KERNEL_DIST = linux-5.10.x
+KERNEL_BASE_ARCH = x86
+KERNEL_URL_VERSION = 7.4
+# v1000nk sources are not published but
+# configuration do reside in epyc7002 sources
+KERNEL_URL_DIR = epyc7002
+KERNEL_CONFIG = synology/synoconfigs/v1000lk5
+KERNEL_PCI_SLOT = 1
+
+include ../../mk/spksrc.kernel.mk

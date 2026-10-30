@@ -1,18 +1,19 @@
 PKG_NAME = icinga2-agent
-PKG_VERS = 2.16.4
+PKG_VERS = 2.16.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icinga2/archive/refs/tags
 PKG_DIST_FILE = icinga2-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = icinga2-$(PKG_VERS)
 
-# Icinga2 requires C++17 (GCC >= 7)
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
+# The agent-only feature set lands on a gcc 7.5 codegen bug the full build
+# misses, so this one needs 8 where cross/icinga2 needs 7:
+#   lib/base/value.cpp:91:1: internal compiler error: Segmentation fault
+MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = native/icinga2-tools
 
-DEPENDS  = cross/boost_1.86
+DEPENDS  = cross/boost-1.92
 DEPENDS += cross/openssl3
 
 HOMEPAGE = https://icinga.com/

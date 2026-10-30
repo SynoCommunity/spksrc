@@ -1,9 +1,7 @@
 SPK_NAME = gickup
-SPK_VERS = 0.10.45
-SPK_REV = 1
+SPK_VERS = 0.10.47
+SPK_REV = 2
 SPK_ICON = src/gickup.png
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 DEPENDS = cross/gickup
 
@@ -13,7 +11,7 @@ MAINTAINER = hgy59
 DESCRIPTION = Backup Git repositories with ease. Gickup is a tool that allows you to clone/mirror repositories from one host to another. This is useful if you want to have a backup of your repositories on another host or on a local server.
 DISPLAY_NAME = gickup
 STARTABLE = no
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update to v0.10.47."
 
 LICENSE = Apache 2.0
 HOMEPAGE = https://gickup.dev/

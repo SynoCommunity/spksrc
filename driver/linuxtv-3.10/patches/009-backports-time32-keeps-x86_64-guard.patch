@@ -1,0 +1,38 @@
+--- backports/v5.0_time32.patch.orig
++++ backports/v5.0_time32.patch
+@@ -29,18 +29,17 @@
+  static int put_v4l2_buffer32_time32(struct v4l2_buffer *vb,
+  				    struct v4l2_buffer32_time32 __user *arg)
+  {
+-@@ -764,8 +764,9 @@ struct v4l2_event32 {
++@@ -764,8 +764,8 @@ struct v4l2_event32 {
+  	__u32				id;
+  	__u32				reserved[8];
+  };
+-+#endif
+  
+ -#ifdef CONFIG_COMPAT_32BIT_TIME
+ +#if 0
+  struct v4l2_event32_time32 {
+  	__u32				type;
+  	union {
+-@@ -795,7 +796,7 @@ static int put_v4l2_event32(struct v4l2_event *p64,
++@@ -795,7 +795,7 @@ static int put_v4l2_event32(struct v4l2_event *p64,
+  	return 0;
+  }
+  
+@@ -49,14 +48,6 @@
+  static int put_v4l2_event32_time32(struct v4l2_event *p64,
+  				   struct v4l2_event32_time32 __user *p32)
+  {
+-@@ -811,7 +812,6 @@ static int put_v4l2_event32_time32(struct v4l2_event *p64,
+- 	return 0;
+- }
+- #endif
+--#endif
+- 
+- struct v4l2_edid32 {
+- 	__u32 pad;
+ @@ -869,7 +869,7 @@ static int put_v4l2_edid32(struct v4l2_edid *p64,
+  #define VIDIOC_CREATE_BUFS32	_IOWR('V', 92, struct v4l2_create_buffers32)
+  #define VIDIOC_PREPARE_BUF32	_IOWR('V', 93, struct v4l2_buffer32)

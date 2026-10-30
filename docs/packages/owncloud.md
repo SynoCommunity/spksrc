@@ -2,6 +2,10 @@
 
 [ownCloud](https://owncloud.com/) is a file sync and share platform.
 
+!!! note
+    ownCloud 11.x requires DSM 7.2+, WebStation PHP 8.3, MariaDB, and Redis.
+    The 10.16.x package remains available for older DSM versions and uses PHP 7.4.
+
 ## Default Login Credentials
 
 After installing from SynoCommunity:
@@ -23,17 +27,7 @@ Ensure SSH is enabled on your DiskStation. See [FAQ-ssh](dsm-utilities.md) for i
 ### 2. Define Shortcuts
 
 ```bash
-oc_php=/usr/local/bin/php74
-```
-
-**For DSM 6:**
-```bash
-oc_occ=/var/services/web/owncloud/occ
-oc_usr=http
-```
-
-**For DSM 7:**
-```bash
+oc_php=/usr/local/bin/php83
 oc_occ=/var/services/web_packages/owncloud/occ
 oc_usr=sc-owncloud
 ```
@@ -69,7 +63,11 @@ sudo -u $oc_usr $oc_php $oc_occ config:system:set --type=integer filesystem_chec
 sudo -u $oc_usr $oc_php $oc_occ maintenance:mode --off
 ```
 
-## Database Migration (SQLite to MariaDB)
+## Legacy ownCloud 10.x: Database Migration (SQLite to MariaDB)
+
+!!! note
+    This section applies only to ownCloud 10.x installations that still use SQLite.
+    Complete the migration on 10.x before upgrading to 11.x; 11.x requires MariaDB and PHP 8.3.
 
 Starting with version 10.15.0, the ownCloud package transitions from SQLite to MariaDB back-end. This includes optimized configurations to eliminate all warnings in the settings screen.
 
@@ -169,3 +167,6 @@ sudo -u $oc_usr $oc_php $oc_occ system:cron
 
 !!! note
     After upgrading to ownCloud version 10.15.0, you may encounter login issues with messages such as "You took too long to login, please try again." To resolve this, clear your browser's cache for cookies and site data.
+
+!!! note
+    After migrating and upgrading to 11.x, use the 11.x shortcuts from the "Using the `occ` Command" section above (`php83`, DSM 7 paths).

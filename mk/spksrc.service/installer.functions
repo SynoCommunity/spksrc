@@ -29,6 +29,20 @@ fi
 
 ### Functions library
 
+# Prints the resolved path of a package directory that is about to be erased, moved or
+# copied, or fails without output when it must not be touched: an empty or dangling path,
+# or one with no component named after the package. Unquoted, an empty path would make
+# ls, find, cp and rsync act on the current directory, which is "/" for these scripts.
+package_dir ()
+{
+    [ -n "${1}" ] && [ -n "${SYNOPKG_PKGNAME}" ] && [ -d "${1}" ] || return 1
+    _package_dir=$(realpath "${1}" 2>/dev/null) || return 1
+    case "${_package_dir}/" in
+        */"${SYNOPKG_PKGNAME}"/*) echo "${_package_dir}" ;;
+        *) return 1 ;;
+    esac
+}
+
 log_step ()
 {
     install_log "===> Step $1. STATUS=${SYNOPKG_PKG_STATUS} USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"

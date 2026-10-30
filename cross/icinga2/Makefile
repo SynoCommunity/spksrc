@@ -1,5 +1,5 @@
 PKG_NAME = icinga2
-PKG_VERS = 2.16.4
+PKG_VERS = 2.16.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icinga2/archive/refs/tags
@@ -7,14 +7,14 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Icinga2 requires C++17 (GCC >= 7)
-# DSM 7.1 provides GCC 12.x for most architectures
-REQUIRED_MIN_DSM = 7.1
-# comcerto2k has older toolchain than other DSM 7.1 archs
-UNSUPPORTED_ARCHS = comcerto2k
+# icinga2's own CMakeLists.txt refuses it before we would:
+#   Your version of GCC (4.9.3) is too old for building Icinga 2
+#   (GCC >= 7.0.0 is required).
+MIN_GCC_VERSION = 7
 
 BUILD_DEPENDS = native/icinga2-tools
 
-DEPENDS  = cross/boost_1.86
+DEPENDS  = cross/boost-1.92
 DEPENDS += cross/openssl3
 
 # Optional database backends for IDO

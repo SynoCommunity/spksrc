@@ -1,5 +1,5 @@
 PKG_NAME = metacubexd
-PKG_VERS = 1.186.1
+PKG_VERS = 1.273.1
 PKG_EXT = tgz
 PKG_DIST_NAME = compressed-dist.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MetaCubeX/metacubexd/releases/download/v$(PKG_VERS)

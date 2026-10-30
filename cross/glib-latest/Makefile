@@ -1,5 +1,5 @@
 PKG_NAME = glib
-PKG_VERS = 2.84.2
+PKG_VERS = 2.90.1
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -11,10 +11,14 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-# Only the 2008 PowerPC compiler (4.3.7) was ever excluded here. The real floor for
-# glib 2.84 is far higher -- cross/glib only ever selects it from gcc 7.5 -- but that
-# is the selector's business; this restates the exclusion that was here, nothing more.
-MIN_GCC_VERSION = 4.6
+# cross/glib has only ever selected this line from gcc 7.5 (and kernel 3.2, which every
+# gcc >= 7.5 toolchain satisfies), and the floor is real rather than historical: the
+# installed gmacros.h of glib 2.90 reaches for g_macro__has_attribute(flag_enum) with no
+# fallback define, so a consumer compiled without __has_attribute (gcc < 5) fails on
+# glib's own header -- json-glib does, under -Werror=undef.
+MIN_GCC_VERSION = 7.5
+# gio-launch-desktop uses SOCK_CLOEXEC, which glibc has from 2.9 (ppc853x-5.2 has 2.8)
+MIN_GLIBC_VERSION = 2.9
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false

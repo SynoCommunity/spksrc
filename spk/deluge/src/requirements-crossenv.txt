@@ -15,20 +15,18 @@ zope.interface==8.6
 
 # Additional core requirements not included by default
 
-# [libtorrent] 2.0.14
+# [libtorrent] 2.1.2
 # Depends: openssl3, boost 1.86
 # Require environment variables
 #  BOOST_LIBRARIES
 #  BOOST_BUILD_PATH
 # Only supported on DSM7 armv7, aarch64, x64
 # 
-# NOTE: version 2.1.x requires c++17 > gcc-8.5
-# 
-git+https://github.com/arvidn/libtorrent.git@v2.0.14#egg=libtorrent==2.0.14
+git+https://github.com/arvidn/libtorrent.git@v2.1.2#egg=libtorrent==2.1.2
 
 # Reference documentation for using Git bisect, in case it's needed in the future
 #
-# [libtorrent] 2.0.14
+# [libtorrent] 2.1.2
 # Instructions for using RC_2_0 branch for the latest development snapshots
-# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.14
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.1.2
 #

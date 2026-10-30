@@ -9,8 +9,10 @@ HOMEPAGE = https://pygobject.gnome.org/
 COMMENT  = PyGObject is a Python package which provides bindings for GObject based libraries such as GTK, GStreamer, WebKitGTK, GLib, GIO and many more.
 LICENSE  = LGPLv2.1+
 
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
+# needs glib >= 2.80, i.e. cross/glib-latest, which declares gcc 7.5; below that
+# the glib virtual offers 2.66 and meson stops on
+#   Dependency 'glib-2.0' ... found '2.66.x' but need '>= 2.80.0'
+MIN_GCC_VERSION = 7.5
 
 DEPENDS += python/pycairo
 

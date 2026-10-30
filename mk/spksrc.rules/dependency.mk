@@ -10,7 +10,8 @@
 #  post_depend_target  (override with POST_DEPEND_TARGET)
 #
 # Variables:
-#  DEPENDS             List of dependencies to go through
+#  DEPENDS             List of dependencies to go through; driver/* are built per
+#                      kernel by spksrc.kernel/dependency.mk instead
 #  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
@@ -99,7 +100,9 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+# KERNEL_DEPEND is only set for REQUIRE_KERNEL: a dependency that merely inherits
+# REQUIRE_KERNEL_MODULE through ENV has no kernels of its own to walk
+ifneq ($(strip $(KERNEL_DEPEND)),)
 # As depend is also ran at toolchain-time, ensure to skip kernel-depend
 ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
 depend_target: kernel-depend
@@ -118,7 +121,7 @@ endif
 	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \
 	done
 	@set -e; \
-	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
+	for depend in $(filter-out native/% spk/% driver/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
 	  $(call dep_seen,$(DEPEND_SEEN),$$depend) && continue ; \
 	  env $(ENV) $(MAKE) DEPEND_WALK=$(WORK_DIR) $(FWRD_ARGS) -C ../../$$depend ; \

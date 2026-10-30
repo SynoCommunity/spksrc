@@ -11,9 +11,10 @@ BUILD_DEPENDS = native/lua
 LUA_NATIVE_PATH = $(abspath $(PWD)/../../native/lua/work-native/install/bin)
 ENV += PATH=$(LUA_NATIVE_PATH):$$PATH
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# cmake drops the -std=gnu17 it asks for when gcc cannot take it, leaving the
+# compiler default, which is gnu90 below gcc 5:
+#   dist/mongoose/mongoose.c:1: C++ style comments are not allowed in ISO C90
+MIN_GCC_VERSION = 5
 
 HOMEPAGE = https://jcorporation.github.io/
 COMMENT  = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.

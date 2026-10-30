@@ -14,9 +14,10 @@
 #
 ###############################################################################
 
-# Disabled for dependency targets, and for the check goal -- whose whole job is to REPORT
-# the gates this arch fails, which a fatal pre-check would cut short at the first one.
-ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check,$(MAKECMDGOALS))),)
+# Disabled for dependency targets, for the check goal -- whose whole job is to REPORT
+# the gates this arch fails, which a fatal pre-check would cut short at the first one --
+# and for download-wheels, which only downloads wheel sources and runs without an arch.
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check download-wheels,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
@@ -57,6 +58,11 @@ ifneq ($(REQUIRE_KERNEL),)
     ifneq (,$(findstring $(ARCH),$(GENERIC_ARCHS)))
       $(call precheck_fatal,Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set unless using REQUIRE_KERNEL_MODULE)
     endif
+  else ifneq ($(TCVERSION),)
+    # A toolchain may come without its kernel (kernel/syno-<arch>-<version>)
+    ifeq ($(filter $(ARCH),$(GENERIC_ARCHS))$(filter $(ARCH)-$(TCVERSION),$(AVAILABLE_KERNEL)),)
+      $(call precheck_fatal,No kernel source for '$(ARCH)-$(TCVERSION)')
+    endif
   endif
 endif
 
@@ -68,7 +74,7 @@ ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 ifneq ($(PRECHECK_TREE_DONE),$(WORK_DIR))
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null \
-                   | grep -E '^(cross|spk|diyspk|native|kernel)/' | sed 's/ /~/g')
+                   | grep -E '^(cross|driver|spk|diyspk|native|python|kernel)/' | sed 's/ /~/g')
 endif
 endif
 

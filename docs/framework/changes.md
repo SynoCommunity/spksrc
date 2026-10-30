@@ -124,6 +124,190 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 29th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
+
+    - **A kernel module spk carries the modules of every kernel of its arch**:
+      `kernel-depend` prepares `kernel/syno-<arch>-<version>` for each sub-arch, in the
+      `WORK_DIR` of the spk, and builds the in-tree modules of `REQUIRE_KERNEL_MODULE`
+      there. An out-of-tree driver had no place in that walk: as a regular dependency it
+      was built once, for the generic arch, with no kernel to build against.
+
+    - **`driver/<pkg>` is that place.** `kernel-depend` builds every `driver/*` of the
+      spk `DEPENDS` right after each kernel, with its `ARCH` and `TCVERSION`; the regular
+      walk leaves them out. `spksrc.driver.mk` is cross-cc with, per kernel, its own
+      cookies and extracted source (every kernel of the arch shares the `WORK_DIR`),
+      `KERNEL_ROOT` for the prepared kernel source, and `DRIVER_MODULE_DIR`, the
+      `lib/modules/<arch>/<kernel>` of the in-tree modules.
+
+    - **A driver states the kernel and gcc it needs** -- `DRIVER_KERNEL_MIN`,
+      `DRIVER_GCC_MIN` -- and is skipped below them. A driver without sources builds,
+      per kernel, the first of several versions that is not skipped: the counterpart of
+      `$(call depend,a|b|c)` for a choice that depends on each sub-arch rather than on the
+      generic arch. `driver/linuxtv` picks media_build frozen for kernels 4.4+, 3.10+
+      or 3.2+ this way, a 4.4 kernel on gcc 4.9 taking the 3.10 one.
+
+    - **A driver reads `KERNEL_PCI_SLOT`** of its kernel as `DRIVER_PCI_SLOT`, to build
+      PCI drivers only where a card can go.
+
+    - **A multi-kernel build drops each kernel's sources once its modules are installed**;
+      cookies stay, so a stopped run resumes.
+
+    - **A driver builds the `driver/*` of its own `DEPENDS` first**, for the same
+      kernel: `driver/linuxtv-*` take their media tree from `driver/linux-media-*`,
+      hosted in the `linuxtv/media_build` release and rebuilt by `native/linux-media-*`
+      with the archive step of `spksrc.build/archive.mk`.
+
+    - **Kernel modules and drivers build with the compiler of the Synology
+      toolchain**: `OVERLAY_GCC` and `OVERLAY_BINUTILS` are forced off there.
+
+??? note "October 28th 2026 — Kernel modules on every kernel that has sources, built once per directory (#7672)"
+
+    - **Kernel modules are stripped with `--strip-debug`** by `strip.mk`: the plain strip
+      left a `*.ko` without the symbol table the module loader links it with, so every
+      synokernel package replaced the target with its own `find`.
+
+    - **`REQUIRE_KERNEL_MODULE` builds each directory once**, and skips an option the
+      kernel does not offer, so one list spans kernels: `CONFIG_<option>=m` on the command
+      line rebuilt the whole directory for every module (usbserial on braswell-7.3: 16
+      minutes to 36 seconds). An optional fourth field names a feature the kernel must
+      have built in (`...:regmap-i2c:CONFIG_REGMAP`).
+
+    - **A generic build takes the sub-archs that have a kernel**, and leaves the others
+      out of the package arch list: `epyc7003` (a kernel for 7.4 only) no longer needs
+      excluding per package. `REMOVE_FROM_GENERIC_ARCHS` now applies (its generic-arch
+      test ran before `GENERIC_ARCHS` was set), and a sub-arch built directly without a
+      kernel stops in pre-check.
+
+    - **powerpc and SRM 1.2 kernels build modules**: `crtsavres.o`, which older
+      `modules_prepare` skip, and the `yylloc` of dtc on ipq806x-1.2.
+
+    - **`KERNEL_PCI_SLOT = 1`** marks, in `kernel/syno-<arch>-<version>`, the platforms of
+      which a model takes PCIe add-in cards.
+
+    - **`kernel-depend` only runs where `REQUIRE_KERNEL` listed kernels**: a cross
+      dependency of a kernel module spk inherited `REQUIRE_KERNEL_MODULE` and ran the walk
+      in its own directory.
+
+??? note "October 28th 2026 — A fresh tree no longer hangs on its first toolchain bootstrap (#7667)"
+
+    - **`make check` could wait forever on a new tree.** `depend.mk` resolves
+      `OPTIONAL_DEPENDS` in parallel, one `dependency-unsupported` sub-make each. With
+      the toolchain not yet extracted, each of them bootstrapped it (`stage0.mk`) at the
+      same time: the second found the toolchain patch applied, and `patch` asked whether
+      to reverse it, on the terminal `script` gives the build, where no one answers.
+
+    - **The bootstrap holds a lock per toolchain** (`flock $(TC_WORK_DIR).lock`): one
+      sub-make prepares it, the others wait and find its cookies.
+
+    - **`patch` asks no questions** (`--forward --batch`, `spksrc.build/patch.mk`): a
+      patch already applied, or a file it cannot find, fails the build instead of
+      waiting, and a patch is never applied reversed.
+
+??? note "October 26th 2026 — DSM 7.4 toolchains, toolkits and kernels (#7663)"
+
+    - **DSM 7.4 (build 90080) is a target.** `tc-versions.mk`, `tk-versions.mk` and
+      `kernel/versions.mk` map `7.4` to it, and `toolchain/`, `toolkit/` and `kernel/`
+      gain their `syno-<arch>-7.4`: 32 toolchains (with the generic `x64`, `aarch64` and
+      `armv7`), 29 toolkits and 28 kernels.
+
+    - **CI builds DSM 7.4** when a package asks for it: a `MIN_DSM_VERSION` of 7.4 adds
+      `x64-7.4`, `aarch64-7.4` and `armv7-7.4` (or `noarch-7.4`) to the matrix, as 7.2 and
+      7.3 do.
+
+    - **Every 7.4 arch has its kernel but `epyc7003ntb`**, whose sources Synology has
+      not published: kernel module packages can target DSM 7.4 on the others.
+
+??? note "October 13th 2026 — The Rust build environment is isolated, and DEFAULT_ENV splits in two (#7584)"
+
+    - **A bare `CFLAGS` is what cc-rs falls back to for both sides of a cross build.**
+      `tc_vars.flags.mk` only records make variables; `tc_autotools_vars` is what puts
+      `CFLAGS` into the *environment*, and from there the target sysroot and `-idirafter`
+      reached host build scripts -- the `psm` crate failing on old-gcc archs (#7573).
+
+    - **`tc_rust_vars` now names every variable cc-rs consults**: `CFLAGS_<triple>` and
+      `CXXFLAGS_<triple>` for the target, `HOST_CC`, `HOST_CXX`, `HOST_AR` and empty
+      `HOST_CFLAGS` / `HOST_CXXFLAGS` for the host, beside the `CC_/CXX_/AR_<triple>` it
+      already emitted. cc-rs prefers those over the bare value, so the autotools `CFLAGS`
+      is never consulted there -- with nothing kept out of the environment.
+      `ADDITIONAL_C*FLAGS` stay deferred, as in `tc_autotools_vars`, so a package's own
+      additions still reach cc-rs.
+
+    - **`DEFAULT_ENV` held two jobs**, and that is what made #7577 breakable: narrowing the
+      list to isolate the rust env also dropped a build-system marker, so librsvg lost its
+      ninja install and pngquant3 its flags (reverted in #7581). They are separate now --
+      `BUILD_SYSTEM` is `autotools`, `cargo`, `cmake`, `meson` or `none`, what `install.mk`
+      and `compile.mk` ask about; `TC_VARS_ENV` lists which `tc_vars.<word>.mk` to load.
+      A cargo build loads `rust` alone, reading the per-triple and `HOST_*` variables
+      rather than the bare `CC` and `CFLAGS`; `cross-rust.mk` declared no build system at
+      all before, so a pure Rust package fell through to the autotools default.
+
+    - **A bare `CFLAGS` cannot be made safe by naming the host's.** cc-rs *adds* it to
+      whatever `HOST_CFLAGS` says rather than choosing between them, so one in the
+      environment puts the target ABI on a host compile whatever the host value -- measured
+      on `psm` at comcerto2k, which fails on `-mfloat-abi=hard` with `HOST_CFLAGS` empty
+      and with `-O2` alike. The isolation rests on the bare flags being absent from a
+      cargo environment, which is why they stay autotools' own. A package that genuinely
+      needs one names it in its own `ENV`: `cross/nushell` does, since `aws-lc-sys`
+      builds BoringSSL through CMake, which reads the bare `CFLAGS` and nothing cc-rs
+      offers, and without the sysroot include `bcm.c` compiles against the host glibc and
+      the link ends on undefined `__isoc23_*`.
+
+    - **`cross/fish` and `cross/helix` state their target flag through `ADDITIONAL_CFLAGS`.**
+      Both named `CFLAGS_<triple>` themselves -- fish `-std=c99` for pcre2-sys under
+      gcc < 5, helix `-O3` -- and `tc_rust_vars` names it too, so whichever `ENV +=` ran
+      last took the variable whole: fish includes the framework after its own line and
+      lost the flag, helix includes it before and kept the flag while losing the sysroot
+      includes. `ADDITIONAL_CFLAGS` is deferred into `CFLAGS_<triple>`, so it
+      concatenates and both arrive. helix also drops its hand-written
+      `CC_/CXX_/AR_/RANLIB_<triple>`: they spelled the vendor path directly and so
+      ignored a gcc overlay, where the framework's come from the `tc` macro.
+
+    - **`none` holds wherever it is set.** `cross-virtual.mk` and `spk.mk` set it for
+      something that builds nothing, and each `env-<system>.mk` declines to append over
+      it -- the guard has to be local, since `env-default.mk` is last only for cross
+      packages, not for a python spk whose metas come after it (`spk-meta/python.mk`
+      reaches `wheel.mk`, which includes `env-cmake.mk`).
+
+    - **`tc_rust_vars` states the Rust identity a package reads**: `RUST_TARGET` and
+      `TC_RUSTC` as before, now `TC_RUSTUP_TOOLCHAIN` beside them, so `cross/netdata`
+      and `cross/nushell` can call `cargo +$(TC_RUSTUP_TOOLCHAIN)` without a Rust mk
+      file of their own -- that is what `invalid toolchain name ''` was. The fragment
+      also carries `RANLIB_<triple>` and `HOST_RANLIB`, which cc-rs reads through the
+      same per-triple and `HOST_*` prefixes as `AR`, and the deterministic
+      `CARGO_TERM_*` that `env-rust.mk` used to put in every environment that read it.
+
+    - **The words `cmake` and `meson` never loaded anything.** Their generated files are
+      `tc_vars.cmake`, `tc_vars.meson-cross` and `tc_vars.meson-native`, with no `.mk`
+      suffix, while the wildcard globs `tc_vars.<word>.mk`. It matched nothing for those
+      two, silently, which is exactly what hid the marker role -- the architecture page
+      already said there was no `tc_vars.cmake.mk` to pick up; only the variable name
+      implied otherwise.
+
+    - **Both are appended, never claimed with `?=`**, which cannot compose a list: the
+      first file to run claimed the variable and silenced every later one, so the result
+      depended on each package's include order. `env-default.mk`, always last through
+      `spksrc.cross-cc.mk`, supplies what nobody asked for. `flags` stays autotools'
+      companion; CMake and Meson read the flags through their own generated toolchain and
+      cross file.
+
+    - **Nothing is declared per package any more.** The explicit `env-rust.mk` includes in
+      `cross/librsvg-latest` and `cross/netdata` are gone; `cross/fish` builds crates
+      through Corrosion and declared nothing, and gets the rust tc_vars all the same.
+      `cross/znc` is the only package that declared any of this and the only one the split
+      simplifies -- three lines to one, since its `BUILD_SYSTEM` is cmake and what it
+      needed was the two fragments `znc-buildmod` reads.
+
+    - **`none`** carried both senses too, and the second was vestigial: `cross-virtual.mk`
+      does include `install.mk`, so the filter ran and set `INSTALL_ARGS` for a package
+      that installs nothing. It is now `BUILD_SYSTEM = none` with `TC_VARS_ENV` empty.
+
+    - **Note for packagers**: `HOST_CC`, `HOST_CXX` and `HOST_AR` now reach every cross
+      package's environment, since `rust` is in `TC_VARS_ENV` for all of them. For
+      autotools that is `HOST_CC`'s conventional meaning -- a compiler for the build host
+      -- and it was previously unset.
+
+    - **Documented**: [Toolchain Variable Files](architecture.md#toolchain-variable-files-tc_vars).
+
 ??? note "October 7th 2026 — A git download can include submodules, and name a tag (#7549)"
 
     - **`git archive` leaves a submodule an empty directory**, so a project whose release
@@ -363,7 +547,7 @@ If you only read one thing, read this. The details are in the dated log below.
 ??? note "September 28th 2026 — A plist pattern is the files it stands for, not a path (#7518)"
 
     - **A package built on demand describes its libraries with a pattern.**
-      `cross/boost_1.92/PLIST` says `lib:lib/libboost_*.so.1.92.0`, because it does not
+      `cross/boost-1.92/PLIST` says `lib:lib/libboost_*.so.1.92.0`, because it does not
       know which libraries the caller asked it to build.
       `include_toolchain_specific_libraries` handed that to `objdump` as written -- a path
       that does not exist -- so the files it stands for were never examined, and the
@@ -1052,7 +1236,7 @@ If you only read one thing, read this. The details are in the dated log below.
       target that ships them.
     - **Also in this PR:** `dependency-list` now keys its output on the package
       **folder** instead of `$(NAME)`. Three packages set `SPK_NAME` to something
-      else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix_22` (`mkvtoolnix`),
+      else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix-22` (`mkvtoolnix`),
       `spk/mono_58` (`mono`) — while every consumer of the list already looked the
       key up as a directory (`.github/actions/prepare.sh`, `spk-meta/base.mk`). The
       three silently fell out of the CI build matrix, and the latter two collided

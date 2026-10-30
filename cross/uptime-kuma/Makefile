@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/louislam/uptime-kuma/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22
+BUILD_DEPENDS = native/nodejs-22
 
 HOMEPAGE = https://uptime.kuma.pet
 COMMENT  = A self-hosted monitoring tool
@@ -15,7 +15,7 @@ LICENSE  = MIT
 INSTALL_TARGET = uptime_kuma_install
 
 # Build environment - use native Node.js from spksrc
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$$PATH
 
 include ../../mk/spksrc.cross-install.mk
 

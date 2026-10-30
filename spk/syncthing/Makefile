@@ -1,19 +1,16 @@
 SPK_NAME = syncthing
-SPK_VERS = 2.1.3
-SPK_REV = 36
+SPK_VERS = 2.1.6
+SPK_REV = 37
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/syncthing
 
-# archs not supported by go (ARMv5 requires legacy toolchain no longer provided)
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
-
 MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "1. Update Syncthing to v2.1.3 (built with Go 1.26)."
+CHANGELOG = "1. Update Syncthing to v2.1.6."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes

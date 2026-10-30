@@ -6,7 +6,9 @@
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
 #
 # prerequisites:
-# - cross/module depends on native/go or native/go_1.23 only
+# - cross/module needs no BUILD_DEPENDS for go: env-go.mk adds the native go it picks
+# - MIN_GO_VERSION defaults to 1.24, which needs Linux 3.2; a module go 1.23 still builds
+#   sets MIN_GO_VERSION = 1.23 to build for older kernels (ARMv5) too
 # - module does not require kernel (REQUIRE_KERNEL)
 #
 # remarks:
@@ -34,6 +36,13 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
+
+# Go 1.24 and later need Linux 3.2 (accept4 lost its fallback; ARM 2.6.32 lacks it). A module
+# go 1.23 still builds sets MIN_GO_VERSION = 1.23, the go env-go.mk gives older kernels.
+MIN_GO_VERSION ?= 1.24
+GO_NEEDS_LINUX_3_2 = $(if $(filter 1.23 1.23.%,$(MIN_GO_VERSION)),,1)
+GO_LINUX_3_2_FROM = 1.24
+MIN_KERNEL_VERSION ?= $(if $(GO_NEEDS_LINUX_3_2),3.2)
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -65,6 +74,26 @@ ifneq ($(REQUIRE_KERNEL),)
 endif
 
 ###
+
+# Where the build is locked to the native go (GOTOOLCHAIN=local), a go.mod asking for more
+# fails it: warn first, with what to change. Elsewhere go fetches the go that go.mod asks for.
+GO_TOOLCHAIN_LOCAL = $(filter GOTOOLCHAIN=local,$(lastword $(filter GOTOOLCHAIN=%,$(ENV))))
+configure_msg: go_mod_check
+.PHONY: go_mod_check
+go_mod_check:
+	@d=$(or $(GO_SRC_DIR),$(WORK_DIR)/$(PKG_DIR)) ; \
+	while [ ! -f "$$d/go.mod" ] && [ "$$d" != "$(WORK_DIR)" ] && [ "$$d" != "/" ] ; do d=$$(dirname "$$d") ; done ; \
+	v=$$(sed -n 's/^go[[:space:]]\{1,\}\([0-9][0-9.]*\).*/\1/p' "$$d/go.mod" 2>/dev/null | head -1) ; \
+	[ -n "$$v" ] || exit 0 ; \
+	if [ -n "$(GO_TOOLCHAIN_LOCAL)" ] ; then \
+	  n=$$(cd / && env $(ENV) go env GOVERSION | sed 's/^go//') ; \
+	  if ! printf '%s\n' "$$v" "$$n" | sort -VC ; then \
+	    echo "WARNING: $$d/go.mod asks for go $$v, this build is locked to go $$n (GOTOOLCHAIN=local):" ; \
+	    echo "WARNING: $(if $(GO_NEEDS_LINUX_3_2),it needs a newer native go,it no longer builds for kernels older than 3.2: remove MIN_GO_VERSION = $(MIN_GO_VERSION))" ; \
+	  fi ; \
+	elif [ -n "$(GO_NEEDS_LINUX_3_2)" ] && ! printf '%s\n' $(GO_LINUX_3_2_FROM) "$$v" | sort -VC ; then \
+	  echo "NOTE: $$d/go.mod asks for go $$v: MIN_GO_VERSION = 1.23 would also build it for kernels older than 3.2" ; \
+	fi
 
 # Go specific targets
 .PHONY: go_build_target

@@ -21,7 +21,9 @@ DEPENDS += cross/libcap
 
 # needs C11 with some C17 features (gcc >= 7; comcerto2k is the only
 # DSM-7 arch below that and every older DSM is too)
-MIN_GCC_VERSION = 7
+# gcc folds a const int into a static initializer only from 8; 7.5 refuses:
+#   opensslrsa_link.c:53: error: initializer element is not constant
+MIN_GCC_VERSION = 8
 
 
 HOMEPAGE = https://www.isc.org/
@@ -35,12 +37,9 @@ ADDITIONAL_CFLAGS = -O2
 ADDITIONAL_CPPFLAGS = -O2
 
 CONFIGURE_ARGS  = --enable-full-report
-# needed for cross compile:
-CONFIGURE_ARGS += BUILD_CC="$(CC)"
-CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS) $(ADDITIONAL_CFLAGS)"
-CONFIGURE_ARGS += BUILD_CPPFLAGS="$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS)"
-CONFIGURE_ARGS += BUILD_LDFLAGS="$(LDFLAGS)"
-CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
+# Nothing is named for the build machine: configure.ac uses AX_PROG_CC_FOR_BUILD, which
+# reads CC_FOR_BUILD and the *_FOR_BUILD flags the toolchain now supplies. The BUILD_CC
+# this used to pass was never read -- that spelling is bind 9.16's.
 
 include ../../mk/spksrc.cross-cc.mk
 

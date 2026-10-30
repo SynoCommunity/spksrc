@@ -114,7 +114,7 @@ cross-compile-wheel-%:
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$$(echo $${PATH}:$(call merge, $(ENV), PATH, :):$(CROSSENV_PATH)/build/bin | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
 	   $(MSG) "PATH: [$${PATH}]" ; \
-	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
+	   $(MSG) "environment: [$(TC_VARS_ENV)]" ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
 	else \

@@ -1,0 +1,27 @@
+#!/bin/sh
+# sc-google-authenticator - run the upstream google-authenticator and ensure
+# the generated configuration file is only readable by its owner.
+
+if [ "$(id -u)" -eq 0 ]; then
+    echo "Run this as the user who will log in, not as root." >&2
+    exit 1
+fi
+
+SELF=$0
+while [ -L "$SELF" ]; do
+    DIR=$(CDPATH= cd "$(dirname "$SELF")" && pwd)
+    LINK=$(readlink "$SELF")
+    case "$LINK" in
+        /*) SELF=$LINK ;;
+        *) SELF=$DIR/$LINK ;;
+    esac
+done
+SELF_DIR=$(CDPATH= cd "$(dirname "$SELF")" && pwd)
+
+"${SELF_DIR}/google-authenticator" "$@"
+rc=$?
+if [ "$rc" -eq 0 ] && [ -f "${HOME}/.google_authenticator" ]; then
+    chmod 600 "${HOME}/.google_authenticator"
+    echo "Set ${HOME}/.google_authenticator permissions to 600."
+fi
+exit "$rc"

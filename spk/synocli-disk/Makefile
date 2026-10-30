@@ -10,7 +10,6 @@ DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 DEPENDS += cross/disktype
 
 OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
-OPTIONAL_DEPENDS += cross/dua cross/dua_2.30.0 cross/dutree
 OPTIONAL_DEPENDS += cross/smartmontools
 OPTIONAL_DEPENDS += cross/mergerfs
 OPTIONAL_DEPENDS += cross/gpart
@@ -35,12 +34,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 SPK_COMMANDS += bin/dua bin/dutree
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/dua cross/dutree
-else
-# older version of dua for ARMv5 and qoriq
-DEPENDS += cross/dua_2.30.0 cross/dutree
-endif
+$(call depend,cross/dua cross/dutree,nop)
 endif
 
 
@@ -79,7 +73,7 @@ DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilit
 STARTABLE = no
 CHANGELOG  = "1. Update dar from v2.7.19 to v2.8.1 and add SFTP repository support. <br/>"
 CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
-CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5 and qoriq). <br/>"
+CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5, qoriq and x86). <br/>"
 CHANGELOG += "4. Update duf from v0.8.1 to v0.9.1. <br/>"
 CHANGELOG += "5. Update s3backer from v2.1.5 to v2.1.6. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".

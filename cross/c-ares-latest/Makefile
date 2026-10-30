@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 
 # ares_event_configchg.c:140: error: 'IN_NONBLOCK' undeclared (first use in this function)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://c-ares.org/
 COMMENT  = c-ares is a C library for asynchronous DNS requests (including name resolves).

@@ -1,0 +1,20 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -2542,4 +2542,17 @@
+ #define clk_set_rate(clk, rate)		(-EINVAL)
+ #define clk_round_rate(clk, rate)	(-EINVAL)
+ 
++/*
++ * comcerto2k defines GPIO_3, GPIO_4 and PLL0 to PLL3 in mach headers the
++ * includes above pull in: names of enums of mxl5005s and zl10039
++ */
++#ifdef CONFIG_ARCH_COMCERTO
++#undef GPIO_3
++#undef GPIO_4
++#undef PLL0
++#undef PLL1
++#undef PLL2
++#undef PLL3
++#endif
++
+ #endif /*  _COMPAT_H */

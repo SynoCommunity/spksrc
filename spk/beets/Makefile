@@ -5,11 +5,6 @@ SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
 
-# numpy, pygobject
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59

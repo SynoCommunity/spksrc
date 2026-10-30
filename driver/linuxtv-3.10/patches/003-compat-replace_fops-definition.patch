@@ -1,0 +1,11 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1403,7 +1403,7 @@
+ }
+ #endif
+ 
+-#ifdef NEED_REPLACE_FOPS
++#ifndef replace_fops
+ #define replace_fops(f, fops) \
+ 	do {	\
+ 		struct file *__file = (f); \

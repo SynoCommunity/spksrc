@@ -1,10 +1,7 @@
 #!/bin/bash
 
-INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ {for (i=1; i<NF; i++) if ($i=="src") print $(i+1)}')
-
-quote_json () {
-    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
-}
+INTERNAL_IP=$(ip -4 route get 8.8.8.8 2>/dev/null | awk '/8.8.8.8/ {for (i=1; i<NF; i++) if ($i=="src") print $(i+1)}')
+INTERNAL_IP=${INTERNAL_IP:-<NAS_IP>}
 
 page_append ()
 {

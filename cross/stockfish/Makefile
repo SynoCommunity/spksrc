@@ -14,9 +14,8 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-
-# Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# src/Makefile compiles with -std=c++17, which gcc takes from 7.
+MIN_GCC_VERSION = 7
 
 include ../../mk/spksrc.common.mk
 
@@ -35,10 +34,6 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 	BUILD_ARCH=ppc-32
 endif
-ifeq ($(BUILD_ARCH),)
-$(error "ARCH $(ARCH) not expected.")
-endif
-
 COMPILE_ARGS = build ARCH=$(BUILD_ARCH)
 ifeq (g++,$(CXX))
 # workaround for: CXX not fully qualified when building in cross folder

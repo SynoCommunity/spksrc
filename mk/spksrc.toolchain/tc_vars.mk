@@ -294,19 +294,35 @@ tc_meson_native_vars:
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
-# cc-rs CC_/CXX_/AR_<rust triple>: TARGET_CC is ignored on x64 (host == target triple),
-# and underscored since dash drops hyphenated names from the environment.
+# cc-rs CC_/CXX_/AR_/RANLIB_<rust triple>: TARGET_CC is ignored on x64 (host == target
+# triple), and underscored since dash drops hyphenated names from the environment.
+# RUST_TARGET, TC_RUSTC and TC_RUSTUP_TOOLCHAIN are emitted as make variables: this
+# fragment is what every cross package reads them from, so a package calling cargo
+# itself needs no rust mk of its own.
 .PHONY: tc_rust_vars
 tc_rust_vars:
-	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
-	@# RUSTFLAGS. cargo gives the global RUSTFLAGS env higher precedence than the
-	@# per-target flags, so a global RUSTFLAGS would SILENTLY DROP the arch codegen
-	@# options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc SPE) --
-	@# and it also wrongly leaked the target sysroot link-args onto the host's build
-	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
-	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
-	@# TC_EXTRA_RUSTFLAGS is skipped when the rust overlay is on: the JSON spec already
-	@# carries cpu/features, and re-passing them makes rustc warn ("unknown feature: spe").
+	@# Target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS, never a global
+	@# RUSTFLAGS: cargo ranks the global one higher, so it would silently drop the arch
+	@# codegen options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc
+	@# SPE) and put the target sysroot link-args on host build scripts and proc-macros.
+	@# Consolidated here -- link-args, arch codegen, debug ADDITIONAL_RUSTFLAGS -- they
+	@# reach the target alone. TC_EXTRA_RUSTFLAGS is skipped under the rust overlay,
+	@# whose JSON spec carries cpu/features already; re-passing them makes rustc warn.
+	@# The C flags work the same, one layer down: cc-rs prefers CFLAGS_<triple> and
+	@# HOST_CFLAGS over a bare CFLAGS it would otherwise use for both sides. HOST_C*FLAGS
+	@# are empty, the host wanting no target sysroot; ADDITIONAL_C*FLAGS stay deferred.
+	@#
+	@# HOST_* names the build machine, and is emitted only where that machine's triple
+	@# differs from the target's -- so everywhere but x64, where the two are the same
+	@# string. A build script that answers "am I cross compiling?" by comparing them
+	@# (aws-lc-sys: cargo_env("HOST") != target()) then reads HOST_CC and HOST_CFLAGS as
+	@# if they described the target, and overwrites CC_<triple> and CFLAGS_<triple> with
+	@# them. Its bcm.c is compiled by the build machine's gcc against the build machine's
+	@# headers, where _GNU_SOURCE over glibc >= 2.38 redirects sscanf and strtol to
+	@# __isoc23_*, which no DSM sysroot carries (glibc 2.26 on 7.1), and the link ends on
+	@# those two symbols. Left unsaid, the per-triple names stand: the target gets the
+	@# cross compiler, and so does a host-side crate on x64 -- the same arch, built
+	@# against an older sysroot, which is what it had before HOST_* existed.
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
@@ -318,9 +334,39 @@ tc_rust_vars:
 	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(call tc,g++)\" ; \
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
+	echo TC_ENV += RANLIB_$(RUST_TARGET_LENV)=\"$(call tc,ranlib)\" ; \
+	echo TC_ENV += CFLAGS_$(RUST_TARGET_LENV)=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS_$(RUST_TARGET_LENV)=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\"
+ifneq ($(RUST_TARGET),$(RUST_BUILD_TRIPLE))
+	@echo TC_ENV += HOST_CC=\"$(call native,gcc)\" ; \
+	echo TC_ENV += HOST_CXX=\"$(call native,g++)\" ; \
+	echo TC_ENV += HOST_AR=\"$(call native,ar)\" ; \
+	echo TC_ENV += HOST_RANLIB=\"$(call native,ranlib)\" ; \
+	echo TC_ENV += HOST_CFLAGS=\"\" ; \
+	echo TC_ENV += HOST_CXXFLAGS=\"\"
+endif
+	@echo TC_ENV += CARGO_TERM_COLOR=\"never\" ; \
+	echo TC_ENV += CARGO_TERM_PROGRESS_WHEN=\"never\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
-	echo TC_RUSTC := $(TC_RUSTC)
+	echo TC_RUSTC := $(TC_RUSTC) ; \
+	echo TC_RUSTUP_TOOLCHAIN := $(TC_RUSTUP_TOOLCHAIN)
 
+# The build/host split autoconf actually uses. With --host=<triple> the *bare* CC, CFLAGS
+# and LDFLAGS below are the host's -- autoconf's host being the machine the output runs on,
+# which is our target -- so they stay as they are. Drop them and AC_PROG_CC probes for
+# itself: no <triple>-gcc on PATH, so it settles on /usr/bin/gcc and configures a native
+# build that looks like it worked.
+#
+# What was missing is the other axis, the build machine, which autoconf spells *_FOR_BUILD
+# and reads for a generator a package compiles and runs during the build. Having no name
+# for it, each package that needs one invented its own: cross/bind_9.* says BUILD_CC,
+# cross/cyrus-sasl patches CC_FOR_BUILD into a Makefile.in, cross/ffmpeg* passes
+# --host-cc. The standard names are emitted here once, so a package can ask instead of
+# improvise. The flags are empty on purpose, as HOST_CFLAGS is in the rust fragment above:
+# the build machine wants none of the target's.
+#
+# No TARGET_*: --target and CC_FOR_TARGET mean something only for a package that is itself
+# a compiler, and autoconf warns when they reach anything else.
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
@@ -334,7 +380,14 @@ tc_autotools_vars:
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
 	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
-	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\"
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += CC_FOR_BUILD=\"$(call native,gcc)\" ; \
+	echo TC_ENV += CXX_FOR_BUILD=\"$(call native,g++)\" ; \
+	echo TC_ENV += CPP_FOR_BUILD=\"$(call native,cpp)\" ; \
+	echo TC_ENV += CFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += CXXFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += CPPFLAGS_FOR_BUILD=\"\" ; \
+	echo TC_ENV += LDFLAGS_FOR_BUILD=\"\"
 
 .PHONY: tc_flags
 tc_flags:
@@ -362,6 +415,12 @@ tc_flags:
 #
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
+#
+# TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
+# it was the one missing here, so a package reading the generated file saw an empty value
+# where the other three were there. Emitted as the version this build will use -- the
+# overlay's as/ld when that is what every compile goes through, like TC_GCC under a gcc
+# overlay -- through the same macro tc-capability.mk resolves a package's with.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -384,6 +443,7 @@ tc_vars:
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS)) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \

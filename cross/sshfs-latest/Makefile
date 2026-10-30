@@ -7,6 +7,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fuse3 cross/glib
 
+# Needs glibc >= 2.18: sshfs.c names AF_VSOCK, which bits/socket.h only carries from
+# there on -- measured on x64-5.2 (glibc 2.17), where it stops at "'AF_VSOCK' undeclared".
+# This is what the virtual used to express as a DSM 3.0-5.x range, which said nothing
+# about the reason and nothing about an arch outside that range. sshfs 3.7.3, the tier
+# below, has no AF_VSOCK at all, which is why it serves ARMv5 and its glibc 2.15.
+MIN_GLIBC_VERSION = 2.18
+
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/libfuse/sshfs

@@ -1,0 +1,61 @@
+--- tools/gst-launch.c.orig
++++ tools/gst-launch.c
+@@ -92,6 +92,9 @@
+ static GstClockTime tfthen = GST_CLOCK_TIME_NONE;
+ static gboolean interrupting = FALSE;
+ static gboolean waiting_eos = FALSE;
++/* Synology VideoStation: start position in seconds, with or without flushing */
++static gint64 seek_start = 0;
++static gint64 seek_start_no_flush = 0;
+ 
+ /* convenience macro so we don't have to litter the code with if(!quiet) */
+ #define PRINT if(!quiet)gst_print
+@@ -568,8 +571,24 @@
+ #endif /* G_OS_UNIX */
+ 
+ static void
++do_seek (GstElement * pipeline, gint64 start, GstSeekFlags flags)
++{
++  PRINT (_("Attempting to SEEK ...\n"));
++  if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME,
++          flags | GST_SEEK_FLAG_ACCURATE, GST_SEEK_TYPE_SET, start * GST_SECOND,
++          GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE))
++    gst_printerr (_("ERROR: Pipeline doesn't want to seek.\n"));
++}
++
++static void
+ do_initial_play (GstElement * pipeline)
+ {
++  /* a flushing seek needs the prerolled pipeline this is called on */
++  if (seek_start) {
++    do_seek (pipeline, seek_start, GST_SEEK_FLAG_FLUSH);
++    seek_start = 0;
++  }
++
+   PRINT (_("Setting pipeline to PLAYING ...\n"));
+ 
+   tfthen = gst_util_get_timestamp ();
+@@ -584,6 +603,12 @@
+   }
+ 
+   target_state = GST_STATE_PLAYING;
++
++  /* a non-flushing seek waits for data to flow, so it follows PLAYING */
++  if (seek_start_no_flush) {
++    do_seek (pipeline, seek_start_no_flush, 0);
++    seek_start_no_flush = 0;
++  }
+ }
+ 
+ static gboolean
+@@ -1121,6 +1146,10 @@
+         N_("Do not install a fault handler"), NULL},
+     {"eos-on-shutdown", 'e', 0, G_OPTION_ARG_NONE, &eos_on_shutdown,
+         N_("Force EOS on sources before shutting the pipeline down"), NULL},
++    {"seek", 's', 0, G_OPTION_ARG_INT64, &seek_start,
++        N_("Seek to TIME in seconds"), N_("TIME")},
++    {"seek-no-flush", 'S', 0, G_OPTION_ARG_INT64, &seek_start_no_flush,
++        N_("Seek to TIME in seconds without flushing"), N_("TIME")},
+ #if 0
+     {"index", 'i', 0, G_OPTION_ARG_NONE, &check_index,
+         N_("Gather and print index statistics"), NULL},

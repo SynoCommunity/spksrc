@@ -52,7 +52,7 @@ build_python_wheel_target: prepare_crossenv
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
-	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
+	   $(MSG) "environment: [$(TC_VARS_ENV)]" ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
 	else \

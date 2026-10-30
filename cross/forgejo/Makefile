@@ -1,14 +1,12 @@
 PKG_NAME = forgejo
-PKG_VERS = 15.0.4
+PKG_VERS = 15.0.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://codeberg.org/forgejo/forgejo/releases/download/v$(PKG_VERS)
 PKG_DIST_FILE = $(PKG_NAME)-src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-src-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
-BUILD_DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/nodejs
 
 HOMEPAGE = https://forgejo.org/
 COMMENT  = Forgejo is a self-hosted lightweight software forge.

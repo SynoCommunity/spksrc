@@ -20,9 +20,10 @@
 # time a toolchain moves, and it cannot express "any arch whose gcc is older than
 # X". A declared floor can, and it stays correct on its own.
 #
-# Resolved statically from the toolchain's own Makefile -- TC_GCC, TC_GLIBC and
-# TC_KERNEL, each declared there beside TC_DIST -- so the answer never depends on
-# how the toolchain was last built.
+# Resolved statically from the toolchain's own Makefile -- TC_GCC, TC_GLIBC,
+# TC_KERNEL and TC_BINUTILS, each declared there beside TC_DIST -- so the answer
+# never depends on how the toolchain was last built. TC_BINUTILS is the one an
+# overlay can replace, and it reports the overlay's version when one is active.
 #
 # A failing check sets TC_CAPABILITY_UNSUPPORTED to a human sentence; pre-check.mk
 # turns that into the arch-refusal error, next to UNSUPPORTED_ARCHS.
@@ -47,7 +48,16 @@ _tc_cap_of    = $(patsubst $(1)=%,%,$(filter $(1)=%,$(_TC_CAP_DECL)))
 TC_GCC      := $(call _tc_cap_of,TC_GCC)
 TC_GLIBC    := $(call _tc_cap_of,TC_GLIBC)
 TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
-TC_BINUTILS := $(call _tc_cap_of,TC_BINUTILS)
+
+# TC_BINUTILS is the as/ld a build will actually use: the ACTIVE overlay's, else the
+# toolchain's own, which TC_BINUTILS_VENDOR keeps for a caller that means the stock one.
+# Without this the floor below would refuse an arch the overlay had just equipped -- the
+# whole point of a binutils floor being that a newer as/ld answers it. Inert by default
+# today (OVERLAY_BINUTILS ?= 0, the narrow rust link leaving C on the vendor's); live for
+# OVERLAY_BINUTILS=1, and for a gcc overlay, which turns it on because gcc 8.5 needs its
+# own assembler. overlay.mk resolves the version, where the consumer path is known.
+TC_BINUTILS_VENDOR := $(call _tc_cap_of,TC_BINUTILS)
+TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS_VENDOR))
 
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and

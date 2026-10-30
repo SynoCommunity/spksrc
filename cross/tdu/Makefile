@@ -6,15 +6,8 @@ PKG_DIST_SITE = https://github.com/josephpaul0/tdu/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/go_1.23
-NATIVE_GO = native/go_1.23
-else
-BUILD_DEPENDS = native/go
-NATIVE_GO = native/go
-endif
+# Builds with go 1.23, so for kernels older than 3.2 (ARMv5) too
+MIN_GO_VERSION = 1.23
 
 HOMEPAGE = https://github.com/josephpaul0/tdu
 COMMENT  = Top Disk Usage. You want to know what is using all your disk space? This command-line tool estimates the disk space occupied by all files in a given path. It displays a sorted list of the biggest items. The estimation method is similar to the 'du -skx' command from GNU Coreutils package.

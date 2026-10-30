@@ -3,8 +3,6 @@ SPK_VERS = 0.74.3
 SPK_REV = 1
 SPK_ICON = src/fzf.png
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 DEPENDS = cross/fzf
 
 MAINTAINER = SynoCommunity

@@ -1,7 +1,7 @@
 # node_exporter parameters
 # ------------------------
 # 
-# Every line without a leading # is added as paramter to node_exporter
+# Every line without a leading # is added as parameter to node_exporter
 # 
 # To list all available parameters call:
 # /var/packages/node-exporter/target/bin/node_exporter --help

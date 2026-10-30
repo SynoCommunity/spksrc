@@ -1,6 +1,6 @@
 SPK_NAME = memcached
-SPK_VERS = 1.6.42
-SPK_REV = 10
+SPK_VERS = 1.6.45
+SPK_REV = 11
 SPK_ICON = src/memcached.png
 
 DEPENDS = cross/memcached
@@ -8,13 +8,14 @@ DEPENDS = cross/memcached
 MAINTAINER = SynoCommunity
 DESCRIPTION = Memcached is a high-performance, distributed memory object caching system, generic in nature, but originally intended for use in speeding up dynamic web applications by alleviating database load.
 DISPLAY_NAME = Memcached
-CHANGELOG = "1. Update Memcached to v1.6.42."
+CHANGELOG = "1. Update Memcached to v1.6.45."
 
 HOMEPAGE = https://memcached.org/
 LICENSE  = 3-Clause BSD
 
 SERVICE_USER = auto
 SERVICE_PORT = 11211
+SERVICE_PORT_TITLE = Memcached
 NO_SERVICE_SHORTCUT = true
 
 # SERVICE_COMMAND is defined in service setup script

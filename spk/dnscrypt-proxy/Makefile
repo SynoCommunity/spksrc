@@ -1,22 +1,23 @@
 # Package identity
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.1.15
-SPK_REV = 6
+SPK_VERS = 2.1.20
+SPK_REV = 8
 SPK_ICON = src/dnscrypt-proxy.png
 
 # Dependencies
 DEPENDS = cross/dnscrypt-proxy
 
 # Platform constraints
+# DSM 6 only: the service needs root (bind port 53, modify /etc/cron.d and
+# /etc/dhcpd), which DSM 7's privilege model does not allow (see src/conf/privilege).
 REQUIRED_MAX_DSM = 6.999
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 SPK_CONFLICT = DNSServer
 
 # Package metadata
 MAINTAINER = publicarray
 DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS.
 DISPLAY_NAME = dnscrypt-proxy
-CHANGELOG = "Update to 2.1.15 with built-in monitoring dashboard"
+CHANGELOG = "Update to 2.1.20."
 HOMEPAGE = https://github.com/DNSCrypt/dnscrypt-proxy
 HELPURL = https://github.com/DNSCrypt/dnscrypt-proxy/wiki
 LICENSE = ISC
@@ -41,12 +42,6 @@ DSM_UI_CONFIG = src/app/config
 PRE_COPY_TARGET = dnscrypt_extra_install
 
 # Includes
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-NATIVE_GO = native/go_1.23
-else
-NATIVE_GO = native/go
-endif
 include ../../mk/spksrc.spk.mk
 
 # Custom targets

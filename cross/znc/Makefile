@@ -22,7 +22,7 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
 ifeq ($(strip $(PYTHON_PACKAGE)),)
-BUILD_DEPENDS = python314
+BUILD_DEPENDS = cross/python314
 endif
 
 CONFIGURE_ARGS += -DWANT_PYTHON=true
@@ -58,12 +58,10 @@ ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
 endif
 
-# Although ZNC uses CMake, its modules are built via znc-buildmod,
-# which requires CC/CXX (tc_vars.autotools.mk) and *FLAGS (tc_vars.flags.mk)
-# to be present in the environment.
-DEFAULT_ENV  = cmake
-DEFAULT_ENV += autotools
-DEFAULT_ENV += flags
+# Although ZNC uses CMake, its modules are built via znc-buildmod, which requires
+# CC/CXX (tc_vars.autotools.mk) and *FLAGS (tc_vars.flags.mk) in the environment.
+# BUILD_SYSTEM stays cmake, set by env-cmake.mk; only the fragments are extra.
+TC_VARS_ENV += autotools flags
 
 include ../../mk/spksrc.cross-cmake.mk
 

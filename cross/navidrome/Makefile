@@ -1,18 +1,13 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.63.2
+PKG_VERS = 0.64.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/nodejs
 DEPENDS = cross/taglib2
-
-# taglib2:
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://www.navidrome.org/
 COMMENT  = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic.

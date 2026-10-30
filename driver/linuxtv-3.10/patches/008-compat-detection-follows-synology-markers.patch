@@ -1,0 +1,63 @@
+--- v4l/scripts/make_config_compat.pl.orig
++++ v4l/scripts/make_config_compat.pl
+@@ -486,6 +486,40 @@
+ }
+ 
+ 
++# The options the kernel is built with, as #ifdef sees them: =y only
++my %kconfig;
++if (open(my $cfg, "<", "$kdir/.config")) {
++	while (<$cfg>) {
++		$kconfig{$1} = 1 if (m/^(CONFIG_\w+)=y$/);
++	}
++	close($cfg);
++}
++
++# Synology marks its kernel changes with MY_ABC_HERE, which its headers define,
++# and MY_DEF_HERE, which nothing an out-of-tree build sees does, or with options
++# of its own (CONFIG_SYNO_*): true when the line is in a branch they, or any
++# kernel option, leave out of the compiled header
++sub syno_dead($$)
++{
++	my ($stack, $line) = @_;
++
++	if ($line =~ m/^\s*#\s*(?:(ifdef|ifndef)\s+(\w+)|if\s+(!)?\s*defined\s*\(?\s*(\w+)\s*\)?\s*$)/) {
++		my ($kind, $name) = defined($1) ? ($1, $2) : (($3 ? "ifndef" : "ifdef"), $4);
++		my $value = $name eq "MY_ABC_HERE" ? 1 : $name eq "MY_DEF_HERE" ? 0 :
++			    $name =~ m/^CONFIG_/ ? ($kconfig{$name} ? 1 : 0) : -1;
++		push @$stack, $value < 0 ? -1 : (($kind eq "ifdef") == $value ? 1 : 0);
++	} elsif ($line =~ m/^\s*#\s*if/) {
++		push @$stack, -1;
++	} elsif ($line =~ m/^\s*#\s*else/) {
++		$stack->[-1] = 1 - $stack->[-1] if (@$stack && $stack->[-1] >= 0);
++	} elsif ($line =~ m/^\s*#\s*elif/) {
++		$stack->[-1] = -1 if (@$stack);
++	} elsif ($line =~ m/^\s*#\s*endif/) {
++		pop @$stack;
++	}
++	return scalar(grep { $_ == 0 } @$stack);
++}
++
+ sub check_files_for_func($$@)
+ {
+ 	my $function = shift;
+@@ -497,7 +531,9 @@
+ 
+ 		foreach my $file ( @files ) {
+ 			open IN, "<$file" or next;
++			my @syno = ();
+ 			while (<IN>) {
++				next if (syno_dead(\@syno, $_));
+ 				if (m/($function)/) {
+ 					close IN;
+ 					# definition found. No need for compat
+@@ -524,7 +560,9 @@
+ 
+ 		foreach my $file ( @files ) {
+ 			open IN, "<$file" or next;
++			my @syno = ();
+ 			while (<IN>) {
++				next if (syno_dead(\@syno, $_));
+ 				if (m/($function)/) {
+ 					close IN;
+ 					# definition found. No need for compat

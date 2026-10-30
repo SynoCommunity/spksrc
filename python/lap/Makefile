@@ -9,11 +9,6 @@ HOMEPAGE = https://github.com/gatagat/lap
 COMMENT  = lap is a linear assignment problem solver using Jonker-Volgenant algorithm for dense LAPJV or sparse LAPMOD matrices.
 LICENSE  = BSD-2-Clause license
 
-# Requires gcc>=8.4 to build sucesfully
-REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
-
 DEPENDS  = python/numpy_1.26
 
 include ../../mk/spksrc.python-wheel.mk

@@ -10,7 +10,7 @@ INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
 # Only DSM > 5 have this temp upgrade folder variable
-TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
+TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER:+${SYNOPKG_TEMP_UPGRADE_FOLDER}/var}"
 
 
 install_log ()
@@ -185,6 +185,10 @@ set_syno_permissions ()
 set_unix_permissions ()
 {
     DIRNAME=$1
+    if [ -z "${DIRNAME}" ] || [ ! -d "${DIRNAME}" ] || [ "$(realpath "${DIRNAME}")" = "/" ]; then
+        echo "Skip unix ownership on '${DIRNAME}': not a directory"
+        return
+    fi
     if [ -n "${EFF_USER}" ]; then
         echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
         if [ -n "${GROUP}" ]; then
@@ -365,14 +369,18 @@ preupgrade ()
     call_func "service_preupgrade" install_log
 
     # Save some stuff
-    $RM "$TMP_DIR" 2>&1 | install_log
-    $MKDIR "$TMP_DIR" 2>&1 | install_log
+    if [ -n "${TMP_DIR}" ]; then
+        $RM "$TMP_DIR" 2>&1 | install_log
+        $MKDIR "$TMP_DIR" 2>&1 | install_log
+    fi
 
     call_func "service_save" install_log
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
-    $CP "${SYNOPKG_PKGVAR}"/. "$TMP_DIR" 2>&1 | install_log
+    if [ -n "${TMP_DIR}" ] && _var=$(package_dir "${SYNOPKG_PKGVAR}"); then
+        $CP "${_var}"/. "$TMP_DIR" 2>&1 | install_log
+    fi
 
     exit 0
 }
@@ -384,12 +392,16 @@ postupgrade ()
     call_func "service_restore" install_log
 
     # Restore some stuff, has to be cp otherwise fails on directories
-    $CP "${TMP_DIR}"/. "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+    if [ -n "${TMP_DIR}" ] && [ -d "${TMP_DIR}" ] && _var=$(package_dir "${SYNOPKG_PKGVAR}"); then
+        $CP "${TMP_DIR}"/. "${_var}" 2>&1 | install_log
 
-    # Correct permissions of var folder
-    set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+        # Correct permissions of var folder
+        set_unix_permissions "${_var}" 2>&1 | install_log
+    fi
 
-    $RM "$TMP_DIR" 2>&1 | install_log
+    if [ -n "${TMP_DIR}" ]; then
+        $RM "$TMP_DIR" 2>&1 | install_log
+    fi
 
     call_func "service_postupgrade" install_log
 

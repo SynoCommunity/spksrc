@@ -1,5 +1,5 @@
 PKG_NAME = nmap
-PKG_VERS = 7.99
+PKG_VERS = 7.992
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://nmap.org/dist
@@ -25,6 +25,15 @@ CONFIGURE_ARGS += --with-libpcre=included
 # meta staging if present, else the local staging (cross/openssl3).
 CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_INSTALL_PREFIX)
 
+include ../../mk/spksrc.common.mk
+
 ADDITIONAL_CPPFLAGS = -O3
+# glibc hides the inttypes.h PRI* and stdint.h limit macros from C++ behind these
+# until 2.18, and nmap uses them:
+#   MACLookup.cc:163:30: error: expected ')' before 'PRIX64'
+ifeq ($(call version_lt,$(TC_GLIBC),2.18),1)
+ADDITIONAL_CPPFLAGS += -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+ADDITIONAL_CPPFLAGS += -D__STDC_CONSTANT_MACROS
+endif
 
 include ../../mk/spksrc.cross-cc.mk

@@ -20,7 +20,9 @@ DEPENDS += cross/nghttp2
 DEPENDS += cross/libcap
 
 # lacking support for atomics:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# netmgr/udp.c uses the C11 _Atomic qualifier, which gcc has from 4.9:
+#   udp.c:813: error: expected declaration specifiers before 'last_udpsends_log'
+MIN_GCC_VERSION = 4.9
 
 
 HOMEPAGE = https://www.isc.org/
@@ -34,12 +36,9 @@ ADDITIONAL_CFLAGS = -O2
 ADDITIONAL_CPPFLAGS = -O2
 
 CONFIGURE_ARGS  = --enable-full-report
-# needed for cross compile:
-CONFIGURE_ARGS += BUILD_CC="$(CC)"
-CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS) $(ADDITIONAL_CFLAGS)"
-CONFIGURE_ARGS += BUILD_CPPFLAGS="$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS)"
-CONFIGURE_ARGS += BUILD_LDFLAGS="$(LDFLAGS)"
-CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
+# Nothing is named for the build machine: configure.ac uses AX_PROG_CC_FOR_BUILD, which
+# reads CC_FOR_BUILD and the *_FOR_BUILD flags the toolchain now supplies. The BUILD_CC
+# this used to pass was never read -- that spelling is bind 9.16's.
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -296,9 +296,10 @@ cross-stage2:
 Sets up the cross-compilation environment by loading tc_vars files:
 
 ```makefile
-# Loads toolchain configuration
+# Loads toolchain configuration: tc_vars.mk always, then one fragment per
+# word in TC_VARS_ENV (autotools, flags, rust -- the words that name a file)
 include $(WORK_DIR)/tc_vars.mk
-include $(WORK_DIR)/tc_vars.$(DEFAULT_ENV).mk
+TC_VARS_FILES := $(wildcard $(foreach b,$(sort $(TC_VARS_ENV)),$(WORK_DIR)/tc_vars.$(b).mk))
 
 # Exports to ENV for command execution
 ENV += CC=$(TC_CC) CXX=$(TC_CXX) ...

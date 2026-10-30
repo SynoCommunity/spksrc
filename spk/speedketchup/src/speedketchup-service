@@ -1,0 +1,5 @@
+#!/bin/sh
+# stdout has a trace of every test, which would grow the package log
+# without bound, the results are in the csv file and errors still go
+# to the log on stderr
+exec "$(dirname "$0")/speedketchup" "$@" > /dev/null

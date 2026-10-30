@@ -3,8 +3,6 @@ SPK_VERS = 5.3
 SPK_REV = 1
 SPK_ICON = src/nnn.png
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 DEPENDS = cross/nnn
 
 include ../../mk/spksrc.common.mk

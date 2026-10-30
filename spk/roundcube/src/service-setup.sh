@@ -14,6 +14,18 @@ WEB_DIR="/var/services/web_packages"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 CFG_FILE="${WEB_ROOT}/config/config.inc.php"
 
+# Escape a value for a single-quoted PHP string, then for a sed replacement.
+sed_escape ()
+{
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e "s/'/\\\\'/g" -e 's/[\\&|]/\\&/g'
+}
+
+# Roundcube rawurldecodes the DSN password, so encode '%' to round-trip it.
+dsn_encode ()
+{
+    printf '%s' "$1" | sed 's|%|%25|g'
+}
+
 validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -88,8 +100,8 @@ service_postinst ()
             fi
 
             # Update database password
-            MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_roundcube}" | sed 's/[&/\]/\\&/g')
-            sed -i "s|\(\$config\['db_dsnw'\] = 'mysqli://roundcube:\)[^@]*\(@unix(/run/mysqld/mysqld10.sock)/roundcube';\)|\1${MARIADB_PASSWORD_ESCAPED}\2|" "${CFG_FILE}"
+            MARIADB_PASSWORD_ESCAPED=$(sed_escape "$(dsn_encode "${wizard_mysql_password_roundcube}")")
+            sed -i "s|\(\$config\['db_dsnw'\] = 'mysqli://roundcube:\).*\(@unix(/run/mysqld/mysqld10.sock)/roundcube';\)|\1${MARIADB_PASSWORD_ESCAPED}\2|" "${CFG_FILE}"
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
@@ -101,12 +113,18 @@ service_postinst ()
             # Setup initial database structure
             ${MYSQL} -u "${MYSQL_USER}" -p"${wizard_mysql_password_roundcube}" "${MYSQL_DATABASE}" < "${WEB_ROOT}/SQL/mysql.initial.sql"
 
-            # Setup configuration file
-            sed -e "s|^\(\$config\['db_dsnw'\] =\).*$|\1 \'mysqli://roundcube:${wizard_mysql_password_roundcube}@unix(/run/mysqld/mysqld10.sock)/roundcube\';|" \
-                -e "s|^\(\$config\['imap_host'\] =\).*$|\1 \'${wizard_roundcube_imap_host}\';|" \
-                -e "s|^\(\$config\['smtp_host'\] =\).*$|\1 \'${wizard_roundcube_smtp_host}\';|" \
-                -e "s|^\(\$config\['smtp_user'\] =\).*$|\1 \'${wizard_roundcube_smtp_user}\';|" \
-                -e "s|^\(\$config\['smtp_pass'\] =\).*$|\1 \'${wizard_roundcube_smtp_pass}\';|" \
+            # Setup configuration file
+            DB_PASSWORD_ESCAPED=$(sed_escape "$(dsn_encode "${wizard_mysql_password_roundcube}")")
+            IMAP_HOST_ESCAPED=$(sed_escape "${wizard_roundcube_imap_host}")
+            SMTP_HOST_ESCAPED=$(sed_escape "${wizard_roundcube_smtp_host}")
+            SMTP_USER_ESCAPED=$(sed_escape "${wizard_roundcube_smtp_user}")
+            SMTP_PASS_ESCAPED=$(sed_escape "${wizard_roundcube_smtp_pass}")
+
+            sed -e "s|^\(\$config\['db_dsnw'\] =\).*$|\1 \'mysqli://roundcube:${DB_PASSWORD_ESCAPED}@unix(/run/mysqld/mysqld10.sock)/roundcube\';|" \
+                -e "s|^\(\$config\['imap_host'\] =\).*$|\1 \'${IMAP_HOST_ESCAPED}\';|" \
+                -e "s|^\(\$config\['smtp_host'\] =\).*$|\1 \'${SMTP_HOST_ESCAPED}\';|" \
+                -e "s|^\(\$config\['smtp_user'\] =\).*$|\1 \'${SMTP_USER_ESCAPED}\';|" \
+                -e "s|^\(\$config\['smtp_pass'\] =\).*$|\1 \'${SMTP_PASS_ESCAPED}\';|" \
                 "${WEB_ROOT}/config/config.inc.php.sample" > "${CFG_FILE}"
         fi
     fi

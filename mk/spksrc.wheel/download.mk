@@ -69,14 +69,15 @@ endif
 	   query+=" | jq -r '.releases[][]" ; \
 	   query+=" | select(.packagetype==\"sdist\")" ; \
 	   query+=" | select((.filename|test(\"-$(WHEEL_VERSION).tar.gz\")) or (.filename|test(\"-$(WHEEL_VERSION).zip\"))) | .url'" ; \
-	   outFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
+	   pkgUrl=$$(eval $${query} 2>/dev/null) ; \
+	   outFile=$$(basename $${pkgUrl} 2>/dev/null) ; \
 	   if [ "$${outFile}" = "" ]; then \
 	      echo "ERROR: Unable to find version on pypi.org for [$(WHEEL_NAME)]" ; \
 	   elif [ -s $(PIP_DISTRIB_DIR)/$${outFile} ]; then \
 	      echo "INFO: File already exists [$${outFile}]" ; \
 	   else \
-	      echo "wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${outFile}.part -nc $$(eval $${query})" ; \
-	      wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${outFile}.part -nc $$(eval $${query}) ; \
+	      echo "wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${outFile}.part -nc $${pkgUrl}" ; \
+	      wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${outFile}.part -nc $${pkgUrl} ; \
 	      mv $(PIP_DISTRIB_DIR)/$${outFile}.part $(PIP_DISTRIB_DIR)/$${outFile} ; \
 	   fi ; \
 	fi

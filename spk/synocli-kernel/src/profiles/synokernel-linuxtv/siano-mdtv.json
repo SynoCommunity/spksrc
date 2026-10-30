@@ -1,0 +1,6 @@
+{
+  "name": "siano-mdtv",
+  "description": "Siano Mobile Digital TV USB receivers (sms1xxx)",
+  "comments": "Not tested on hardware since the media_build tiers.",
+  "modules": ["smsmdtv", "smsdvb", "smsusb"]
+}

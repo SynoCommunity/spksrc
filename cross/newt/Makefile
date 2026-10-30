@@ -2,7 +2,7 @@ PKG_NAME = newt
 PKG_VERS = 0.52.24
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://releases.pagure.org/newt
+PKG_DIST_SITE = https://ftp.osuosl.org/pub/blfs/conglomeration/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/slang

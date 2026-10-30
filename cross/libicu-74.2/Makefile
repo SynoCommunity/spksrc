@@ -9,18 +9,18 @@ PKG_DIR = icu/source
 # libicu 74 is the latest version that builds for DSM 6
 # libicu >= 75 requires compiler with c++17
 
+# Compiler too old, stdc++11 is required.
+MIN_GCC_VERSION = 4.8
+
 BUILD_DEPENDS = native/libicu
 
 HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
-include ../../mk/spksrc.common.mk
-
-# Compiler too old, stdc++11 is required.
-MIN_GCC_VERSION = 4.8
-
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=arm-unknown-linux-gnueabi
@@ -40,25 +40,13 @@ endif
 
 NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR))
 
-# the packaging can be customized in a dependent package by definition
-# of LIBICU_DATA_PACKAGING_MODE like:
-# export LIBICU_DATA_PACKAGING_MODE=archive
-# 
-# valid data packaging values are
-# - library (the default)
-# - archive
-
-DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
-ifeq ($(strip $(DATA_PACKAGING)),)
-# default data packaging
-DATA_PACKAGING = library
-endif
-CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
-
-ifeq ($(strip $(DATA_PACKAGING)),archive)
-# add the ICU data file.
-PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/*/icudt*.dat'
-endif
+# archive is the only mode built. In library mode the ICU data lives in libicudata.so,
+# which DSM ARMv7 systems fail to load at runtime (#7347) and every other arch loads
+# slightly slower. postgresql, znc and kiwix each asked for archive themselves; the
+# packages that did not were simply broken on ARMv7, so this is not a choice a consumer
+# should have to make -- and with the knob gone nothing can make it wrongly. The data file
+# archive installs, share/icu/*/icudt*.dat, is a plain PLIST line.
+CONFIGURE_ARGS += --with-data-packaging=archive
 
 PRE_COMPILE_TARGET = libicu_prepare_dir
 POST_INSTALL_TARGET = libicu_post_install

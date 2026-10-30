@@ -52,7 +52,7 @@ endif
 #   - architecture and DSM metadata
 #
 # This file is framework-agnostic and is ALWAYS loaded once tcvars
-# generation is complete, independently of DEFAULT_ENV.
+# generation is complete, independently of TC_VARS_ENV.
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_WORK_DIR=$(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 ENV += TC_WORK_DIR=$(TC_WORK_DIR)
@@ -91,14 +91,14 @@ endif
 #
 #   2) tc_vars.<env>.mk
 #      - Generated per build framework
-#      - Selected via DEFAULT_ENV
+#      - Selected via TC_VARS_ENV
 #      - Extend TC_ENV with framework-specific flags
 #
 #   3) tk_vars.mk
 #      - Extend ENV with toolkit specific flags
 #
 # tc_vars.mk is always loaded once $(TCVARS_DONE) exists.
-# tc_vars.<env>.mk files are loaded based on DEFAULT_ENV.
+# tc_vars.<env>.mk files are loaded based on TC_VARS_ENV.
 # tk_vars.mk file is loaded based on REQUIRE_TOOLKIT=1.
 #
 # Result:
@@ -111,11 +111,41 @@ ifneq ($(strip $(TC)),)
 export INSTALL_DIR
 export INSTALL_PREFIX
 
-# Default is autotools / make
-DEFAULT_ENV ?= autotools flags rust
+# Two variables, two questions.
+#
+# BUILD_SYSTEM -- autotools, cargo, cmake, meson or none. What install.mk and compile.mk
+# ask about: a cmake or meson build installs through its own tool, a cargo build through
+# rust_install_target. Set by the build system's own mk, or to none by cross-virtual.mk
+# and spk.mk.
+#
+# TC_VARS_ENV -- which tc_vars.<word>.mk fragments to load. Only autotools, flags and
+# rust name a file: the cmake and meson files are tc_vars.cmake, tc_vars.meson-cross and
+# tc_vars.meson-native, with no .mk suffix, and the wildcard below never matches them.
+#
+# Both are appended, so the order packages include their mk files in does not matter.
+# This file fills in the rest: the autotools pair for an autotools build, which reads
+# CC and the flags from the environment, then rust for every package. cmake and meson
+# read theirs from their own generated file; cargo reads the per-triple and HOST_*
+# names tc_vars.rust.mk states. rust is loaded for every package because any of them may
+# build crates, and tc_vars.rust.mk is also where RUST_TARGET and TC_RUSTUP_TOOLCHAIN
+# come from -- so a package calling cargo itself needs no rust mk of its own.
+# none means nothing is built: cross-virtual.mk and spk.mk set it, and each
+# env-<system>.mk declines to append over it, so an env pulled in further down the tree
+# -- wheel.mk reaches env-cmake.mk for a python spk -- cannot turn it into a build.
+ifneq ($(filter none,$(BUILD_SYSTEM)),)
+  TC_VARS_ENV :=
+else
+  ifeq ($(strip $(BUILD_SYSTEM)),)
+    BUILD_SYSTEM += autotools
+  endif
+  ifneq ($(filter autotools,$(BUILD_SYSTEM)),)
+    TC_VARS_ENV += autotools flags
+  endif
+  TC_VARS_ENV += rust
+endif
 
-# Map DEFAULT_ENV definitions to filenames
-TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Map TC_VARS_ENV to filenames; sort drops any word added twice.
+TC_VARS_FILES := $(wildcard $(foreach b,$(sort $(TC_VARS_ENV)),$(WORK_DIR)/tc_vars.$(b).mk))
 
 # Load full toolchain environment ONLY after tc_vars have been generated at stage1
 ifeq ($(wildcard $(TCVARS_DONE)),$(TCVARS_DONE))

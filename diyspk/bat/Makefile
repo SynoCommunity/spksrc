@@ -2,8 +2,6 @@ SPK_NAME = bat
 SPK_VERS = 0.26.1
 SPK_REV = 1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 DEPENDS = cross/bat
 
 include ../../mk/spksrc.common.mk

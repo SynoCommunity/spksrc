@@ -9,11 +9,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # the (rate-limited) GitHub API at build time. Bump together with PKG_VERS.
 PKG_COMMIT = db8e0ab
 
-BUILD_DEPENDS = native/go
-
-# Go does not support ppc32 and Go 1.26 dropped ARMv5. Keep in sync with spk/loom.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
-
 HOMEPAGE = https://loom.deroock.co.za
 COMMENT  = Loom is a unified, self-hosted media automation server (a Radarr/Sonarr/Prowlarr/Overseerr replacement).
 LICENSE  = AGPL-3.0

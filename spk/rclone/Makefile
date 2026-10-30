@@ -1,18 +1,16 @@
 SPK_NAME = rclone
-SPK_VERS = 1.74.2
-SPK_REV = 5
+SPK_VERS = 1.75.2
+SPK_REV = 7
 SPK_ICON = src/rclone.png
 
 DEPENDS = cross/rclone
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = dotwee
 DESCRIPTION = Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendors' web storage interfaces.
 DISPLAY_NAME = rclone
 STARTABLE = no
 
-CHANGELOG = "Update to v1.74.2."
+CHANGELOG = "Add ARMv5 (88f6281)."
 
 HOMEPAGE = https://rclone.org/
 HELPURL = https://rclone.org/docs/

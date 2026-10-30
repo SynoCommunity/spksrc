@@ -6,6 +6,8 @@ PKG_DIST_SITE = https://github.com/sharkdp/fd/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# tikv-jemalloc-sys fails to build:
+MIN_BINUTILS_VERSION = 2.22
 MIN_RUSTC_VERSION = 1.90
 
 HOMEPAGE = https://github.com/sharkdp/fd

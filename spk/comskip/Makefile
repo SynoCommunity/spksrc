@@ -1,11 +1,9 @@
 SPK_NAME = comskip
 SPK_VERS = 0.83
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg8
-
-# ffmpeg8 needs C11 -- gcc 4.9 or newer
 
 DEPENDS = cross/comskip
 
@@ -14,7 +12,7 @@ STARTABLE = no
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to FFMPEG 8.1.2"
+CHANGELOG = "1. Update to FFMPEG 8.1.3"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
