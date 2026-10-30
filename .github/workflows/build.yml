@@ -480,6 +480,52 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # Free up disk space on GitHub runner before build starts
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          # Capture initial disk space before cleanup
+          {
+            echo "=========================================="
+            echo "DISK SPACE BEFORE CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Largest directories in workspace ==="
+            du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          } > disk_usage_start.txt
+          
+          # Also display to console
+          cat disk_usage_start.txt
+          
+          echo ""
+          echo "=== Removing unnecessary files ==="
+          
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+
+          
+          
+          # Capture disk space after cleanup
+          {
+            echo ""
+            echo "=========================================="
+            echo "DISK SPACE AFTER CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Space freed calculation ==="
+            df -h / | tail -1 | awk '{print "Available space: " $4}'
+          } >> disk_usage_start.txt
+          
+          # Display cleanup results to console
+          echo ""
+          echo "=== Disk space after cleanup ==="
+          df -h
+          echo ""
+          echo "=== Space freed calculation ==="
+          df -h / | tail -1 | awk '{print "Available space: " $4}'
+
       - name: Cache toolchains
         uses: actions/cache@v6
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
