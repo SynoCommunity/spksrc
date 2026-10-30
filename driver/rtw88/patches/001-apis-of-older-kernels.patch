@@ -1,0 +1,59 @@
+--- main.c.orig
++++ main.c
+@@ -20,6 +20,9 @@
+ #include "sar.h"
+ #include "sdio.h"
+ #include "led.h"
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
++#include <linux/property.h>
++#endif
+ 
+ bool rtw_disable_lps_deep_mode;
+ EXPORT_SYMBOL(rtw_disable_lps_deep_mode);
+@@ -2167,7 +2170,11 @@
+ 	efuse->ext_lna_5g = efuse->lna_type_5g & BIT(3) ? 1 : 0;
+ 
+ 	if (!is_valid_ether_addr(efuse->addr)) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
+ 		if (device_get_mac_address(rtwdev->dev, efuse->addr)) {
++#else
++		if (!device_get_mac_address(rtwdev->dev, efuse->addr, ETH_ALEN)) {
++#endif
+ 			eth_random_addr(efuse->addr);
+ 			dev_warn(rtwdev->dev,
+ 				 "failed to get valid MAC address, using random\n");
+--- rtw8723b.c.orig
++++ rtw8723b.c
+@@ -14,6 +14,11 @@
+ #include "sdio.h"
+ #include "tx.h"
+ 
++/* As in rtw8703b.c */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
++#define FIELD_PREP_CONST FIELD_PREP
++#endif
++
+ #define TRANS_SEQ_END			\
+ 	0xFFFF,				\
+ 	RTW_PWR_CUT_ALL_MSK,		\
+--- usb.c.orig
++++ usb.c
+@@ -17,6 +17,18 @@
+ #include "ps.h"
+ #include "usb.h"
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0)
++/* Exported to drivers by mac80211 6.10 */
++static void ieee80211_purge_tx_queue(struct ieee80211_hw *hw,
++				     struct sk_buff_head *skbs)
++{
++	struct sk_buff *skb;
++
++	while ((skb = __skb_dequeue(skbs)))
++		ieee80211_free_txskb(hw, skb);
++}
++#endif
++
+ static bool rtw_switch_usb_mode = true;
+ module_param_named(switch_usb_mode, rtw_switch_usb_mode, bool, 0644);
+ MODULE_PARM_DESC(switch_usb_mode,

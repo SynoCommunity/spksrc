@@ -43,10 +43,18 @@ own wireless stack.
 | `mt76x0u`, `mt76x2u` | MediaTek MT7610U, MT7612U | Alfa AWUS036ACM, TP-Link Archer T2U v1, kernels 5.10 |
 | `ath9k_htc` | Atheros AR9271, AR7010 | TP-Link TL-WN722N v1, Alfa AWUS036NHA, kernels with LED triggers |
 | `carl9170` | Atheros AR9170 | Netgear WN111 v2, TP-Link TL-WN821N v2 |
+| `rtl8821cu` | Realtek RTL8811CU, RTL8821CU | |
+| `rtl8821au` | Realtek RTL8811AU, RTL8821AU | kernels 4.4 and newer |
+| `rtl8812au` | Realtek RTL8812AU | kernels 4.4 and newer |
+| `rtl8814au` | Realtek RTL8814AU | kernels 4.4 and newer |
+| `rtw88-8822bu`, `rtw88-8821cu`, `rtw88-8822cu`, `rtw88-8723du`, `rtw88-8812au`, `rtw88-8821au`, `rtw88-8814au` | Realtek RTL8822BU, RTL8821CU, RTL8822CU, RTL8723DU, RTL8812AU, RTL8821AU, RTL8814AU | kernels 5.10 |
 
-`rtl88x2bu` is the [driver of the Linux community](https://github.com/morrownr/88x2bu-20210702)
-for these Realtek chips; the others are the drivers of each kernel, so newer
-kernels offer more of them. `synocli-kernelmodule list` tells which profiles
+The `rtl88x2bu`, `rtl8821cu`, `rtl8821au`, `rtl8812au` and `rtl8814au` profiles
+load the [drivers of the Linux community](https://github.com/morrownr) for
+these Realtek chips; `rtw88-*` load [rtw88](https://github.com/lwfinger/rtw88),
+the mac80211 driver of the same chips in recent kernels, built out of tree.
+For a chip both cover, load one profile or the other, not both. The others are
+the drivers of each kernel, so newer kernels offer more of them. `synocli-kernelmodule list` tells which profiles
 the kernel of the NAS can load. The firmware they need comes from
 [linux-firmware](https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git).
 

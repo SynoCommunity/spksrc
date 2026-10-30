@@ -4,7 +4,8 @@ SPK_REV = 1
 SPK_ICON = src/synokernel-wifi.png
 
 DEPENDS  = cross/iw cross/linux-firmware-wifi
-DEPENDS += driver/rtl88x2bu driver/wireless-regdb
+DEPENDS += driver/rtl88x2bu driver/rtl8821cu driver/rtl8821au driver/rtl8812au driver/rtl8814au
+DEPENDS += driver/rtw88 driver/wireless-regdb
 
 REQUIRE_KERNEL ?= 1
 # No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
