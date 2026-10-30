@@ -1,6 +1,6 @@
 SPK_NAME = metacubexd
-SPK_VERS = 1.186.1
-SPK_REV = 1
+SPK_VERS = 1.273.1
+SPK_REV = 2
 SPK_ICON = src/metacubexd.png
 
 DEPENDS = cross/metacubexd
@@ -12,7 +12,7 @@ MAINTAINER_URL = https://github.com/wangbin1989
 
 DESCRIPTION = Mihomo Dashboard, The Official One, XD
 DISPLAY_NAME = "MetaCubeXD"
-CHANGELOG = "Initial package release."
+CHANGELOG = "1. Update to v1.273.1."
 
 LICENSE = GPLv3
 
