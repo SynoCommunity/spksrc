@@ -1,8 +1,11 @@
 PKG_NAME = lua
-PKG_VERS = 5.4.8
+PKG_VERS = 5.5.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.lua.org/ftp
+# lua.org can be unreachable from CI runners, so fall back to the PUC-Rio tecgraf
+# mirror of the official /ftp tree (byte-identical tarball, same checksum).
+PKG_DIST_MIRRORS = https://www.tecgraf.puc-rio.br/lua/ftp
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw cross/readline
