@@ -1,5 +1,5 @@
 PKG_NAME = ariang
-PKG_VERS = 1.3.7
+PKG_VERS = 1.3.15
 PKG_EXT = zip
 PKG_DIST_NAME = AriaNg-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mayswind/AriaNg/releases/download/$(PKG_VERS)

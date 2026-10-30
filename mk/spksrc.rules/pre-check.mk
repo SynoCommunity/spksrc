@@ -14,9 +14,10 @@
 #
 ###############################################################################
 
-# Disabled for dependency targets, and for the check goal -- whose whole job is to REPORT
-# the gates this arch fails, which a fatal pre-check would cut short at the first one.
-ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check,$(MAKECMDGOALS))),)
+# Disabled for dependency targets, for the check goal -- whose whole job is to REPORT
+# the gates this arch fails, which a fatal pre-check would cut short at the first one --
+# and for download-wheels, which only downloads wheel sources and runs without an arch.
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check download-wheels,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
