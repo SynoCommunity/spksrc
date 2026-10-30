@@ -1,8 +1,8 @@
 PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 7
-JAVA_VERSION = 17.0.16
+JAVA_RELEASE = 9
+JAVA_VERSION = 17.0.21
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -68,7 +68,7 @@ CONFIGURE_ARGS += --with-freetype-include=$(INSTALL_DIR)/$(INSTALL_PREFIX)/inclu
 CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) $(ADDITIONAL_CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
-CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) $(ADDITIONAL_LDFLAGS) -ljpeg -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
+CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) $(ADDITIONAL_LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --disable-manpages
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
