@@ -101,17 +101,23 @@ service_postinst ()
     echo ""                                 >> ${CONSTRAINTS}
     echo "# Added by SynoCommunity package" >> ${CONSTRAINTS}
     echo "pycares==5.0.1"                   >> ${CONSTRAINTS}
-    echo "caio==0.9.25"                     >> ${CONSTRAINTS}
-    echo "scapy==2.7.0"                     >> ${CONSTRAINTS}
-    echo "voip_utils==0.4.0"                >> ${CONSTRAINTS}
-    echo "boto3==1.37.1"                    >> ${CONSTRAINTS}
-    echo "botocore==1.37.1"                 >> ${CONSTRAINTS}
-    echo "tenacity==8.5.0"                  >> ${CONSTRAINTS}
+    echo "voip_utils==0.4.3"                >> ${CONSTRAINTS}
+    echo "tenacity==9.1.4"                  >> ${CONSTRAINTS}
     echo "construct-typing==0.6.2"          >> ${CONSTRAINTS}
     echo "click==8.1.8"                     >> ${CONSTRAINTS}
-    echo "ical==13.3.0"                     >> ${CONSTRAINTS}
-    echo "wrapt==1.17.3"                    >> ${CONSTRAINTS}
+    echo "crc==7.1.0"                       >> ${CONSTRAINTS}
+    echo "wrapt==2.5.0"                     >> ${CONSTRAINTS}
     echo "websockets==15.0.1"               >> ${CONSTRAINTS}
     echo "rich==10.16.2"                    >> ${CONSTRAINTS}
     echo "pysignalr==1.3.0"                 >> ${CONSTRAINTS}
+    echo "typer-slim==0.21.2"               >> ${CONSTRAINTS}
+    echo "modbus-connection==4.10.0"        >> ${CONSTRAINTS}
+    echo "tmodbus==0.6.2"                   >> ${CONSTRAINTS}
+    echo "tzlocal==5.3.1"                   >> ${CONSTRAINTS}
+    echo "oauthlib==3.3.1"                  >> ${CONSTRAINTS}
+    echo "PyPasser==0.0.5"                  >> ${CONSTRAINTS}
+    echo "python-dateutil==2.9.0.post0"     >> ${CONSTRAINTS}
+    echo "graphql-core==3.2.13"             >> ${CONSTRAINTS}
+    echo "gql==4.0.0"                       >> ${CONSTRAINTS}
+    echo "zha==2.2.2"                       >> ${CONSTRAINTS}
 }

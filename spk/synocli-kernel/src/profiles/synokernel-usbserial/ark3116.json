@@ -1,0 +1,6 @@
+{
+  "name": "ark3116",
+  "description": "ARK Micro 3116 USB Serial Driver",
+  "modules": ["ark3116"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

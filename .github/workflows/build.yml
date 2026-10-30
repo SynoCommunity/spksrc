@@ -97,6 +97,7 @@ on:
     paths:
       - 'spk/**'
       - 'cross/**'
+      - 'driver/**'
       - 'python/**'
       - 'native/**'
   push:
@@ -105,6 +106,7 @@ on:
     paths:
       - 'spk/**'
       - 'cross/**'
+      - 'driver/**'
       - 'python/**'
       - 'native/**'
 
@@ -183,12 +185,16 @@ jobs:
       noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.noarch_min_dsm72_packages }}
       arch_min_dsm73_packages: ${{ steps.dependencies.outputs.arch_min_dsm73_packages }}
       noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.noarch_min_dsm73_packages }}
+      arch_min_dsm74_packages: ${{ steps.dependencies.outputs.arch_min_dsm74_packages }}
+      noarch_min_dsm74_packages: ${{ steps.dependencies.outputs.noarch_min_dsm74_packages }}
       has_arch_packages: ${{ steps.dependencies.outputs.has_arch_packages }}
       has_noarch_packages: ${{ steps.dependencies.outputs.has_noarch_packages }}
       has_arch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm72_packages }}
       has_noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm72_packages }}
       has_arch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm73_packages }}
       has_noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm73_packages }}
+      has_arch_min_dsm74_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm74_packages }}
+      has_noarch_min_dsm74_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm74_packages }}
       videodriver: ${{ steps.dependencies.outputs.videodriver }}
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
@@ -204,8 +210,8 @@ jobs:
         run: |
           git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
@@ -213,8 +219,8 @@ jobs:
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
@@ -293,6 +299,7 @@ jobs:
       - id: defaults
         run: |
           # Retrieve inputs and package availability
+          add_dsm74_builds=${{ github.event.inputs.add_dsm74_builds || 'false' }}
           add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
@@ -305,12 +312,15 @@ jobs:
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
           add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
           add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm73_builds || 'false' }}
+          add_noarch_dsm74_builds=${{ github.event.inputs.add_noarch_dsm74_builds || 'false' }}
           has_arch_packages=${{ needs.prepare.outputs.has_arch_packages || 'false' }}
           has_arch_min_dsm72_packages=${{ needs.prepare.outputs.has_arch_min_dsm72_packages || 'false' }}
           has_arch_min_dsm73_packages=${{ needs.prepare.outputs.has_arch_min_dsm73_packages || 'false' }}
+          has_arch_min_dsm74_packages=${{ needs.prepare.outputs.has_arch_min_dsm74_packages || 'false' }}
           has_noarch_packages=${{ needs.prepare.outputs.has_noarch_packages || 'false' }}
           has_noarch_min_dsm72_packages=${{ needs.prepare.outputs.has_noarch_min_dsm72_packages || 'false' }}
           has_noarch_min_dsm73_packages=${{ needs.prepare.outputs.has_noarch_min_dsm73_packages || 'false' }}
+          has_noarch_min_dsm74_packages=${{ needs.prepare.outputs.has_noarch_min_dsm74_packages || 'false' }}
 
           # Dynamic logic for automatic builds
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
@@ -587,6 +597,8 @@ jobs:
           NOARCH_MIN_DSM72_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm72_packages }}
           ARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.arch_min_dsm73_packages }}
           NOARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm73_packages }}
+          ARCH_MIN_DSM74_PACKAGES: ${{ needs.prepare.outputs.arch_min_dsm74_packages }}
+          NOARCH_MIN_DSM74_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm74_packages }}
           VIDEODRV: ${{ needs.prepare.outputs.videodriver }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}

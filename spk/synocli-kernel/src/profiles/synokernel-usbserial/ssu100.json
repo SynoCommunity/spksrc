@@ -1,0 +1,6 @@
+{
+  "name": "ssu100",
+  "description": "Quatech SSU-100 Single Port Serial Driver",
+  "modules": ["ssu100"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

@@ -75,7 +75,7 @@
 #   KERNEL_ARCH_SUFFIX        Derived arch/version suffix
 #   KERNEL_COOKIE             Build completion marker
 #   KERNEL_PCI_SLOT           1 when a model of the platform has a PCIe slot for
-#                             add-in cards, for what builds PCI drivers
+#                             add-in cards; read by spksrc.driver.mk
 #
 # Important Behavioral Differences:
 #   - PKG_NAME and PKG_DIR vary depending on REQUIRE_KERNEL_MODULE
@@ -108,6 +108,11 @@
 ###############################################################################
 
 # Configure the included makefiles
+# Kernel modules are built with the compiler of the Synology toolchain the kernel
+# was built with: no compiler overlay, whatever local.mk or the command line asks
+override OVERLAY_GCC := 0
+override OVERLAY_BINUTILS := 0
+
 NAME          = $(KERNEL_NAME)
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-

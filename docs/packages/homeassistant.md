@@ -141,6 +141,10 @@ State as of Home Assistant Package Versions
   Depends on Python 3.14 <br>
   Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore.
+- **2026.9.4-27** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br>
+  Depends on Python 3.14 <br>
+  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br>
+  All integrations that can be configured with an UI are supported. The list below is not maintained anymore.
 
 _**Supported HA Integrations up to HA 2024.12.5**_
 

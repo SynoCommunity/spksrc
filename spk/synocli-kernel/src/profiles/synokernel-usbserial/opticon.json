@@ -1,0 +1,6 @@
+{
+  "name": "opticon",
+  "description": "Opticon Barcode driver (serial mode)",
+  "modules": ["opticon"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

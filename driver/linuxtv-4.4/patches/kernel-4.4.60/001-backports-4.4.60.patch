@@ -1,0 +1,12 @@
+--- backports/backports.txt.orig
++++ backports/backports.txt
+@@ -161,6 +161,9 @@
+ add v4.4_gpio_chip_parent.patch
+ add v4.4_user_pages_flag.patch
+ 
++[4.4.60]
++delete v4.4_user_pages_flag.patch
++
+ [4.3.1023]
+ delete v4.4_user_pages_flag.patch
+ add v4.3_bt87x_const_fix.patch

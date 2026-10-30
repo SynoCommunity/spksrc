@@ -1,0 +1,5 @@
+{
+  "name": "cdrom",
+  "description": "USB CD, DVD and Blu-ray drives",
+  "modules": ["cdrom", "sr_mod"]
+}

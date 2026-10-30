@@ -1,0 +1,17 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -2532,4 +2532,14 @@
+         list_entry((ptr)->prev, type, member)
+ #endif
+ 
++/*
++ * These kernels declare the clk API without exporting all of it. Its only user
++ * is v4l2-clk, for the clocks of camera sensors a NAS does not have
++ */
++#include <linux/clk.h>
++#define clk_get_rate(clk)		0
++#define clk_put(clk)			do { } while (0)
++#define clk_set_rate(clk, rate)		(-EINVAL)
++#define clk_round_rate(clk, rate)	(-EINVAL)
++
+ #endif /*  _COMPAT_H */

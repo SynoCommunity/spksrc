@@ -1,7 +1,8 @@
-# Generated using the requirements script on March 2, 2025
+# Generated using the requirements script on October 30, 2026
+# Command: generate_requirements.sh "rdiff-backup[meta]==2.2.7" 314
 
-psutil==7.0.0
-pylibacl==0.7.2
+psutil==7.2.2
+pylibacl==0.7.3
 pyxattr==0.8.1
-PyYAML==6.0.2
-rdiff_backup==2.2.6
+PyYAML==6.0.3
+rdiff-backup==2.2.7

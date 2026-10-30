@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2026.7.4
-SPK_REV = 26
+SPK_VERS = 2026.9.4
+SPK_REV = 27
 SPK_ICON = src/homeassistant.png
 
 PYTHON_PACKAGE = python314
@@ -19,7 +19,7 @@ UNSUPPORTED_ARCHS = $(ARMv7_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. 
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2026.7.4 and depend on Python 3.14. <br/><br/>REMARKS: A minimal set of cross compiled wheels is included in this package. All other wheels and HACS are downloaded at installation time. <br/>Home Assistant Core installation is deprecated since version 2025.12, you should consider migrating to a container installation."
+CHANGELOG = "Update homeassistant to 2026.9.4. <br/><br/>REMARKS: A minimal set of cross compiled wheels is included in this package. All other wheels and HACS are downloaded at installation time. <br/>Home Assistant Core installation is deprecated since version 2025.12, you should consider migrating to a container installation."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -61,12 +61,7 @@ DEPENDS += cross/opus
 
 include ../../mk/spksrc.spk-meta.mk
 
-# use python arch specific requirements file to download cross wheels from index
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_x64.txt
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_aarch64.txt
-endif
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index.txt
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:

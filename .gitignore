@@ -7,10 +7,15 @@
 native/*/work*
 native/*/build*
 native/*/status*
+native/*/*.tar.bz2
 
 cross/*/work*
 cross/*/build*
 cross/*/status*
+
+driver/*/work*
+driver/*/build*
+driver/*/status*
 
 kernel/*/work*
 kernel/*/build*

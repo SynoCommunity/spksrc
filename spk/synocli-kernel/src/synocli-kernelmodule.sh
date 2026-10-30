@@ -18,436 +18,424 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-#------------------------------------------------
-# Make sure an argument was passed 
-#------------------------------------------------
+# Loads the kernel modules of a SynoCommunity synokernel-* package, by profile:
+# one JSON file per device in etc/profiles/<package> of this package, listing
+# the modules of that device in load order. The modules each of them depends on
+# are read from the module itself and loaded first.
+
+PACKAGES=/var/packages
+# This package: its profiles and udev rules
+TARGET=$(dirname $(dirname $(readlink -f $0)))
+PROFILES_DIR=${TARGET}/etc/profiles
+RULES_DIR=${TARGET}/etc/rules.d
+FPATH_SYS=/sys/module/firmware_class/parameters/path
+LOG=/var/log/packages/synocli-kernelmodule.log
+
 usage() {
-   echo
-   printf '%10s %s\n' "Usage :" "$0 [-s|--spk <package>] [<insmod,start|rmmod,stop|reload,restart|status>] module1.ko module2.ko ..."
-   printf '%20s %s\n' "Optional :" "[-c|--config <file>:<option1>,<option2>,...]"
-   printf '%20s %s\n' "" "[-u|--udev <file>]"
-   echo
-   printf '%40s %s\n' "[-s|--spk <package>] : " "SynoCommunity package name containing kernel modules"
-   printf '%40s %s\n' "[<insmod|rmmod|reload|status>] : " "Action to be performed"
-   printf '%40s %s\n' "[-h|--help] : " "Print this help"
-   printf '%40s %s\n' "[-v|--verbose] : " "Verbose mode"
-   echo
-   printf '%10s %s\n' "" "Examples :"
-   printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
-   printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
-   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --udev 60-synokernel-usbserial.rules usbserial ch341 cp210x status"
-   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x status"
-   echo
+   cat <<EOF
+
+Usage: $0 [options] <list|modules|start|stop|restart|status> [module ...]
+
+   list                      the profiles of every synokernel-* package, and
+                             whether the package is installed and this kernel
+                             has all their modules
+   modules                   the modules the profiles and modules given load, in
+                             order, and where each comes from; nothing is loaded
+   start|stop|restart|status the modules of the profiles, and of the modules given
+
+Options:
+   -s, --spk <package>       package holding the modules (default: the one
+                             of the profiles)
+   -p, --profile <p1,p2,...> profiles to use
+   -r, --root <dir>          package target directory (default: $PACKAGES/<package>/target)
+   -n, --dry-run             start, stop and restart only tell what they would do
+   -v, --verbose             print the modules resolved, and the comments of profiles
+   -h, --help                this help
+
+Examples:
+   $0 list
+   $0 --profile hauppauge-wintv-dualhd-atsc start
+   $0 --spk synokernel-usbserial --profile ch341,cp210x status
+   $0 --profile hauppauge-wintv-dualhd-atsc modules
+   $0 --profile hauppauge-wintv-dualhd-atsc --dry-run start
+   $0 --spk synokernel-cdrom sr_mod start
+
+EOF
+   warning
 }
 
-#------------------------------------------------
-# Print detailed information for debugging
-#------------------------------------------------
-verbose() {
-   printf '%20s %s\n' "" "$0 (verbose)"
-   printf '%60s %s\n' "SynoCommunity kernel driver package name (SPK)" "[${SPK}]"
-   printf '%60s %s\n' "SynoCommunity configuration file (SPK_CFG)" "[${SPK_CFG}]"
-   printf '%60s %s\n' "SynoCommunity configuration path (SPK_CFG_PATH)" "[${SPK_CFG_PATH}]"
-   printf '%60s %s\n' "SynoCommunity configuration option (SPK_CFG_OPT)" "[${SPK_CFG_OPT}]"
-   printf '%60s %s\n' "Synology NAS arch (ARCH)" "[${ARCH}]"
-   printf '%60s %s\n' "Synology DSM version (DSM_VERSION)" "[${DSM_VERSION}]"
-   printf '%60s %s\n' "Running kernel version (KVER)" "[${KVER}]"
-   printf '%60s %s\n' "Module action insmod|rmmod|reload|status (ACTION)" "[${ACTION}]"
-   printf '%60s %s\n' "Kernel modules path (MPATH)" "[${MPATH}]"
-   printf '%60s %s\n' "Full kernel modules path (KPATH)" "[${KPATH}]"
-   printf '%60s %s\n' "Device firmware path (FPATH)" "[${FPATH}]"
-   printf '%60s %s\n' "udev rules.d path (UPATH)" "[${UPATH}]"
-   printf '%60s %s\n' "udev rules.d file (URULE)" "[${URULE}]"
-   printf '%60s %s\n' "Kernel objects list (KO_LIST)" "[${KO_LIST}]"
-   printf '%60s %s\n' "Kernel objects found (KO_PATH)" "[${KO_PATH}]"
+# Kernel modules are outside of what Synology supports
+warning() {
+   cat <<EOF >&2
+WARNING: the kernel modules of SynoCommunity packages are experimental, and
+outside of what Synology supports: use them at your own risk. A module can
+crash the NAS, and support is limited. Read the documentation before opening
+an issue: https://docs.synocommunity.com/packages/synocli-kernel/
+EOF
 }
 
+die() { echo "ERROR: $*" >&2; exit 1; }
+say() { [ "${VERBOSE}" = "TRUE" ] && echo "$*"; return 0; }
+
+# A module name, as /sys/module and lsmod show it
+modname() { local m=${1##*/}; m=${m%.ko}; echo "${m//-/_}"; }
+
+loaded() { [ -d /sys/module/$(modname $1) ]; }
+
+# 0 when $1 <= $2, both dotted versions
+ver_le() { [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -1)" = "$1" ]; }
 
 #------------------------------------------------
-# Get all kernel modules from configuration file
-# based on passed configuration option
+# Profiles
 #------------------------------------------------
-get_ko_list() {
-   ko_list_cfg=""
 
-   if [ "${SPK_CFG}" ]; then
-      # Check that configuration exists (if requested)
-      if [ ! -r ${SPK_CFG_PATH}/${SPK_CFG} ]; then
-         usage
-         echo -ne "\nERROR: Configuration file [${SPK_CFG_PATH}/${SPK_CFG}] does not exist or inaccessible...\n\n"
-         exit 1
-      fi
-
-      # Always include default first
-      ko_list_cfg=$(sed -n "s/^default:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
-      if [ ! "${ko_list_cfg}" ]; then
-         usage
-         echo -ne "\nERROR: Configuration option [default] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
-         exit 1
-      fi
-
-      IFS=","
-      for config in ${SPK_CFG_OPT}
-      do
-         ko_list_cfg_tmp=$(sed -n "s/^${config}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
-         if [ ! "${ko_list_cfg}" ]; then
-            usage
-            echo -ne "\nERROR: Configuration option [${config}:] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
-            exit 1
-         fi
-         ko_list_cfg+="${ko_list_cfg_tmp} "
-      done
-      IFS=" "
-   fi
-
-   # Return merged module list from config file and
-   # parameters passed as arguments but keep its order,
-   # starting with the config file followed by args
-   echo ${ko_list_cfg} ${KO_LIST_ARG} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs
+# The profile files of a package, or of every synokernel-* package
+profile_files() {
+   ls ${PROFILES_DIR}/${SPK:-synokernel-*}/*.json 2>/dev/null
 }
 
+# The file of profile $1: fails when it is in no package, or in several
+profile_file() {
+   local found
+   found=$(profile_files | grep "/$1\.json$")
+   [ -n "${found}" ] || die "profile [$1] not found, see: $0 list"
+   [ $(echo "${found}" | wc -l) -eq 1 ] || die "profile [$1] is in several packages, choose one with --spk: $(echo ${found})"
+   echo "${found}"
+}
 
-#------------------------------------------------
-# Modules can be passed as:
-#   <module>
-#   <module>.ko
-#   /<path>/<module>*
-# The following find the right module as needed
-#------------------------------------------------
-ko_path_match() {
-   ko_find=""
-   ko_path=""
-   ko_missing=""
+# The package of a profile file: its directory
+profile_spk() { basename $(dirname $1); }
 
-   for ko in $KO_LIST
-   do
-      # first check if the name
-      # matches to a path
-      if [ ! "$(echo $ko | grep '/')" ]; then
-         # Ensure to add .ko if needed
-         [ ! "$(echo $ko | grep '.ko$')" ] && ko=$ko.ko
-         # Replace any '-' or '_' by '[-_]
-         ko=$(echo ${ko} | sed -r 's/[-_]/[-_]/g')
-         # Find full module kernel object path
-         ko_find=$(find $KPATH -name $ko)
-         [ ! "$ko_find" ] && ko_missing+="$ko "
+# The modules of a profile for the running kernel: those of the first entry of
+# "kernels" whose min and max bracket it, else "modules"
+profile_modules() {
+   local file=$1 min max mods
+   while IFS='|' read -r min max mods; do
+      [ -n "${min}" ] && ! ver_le "${min}" "${KVER}" && continue
+      [ -n "${max}" ] && ! ver_le "${KVER}" "${max}.999" && continue
+      echo "${mods}"
+      return
+   done < <(jq -r '(.kernels // [])[] | "\(.min // "")|\(.max // "")|\(.modules | join(" "))"' "${file}")
+   jq -r '(.modules // []) | join(" ")' "${file}"
+}
+
+# The modules directory of the running kernel in a package target
+kernel_path() { echo "$1/lib/modules/${PLATFORM}/$(uname -r)"; }
+
+# The profiles, available when this kernel has every module they load
+list() {
+   local file spk root missing state
+   for file in $(profile_files); do
+      spk=$(profile_spk ${file})
+      root=${ROOT:-${PACKAGES}/${spk}/target}
+      KPATH=$(kernel_path ${root})
+      index_modules
+      SEEN="" ; ORDER=""
+      for m in $(profile_modules ${file}); do resolve ${m}; done
+      missing=$(missing_modules)
+      state="available"
+      [ -d "${KPATH}" ] || state="n/a (no modules for this kernel)"
+      [ -n "${ROOT}" -o -d "${PACKAGES}/${spk}/target" ] || state="n/a (install ${spk})"
+      [ "${state}" = "available" ] && [ -n "${missing}" ] && state="n/a (missing: ${missing})"
+      printf '%-24s %-32s %-10s %s\n' "${spk:-${ROOT}}" "$(basename ${file} .json)" "${state%% *}" "$(jq -r '.description // ""' ${file})"
+      [ "${state}" = "available" ] || echo "      ${state#n/a }"
+      if [ "${VERBOSE}" = "TRUE" ]; then
+         jq -r '.comments // empty' ${file} | sed 's/^/      /'
+         echo "      modules: $(profile_modules ${file})"
       fi
-      ko_path+="${ko_find##*${KVER}} "
    done
-
-   # Return missing modules in case of error
-   # else return the list of found modules
-   [ ! "${ko_missing}" ] \
-      && echo "$ko_path" | xargs \
-      || echo "missing: ${ko_missing}" | xargs
 }
 
-# exit if no parameters passed
-[ $# -eq 0 ] && usage && exit 1
+#------------------------------------------------
+# Modules
+#------------------------------------------------
 
-# must be root to load/unload kernel modules
-if [ ! "$(id -un)" = "root" ]; then
-   verbose && usage
-   echo
-   echo "ERROR: Must have root or sudo priviledges..."
-   echo
-   exit 1
-fi
+# "<name> <path>" of every .ko of the kernel directory, '-' and '_' being the
+# same; built in the main shell, once per directory, as ko_file runs in $(...)
+index_modules() {
+   [ "${KO_INDEX_OF}" = "${KPATH}" ] && return
+   KO_INDEX=$(find ${KPATH} -name '*.ko' 2>/dev/null | awk -F/ '{ n = $NF; sub(/\.ko$/, "", n); gsub(/-/, "_", n); print n, $0 }')
+   KO_INDEX_OF=${KPATH}
+}
 
+# The .ko of a module in the package
+ko_file() {
+   echo "${KO_INDEX}" | awk -v n="$(modname $1)" '$1 == n { print $2; exit }'
+}
 
-###
-### Global variables
-###
-SPK=""                                                                 # SynoCommunity kernel driver package name
-SPK_CFG=""                                                             # SynoCommunity configuration file
-SPK_CFG_OPT=""                                                         # SynoCommunity configuration option
-SPK_CFG_PATH=""                                                        # SynoCommunity configuration path
-ACTION=""                                                              # Module action insmod|rmmod|reload|status
-VERBOSE="FALSE"                                                        # Set verbose mode
-HELP="FALSE"                                                           # Print help
-URULE="FALSE"                                                          # Set udev rules to false by default
+# Where a module of ORDER comes from: the package, DSM's /lib/modules, the
+# running kernel (loaded or built in), or nowhere
+module_source() {
+   local name=$(modname $1)
+   if [ -f "$1" ]; then echo "package"
+   elif [ -f /lib/modules/${name}.ko -o -f /lib/modules/${name//_/-}.ko ]; then echo "kernel"
+   elif loaded ${name}; then echo "kernel (loaded)"
+   else echo "missing"
+   fi
+}
 
-while [ $# -gt 0 ] 
-do
+# The modules of ORDER no one provides
+missing_modules() {
+   local m out=""
+   for m in ${ORDER}; do
+      [ "$(module_source ${m})" = "missing" ] && out="${out} $(modname ${m})"
+   done
+   echo ${out}
+}
+
+modules() {
+   local m
+   for m in ${ORDER}; do
+      printf '%-40s %-16s %s\n' "$(modname ${m})" "$(module_source ${m})" "$([ -f "${m}" ] && echo "${m#${KPATH}/}")"
+   done
+   [ -z "$(missing_modules)" ]
+}
+
+# Appends to ORDER the modules $1 depends on, then $1: a module of the package
+# by its path, one it does not have by its name (one of the kernel's own)
+resolve() {
+   local name=$(modname $1) ko dep
+   case " ${SEEN} " in *" ${name} "*) return;; esac
+   SEEN="${SEEN} ${name}"
+   ko=$(ko_file $1)
+   if [ -n "${ko}" ]; then
+      for dep in $(grep -a -o 'depends=[^[:cntrl:]]*' ${ko} | head -1 | cut -d= -f2 | tr ',' ' '); do
+         resolve ${dep}
+      done
+      ORDER="${ORDER} ${ko}"
+   else
+      ORDER="${ORDER} ${name}"
+   fi
+}
+
+# One of the kernel's own modules: by modprobe, or from the flat /lib/modules
+# of DSM, which modprobe does not index
+load_kernel_module() {
+   local ko
+   modprobe -q $1 2>/dev/null && return 0
+   for ko in /lib/modules/$1.ko /lib/modules/${1//_/-}.ko; do
+      [ -f ${ko} ] && insmod ${ko} && return 0
+   done
+   return 1
+}
+
+load() {
+   local error=0 m
+   if [ "${DRYRUN}" = "TRUE" ]; then
+      for m in ${ORDER}; do
+         printf '%-40s' "$(modname ${m})"
+         if loaded ${m}; then echo "already loaded"
+         elif [ "$(module_source ${m})" = "missing" ]; then echo "missing"; error=1
+         else echo "OK (simulated, $(module_source ${m}))"
+         fi
+      done
+      return ${error}
+   fi
+   firmware_on
+   udev_on
+   for m in ${ORDER}; do
+      printf '%-40s' "$(modname ${m})"
+      if loaded ${m}; then
+         echo "already loaded"
+      elif [ -f "${m}" ]; then
+         insmod ${m} && echo "OK" || { echo "ERROR"; error=1; }
+      else
+         load_kernel_module ${m} && echo "OK (kernel)" || { echo "ERROR: not in the package nor the kernel"; error=1; }
+      fi
+   done
+   return ${error}
+}
+
+# Unloads the modules of the package in reverse order; those another module
+# still uses stay loaded, and so do the kernel's own
+unload() {
+   local error=0 m
+   for m in $(echo ${ORDER} | tr ' ' '\n' | tac); do
+      [ -f "${m}" ] || continue
+      printf '%-40s' "$(modname ${m})"
+      if ! loaded ${m}; then
+         echo "not loaded"
+      elif [ "$(cat /sys/module/$(modname ${m})/refcnt 2>/dev/null)" != "0" ]; then
+         echo "in use, left loaded"
+      elif [ "${DRYRUN}" = "TRUE" ]; then
+         echo "OK (simulated)"
+      else
+         rmmod $(modname ${m}) && echo "OK" || { echo "ERROR"; error=1; }
+      fi
+   done
+   [ "${DRYRUN}" = "TRUE" ] && return ${error}
+   udev_off
+   firmware_off
+   return ${error}
+}
+
+status() {
+   local error=0 m
+   for m in ${ORDER}; do
+      printf '%-40s' "$(modname ${m})"
+      loaded ${m} && echo "loaded" || { echo "not loaded"; error=1; }
+   done
+   return ${error}
+}
+
+#------------------------------------------------
+# Firmware and udev rules
+#------------------------------------------------
+
+# The firmware of the package, through the search path of the kernel where it
+# has one, else linked into /lib/firmware
+firmware_on() {
+   local f
+   [ -d "${FPATH}" ] || return 0
+   if [ -w ${FPATH_SYS} ]; then
+      echo -n "${FPATH}" > ${FPATH_SYS}
+   else
+      mkdir -p /lib/firmware
+      for f in ${FPATH}/*; do
+         [ -e /lib/firmware/${f##*/} ] || ln -s ${f} /lib/firmware/${f##*/}
+      done
+   fi
+}
+
+firmware_off() {
+   local f
+   [ -d "${FPATH}" ] || return 0
+   if [ -w ${FPATH_SYS} ]; then
+      grep -q "^${FPATH}$" ${FPATH_SYS} && echo -n "" > ${FPATH_SYS}
+   else
+      for f in /lib/firmware/*; do
+         [ -h ${f} ] && case $(readlink ${f}) in ${FPATH}/*) rm -f ${f};; esac
+      done
+      rmdir /lib/firmware 2>/dev/null
+   fi
+   return 0
+}
+
+udev_on() {
+   local rule
+   [ -n "${UDEV}" ] || return 0
+   for rule in ${UDEV}; do
+      ln -sf ${RULES_DIR}/${rule} /lib/udev/rules.d/${rule}
+   done
+   udevadm control --reload-rules
+}
+
+udev_off() {
+   local rule
+   [ -n "${UDEV}" ] || return 0
+   for rule in ${UDEV}; do
+      rm -f /lib/udev/rules.d/${rule}
+   done
+   udevadm control --reload-rules
+}
+
+#------------------------------------------------
+# Main
+#------------------------------------------------
+
+SPK=""
+ROOT=""
+PROFILES=""
+ACTION=""
+MODULES=""
+VERBOSE="FALSE"
+DRYRUN="FALSE"
+
+while [ $# -gt 0 ]; do
    case $1 in
-                                        -s|--spk ) shift 1
-                                                   SPK=$1;;
-                                     -c|--config ) shift 1
-                                                   SPK_CFG=$(echo $1 | cut -f1 -d:)
-                                                   SPK_CFG_OPT=$(echo $1 | cut -f2 -d:);;
-                                       -u|--udev ) shift 1
-                                                   URULE=$(echo $1 | cut -f1 -d:);;
-                                       -h|--help ) HELP="TRUE";;
-   insmod|rmmod|reload|start|stop|restart|status ) ACTION=$1;;
-                                    -v|--verbose ) VERBOSE="TRUE";;
-                                               * ) KO_LIST_ARG+="$1 ";;
+      -s|--spk)     shift; SPK=$1;;
+      -p|--profile) shift; PROFILES=$(echo $1 | tr ',' ' ');;
+      -r|--root)    shift; ROOT=$1;;
+      -n|--dry-run) DRYRUN="TRUE";;
+      -v|--verbose) VERBOSE="TRUE";;
+      -h|--help)    usage; exit 0;;
+      list|modules|start|stop|restart|status) ACTION=$1;;
+      insmod)       ACTION=start;;
+      rmmod)        ACTION=stop;;
+      reload)       ACTION=restart;;
+      -*)           usage; die "unknown option [$1]";;
+      *)            MODULES="${MODULES} $1";;
    esac
-   shift 1;
+   shift
 done
 
-###
-### Other global variables
-###
-ARCH=$(uname -a | awk '{print $NF}' | cut -f2 -d_)                     # Synology NAS arch
-DSM_VERSION=$(sed -n 's/^productversion="\(.*\)"/\1/p' /etc/VERSION)   # Synology DSM version
-FPATH_SYS="/sys/module/firmware_class/parameters/path"                 # System module firmware path file index
-KVER=$(uname -r | awk -F. '{print $1 "." $2 "." $3}')                  # Running kernel version
-FPATH=""                                                               # Device firmware path
-KPATH=""                                                               # Full kernel modules path
-MPATH=""                                                               # Kernel modules path
-KO_LIST=""                                                             # List of kernel objects to enable|disable (includes config+args)
-KO_LIST_ARG=$(echo ${KO_LIST_ARG} | xargs)                             # List of kernel objects passed in argument
-KO_PATH=""                                                             # List of found kernel objects (*.ko) with path (includes config+args)
-SYNOLOG_PATH=/var/log/packages                                         # Default log output file
-SYNOLOG=${SYNOLOG_PATH}/synocli-kernelmodule.log                       # Default log output file
+[ -n "${ACTION}" ] || { usage; exit 1; }
+command -v jq >/dev/null || die "jq is needed to read the profiles"
 
-# If SPK is set reassign variables
-if [ -n "${SPK}" ]; then
-   SPK_CFG_PATH="/var/packages/${SPK}/target/etc"
-   FPATH="/var/packages/${SPK}/target/lib/firmware"
-   MPATH="/var/packages/${SPK}/target/lib/modules"
-   UPATH="/var/packages/${SPK}/target/rules.d"
-   KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}"
-   SYNOLOG="${SYNOLOG_PATH}/synocli-kernelmodule-${SPK}.log"
+# The platform the modules are built for (uname: synology_<platform>_<model>),
+# and the kernel version, without the "+" of 4.4 and newer
+PLATFORM=$(uname -a | awk '{print $NF}' | cut -d_ -f2)
+KVER=$(uname -r | sed 's/+$//')
+
+if [ "${ACTION}" = "list" ]; then
+   list
+   exit 0
 fi
 
-# All output to SYNOLOG, STDOUT to the screen
-exec > >(tee -a ${SYNOLOG}) 2> >(tee -a ${SYNOLOG} >/dev/null)
+[ -n "${PROFILES}${MODULES}" ] || { usage; die "no profile nor module given"; }
 
-
-# Get list of kernel objects from
-# both the configuration file and
-# arguments passed on cmd line
-KO_LIST=$(get_ko_list)
-
-# Find resulting kernel object (*.ko) full path
-KO_PATH=$(ko_path_match)
-
-# exit if modules are missing/not found
-if [ "$(echo $KO_PATH | cut -f1 -d:)" = "missing" ]; then
-   verbose && usage
-   echo
-   echo "ERROR: Missing kernel modules: [$(echo $KO_PATH | cut -f2 -d: | xargs)]"
-   echo
-   exit 1
-fi
-
-# If verbose is set print default arguments
-[ ${VERBOSE} = "TRUE" ] && verbose
-
-[ ${HELP} = "TRUE" ] && usage && exit 0
-
-# If module path does not exists, exit
-if [ ! -d ${MPATH} ]; then
-   usage
-   echo -ne "\nERROR: Module path [${MPATH}] does not exist or inaccessible...\n\n"
-   exit 1
-fi
-
-# Set kernel module .ko object base path
-# If does not exists, exit
-if [ ! -d ${KPATH} ]; then
-   usage
-   echo -ne "\nERROR: Kernel modules base path [${KPATH}] does not exist or inaccessible...\n\n"
-   exit 1
-fi
-
-# Check that udev rules file exist
-if [ ! ${URULE} "FALSE" -a ! -f ${UPATH}/${URULE} ]; then
-   usage
-   echo -ne "\nERROR: udev rules.d file [${UPATH}/${URULE}] does not exist or inaccessible...\n\n"
-   exit 1
-fi
-
-# load the requested modules
-load ()
-{
-   error=0
-
-   if [ "{URULE}" ]; then
-      echo -ne "\t[enable] optional udev rules...\n"
-      printf '%40s %-34s' "" "[$URULE]"
-      ln -s ${UPATH}/${URULE} /lib/udev/rules.d/${URULE}
-      udevadm control --reload-rules
-      if [ $? -eq 0 ]; then
-         echo -ne " OK\n"
-      else
-         error=1
-         echo -ne " N/A\n"
-      fi
-   fi
-
-   # Add firmware path to running kernel
-   if [ -d "${FPATH}" ]; then
-      echo -ne "\t[loading] optional firmware path...\n"
-      printf '%65s' "[${FPATH}]"
-      echo "${FPATH}" > ${FPATH_SYS}
-      if [ $? -eq 0 ]; then
-         echo -ne " OK\n"
-      else
-         error=1
-         echo -ne " N/A\n"
-      fi
-   fi
-
-   echo -ne "\t[insmod] kernel modules...\n"
-   for ko in $KO_PATH
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-35s' $ko "[$module]"
-
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         echo "Already Loaded"
-      else
-         if [ -f $KPATH/$ko ]; then
-            insmod $KPATH/$ko
-            [ $? -eq 0 ] && echo "OK" || echo "ERROR"
-         else
-            echo "ERROR: Module $KPATH/$ko not found!"
-            error=1
-         fi
-      fi
+# The package: given, or the one holding the profiles
+if [ -z "${SPK}" -a -z "${ROOT}" ]; then
+   for p in ${PROFILES}; do
+      s=$(profile_spk $(profile_file ${p}))
+      [ -z "${SPK}" -o "${SPK}" = "${s}" ] || die "profiles of several packages: ${SPK} and ${s}"
+      SPK=${s}
    done
+   [ -n "${SPK}" ] || die "modules given without --spk"
+fi
+ROOT=${ROOT:-${PACKAGES}/${SPK}/target}
+FPATH=${ROOT}/lib/firmware
+KPATH=${ROOT}/lib/modules/${PLATFORM}/$(uname -r)
 
-   return $error
-}
+[ -d "${ROOT}" ] || die "${SPK} is not installed"
+[ -d "${KPATH}" ] || die "no modules for this kernel in [${KPATH}]"
 
+# Modules and udev rules of the profiles, then the modules given
+WANTED=""
+UDEV=""
+for p in ${PROFILES}; do
+   file=$(profile_file ${p})
+   WANTED="${WANTED} $(profile_modules ${file})"
+   UDEV="${UDEV} $(jq -r '(.udev // []) | join(" ")' ${file})"
+done
+WANTED="${WANTED} ${MODULES}"
+UDEV=$(echo ${UDEV})
 
-# unload the requested modules in a reversed order
-unload ()
-{
-   error=0
+index_modules
+SEEN=""
+ORDER=""
+for m in ${WANTED}; do
+   resolve ${m}
+done
 
-   # Unload drivers in reverse order
-   echo -ne "\t[rmmod] kernel modules...\n"
-   for item in $KO_PATH; do echo $item; done | tac | while read ko
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-35s' $ko "[$module]"
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         rmmod $module
-         echo -ne "N/A\n"
-      else
-         echo -ne "ERROR\n"
-         error=1
-      fi
-   done
+if [ "${ACTION}" = "modules" ]; then
+   modules
+   exit $?
+fi
+[ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "must be run as root"
 
-   # Remove firmware path to running kernel
-   if [ -d "${FPATH}" ]; then
-      echo -ne "\t[unloading] optional firmware path...\n"
-      echo "" > ${FPATH_SYS}
-      error=$?
-   fi
+# The log needs root: a dry run without it prints only
+if [ "$(id -u)" = "0" ]; then
+   mkdir -p $(dirname ${LOG})
+   exec > >(tee -a ${LOG}) 2>&1
+   TEE=$!
+fi
+[ "${ACTION}" = "status" ] || warning
+echo "--- $(date '+%Y-%m-%d %H:%M:%S') ${ACTION}$([ "${DRYRUN}" = "TRUE" ] && echo " (dry run)") ${SPK:-${ROOT}} [${PROFILES}${MODULES:+ +${MODULES}}]"
+say "kernel ${PLATFORM} $(uname -r): ${KPATH}"
+say "modules: $(for m in ${ORDER}; do echo -n "$(modname ${m}) "; done)"
 
-   # Remove udev rules
-   if [ "{URULE}" ]; then
-      echo -ne "\t[remove] optional udev rules...\n"
-      printf '%40s %-34s' "" "[$URULE]"
-      rm -f /lib/udev/rules.d/${URULE}
-      udevadm control --reload-rules
-      if [ $? -eq 0 ]; then
-         echo -ne " N/A\n"
-      else
-         error=1
-         echo -ne " ERROR\n"
-      fi
-   fi
-
-   return $error
-}
-
-
-# Provide a status of the loaded modules
-status ()
-{
-   error=0
-
-   echo -ne "\t[status] kernel modules...\n"
-   for ko in $KO_PATH
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-35s' $ko "[$module]"
-
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         echo -ne "OK\n"
-      else
-         error=1
-         echo -ne "N/A\n"
-      fi
-   done
-
-   # Validate option firmware path
-   if [ -d "${FPATH}" ]; then
-      echo -ne "\t[status] of optional firmware path...\n"
-	  printf '%65s' "[${FPATH}]"
-
-      grep -q ${FPATH} ${FPATH_SYS}
-      if [ $? -eq 0 ]; then
-         echo -ne " OK\n"
-      else
-         error=1
-         echo -ne " N/A\n"
-      fi
-   fi
-
-   # Validate udev rules (not much can be done)
-   if [ "{URULE}" ]; then
-      echo -ne "\t[status] of optional udev rules...\n"
-      printf '%40s %-34s' "" "[$URULE]"
-      if [ -h /lib/udev/rules.d/${URULE} ]; then
-         echo -ne " OK\n"
-      else
-         error=1
-         echo -ne " N/A\n"
-      fi
-   fi
-
-   return $error
-}
-
-
-case $ACTION in
-    insmod|start)
-       if status; then
-           echo ${SPK} is already running
-           exit 0
-       else
-           echo Starting ${SPK} ...
-           load
-           exit $?
-       fi
-       ;;
-    rmmod|stop)
-       if status; then
-           echo Stopping ${SPK} ...
-           unload
-           exit $?
-       else
-           echo ${SPK} is not running
-           exit 0
-       fi
-       ;;
-    reload|restart)
-       echo -ne "---\nReloading ${SPK} package...\n"
-       unload
-       load
-       exit $?
-       ;;
-    status)
-       echo -ne "---\nStatus of ${SPK} package...\n"
-       if status; then
-           echo ${SPK} is running
-           exit 0
-       else
-           echo ${SPK} is not running
-           exit 1
-       fi
-       ;;
-    *) usage
-       exit 1
-       ;;
+case ${ACTION} in
+   start)   load;;
+   stop)    unload;;
+   restart) unload; load;;
+   status)  status;;
 esac
+rc=$?
+
+# Let tee write the last lines before returning
+if [ -n "${TEE}" ]; then
+   exec >&- 2>&-
+   wait ${TEE}
+fi
+exit ${rc}

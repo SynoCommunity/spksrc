@@ -322,7 +322,7 @@ dependency-flat:
 		  /^(DEPENDS|BUILD_DEPENDS|OPTIONAL_DEPENDS|NATIVE_DEPENDS) / { \
 		    if (index(types, " " $$1 " ") > 0) print $$2 \
 		  }' \
-		| grep -P "^(cross|python|native|spk|diyspk)/" \
+		| grep -P "^(cross|driver|python|native|spk|diyspk)/" \
 		| sort -u
 
 # -------------------------------------------------------------------

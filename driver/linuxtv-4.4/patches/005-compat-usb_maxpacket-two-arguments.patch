@@ -1,0 +1,13 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1346,4 +1346,10 @@
+ #define dma_buf_vunmap(...)		((void)0)
+ #endif
+ 
++/* usb_maxpacket() loses its is_out argument in 5.19 */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
++#include <linux/usb.h>
++#define usb_maxpacket(udev, pipe) usb_maxpacket(udev, pipe, usb_pipeout(pipe))
++#endif
++
+ #endif /*  _COMPAT_H */

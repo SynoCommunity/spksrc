@@ -1,0 +1,20 @@
+--- v4l/compat.h.orig
++++ v4l/compat.h
+@@ -1583,7 +1583,7 @@
+ }
+ #endif
+ 
+-#ifdef NEED_GENMASK
++#ifndef GENMASK
+ #define GENMASK(h, l)           (((U32_C(1) << ((h) - (l) + 1)) - 1) << (l))
+ #endif
+ 
+@@ -1886,7 +1886,7 @@
+ #endif
+ #endif
+ 
+-#ifdef NEED_GENMASK_ULL
++#ifndef GENMASK_ULL
+ #define BITS_PER_LONG_LONG 64
+ #define GENMASK_ULL(h, l) \
+ 	(((~0ULL) << (l)) & (~0ULL >> (BITS_PER_LONG_LONG - 1 - (h))))

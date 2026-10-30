@@ -1,0 +1,130 @@
+--- drivers/usb/serial/ark3116.c.orig
++++ drivers/usb/serial/ark3116.c
+@@ -37,6 +37,9 @@
+ #include <linux/mutex.h>
+ #include <linux/spinlock.h>
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "Bart Hartgers <bart.hartgers+ark3116@gmail.com>"
+ #define DRIVER_DESC "USB ARK3116 serial/IrDA driver"
+ #define DRIVER_DEV_DESC "ARK3116 RS232/IrDA"
+--- drivers/usb/serial/belkin_sa.c.orig
++++ drivers/usb/serial/belkin_sa.c
+@@ -37,6 +37,9 @@
+ #include <linux/usb/serial.h>
+ #include "belkin_sa.h"
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "William Greathouse <wgreathouse@smva.com>"
+ #define DRIVER_DESC "USB Belkin Serial converter driver"
+ 
+--- drivers/usb/serial/cyberjack.c.orig
++++ drivers/usb/serial/cyberjack.c
+@@ -41,6 +41,9 @@
+ #include <linux/usb.h>
+ #include <linux/usb/serial.h>
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define CYBERJACK_LOCAL_BUF_SIZE 32
+ 
+ #define DRIVER_AUTHOR "Matthias Bruestle"
+--- drivers/usb/serial/empeg.c.orig
++++ drivers/usb/serial/empeg.c
+@@ -28,6 +28,9 @@
+ #include <linux/usb.h>
+ #include <linux/usb/serial.h>
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "Greg Kroah-Hartman <greg@kroah.com>, Gary Brubaker <xavyer@ix.netcom.com>"
+ #define DRIVER_DESC "USB Empeg Mark I/II Driver"
+ 
+--- drivers/usb/serial/keyspan.c.orig
++++ drivers/usb/serial/keyspan.c
+@@ -123,6 +123,9 @@
+ #include "keyspan_usa90msg.h"
+ #include "keyspan_usa67msg.h"
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ 
+ module_usb_serial_driver(serial_drivers, keyspan_ids_combined);
+ 
+--- drivers/usb/serial/kl5kusb105.c.orig
++++ drivers/usb/serial/kl5kusb105.c
+@@ -49,6 +49,9 @@
+ #include <linux/usb/serial.h>
+ #include "kl5kusb105.h"
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "Utz-Uwe Haus <haus@uuhaus.de>, Johan Hovold <jhovold@gmail.com>"
+ #define DRIVER_DESC "KLSI KL5KUSB105 chipset USB->Serial Converter driver"
+ 
+--- drivers/usb/serial/kobil_sct.c.orig
++++ drivers/usb/serial/kobil_sct.c
+@@ -38,6 +38,9 @@
+ #include <linux/ioctl.h>
+ #include "kobil_sct.h"
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "KOBIL Systems GmbH - http://www.kobil.com"
+ #define DRIVER_DESC "KOBIL USB Smart Card Terminal Driver (experimental)"
+ 
+--- drivers/usb/serial/omninet.c.orig
++++ drivers/usb/serial/omninet.c
+@@ -23,6 +23,9 @@
+ #include <linux/usb.h>
+ #include <linux/usb/serial.h>
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define DRIVER_AUTHOR "Alessandro Zummo"
+ #define DRIVER_DESC "USB ZyXEL omni.net LCD PLUS Driver"
+ 
+--- drivers/usb/serial/ssu100.c.orig
++++ drivers/usb/serial/ssu100.c
+@@ -18,6 +18,9 @@
+ #include <linux/serial_reg.h>
+ #include <linux/uaccess.h>
+ 
++/* The usb-serial core no longer defines debug, which this driver still uses */
++static bool debug;
++
+ #define QT_OPEN_CLOSE_CHANNEL       0xca
+ #define QT_SET_GET_DEVICE           0xc2
+ #define QT_SET_GET_REGISTER         0xc0
+--- drivers/usb/serial/cypress_m8.c.orig
++++ drivers/usb/serial/cypress_m8.c
+@@ -762,7 +762,7 @@
+ 		actual_size = count +
+ 			      (priv->pkt_fmt == packet_format_1 ? 2 : 1);
+ 
+-	usb_serial_debug_data(dev, __func__, port->interrupt_out_size,
++	usb_serial_debug_data(&port->dev, __func__, port->interrupt_out_size,
+ 			      port->interrupt_out_urb->transfer_buffer);
+ 
+ 	usb_fill_int_urb(port->interrupt_out_urb, port->serial->dev,
+--- drivers/usb/serial/garmin_gps.c.orig
++++ drivers/usb/serial/garmin_gps.c
+@@ -1071,7 +1071,7 @@
+ 	struct garmin_data *garmin_data_p = usb_get_serial_port_data(port);
+ 	__le32 *privpkt = (__le32 *)garmin_data_p->privpkt;
+ 
+-	usb_serial_debug_data(dev, __func__, count, buf);
++	usb_serial_debug_data(&port->dev, __func__, count, buf);
+ 
+ 	if (garmin_data_p->state == STATE_RESET)
+ 		return -EIO;

@@ -1,0 +1,6 @@
+{
+  "name": "ch341",
+  "description": "WinChipHead CH340 and CH341 USB serial adapters",
+  "modules": ["ch341"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

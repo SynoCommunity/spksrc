@@ -1,0 +1,6 @@
+{
+  "name": "hauppauge-wintv-dualhd-dvb",
+  "description": "Hauppauge WinTV-dualHD, DVB-T2 and DVB-C (USB 2040:0265)",
+  "comments": "The European model of the dualHD: the si2168 demodulator in place of the lgdt3306a. Not tested on hardware.",
+  "modules": ["si2157", "si2168", "rc-hauppauge", "em28xx-dvb", "em28xx-rc"]
+}

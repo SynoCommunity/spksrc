@@ -100,6 +100,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="CLI"><td><a href="synocli-monitor/">SynoCli Monitor Tools</a></td><td>CLI</td><td>System monitoring tools</td></tr>
     <tr data-category="CLI"><td><a href="synocli-net/">SynoCli Network Tools</a></td><td>CLI</td><td>Network utilities</td></tr>
     <tr data-category="CLI"><td><a href="synocli-videodriver/">SynoCli Video Driver</a></td><td>CLI</td><td>Intel GPU drivers for hardware transcoding</td></tr>
+    <tr data-category="Kernel"><td><a href="synokernel-linuxtv/">SynoKernel LinuxTV</a></td><td>Kernel</td><td>LinuxTV drivers for USB TV tuners</td></tr>
     <tr data-category="Kernel"><td><a href="synokernel-usbserial/">SynoKernel USB Serial</a></td><td>Kernel</td><td>USB serial adapter drivers</td></tr>
     <tr data-category="Downloads"><td><a href="transmission/">Transmission</a></td><td>Downloads</td><td>Lightweight BitTorrent client</td></tr>
     <tr data-category="Security"><td><a href="vaultwarden/">Vaultwarden</a></td><td>Security</td><td>Bitwarden-compatible password manager</td></tr>

@@ -10,7 +10,17 @@ tags:
 
 # SynoCli Kernel Tools
 
-The `synocli-kernel` package provides lower-level USB helpers and scripts to help with kernel module loading and unloading. This package should normally be a hard dependency for any other kernel module related package.
+!!! warning "Experimental, at your own risk"
+    The kernel modules of SynoCommunity packages are outside of what Synology
+    supports: a module that does not suit the kernel can crash the NAS, and DSM
+    updates may break them. Support is limited: read this documentation, and
+    check the issues already open, before opening one. Do not use them on a NAS
+    you cannot afford to restart or recover.
+
+The `synocli-kernel` package provides USB and process helpers (`usb-devices`,
+`lsusb.py`, `usbhid-dump`, `fuser`), the `synocli-kernelmodule` helper that loads
+the kernel modules of the `synokernel-*` packages, and the device profiles it
+loads them by. Every kernel module package depends on it.
 
 ## Package Information
 
@@ -19,111 +29,170 @@ The `synocli-kernel` package provides lower-level USB helpers and scripts to hel
 | Package Name | synocli-kernel |
 | License | GPL |
 
-To add as a dependency in `spk/<package>/Makefile`:
+To add as a dependency in `spk/<package>/Makefile`, from the version that
+holds the profiles:
 ```makefile
-SPK_DEPENDS = synocli-kernel
+SPK_DEPENDS = "synocli-kernel>=2.0"
 ```
 
 ## Kernel Module Helper Script
 
-The module loading helper script can be called with `--help --verbose` for details:
+`synocli-kernelmodule` loads the modules of a `synokernel-*` package, one device
+at a time, through the profile of that device. Run as root:
 
 ```bash
-./synocli-kernelmodule.sh --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x --verbose --udev 60-synokernel-usbserial.rules status --help
+# Profiles of every synokernel-* package, and whether the package is installed
+# and this kernel has all their modules (available, or n/a with what is missing)
+synocli-kernelmodule list
 
-# Output:
-#              SynoCommunity kernel driver package name (SPK) [synokernel-usbserial]
-#                  SynoCommunity configuration file (SPK_CFG) [synokernel-usbserial.cfg]
-#             SynoCommunity configuration path (SPK_CFG_PATH) [/var/packages/synokernel-usbserial/target/etc]
-#            SynoCommunity configuration option (SPK_CFG_OPT) [ch341,cp210x]
-#                                    Synology NAS arch (ARCH) [apollolake]
-#                          Synology DSM version (DSM_VERSION) [6.2.4]
-#                               Running kernel version (KVER) [4.4.59+]
-#           Module action insmod|rmmod|reload|status (ACTION) [status]
-#                                 Kernel modules path (MPATH) [/var/packages/synokernel-usbserial/target/lib/modules]
-#                                   udev rules.d path (UPATH) [/var/packages/synokernel-usbserial/target/rules.d]
-#                                   udev rules.d file (URULE) [60-synokernel-usbserial.rules]
-#                               Kernel objects list (KO_LIST) [usbserial ch341 cp210x]
+# The modules a profile loads, in order, and where each comes from
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
 
-# Usage:
-#   ./synocli-kernelmodule.sh [-s|--spk <package>] [<insmod,start|rmmod,stop|reload,restart|status>] module1.ko module2.ko ...
-#   Optional: [-c|--config <file>:<option1>,<option2>,...]
-#             [-u|--udev <file>]
+# What start would do, without loading anything (no root needed)
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
+
+# Load, check and unload the modules of a device
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc status
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
+
+# Several profiles of one package
+sudo synocli-kernelmodule --spk synokernel-usbserial --profile ch341,cp210x start
+
+# Modules by name, without a profile
+sudo synocli-kernelmodule --spk synokernel-cdrom sr_mod start
 ```
 
-### Examples
+| Option | Use |
+|--------|-----|
+| `-p`, `--profile <p1,p2,...>` | profiles to load; the package is the one they are for |
+| `-s`, `--spk <package>` | package holding the modules, needed for modules by name |
+| `-n`, `--dry-run` | `start`, `stop` and `restart` tell each step (`OK (simulated)`, or `missing`) and change nothing |
+| `-r`, `--root <dir>` | package directory other than `/var/packages/<package>/target`, to try modules before packaging them |
+| `-v`, `--verbose` | modules in load order, and the comments of each profile |
 
-```bash
-# Check status of CD-ROM modules
-./synocli-kernelmodule.sh --spk synokernel-cdrom --verbose cdrom sr_mod status
+Each module comes after the modules it depends on, read from the `depends=` of
+the module itself: a profile lists the modules of its device, not the media or
+USB cores they need. A module the package does not have is taken from the
+kernel (`modprobe`, or `/lib/modules`).
 
-# Load CD-ROM modules using config file
-./synocli-kernelmodule.sh --spk synokernel-cdrom --config synokernel-cdrom.cfg:default insmod
+`stop` unloads in reverse order and leaves loaded a module still in use, by
+another device for instance. The firmware of the package (`target/lib/firmware`)
+is given to the kernel firmware loader on `start`; the output of every run goes
+to `/var/log/packages/synocli-kernelmodule.log`, starting with the warning above.
 
-# Load USB serial modules with udev rules
-./synocli-kernelmodule.sh --spk synokernel-usbserial --udev 60-synokernel-usbserial.rules usbserial ch341 cp210x start
+Modules are looked for in
+`/var/packages/<package>/target/lib/modules/<platform>/<uname -r>/`, the
+platform being the one `uname -a` names (`synology_<platform>_<model>`).
 
-# Load USB serial using config
-./synocli-kernelmodule.sh --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x start
+### Loading modules at boot
+
+The `synokernel-*` packages are not services: DSM loads none of their modules,
+at installation or at boot. To load those of a device at every startup, create
+a task in DSM:
+
+1. *Control Panel* > *Task Scheduler* > *Create* > *Triggered Task* >
+   *User-defined script*
+
+   ![Creating a triggered task](../assets/images/synocli-kernel-task-create.png)
+
+2. *General*: *Task* a name such as `synocli-kernelmodule`, *User* `root`,
+   *Event* `Boot-up`, *Enabled* checked
+
+   ![The General tab](../assets/images/synocli-kernel-task-general.png)
+
+3. *Task Settings*: optionally *Send run details by email*, with *Send run
+   details only when the script terminates abnormally*, to hear of a device
+   that failed to load
+4. *Task Settings* > *Run command*: one line per package, as the profiles of
+   one command must come from the same package:
+   ```bash
+   synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+   synocli-kernelmodule --profile cdrom start
+   ```
+
+   ![The Task Settings tab](../assets/images/synocli-kernel-task-settings.png)
+
+5. *OK*, then select the task and *Run* it once to check it, or reboot
+
+The output of each run is in `/var/log/packages/synocli-kernelmodule.log`.
+After a DSM update that changes the kernel, install the build of the packages
+for that DSM version: the task then loads the new modules.
+
+### Device profiles
+
+A profile is one JSON file per device. The profiles are part of this package,
+not of the packages of kernel modules: a new device only needs a new release of
+SynoCli Kernel Tools. They are in `spk/synocli-kernel/src/profiles/<package>/`,
+installed in `target/etc/profiles/<package>/`, the directory naming the package
+of the modules. The file name is the profile name:
+
+```json
+{
+  "name": "hauppauge-wintv-dualhd-atsc",
+  "description": "Hauppauge WinTV-dualHD 01595, ATSC and ClearQAM (USB 2040:026d)",
+  "comments": "Two tuners, /dev/dvb/adapter0 and adapter1, and its remote control.",
+  "modules": ["si2157", "lgdt3306a", "rc-hauppauge", "em28xx-dvb", "em28xx-rc"]
+}
 ```
 
-## Related Kernel Module Packages
+| Field | Content |
+|-------|---------|
+| `name` | the file name, without `.json` |
+| `description` | one line, shown by `list`: device, and its USB id |
+| `comments` | optional: quirks, what was tested and where |
+| `modules` | modules of the device, in load order, without `.ko`; `-` and `_` are the same |
+| `kernels` | optional: other module lists for some kernels (below) |
+| `udev` | optional: rules files of `target/etc/rules.d` the device needs |
 
-### synokernel-cdrom
+Where a kernel needs other modules, `kernels` gives lists by kernel version;
+the first entry whose `min` and `max` bracket the running kernel replaces
+`modules`, either bound being optional:
 
-A basic kernel module package that provides `cdrom.ko` and `sr_mod.ko` kernel modules for USB CD-ROM devices:
-
-```bash
-# Load CD-ROM modules
-./synocli-kernelmodule.sh --spk synokernel-cdrom --config synokernel-cdrom.cfg:default insmod
+```json
+  "modules": ["si2157", "si2168", "em28xx-dvb"],
+  "kernels": [
+    { "max": "3.9", "modules": ["si2157", "si2168", "em28xx-dvb", "i2c-mux"] }
+  ]
 ```
 
-`dmesg` output should show:
-```
-[3553418.051365] usb 2-1: new SuperSpeed USB device number 2 using xhci_hcd
-[3553418.077353] usb-storage 2-1:1.0: USB Mass Storage device detected
-[3553418.084541] scsi host6: usb-storage 2-1:1.0
-[3553419.104008] scsi 6:0:0:0: CD-ROM            PIONEER  BD-RW   BDR-XD05
-[3790953.029269] sr 6:0:0:0: [sr0] scsi3-mmc drive: 62x/62x writer dvd-ram cd/rw xa/form2 cdda tray
-[3790953.039237] cdrom: Uniform CD-ROM driver Revision: 3.20
-[3790953.045785] sr 6:0:0:0: Attached scsi CD-ROM sr0
-```
+### udev rules
 
-Unloading:
-```bash
-./synocli-kernelmodule.sh --spk synokernel-cdrom --config synokernel-cdrom.cfg:default rmmod
+A profile can name rules files (`udev`), from `src/rules.d/` of this package,
+installed in `target/etc/rules.d/`: on `start` they are linked into
+`/lib/udev/rules.d` and udev reloads them, on `stop` they are removed. The
+profiles of `synokernel-usbserial` use one for every driver,
+`60-synokernel-usbserial.rules`, which opens the serial devices to every user:
+
+```
+KERNEL=="ttyACM*", ACTION=="add", MODE="0666"
+KERNEL=="ttyUSB*", ACTION=="add", MODE="0666"
 ```
 
-### synokernel-usbserial
+Without it `/dev/ttyUSB*` and `/dev/ttyACM*` belong to root alone, and a service
+running as its own user (Home Assistant, Zigbee2MQTT, ...) cannot open them. A rule
+applies to the devices that appear once it is in place: plug the device after
+`start`, or unplug and plug it again.
 
-Provides USB serial adapter support with `udev` rules for device file permissions. Includes:
+### Writing a profile
 
-- `usbserial.ko` - USB Serial core
-- `ch341.ko` - Winchiphead CH341 adapters
-- `cp210x.ko` - Silicon Labs CP210x adapters
-- `pl2303.ko` - Prolific PL2303 adapters
-- `ti_usb3410_5052.ko` - Texas Instruments adapters
-- `ftdi_sio.ko` - FTDI adapters
-
-```bash
-# Load ch341 and cp210x with udev rules
-./synocli-kernelmodule.sh --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x --udev 60-synokernel-usbserial.rules start
-```
-
-`dmesg` output:
-```
-[3994283.661384] usbcore: registered new interface driver usbserial
-[3994283.695707] usbcore: registered new interface driver ch341
-[3994283.702615] usbserial: USB Serial support registered for ch341-uart
-[3994283.731617] usbcore: registered new interface driver cp210x
-[3994283.738064] usbserial: USB Serial support registered for cp210x
-```
-
-See [SynoKernel USB Serial](synokernel-usbserial.md) for detailed configuration.
-
-### synokernel-linuxtv
-
-Provides LinuxTV media drivers for TV tuners and capture cards. Complex module dependency ordering and extensive configuration options.
+1. Find the driver of the device: its USB id (`usb-devices`) in the driver sources,
+   `drivers/media/usb/*/*-cards.c` for most TV tuners, names the board and the
+   bridge module (`em28xx`, `dvb-usb-*`).
+2. The bridge module loads the tuner and demodulator chips of the board only
+   when they are already loaded: list them first. The board entry names them
+   (`si2157`, `lgdt3306a`), and `dmesg` reports one that is missing when the
+   device is plugged in.
+3. Add the bridge and its parts for the device (`em28xx-dvb` for DVB,
+   `em28xx-rc` for the remote control, and the keymap module `rc-*` of the
+   board).
+4. Try it before packaging it: put the profile in
+   `/var/packages/synocli-kernel/target/etc/profiles/<package>/` on the NAS,
+   and run `sudo synocli-kernelmodule --profile <name> --verbose start`.
+5. Check `dmesg` and `/dev/dvb`, then `stop`, which must leave no module of
+   the profile loaded (`status`).
+6. Put the file in `spk/synocli-kernel/src/profiles/<package>/`, with what was
+   tested and on which NAS in `comments`.
 
 ## Building Kernel Module Packages
 
@@ -133,7 +202,7 @@ Kernel dependency usage is enabled with `REQUIRE_KERNEL = 1`.
 
 Automated building of modules uses `REQUIRE_KERNEL_MODULE`:
 ```makefile
-REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
+REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL:drivers/usb/serial:usbserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CP210X:drivers/usb/serial:cp210x
 ```
@@ -156,12 +225,12 @@ REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c:CONFIG_
 
 ### Module Installation Structure
 
-When `REQUIRE_KERNEL_MODULE` is not empty, kernel modules are compiled and installed by `spksrc.kernel.mk`. The installation location reflects the default kernel path:
+When `REQUIRE_KERNEL_MODULE` is not empty, kernel modules are compiled and installed by `spksrc.kernel.mk`, one directory per platform and kernel, the kernel named as `uname -r` names it:
 
 ```
-modules
-└── 4.4.59+
-    └── kernel
+lib/modules
+└── apollolake
+    └── 4.4.302+
         └── drivers
             └── usb
                 ├── class
@@ -172,44 +241,54 @@ modules
                     └── ftdi_sio.ko
 ```
 
-### Installation Wizard with Module Selection
+### Out-of-tree drivers
 
-The `synokernel-usbserial` package demonstrates an installation wizard for module selection. Configuration files:
+A driver that is not part of the kernel tree lives in `driver/<name>` and includes
+`spksrc.driver.mk`. Listed in the spk `DEPENDS`, it is built right after each kernel the
+spk prepares, against that kernel's source (`$(KERNEL_ROOT)`), and installs its modules
+in `$(DRIVER_MODULE_DIR)` next to those of `REQUIRE_KERNEL_MODULE`:
 
-1. **`src/synokernel-usbserial.cfg`** - Lists all modules with their directory paths
-2. **`src/synokernel-usbserial.ini`** - Module enable/disable status (`true`/`false`)
-3. **`src/wizard/install_uifile`** - DSM GUI checkbox configuration
-4. **`src/wizard/upgrade_uifile.sh`** - Preserves previous selections during upgrade
-5. **`src/service-setup.sh`** - Writes GUI selections to `.ini` file
+```makefile
+# driver/<name>/Makefile
+DRIVER_KERNEL_MIN = 3.10    # skipped on older kernels
+DRIVER_GCC_MIN    = 4.9     # and with an older gcc
 
-Variable names must match across all configuration files for the wizard to work properly.
+include ../../mk/spksrc.driver.mk
+```
+
+The `driver/*` a driver lists in its `DEPENDS` are built first, for the same
+kernel: `driver/linuxtv-*` take their media tree from `driver/linux-media-*`.
+
+Where one version of a driver cannot serve every kernel, a driver without sources
+(no `PKG_DIST_SITE`) is a selector: it builds the first of its `DEPENDS` that is
+not skipped, kernel by kernel. `driver/linuxtv` does so for
+[SynoKernel LinuxTV](synokernel-linuxtv.md):
+
+```makefile
+# driver/linuxtv/Makefile
+DEPENDS  = driver/linuxtv-4.4
+DEPENDS += driver/linuxtv-3.10
+DEPENDS += driver/linuxtv-3.2
+
+include ../../mk/spksrc.driver.mk
+```
 
 ## Troubleshooting
 
-### Finding the Right Module Order
+### A module fails to load
 
-For complex drivers like LinuxTV:
+`dmesg` names the cause. `Unknown symbol` means a module needed is not loaded:
+one the device loads on demand (a tuner or demodulator) belongs in the profile.
+`disagrees about version of symbol` or `invalid module format` means the
+package does not match the running kernel, typically after a DSM update.
 
-1. Use the helper script to test loading order:
-   ```bash
-   ./synocli-kernelmodule.sh --spk synokernel-linuxtv --verbose i2c-mux-gpio dvb-usb-cxusb start
-   ```
+### No modules for this kernel
 
-2. Check `dmesg` for module dependency messages
-
-3. Once the correct order is found, STOP the package from Package Center
-
-4. Update the configuration file:
-   `/var/packages/synokernel-linuxtv/target/etc/synokernel-linuxtv.cfg`
-
-5. Set corresponding variables to `true` in:
-   `/var/packages/synokernel-linuxtv/target/etc/synokernel-linuxtv.ini`
-
-6. Test START/STOP from Package Center
-
-7. Check logs: `/tmp/synocli-kernelmodule-synokernel-linuxtv.log`
+The package has no modules for the running kernel: it was built for another
+DSM version. Install the build of the package for that DSM version.
 
 ## Related Packages
 
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
+- [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities

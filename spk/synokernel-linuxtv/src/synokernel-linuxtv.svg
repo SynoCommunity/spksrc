@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a8a8a"/>
+      <stop offset="1" stop-color="#4d4d4d"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- antennas -->
+  <g stroke="#4d4d4d" stroke-width="12" stroke-linecap="round">
+    <line x1="256" y1="92" x2="176" y2="26"/>
+    <line x1="256" y1="92" x2="336" y2="26"/>
+  </g>
+  <circle cx="176" cy="26" r="11" fill="#4d4d4d"/>
+  <circle cx="336" cy="26" r="11" fill="#4d4d4d"/>
+  <!-- feet -->
+  <path d="M120 380 L104 420 L156 420 L164 380 Z" fill="#4d4d4d"/>
+  <path d="M392 380 L408 420 L356 420 L348 380 Z" fill="#4d4d4d"/>
+  <!-- cabinet -->
+  <rect x="40" y="88" width="432" height="300" rx="36" fill="url(#body)"/>
+  <rect x="64" y="110" width="384" height="256" rx="22" fill="#2b2b2b"/>
+  <!-- colour bars -->
+  <g transform="translate(80 124)">
+    <rect x="0"   y="0" width="50" height="228" fill="#ffffff"/>
+    <rect x="50"  y="0" width="50" height="228" fill="#ffff00"/>
+    <rect x="100" y="0" width="50" height="228" fill="#00ffff"/>
+    <rect x="150" y="0" width="50" height="228" fill="#00ff00"/>
+    <rect x="200" y="0" width="50" height="228" fill="#ff00ff"/>
+    <rect x="250" y="0" width="50" height="228" fill="#ff0000"/>
+    <rect x="300" y="0" width="52" height="228" fill="#0000ff"/>
+  </g>
+  <rect x="80" y="124" width="352" height="228" fill="url(#gloss)"/>
+  <!-- wordmark -->
+  <text x="256" y="494" text-anchor="middle" font-family="DejaVu Sans, Verdana, sans-serif"
+        font-size="84" font-weight="bold" fill="#1a1a1a" letter-spacing="2">LinuxTV</text>
+</svg>

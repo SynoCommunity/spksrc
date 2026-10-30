@@ -1,0 +1,6 @@
+{
+  "name": "mos7720",
+  "description": "Moschip 7720 Serial Driver",
+  "modules": ["mos7720"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}

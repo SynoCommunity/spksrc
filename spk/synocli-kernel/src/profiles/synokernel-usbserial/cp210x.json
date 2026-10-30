@@ -1,0 +1,6 @@
+{
+  "name": "cp210x",
+  "description": "Silicon Labs CP210x USB serial adapters",
+  "modules": ["cp210x"],
+  "udev": ["60-synokernel-usbserial.rules"]
+}
