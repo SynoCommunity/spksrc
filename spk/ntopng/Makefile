@@ -1,6 +1,6 @@
 SPK_NAME = ntopng
-SPK_VERS = 6.4
-SPK_REV = 6
+SPK_VERS = 7.0
+SPK_REV = 7
 SPK_ICON = src/ntopng.png
 
 DEPENDS = cross/ntopng
@@ -11,7 +11,7 @@ REQUIRED_MIN_DSM = 6
 
 MAINTAINER = hgy59
 DESCRIPTION = High-Speed Web-based Traffic Analysis and Flow Collection. ntopng is a network traffic probe that provides 360° Network visibility, with its ability to gather traffic information from traffic mirrors, NetFlow exporters, SNMP devices, Firewall logs, Intrusion Detection systems.  To run ntopng on DSM 7, the installed privileges file must be manually patched after installation or update.
-CHANGELOG = "1. Update to version 6.4."
+CHANGELOG = "1. Update to version 7.0."
 DISPLAY_NAME = ntopng
 
 HELPURL = https://www.ntop.org/guides/ntopng/index.html
