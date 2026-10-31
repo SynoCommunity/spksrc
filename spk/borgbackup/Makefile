@@ -30,19 +30,15 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # sudo apt-get update
 # sudo apt-get install acl-dev build-essential libfuse-dev liblz4-dev libxxhash-dev libzstd-dev
 # 
-# # 3. Prepare the requirements generation script
-# cd spksrc/spk/borgbackup/
-# curl -O https://gist.githubusercontent.com/hgy59/6676a55ea8b0b0264af7f23850f5e7c8/raw/8d0a3912069c746d1a1fb1d23ca9d650e2ec331d/generate_requirements.sh
-# sudo chmod +x generate_requirements.sh
-# 
-# # 4. Generate the requirements file, restricting version of rpds-py for compatibility
+# # 3. Generate the requirements files
+# cd spksrc
 # # rpds-py >= 0.22.3 requires rustc >= 1.80
-# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.21.0" 311
-# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg" 314
+# tools/generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.21.0" 311
+# tools/generate_requirements.sh "borgbackup[llfuse] borgmatic emborg" 314
 # 
-# # 5. Post-generation
-# # The script will create three files (pure, cross, and combined) for the Borg deployment
-# # with Python 3.14. Use the pure and cross requirement files as the base for your PR.
+# # 4. Post-generation
+# # The script creates three files (pure, cross, and combined).
+# # Use the pure and cross requirement files as the base for your PR.
 
 # Wheels: Python requirements vary by architecture
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
