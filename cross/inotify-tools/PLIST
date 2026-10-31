@@ -1,5 +1,7 @@
 bin:bin/inotifywait
 bin:bin/inotifywatch
+lnk:bin/fsnotifywait
+lnk:bin/fsnotifywatch
 lnk:lib/libinotifytools.so
 lnk:lib/libinotifytools.so.0
 lib:lib/libinotifytools.so.0.4.1
