@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.8
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS  = cross/nmon cross/njmon
@@ -49,11 +49,7 @@ DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Monitor Tools\</
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG  = "1. Add btop 1.4.5. </br>"
-CHANGELOG += "2. Update bottom to v0.11.4. </br>"
-CHANGELOG += "3. Update iperf3 to v3.20. </br>"
-CHANGELOG += "4. Update njmon to v90. </br>"
-CHANGELOG += "5. Update nmon v16s. </br>"
+CHANGELOG  = "1. Update busybox to v1.38.0. </br>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
