@@ -17,7 +17,8 @@
 # Disabled for dependency targets, for the check goal -- whose whole job is to REPORT
 # the gates this arch fails, which a fatal pre-check would cut short at the first one --
 # and for download-wheels, which only downloads wheel sources and runs without an arch.
-ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check download-wheels,$(MAKECMDGOALS))),)
+# The noarch wrapper goals are skipped here because their sub-make supplies TCVERSION.
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check download-wheels,$(MAKECMDGOALS)),$(filter arch-noarch-% build-noarch-%,$(MAKECMDGOALS))),)
 
 # SPK_FOLDER    
 # name of the spk package folder
