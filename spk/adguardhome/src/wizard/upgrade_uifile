@@ -1,0 +1,19 @@
+[
+  {
+    "step_title": "Important Update Notes",
+    "items": [
+      {
+        "desc": "<b style=\"color: red\">Important:</b> Please stop AdGuard Home before upgrading. If the package is running during the upgrade, it will fail to restart and require a manual repair."
+      },
+      {
+        "desc": "To stop, go to Package Center and click <b>Stop</b>, or run in SSH:<br/><code style=\"user-select: all\">sudo synopkg stop adguardhome</code>"
+      },
+      {
+        "desc": "After the update, reconnect the root privileges by running in SSH:<br/><code style=\"user-select: all\">/var/packages/adguardhome/target/bin/adguardhome-fix</code>"
+      },
+      {
+        "desc": "The script will prompt for your DSM password and start the package automatically."
+      }
+    ]
+  }
+]
