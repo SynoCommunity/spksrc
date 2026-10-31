@@ -82,20 +82,21 @@ DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
 the adapters it does not support: the connection is set up from the command
 line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
 and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
-WPA3, first in the `PATH` of root: call those of the package by their path.
+WPA3, first in the `PATH` of root: those of the package are `wifi-wpa_supplicant`,
+`wifi-wpa_cli` and `wifi-wpa_passphrase`.
 Set the [regulatory domain](#regulatory-domain) first:
 
 ```bash
 # The networks in range
 sudo -i ip link set wlan0 up
-sudo -i /var/packages/synokernel-wifi/target/sbin/iw dev wlan0 scan | grep -E 'SSID|freq|signal'
+sudo -i iw dev wlan0 scan | grep -E 'SSID|freq|signal'
 
 # The network and its passphrase, readable by root only, without the clear-text copy
-sudo -i sh -c 'umask 077; /var/packages/synokernel-wifi/target/sbin/wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
+sudo -i sh -c 'umask 077; wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
 
 # Connect, then check the link
-sudo -i /var/packages/synokernel-wifi/target/sbin/wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
-sudo -i /var/packages/synokernel-wifi/target/sbin/iw dev wlan0 link
+sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
+sudo -i iw dev wlan0 link
 ```
 
 For a WPA3 network, add `key_mgmt=SAE` and `ieee80211w=2` to the network block
@@ -107,10 +108,10 @@ Once `iw dev wlan0 link` shows `Connected to`, get an address:
 
 ```bash
 # The address only: the wired interface keeps the default route and DNS servers
-sudo -i /var/packages/synokernel-wifi/target/sbin/udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
+sudo -i udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
 
 # On a NAS on WiFi alone: the default route and DNS servers of the WiFi network too
-sudo -i env WIFI_DEFAULT_ROUTE=1 /var/packages/synokernel-wifi/target/sbin/udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
+sudo -i env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
 ```
 
 `-b` keeps `udhcpc` in the background to renew the lease. DSM's `dhclient` is
@@ -126,7 +127,7 @@ The kernel starts in the world regulatory domain, which leaves out most 5 GHz
 channels. Set the country of the NAS, here Canada, before connecting:
 
 ```bash
-sudo -i /var/packages/synokernel-wifi/target/sbin/iw reg set CA
+sudo -i iw reg set CA
 sudo -i iw reg get
 ```
 

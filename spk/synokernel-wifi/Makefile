@@ -103,7 +103,12 @@ LICENSE  = GPLv2
 
 # The profiles of the WiFi adapters come with synocli-kernel 2.0-12
 SPK_DEPENDS = "synocli-kernel>=2.0-12"
-SPK_COMMANDS = sbin/iw
+SPK_COMMANDS  = sbin/iw
+SPK_COMMANDS += sbin/udhcpc
+# Under names of their own: DSM's wpa_supplicant 2.6 comes first in the PATH of root
+SPK_COMMANDS += sbin/wifi-wpa_supplicant
+SPK_COMMANDS += sbin/wifi-wpa_cli
+SPK_COMMANDS += sbin/wifi-wpa_passphrase
 
 BUSYBOX_CONFIG = udhcpc
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
@@ -117,3 +122,6 @@ wifi_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 src/udhcpc.script $(STAGING_DIR)/etc/udhcpc.script
 	ln -sf ../bin/busybox $(STAGING_DIR)/sbin/udhcpc
+	for tool in wpa_supplicant wpa_cli wpa_passphrase; do \
+	  ln -sf $$tool $(STAGING_DIR)/sbin/wifi-$$tool ; \
+	done
