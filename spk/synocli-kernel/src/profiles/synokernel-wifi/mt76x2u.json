@@ -1,0 +1,5 @@
+{
+  "name": "mt76x2u",
+  "description": "MediaTek MT7612U adapters: Alfa AWUS036ACM, Netgear A6210, Comfast CF-WU782AC and others",
+  "modules": ["mt76x2u"]
+}

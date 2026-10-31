@@ -1,0 +1,5 @@
+{
+  "name": "rt2800usb",
+  "description": "Ralink and MediaTek RT2770, RT2870, RT3070, RT3072, RT3370, RT3572, RT5370 and RT5372 adapters: Panda PAU05 and PAU06, Alfa AWUS036NH and others",
+  "modules": ["rt2800usb"]
+}

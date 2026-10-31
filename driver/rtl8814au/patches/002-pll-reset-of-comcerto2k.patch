@@ -1,0 +1,11 @@
+--- hal/phydm/halrf/halphyrf_ce.h.orig
++++ hal/phydm/halrf/halphyrf_ce.h
+@@ -53,6 +53,8 @@
+ 
+ #include "halrf/halrf_powertracking_ce.h"
+ 
++/* comcerto2k defines PLL_RESET in its clk-rst.h */
++#undef PLL_RESET
+ enum spur_cal_method {
+ 	PLL_RESET,
+ 	AFE_PHASE_SEL
