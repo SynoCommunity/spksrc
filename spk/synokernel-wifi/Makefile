@@ -91,7 +91,7 @@ REQUIRE_KERNEL_MODULE += $(foreach m,$(MT76) mt76/mt76x0:mt76x0-common mt76/mt76
 REQUIRE_KERNEL_MODULE += $(foreach m,$(MT76) mt76/mt76x2:mt76x2-common mt76/mt76x2:mt76x2u,CONFIG_MT76x2U:drivers/net/wireless/mediatek/$(m))
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides drivers of USB WiFi adapters for DSM 6 and DSM 7, with the wireless stack of the Linux kernel, cfg80211 and mac80211, that DSM 7 no longer ships."
+DESCRIPTION = "Provides drivers of USB WiFi adapters for DSM6 and DSM7, with the wireless stack of the Linux kernel, cfg80211 and mac80211, that DSM7 no longer ships."
 CHANGELOG = "1. Initial release"
 
 STARTABLE = no
