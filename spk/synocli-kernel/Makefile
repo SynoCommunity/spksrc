@@ -9,7 +9,7 @@ MAINTAINER    = th0ma7
 DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally synocli-kernelmodule loads the kernel modules of synokernel packages, by device profile, and holds the profiles of their devices."
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
-CHANGELOG     = "1. Profiles of the USB WiFi adapters of synokernel-wifi"
+CHANGELOG     = "1. Profiles of the USB WiFi adapters of synokernel-wifi<br/>2. synocli-kernelmodule tells to run it from a root shell (sudo -i), as sudo alone does not find the commands of packages"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.

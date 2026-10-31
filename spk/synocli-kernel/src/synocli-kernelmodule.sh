@@ -36,6 +36,8 @@ usage() {
 
 Usage: $0 [options] <list|modules|start|stop|restart|status> [module ...]
 
+Run start, stop, restart and status as root, from a root shell (sudo -i).
+
    list                      the profiles of every synokernel-* package, and
                              whether the package is installed and this kernel
                              has all their modules
@@ -412,7 +414,7 @@ if [ "${ACTION}" = "modules" ]; then
    modules
    exit $?
 fi
-[ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "must be run as root"
+[ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "must be run as root, from a root shell (sudo -i): sudo alone does not find the commands of packages"
 
 # The log needs root: a dry run without it prints only
 if [ "$(id -u)" = "0" ]; then

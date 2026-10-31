@@ -38,7 +38,9 @@ SPK_DEPENDS = "synocli-kernel>=2.0"
 ## Kernel Module Helper Script
 
 `synocli-kernelmodule` loads the modules of a `synokernel-*` package, one device
-at a time, through the profile of that device. Run as root:
+at a time, through the profile of that device. Run it as root, from a root
+shell (`sudo -i`): `sudo` alone does not find the commands of packages, linked
+in `/usr/local/bin`, out of the `PATH` of `sudo`.
 
 ```bash
 # Profiles of every synokernel-* package, and whether the package is installed
@@ -52,15 +54,15 @@ synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
 synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
 
 # Load, check and unload the modules of a device
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc status
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc status
+synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 
 # Several profiles of one package
-sudo synocli-kernelmodule --spk synokernel-usbserial --profile ch341,cp210x start
+synocli-kernelmodule --spk synokernel-usbserial --profile ch341,cp210x start
 
 # Modules by name, without a profile
-sudo synocli-kernelmodule --spk synokernel-cdrom sr_mod start
+synocli-kernelmodule --spk synokernel-cdrom sr_mod start
 ```
 
 | Option | Use |
@@ -188,7 +190,7 @@ applies to the devices that appear once it is in place: plug the device after
    board).
 4. Try it before packaging it: put the profile in
    `/var/packages/synocli-kernel/target/etc/profiles/<package>/` on the NAS,
-   and run `sudo synocli-kernelmodule --profile <name> --verbose start`.
+   and run, as root, `synocli-kernelmodule --profile <name> --verbose start`.
 5. Check `dmesg` and `/dev/dvb`, then `stop`, which must leave no module of
    the profile loaded (`status`).
 6. Put the file in `spk/synocli-kernel/src/profiles/<package>/`, with what was
