@@ -1,0 +1,15 @@
+# Lua 5.5 adds a seed argument to lua_newstate.
+--- src/LuaEngine.cpp
++++ src/LuaEngine.cpp
+@@ -154,7 +154,11 @@
+   is_system_vm = false;
+   mem_used = 0;
+ 
++#if LUA_VERSION_NUM >= 505
++  L = lua_newstate(l_alloc, this, 0);
++#else
+   L = lua_newstate(l_alloc, this);
++#endif
+ 
+   if (!L) {
+     ntop->getTrace()->traceEvent(TRACE_ERROR,

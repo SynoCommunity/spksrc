@@ -1,0 +1,211 @@
+# Lua 5.5 makes for-loop variables read-only.
+--- scripts/lua/find_category.lua
++++ scripts/lua/find_category.lua
+@@ -18,6 +18,7 @@
+ local categories = interface.getnDPICategories()
+ 
+ for cat, id in pairsByKeys(categories, asc_insensitive) do
++   local cat = cat
+   cat = getCategoryLabel(cat, id)
+ 
+   if string.contains(string.lower(cat), query) then
+--- scripts/lua/flow_details.lua
++++ scripts/lua/flow_details.lua
+@@ -2259,6 +2259,7 @@
+          end
+ 
+          for key, value in pairsByKeys(info) do
++            local key = key
+             if tonumber(key) then
+                key = getFlowLabelFromId(key)
+             end
+--- scripts/lua/host_details.lua
++++ scripts/lua/host_details.lua
+@@ -1315,6 +1315,7 @@
+       if num_extra_names > 0 then
+          local name_sources = {}
+          for source, name in pairsByKeys(extra_names, rev) do
++            local source = source
+             if source == "resolved" then
+                source = "DNS Resolution"
+             else
+--- scripts/lua/if_stats.lua
++++ scripts/lua/if_stats.lua
+@@ -1362,6 +1362,7 @@
+ 
+         local bcast_domains = {}
+         for bcast_domain, domain_info in pairsByKeys(ifstats.bcast_domains) do
++           local bcast_domain = bcast_domain
+             bcast_domain = string.format("<a href='%s/lua/hosts_stats.lua?network_cidr=%s'>%s</a>",
+                 http_prefix, bcast_domain, bcast_domain)
+ 
+--- scripts/lua/modules/active_scan/ascan_utils.lua
++++ scripts/lua/modules/active_scan/ascan_utils.lua
+@@ -1917,6 +1917,7 @@
+    local modules = {}
+ 
+    for name in pairs(ntop.readdir(basedir)) do
++      local name = name
+       if(ends(name, ".lua")) then
+          name = string.sub(name, 1, string.len(name)-4) -- remove .lua trailer
+          local m = ascan_utils.load_module(name)
+--- scripts/lua/modules/as_utils.lua
++++ scripts/lua/modules/as_utils.lua
+@@ -408,6 +408,7 @@
+ 
+     -- Process source ASN statistics
+     for asn, bytes_stats in pairs(live_src_asn) do
++       local asn = asn
+         asn = tostring(asn)
+         
+         local b_transit = bytes_stats.transit_bytes or 0
+@@ -442,6 +443,7 @@
+ 
+     -- Process destination ASN statistics
+     for asn, bytes_stats in pairs(live_dst_asn) do
++       local asn = asn
+         asn = tostring(asn)
+         
+         local b_transit = bytes_stats.transit_bytes or 0
+--- scripts/lua/modules/callback_utils.lua
++++ scripts/lua/modules/callback_utils.lua
+@@ -222,6 +222,7 @@
+    local devices_stats = callback_utils.getDevicesIterator()
+ 
+    for devicename, devicestats in devices_stats do
++      local devicename = devicename
+       if(ntop.isShuttingDown()) then return true end
+       devicename = hostinfo2hostkey(devicestats) -- make devicename the combination of mac address and vlan
+ 
+--- scripts/lua/modules/dashboard_utils.lua
++++ scripts/lua/modules/dashboard_utils.lua
+@@ -88,6 +88,7 @@
+    local templates_names = ntop.readdir(templates_dir)
+ 
+    for template_name in pairs(templates_names) do
++      local template_name = template_name
+       if not ends(template_name, ".json") then
+          goto continue
+       end
+--- scripts/lua/modules/discover_utils.lua
++++ scripts/lua/modules/discover_utils.lua
+@@ -1302,6 +1302,7 @@
+ 
+     -- NOTE: use page_utils.safe_html to protect agains malicious SSDP responses trying to inject code
+     for url, host in pairs(ssdp) do
++       local url = url
+         url = ntop.httpPurifyParam(url) -- Cleanup against XSS
+ 
+         local hresp = ntop.httpGet(url, "", "", 3 --[[ seconds ]] )
+--- scripts/lua/modules/http_lint.lua
++++ scripts/lua/modules/http_lint.lua
+@@ -462,6 +462,7 @@
+    local ip_pat_bare = "^%d+%.%d+%.%d+%.%d+/%d+$"
+    local mac_pat = "^%x%x[:%-%.]%x%x[:%-%.]%x%x[:%-%.]%x%x[:%-%.]%x%x[:%-%.]%x%x$"
+    for line in v:gmatch("[^\r\n]+") do
++      local line = line
+       line = line:match("^%s*(.-)%s*$")
+       if line ~= "" and not line:match("^#") then
+          local member, _ = line:match("^(%S+)[%s,;]+(%S+)%s*$")
+--- scripts/lua/modules/lua_utils_get.lua
++++ scripts/lua/modules/lua_utils_get.lua
+@@ -1176,6 +1176,7 @@
+         services = {}
+ 
+         for line in file:lines() do
++           local line = line
+             if ((line ~= "") and (not (string.starts(line, "#")))) then
+                 line = line:gsub("\t", " ")
+                 line = line:gsub("  ", " ")
+--- scripts/lua/modules/lua_utils.lua
++++ scripts/lua/modules/lua_utils.lua
+@@ -531,6 +531,7 @@
+         local ndpi_category_stats = {}
+ 
+         for key, value in pairs(stats["ndpi_categories"]) do
++           local key = key
+             key = getCategoryLabel(key, value.category)
+             local traffic = value["bytes"]
+ 
+--- scripts/lua/modules/notifications/endpoints/slack.lua
++++ scripts/lua/modules/notifications/endpoints/slack.lua
+@@ -132,7 +132,9 @@
+   end
+ 
+   for entity_type, by_severity in pairs(alerts_by_types) do
++     local entity_type = entity_type
+     for severity, notifications in pairs(by_severity) do
++       local severity = severity
+       local messages = {}
+       entity_type = alert_consts.alertEntityRaw(entity_type)
+       severity = alert_consts.alertSeverityRaw(severity)
+--- scripts/lua/modules/site_utils.lua
++++ scripts/lua/modules/site_utils.lua
+@@ -724,6 +724,7 @@
+ 
+    -- Empty components are skipped
+    for component in path:gmatch("[^" .. SITE_PATH_SEPARATOR .. "]+") do
++      local component = component
+       component = trimSpace(component)
+ 
+       if not isEmptyString(component) then
+--- scripts/lua/modules/snmp_mappings.lua
++++ scripts/lua/modules/snmp_mappings.lua
+@@ -24,6 +24,7 @@
+       local postfix_len = string.len(_postfix)
+       
+       for k,v in pairs(rsp) do
++         local k = k
+ 	 local len1
+ 	 
+ 	 k = string.sub(k, len)
+--- scripts/lua/modules/timeseries/ts_common.lua
++++ scripts/lua/modules/timeseries/ts_common.lua
+@@ -252,6 +252,7 @@
+         local data = {}
+ 
+         for i = 1, count do
++           local i = i
+             data[i] = fill_value
+             i = i + 1
+         end
+--- scripts/lua/modules/ts_5min_dump_utils.lua
++++ scripts/lua/modules/ts_5min_dump_utils.lua
+@@ -66,6 +66,7 @@
+ 	local lists = lists_utils.getCategoryLists()
+ 
+ 	for list_name, v in pairs(lists) do
++	   local list_name = list_name
+ 		local current_hits = v.status.num_hits.total
+ 		if current_hits > 0 then
+ 			list_name = list_name:gsub("%s+", "_") -- replace space with underscore
+--- scripts/lua/rest/v2/get/alert/filter/consts.lua
++++ scripts/lua/rest/v2/get/alert/filter/consts.lua
+@@ -36,6 +36,7 @@
+ local filters = alert_store_instance:get_available_filters()
+ 
+ for id, v in pairs(filters) do
++   local id = id
+    -- FIXX rename l7_proto to l7proto in flow alert store for consistency
+    if id == "l7_proto" then id = "l7proto" end
+ 
+--- scripts/lua/rest/v2/get/interface/top/hosts.lua
++++ scripts/lua/rest/v2/get/interface/top/hosts.lua
+@@ -38,6 +38,7 @@
+ local top_value = 0
+ local num = 0
+ for key, value in pairs(hosts_stats) do
++   local key = key
+    local host_info = hostkey2hostinfo(key);
+ 
+    local value = hosts_stats[key]["bytes.sent"]+hosts_stats[key]["bytes.rcvd"]
+--- scripts/lua/modules/import_export/pool_import_export.lua
++++ scripts/lua/modules/import_export/pool_import_export.lua
+@@ -51,6 +51,7 @@
+    local pools_map = {}
+ 
+    for line in csv_data:gmatch("[^\r\n]+") do
++      local line = line
+       -- Skip empty lines and comment lines starting with #
+       line = line:match("^%s*(.-)%s*$")
+       if line ~= "" and not line:match("^#") then

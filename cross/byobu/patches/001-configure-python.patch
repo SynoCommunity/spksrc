@@ -1,36 +1,41 @@
-# Define BYOBU_PYTHON to use python312 package
+# Define BYOBU_PYTHON to use python314 package
 # Install snack package into $HOME
 # 
---- usr/lib/byobu/include/constants.orig	2018-05-27 19:30:52.000000000 +0000
-+++ usr/lib/byobu/include/constants	2025-08-17 21:45:25.513931217 +0000
-@@ -57,15 +57,9 @@
- # Determine if we have ulimit support
- eval $BYOBU_TEST ulimit >/dev/null 2>&1 && export BYOBU_ULIMIT="ulimit" || export BYOBU_ULIMIT="false"
+--- usr/lib/byobu/include/constants.orig
++++ usr/lib/byobu/include/constants
+@@ -74,22 +74,5 @@
  
--# Find a suitable python interpreter, if undefined
-+# Use python of python312 package
+-# Find a suitable python interpreter, if undefined.
+-# Cache the result in $BYOBU_CONFIG_DIR so each status-bar subprocess
+-# (run fresh by tmux every few seconds) does not re-import snack on NFS
+-# or slow filesystems.  LP: #2076905
++# Use python of python314 package
  if [ -z "$BYOBU_PYTHON" ]; then
--	if python3 -c "import snack" >/dev/null 2>&1; then
--		export BYOBU_PYTHON="python3"
--	elif python2 -c "import snack" >/dev/null 2>&1; then
--		export BYOBU_PYTHON="python2"
--	elif python -c "import snack" >/dev/null 2>&1; then
--		export BYOBU_PYTHON="python"
+-	_byobu_python_cache="${BYOBU_CONFIG_DIR:-$HOME/.byobu}/.python_cache"
+-	if [ -f "$_byobu_python_cache" ]; then
+-		IFS= read -r BYOBU_PYTHON < "$_byobu_python_cache" 2>/dev/null || true
+-		export BYOBU_PYTHON
+-	else
+-		if python3 -c "import snack" >/dev/null 2>&1; then
+-			export BYOBU_PYTHON="python3"
+-		elif python2 -c "import snack" >/dev/null 2>&1; then
+-			export BYOBU_PYTHON="python2"
+-		elif python -c "import snack" >/dev/null 2>&1; then
+-			export BYOBU_PYTHON="python"
+-		fi
+-		printf "%s\n" "$BYOBU_PYTHON" > "$_byobu_python_cache" 2>/dev/null || true
 -	fi
-+	export BYOBU_PYTHON="/var/packages/python312/target/bin/python3"
+-	unset _byobu_python_cache
++	export BYOBU_PYTHON="/var/packages/python314/target/bin/python3"
  fi
- 
- export BYOBU_WINDOW_NAME="-"
---- usr/lib/byobu/include/dirs.in.orig	2016-04-07 22:05:52.000000000 +0000
-+++ usr/lib/byobu/include/dirs.in	2025-08-17 20:37:43.743019853 +0000
-@@ -70,3 +70,10 @@
- 		export BYOBU_RUN_DIR="$HOME/.cache/$PKG"
- 	fi
+--- usr/lib/byobu/include/dirs.in.orig
++++ usr/lib/byobu/include/dirs.in
+@@ -81 +81,8 @@
  fi
-+BYOBU_SITE_PACKAGES_DIR=$HOME/.local/lib/python3.12/site-packages
++BYOBU_SITE_PACKAGES_DIR=$HOME/.local/lib/python3.14/site-packages
 +if [ ! -d "$BYOBU_SITE_PACKAGES_DIR" ]; then
 +	# link snack into .local site-packages
 +	mkdir -p ${BYOBU_SITE_PACKAGES_DIR}
-+	ln -sf /var/packages/byobu/target/lib/python3.12/site-packages/_snack.so ${BYOBU_SITE_PACKAGES_DIR}/_snack.so
-+	ln -sf /var/packages/byobu/target/lib/python3.12/site-packages/snack.py  ${BYOBU_SITE_PACKAGES_DIR}/snack.py
++	ln -sf /var/packages/byobu/target/lib/python3.14/site-packages/_snack.so ${BYOBU_SITE_PACKAGES_DIR}/_snack.so
++	ln -sf /var/packages/byobu/target/lib/python3.14/site-packages/snack.py  ${BYOBU_SITE_PACKAGES_DIR}/snack.py
 +fi

@@ -1,0 +1,16 @@
+# Older kernels/libcs do not support fchmodat(AT_EMPTY_PATH).
+--- src/net/ChmodLocalSocket.cxx
++++ src/net/ChmodLocalSocket.cxx
+@@ -44,8 +44,10 @@
+ 		throw FmtRuntimeError("Not a socket: {:?}", path);
+ 
+ 	/* note: fchmod() doesn't work on O_PATH file descriptors, but
+-	   fchmodat() with AT_EMPTY_PATH workw */
+-	if (fchmodat(fd.Get(), "", mode, AT_EMPTY_PATH) < 0)
++	   fchmodat() with AT_EMPTY_PATH works -- except on older kernels
++	   or libcs where the flag is unsupported. */
++	if (fchmodat(fd.Get(), "", mode, AT_EMPTY_PATH) < 0 &&
++	    chmod(path, mode) < 0)
+ 		throw FmtErrno("chmod({:?}) failed"sv, path);
+ #else
+ 	/* portable fallback; don't follow a symlink in the last path

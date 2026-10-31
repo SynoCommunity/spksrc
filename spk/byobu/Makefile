@@ -1,9 +1,9 @@
 SPK_NAME = byobu
-SPK_VERS = 5.133
-SPK_REV = 1
+SPK_VERS = 7.23
+SPK_REV = 2
 SPK_ICON = src/byobu.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 SPK_DEPENDS = "synocli-net"
 
 DEPENDS = cross/byobu
@@ -13,7 +13,7 @@ MAINTAINER = tofuHero
 DESCRIPTION = Byobu is a GPLv3 open source text-based window manager and terminal multiplexer. It was originally designed to provide elegant enhancements to the otherwise functional, plain, practical GNU Screen, for the Ubuntu server distribution. Byobu now includes an enhanced profiles, convenient keybindings, configuration utilities, and toggle-able system status notifications for both the GNU Screen window manager and the more modern Tmux terminal multiplexer, and works on most Linux, BSD, and Mac distributions.
 DISPLAY_NAME = byobu
 STARTABLE = no
-CHANGELOG = "Initial package release."
+CHANGELOG = "1. Update to byobu 7.23. <br/>2. Use Python 3.14."
 
 LICENSE  = GPLv3
 HOMEPAGE = https://www.byobu.org/
@@ -23,10 +23,13 @@ SPK_COMMANDS += bin/byobu-config
 SPK_COMMANDS += bin/byobu-ctrl-a
 SPK_COMMANDS += bin/byobu-disable
 SPK_COMMANDS += bin/byobu-disable-prompt
+SPK_COMMANDS += bin/byobu-disable-shell-integration
 SPK_COMMANDS += bin/byobu-enable
 SPK_COMMANDS += bin/byobu-enable-prompt
+SPK_COMMANDS += bin/byobu-enable-shell-integration
 SPK_COMMANDS += bin/byobu-export
 SPK_COMMANDS += bin/byobu-janitor
+SPK_COMMANDS += bin/byobu-keybindings
 SPK_COMMANDS += bin/byobu-launch
 SPK_COMMANDS += bin/byobu-launcher
 SPK_COMMANDS += bin/byobu-launcher-install

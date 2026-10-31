@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
-SPK_VERS = 3.0.29
-SPK_REV = 25
+SPK_VERS = 3.4.7
+SPK_REV = 26
 SPK_ICON = src/haproxy.png
 
 DEPENDS = cross/haproxy
@@ -12,7 +12,7 @@ MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
 DISPLAY_NAME = HAProxy
-CHANGELOG = "Update to HAProxy 3.0.29"
+CHANGELOG = "Update to HAProxy 3.4.7"
 
 HOMEPAGE   = https://haproxy.1wt.eu/
 LICENSE    = GPLv2
