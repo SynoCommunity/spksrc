@@ -36,7 +36,7 @@ usage() {
 
 Usage: $0 [options] <list|modules|start|stop|restart|status> [module ...]
 
-Run start, stop, restart and status as root, from a root shell (sudo -i).
+Run start, stop and restart as root: sudo -i $0 ... (sudo alone does not find it).
 
    list                      the profiles of every synokernel-* package, and
                              whether the package is installed and this kernel
@@ -367,7 +367,7 @@ command -v jq >/dev/null || die "jq is needed to read the profiles"
 # Loading and unloading need root; list, modules, status and a dry run do not
 case ${ACTION} in
    start|stop|restart)
-      [ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "${ACTION} must be run as root, from a root shell (sudo -i): sudo alone does not find the commands of packages";;
+      [ "${DRYRUN}" = "TRUE" -o "$(id -u)" = "0" ] || die "${ACTION} must be run as root: sudo -i $(basename $0) ... (sudo alone does not find the commands of packages)";;
 esac
 
 # The platform the modules are built for (uname: synology_<platform>_<model>),

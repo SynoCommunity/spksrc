@@ -51,7 +51,7 @@ package does not provide (`keyspan`, `io_edgeport`, `whiteheat`).
 ## Usage
 
 The modules are not loaded on installation: load those of your adapter, as
-root (`sudo -i`: `sudo` alone does not find the commands of packages), with the
+root, with `sudo -i` in front (`sudo` alone does not find the commands of packages), with the
 `synocli-kernelmodule` helper of
 [SynoCli Kernel Tools](synocli-kernel.md), which holds the profiles. Each
 driver has a profile of its name, which also installs the udev rule that opens
@@ -59,8 +59,8 @@ driver has a profile of its name, which also installs the udev rule that opens
 
 ```bash
 synocli-kernelmodule list
-synocli-kernelmodule --profile cp210x start
-synocli-kernelmodule --profile ch341,cdc-acm status
+sudo -i synocli-kernelmodule --profile cp210x start
+sudo -i synocli-kernelmodule --profile ch341,cdc-acm status
 ```
 
 To load them at every startup, see

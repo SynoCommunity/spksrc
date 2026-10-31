@@ -65,12 +65,12 @@ kernel itself. Adapters are set up through `nl80211`, with `iw` and
 ## Usage
 
 The modules are not loaded on installation: load those of your adapter, as
-root (`sudo -i`: `sudo` alone does not find the commands of packages), with the
+root, with `sudo -i` in front (`sudo` alone does not find the commands of packages), with the
 `synocli-kernelmodule` helper of [SynoCli Kernel Tools](synocli-kernel.md):
 
 ```bash
 synocli-kernelmodule list
-synocli-kernelmodule --profile rtl88x2bu start
+sudo -i synocli-kernelmodule --profile rtl88x2bu start
 iw dev
 ```
 
@@ -83,7 +83,7 @@ the adapters it does not support: the connection is set up from the command
 line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
 and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
 WPA3, first in the `PATH` of root: call those of the package by their path.
-Set the [regulatory domain](#regulatory-domain) first, as root (`sudo -i`):
+Set the [regulatory domain](#regulatory-domain) first, in a root shell (`sudo -i`):
 
 ```bash
 WIFI=/var/packages/synokernel-wifi/target
