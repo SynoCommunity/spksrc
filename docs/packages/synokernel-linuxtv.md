@@ -66,16 +66,15 @@ slot (`KERNEL_PCI_SLOT` of the kernel), and left out elsewhere.
 
 Modules are installed under
 `/var/packages/synokernel-linuxtv/target/lib/modules/<arch>/<kernel>/` and loaded
-with the `synocli-kernelmodule` helper of SynoCli Kernel Tools, as root, with
-`sudo -i` in front (`sudo` alone does not find the commands of packages):
+with the `synocli-kernelmodule` helper of SynoCli Kernel Tools, as root:
 
 ```bash
 # The device profiles, and which this kernel can load
 synocli-kernelmodule list
 
 # Load the modules of a device, with the modules they depend on
-sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
-sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 ```
 
 | Profile | Device | Tested |
