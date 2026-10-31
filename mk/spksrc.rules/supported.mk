@@ -56,7 +56,7 @@ pre-build-native: SHELL:=/bin/bash
 pre-build-native:
 	@set -o pipefail; { \
 	   $(MSG) Pre-build native dependencies for parallel build [START] ; \
-	   env $(ENV) $(MAKE) native-depend ; \
+	   env $(ENV) $(MAKE) $(if $(TCVERSION),TCVERSION=$(TCVERSION)) native-depend ; \
 	   $(MSG) Pre-build native dependencies for parallel build [END] ; \
 	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
@@ -127,6 +127,8 @@ arch-%: pre-build-native
 	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)),build-$*.log)
 
 arch-noarch-%: SHELL:=/bin/bash
+# The wrapper carries TCVERSION only in its name; prerequisites need it for their parse.
+arch-noarch-%: TCVERSION = $(patsubst arch-noarch-%,%,$@)
 arch-noarch-%: pre-build-native
 	@set -o pipefail ; \
 	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1)),build-noarch-$*.log)
