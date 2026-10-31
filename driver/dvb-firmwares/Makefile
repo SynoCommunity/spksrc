@@ -1,9 +1,10 @@
 PKG_NAME = dvb-firmwares
 PKG_VERS = 2018.05.21
 PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME).$(PKG_EXT)
-PKG_DIST_SITE = https://www.linuxtv.org/downloads/firmware
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+# linuxtv.org answers downloads with a bot check page: the archive of
+# linuxtv.org/downloads/firmware, kept with the media_build trees
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/linuxtv%2Fmedia_build
 PKG_DIR = firmware
 
 HOMEPAGE = https://linuxtv.org/
