@@ -1,4 +1,5 @@
 SPK_NAME = synocli-monitor
+# Unreleased, pending additional changes.
 SPK_VERS = 1.8
 SPK_REV = 14
 SPK_ICON = src/synocli-monitor.png
