@@ -84,19 +84,38 @@ line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
 and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
 WPA3, first in the `PATH` of root: those of the package are `wifi-wpa_supplicant`,
 `wifi-wpa_cli` and `wifi-wpa_passphrase`.
-Set the [regulatory domain](#regulatory-domain) first, and make sure no other
-`wpa_supplicant` runs on `wlan0`: a second one fights the first for the
-interface, and one started without a control interface cannot be stopped by
-`wpa_cli`. The pattern leaves alone a `wpa_supplicant` of DSM on the wired
-interface (802.1X):
+Set the [regulatory domain](#regulatory-domain) first, and start from a clean
+state: no other `wpa_supplicant` nor DHCP client on `wlan0`, and no address. A
+second `wpa_supplicant` fights the first for the interface, and one started
+without a control interface cannot be stopped by `wpa_cli`. The patterns leave
+alone a `wpa_supplicant` of DSM on the wired interface (802.1X):
 
 ```bash
-# Any wpa_supplicant running, and on which interface (-i)
-ps -ef | grep '[w]pa_supplicant'
+# What runs on which interface (-i)
+ps -ef | grep -E '[w]pa_supplicant|[u]dhcpc'
 
-# Stop those of wlan0
+# Back to a clean state: stop wpa_supplicant through its control interface,
+# and the DHCP client, which has none
+sudo -i wifi-wpa_cli -i wlan0 terminate
+sudo -i pkill -f 'udhcpc.*-i wlan0'
+sudo -i ip addr flush dev wlan0
+
+# A wpa_supplicant started without a control interface (-C) is out of reach of
+# wpa_cli: stop it by its command line
 sudo -i pkill -f 'wpa_supplicant.*-i wlan0'
 ```
+
+!!! warning
+    Over a session that goes through `wlan0`, resetting it cuts the session, and
+    the NAS stays off the WiFi network until it is connected again from a cable,
+    the console, or a reboot that runs the boot task. On a NAS on WiFi alone,
+    reset and reconnect in one command that goes on once the session is gone
+    (`sudo -v` first: in the background, `sudo` cannot ask for a password):
+
+    ```bash
+    sudo -v
+    sudo -i nohup sh -c 'wifi-wpa_cli -i wlan0 terminate; pkill -f "udhcpc.*-i wlan0"; ip addr flush dev wlan0; wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf && sleep 10 && env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b' > /dev/null 2>&1 &
+    ```
 
 Then:
 
