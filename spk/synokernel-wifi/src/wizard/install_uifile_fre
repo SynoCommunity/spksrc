@@ -6,7 +6,141 @@
                 "desc": "<b>Expérimental, à vos risques.</b> Ces modules noyau sortent du cadre pris en charge par Synology : un module qui ne convient pas au noyau peut planter le NAS, et les mises à jour de DSM peuvent les briser. Le soutien est limité : lisez la documentation, et vérifiez les issues déjà ouvertes, avant d'en ouvrir une. Ne les utilisez pas sur un NAS que vous ne pouvez pas vous permettre de redémarrer ou de restaurer."
             },
             {
-                "desc": "Les modules noyau de ce paquet ne sont <b>pas chargés</b> à l'installation, ni au démarrage, et DSM n'affiche pas leurs interfaces WiFi dans ses réglages réseau. Chargez le pilote de votre adaptateur, en root, avec l'outil <b>synocli-kernelmodule</b> de SynoCli Kernel Tools, puis connectez-vous avec <b>wpa_supplicant</b> :<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i iw dev</code><br><br>Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synokernel-wifi/\">documentation du paquet</a> pour les adaptateurs pris en charge et la connexion, et <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/#loading-modules-at-boot\">Loading modules at boot</a> pour la tâche planifiée qui les charge à chaque démarrage."
+                "desc": "Les modules noyau de ce paquet ne sont <b>pas chargés</b> à l'installation, ni au démarrage, et DSM n'affiche pas leurs interfaces WiFi dans ses réglages réseau. Chargez le pilote de votre adaptateur, en root, avec l'outil <b>synocli-kernelmodule</b> de SynoCli Kernel Tools, puis connectez-vous avec <b>wifi-connect</b> et le profil du réseau :<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i wifi-connect MonReseau</code><br><br><code>sudo -i wifi-connect --new</code> crée le profil d'un autre réseau. Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synokernel-wifi/\">documentation du paquet</a> pour les adaptateurs pris en charge, et <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/#loading-modules-at-boot\">Loading modules at boot</a> pour la tâche planifiée qui les charge à chaque démarrage."
+            }
+        ]
+    },
+    {
+        "step_title": "Réseau WiFi",
+        "items": [
+            {
+                "desc": "Facultatif : le profil d'un réseau auquel se connecter, dans <code>/var/packages/synokernel-wifi/var/networks</code>, à son nom. Laissez le réseau vide pour passer. La phrase de passe est conservée sous forme de clé WPA2, pas en clair, sauf pour WPA3, qui en a besoin."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_ssid",
+                        "desc": "Réseau (SSID)",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_passphrase",
+                        "desc": "Phrase de passe",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "minLength": 8,
+                            "maxLength": 63
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_country",
+                        "desc": "Pays, deux lettres comme CA ou FR, pour les canaux 5 GHz",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[A-Za-z]{2}$/",
+                                "errorText": "Deux lettres, comme CA ou FR"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>Sécurité</b>",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_wpa2",
+                        "desc": "WPA2",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_wifi_wpa3",
+                        "desc": "WPA3, ou WPA2/WPA3",
+                        "defaultValue": false
+                    },
+                    {
+                        "key": "wizard_wifi_open",
+                        "desc": "Ouvert, sans phrase de passe",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>Adresse</b>",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_dhcp",
+                        "desc": "Par DHCP",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_wifi_static",
+                        "desc": "Statique, ci-dessous",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_address",
+                        "desc": "Adresse, avec son masque (192.168.1.50/24)",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[0-9]{1,3}(\\.[0-9]{1,3}){3}\\/[0-9]{1,2}$/",
+                                "errorText": "Une adresse avec son masque, comme 192.168.1.50/24"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_wifi_gateway",
+                        "desc": "Passerelle",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    },
+                    {
+                        "key": "wizard_wifi_dns",
+                        "desc": "Serveurs DNS, séparés par des espaces",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "multiselect",
+                "desc": "La route par défaut et les serveurs DNS du WiFi remplacent ceux du NAS : pour un NAS en WiFi seulement, pas un NAS câblé.",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_default_route",
+                        "desc": "Route par défaut par le WiFi",
+                        "defaultValue": false
+                    }
+                ]
             }
         ]
     }

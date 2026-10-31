@@ -79,96 +79,90 @@ sudo -i iw dev
 ### Connecting to a network
 
 DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
-the adapters it does not support: the connection is set up from the command
-line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
-and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
-WPA3, first in the `PATH` of root: those of the package are `wifi-wpa_supplicant`,
-`wifi-wpa_cli` and `wifi-wpa_passphrase`.
-Set the [regulatory domain](#regulatory-domain) first, and start from a clean
-state: a second `wpa_supplicant` on `wlan0` fights the first for the
-interface. Stop the DHCP client first, while the network is still there,
-through the PID file it writes (`-p`): run with `-R`, it releases its lease to
-the server and removes the address of `wlan0`. Then stop `wpa_supplicant`
-through its control interface. An error (`No such file`, `Failed to connect`)
-only tells that none runs:
+the adapters it does not support: `wifi-connect` connects the NAS from the
+command line, by profile -- one JSON file per network in
+`/var/packages/synokernel-wifi/var/networks`, written by the installation wizard
+or by `wifi-connect --new`:
 
 ```bash
+sudo -i synocli-kernelmodule --profile rtl88x2bu start
+sudo -i wifi-connect MyNetwork
+```
+
+```bash
+sudo -i wifi-connect --new        # asks for a network, writes its profile
+sudo -i wifi-connect --list       # the profiles
+sudo -i wifi-connect --status     # the state of the connection
+sudo -i wifi-connect --stop       # disconnect
+```
+
+Every connection starts from a clean state: the DHCP client and
+`wpa_supplicant` of the interface are stopped first, and a second connection
+replaces the first. `-i wlan1` picks the interface, the first one of `iw dev`
+otherwise. When connections go through the interface, which resetting it cuts,
+`wifi-connect` goes on in the background; its log is
+`/var/log/packages/wifi-connect.log`.
+
+A profile holds the network, its security, and its address:
+
+```json
+{
+  "ssid": "MyNetwork",
+  "security": "wpa2",
+  "psk": "<the WPA2 key, of wpa_passphrase>",
+  "dhcp": false,
+  "address": "192.168.1.50/24",
+  "gateway": "192.168.1.1",
+  "dns": ["192.168.1.1"],
+  "default_route": false,
+  "country": "CA"
+}
+```
+
+- `security`: `wpa2`, `wpa3` (WPA3, or a WPA2/WPA3 network) or `open`. The
+  passphrase is kept as its WPA2 key only, not in clear, except for WPA3, which
+  needs it (`sae_password`). The file is readable by its owner only.
+- `dhcp`: `true`, or `false` for the static `address`.
+- `default_route`: `false` keeps the default route and DNS servers of the wired
+  interface. `true`, for a NAS on WiFi alone, gives them to the WiFi network;
+  those it replaced come back when it disconnects.
+- `country`, optional: the [regulatory domain](#regulatory-domain) set before
+  connecting.
+
+To connect at every startup, add the two commands to the task of
+[Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
+
+### Connecting by hand
+
+`wifi-connect` runs the tools of this package: `wpa_supplicant` 2.11, which
+knows WPA3, and the DHCP client `udhcpc`. DSM has a `wpa_supplicant` of its
+own, 2.6 without WPA3, first in the `PATH` of root: those of the package are
+`wifi-wpa_supplicant`, `wifi-wpa_cli` and `wifi-wpa_passphrase`. By hand:
+
+```bash
+# The configuration on the standard input; the control interface (-C) lets
+# wpa_cli follow and stop it, and refuses a second instance
+wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /dev/stdin
+sudo -i wifi-wpa_cli -i wlan0 status
+
+# The address only; WIFI_DEFAULT_ROUTE=1 in front for the default route and DNS too
+sudo -i udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
+
+# Disconnect: udhcpc releases its lease (-R)
 sudo -i sh -c 'kill $(cat /var/run/udhcpc-wlan0.pid)'
 sudo -i wifi-wpa_cli -i wlan0 terminate
 ```
 
-A `wpa_supplicant` started without a control interface (`-C`) is out of reach
-of `wpa_cli`: `sudo -i pkill -f 'wpa_supplicant.*-i wlan0'` stops it, and
-leaves alone one of DSM on the wired interface (802.1X).
-
-!!! warning
-    Over a session that goes through `wlan0`, resetting it cuts the session, and
-    the NAS stays off the WiFi network until it is connected again from a cable,
-    the console, or a reboot that runs the boot task. On a NAS on WiFi alone,
-    reset and reconnect in one command that goes on once the session is gone
-    (`sudo -v` first: in the background, `sudo` cannot ask for a password):
-
-    ```bash
-    sudo -v
-    sudo -i nohup sh -c 'kill $(cat /var/run/udhcpc-wlan0.pid); wifi-wpa_cli -i wlan0 terminate; wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf && sleep 10 && env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid' > /dev/null 2>&1 &
-    ```
-
-Then:
-
-```bash
-# The networks in range
-sudo -i ip link set wlan0 up
-sudo -i iw dev wlan0 scan | grep -E 'SSID|freq|signal'
-
-# The network and its passphrase, readable by root only, without the clear-text copy
-sudo -i sh -c 'umask 077; wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
-
-# Connect, then check the link
-sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
-sudo -i iw dev wlan0 link
-```
-
-To try a network without writing a file, give the output of `wifi-wpa_passphrase`
-to `wpa_supplicant` on its standard input; the control interface (`-C`) lets
-`wifi-wpa_cli` follow and stop it, and refuses a second instance on the same
-interface:
-
-```bash
-wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /dev/stdin
-sudo -i wifi-wpa_cli -i wlan0 status
-sudo -i wifi-wpa_cli -i wlan0 terminate
-```
-
-That configuration cannot be read again (`wpa_cli reconfigure`): at boot, use
-the file.
-
-For a WPA3 network, add `key_mgmt=SAE` and `ieee80211w=2` to the network block
-of the configuration. `wpa_supplicant` may report `rfkill: Cannot open RFKILL
-control device`, and with some drivers `Could not re-add multicast membership
-for vendor events`: neither matters.
-
-Once `iw dev wlan0 link` shows `Connected to`, get an address:
-
-```bash
-# The address only: the wired interface keeps the default route and DNS servers
-sudo -i udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
-
-# On a NAS on WiFi alone: the default route and DNS servers of the WiFi network too
-sudo -i env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
-```
-
-`-b` keeps `udhcpc` in the background to renew the lease, `-R` releases it
-when `udhcpc` stops, and `-p` writes the PID file to stop it by. DSM's `dhclient` is
-of no use here: an AppArmor profile lets it run its own script only, which
-sets the routes and DNS of every network it joins.
-
-To connect at every startup, add the commands after `synocli-kernelmodule` in
-the task of [Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
+`wpa_supplicant` may report `rfkill: Cannot open RFKILL control device`, and
+with some drivers `Could not re-add multicast membership for vendor events`:
+neither matters. DSM's `dhclient` is of no use here: an AppArmor profile lets
+it run its own script only, which sets the routes and DNS of every network it
+joins.
 
 ### Regulatory domain
 
 The kernel starts in the world regulatory domain, which leaves out most 5 GHz
-channels. Set the country of the NAS, here Canada, before connecting:
+channels. The `country` of a profile sets it; by hand, here for Canada:
 
 ```bash
 sudo -i iw reg set CA
