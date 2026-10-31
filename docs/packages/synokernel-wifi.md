@@ -85,25 +85,21 @@ and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
 WPA3, first in the `PATH` of root: those of the package are `wifi-wpa_supplicant`,
 `wifi-wpa_cli` and `wifi-wpa_passphrase`.
 Set the [regulatory domain](#regulatory-domain) first, and start from a clean
-state: no other `wpa_supplicant` nor DHCP client on `wlan0`, and no address. A
-second `wpa_supplicant` fights the first for the interface, and one started
-without a control interface cannot be stopped by `wpa_cli`. The patterns leave
-alone a `wpa_supplicant` of DSM on the wired interface (802.1X):
+state: a second `wpa_supplicant` on `wlan0` fights the first for the
+interface. Stop the DHCP client first, while the network is still there,
+through the PID file it writes (`-p`): run with `-R`, it releases its lease to
+the server and removes the address of `wlan0`. Then stop `wpa_supplicant`
+through its control interface. An error (`No such file`, `Failed to connect`)
+only tells that none runs:
 
 ```bash
-# What runs on which interface (-i)
-ps -ef | grep -E '[w]pa_supplicant|[u]dhcpc'
-
-# Back to a clean state: stop wpa_supplicant through its control interface,
-# and the DHCP client, which has none
+sudo -i sh -c 'kill $(cat /var/run/udhcpc-wlan0.pid)'
 sudo -i wifi-wpa_cli -i wlan0 terminate
-sudo -i pkill -f 'udhcpc.*-i wlan0'
-sudo -i ip addr flush dev wlan0
-
-# A wpa_supplicant started without a control interface (-C) is out of reach of
-# wpa_cli: stop it by its command line
-sudo -i pkill -f 'wpa_supplicant.*-i wlan0'
 ```
+
+A `wpa_supplicant` started without a control interface (`-C`) is out of reach
+of `wpa_cli`: `sudo -i pkill -f 'wpa_supplicant.*-i wlan0'` stops it, and
+leaves alone one of DSM on the wired interface (802.1X).
 
 !!! warning
     Over a session that goes through `wlan0`, resetting it cuts the session, and
@@ -114,7 +110,7 @@ sudo -i pkill -f 'wpa_supplicant.*-i wlan0'
 
     ```bash
     sudo -v
-    sudo -i nohup sh -c 'wifi-wpa_cli -i wlan0 terminate; pkill -f "udhcpc.*-i wlan0"; ip addr flush dev wlan0; wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf && sleep 10 && env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b' > /dev/null 2>&1 &
+    sudo -i nohup sh -c 'kill $(cat /var/run/udhcpc-wlan0.pid); wifi-wpa_cli -i wlan0 terminate; wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf && sleep 10 && env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid' > /dev/null 2>&1 &
     ```
 
 Then:
@@ -155,13 +151,14 @@ Once `iw dev wlan0 link` shows `Connected to`, get an address:
 
 ```bash
 # The address only: the wired interface keeps the default route and DNS servers
-sudo -i udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
+sudo -i udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
 
 # On a NAS on WiFi alone: the default route and DNS servers of the WiFi network too
-sudo -i env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b
+sudo -i env WIFI_DEFAULT_ROUTE=1 udhcpc -i wlan0 -s /var/packages/synokernel-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
 ```
 
-`-b` keeps `udhcpc` in the background to renew the lease. DSM's `dhclient` is
+`-b` keeps `udhcpc` in the background to renew the lease, `-R` releases it
+when `udhcpc` stops, and `-p` writes the PID file to stop it by. DSM's `dhclient` is
 of no use here: an AppArmor profile lets it run its own script only, which
 sets the routes and DNS of every network it joins.
 
