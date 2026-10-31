@@ -21,7 +21,7 @@
 # var/networks of this package. Every connection starts from a clean state:
 # the DHCP client and wpa_supplicant of the interface are stopped first.
 
-PACKAGE=synokernel-wifi
+PACKAGE=synocli-wifi-tools
 TARGET=/var/packages/${PACKAGE}/target
 NETWORKS_DIR=/var/packages/${PACKAGE}/var/networks
 RUN_DIR=/var/run/${PACKAGE}

@@ -3,12 +3,7 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/synokernel-wifi.png
 
-DEPENDS  = cross/iw
-DEPENDS += cross/linux-firmware-wifi
-# WPA3 and a DHCP client of its own: DSM's wpa_supplicant 2.6 has neither SAE nor
-# PMF, and its dhclient runs no script but its own
-DEPENDS += cross/wpa_supplicant
-DEPENDS += cross/busybox
+DEPENDS  = cross/linux-firmware-wifi
 DEPENDS += driver/rtl88x2bu
 DEPENDS += driver/rtl8821cu
 DEPENDS += driver/rtl8821au
@@ -101,30 +96,8 @@ DISPLAY_NAME = SynoKernel WiFi drivers
 HOMEPAGE = https://wireless.docs.kernel.org/
 LICENSE  = GPLv2
 
-# The profiles of the WiFi adapters come with synocli-kernel 2.0-12
-SPK_DEPENDS = "synocli-kernel>=2.0-12"
-SPK_COMMANDS  = bin/wifi-connect
-SPK_COMMANDS += sbin/iw
-SPK_COMMANDS += sbin/udhcpc
-# Under names of their own: DSM's wpa_supplicant 2.6 comes first in the PATH of root
-SPK_COMMANDS += sbin/wifi-wpa_supplicant
-SPK_COMMANDS += sbin/wifi-wpa_cli
-SPK_COMMANDS += sbin/wifi-wpa_passphrase
-
-BUSYBOX_CONFIG = udhcpc
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
-SERVICE_SETUP = src/service-setup.sh
-POST_STRIP_TARGET = wifi_extra_install
+# The profiles of the WiFi adapters come with synocli-kernel 2.0-12, and the
+# tools to connect with synocli-wifi-tools
+SPK_DEPENDS = "synocli-kernel>=2.0-12:synocli-wifi-tools>=1.0-1"
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: wifi_extra_install
-wifi_extra_install:
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 755 src/udhcpc.script $(STAGING_DIR)/etc/udhcpc.script
-	install -m 755 src/wifi-connect.sh $(STAGING_DIR)/bin/wifi-connect
-	ln -sf ../bin/busybox $(STAGING_DIR)/sbin/udhcpc
-	for tool in wpa_supplicant wpa_cli wpa_passphrase; do \
-	  ln -sf $$tool $(STAGING_DIR)/sbin/wifi-$$tool ; \
-	done

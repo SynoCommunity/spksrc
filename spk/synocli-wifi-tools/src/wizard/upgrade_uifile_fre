@@ -1,0 +1,10 @@
+[
+    {
+        "step_title": "SynoCli WiFi Tools",
+        "items": [
+            {
+                "desc": "Les outils pour connecter le NAS à un réseau WiFi, avec les adaptateurs de <b>synokernel-wifi</b> : chargez le pilote de l'adaptateur avec <b>synocli-kernelmodule</b>, puis connectez-vous avec <b>wifi-connect</b> et le profil du réseau :<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i wifi-connect MonReseau</code><br><br><code>sudo -i wifi-connect --new</code> crée le profil d'un autre réseau ; <code>--list</code>, <code>--status</code> et <code>--stop</code> listent, montrent l'état et déconnectent. Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-wifi-tools/\">documentation du paquet</a>."
+            }
+        ]
+    }
+]

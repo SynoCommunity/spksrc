@@ -190,6 +190,7 @@ nav:
       - SynoCli Monitor: packages/synocli-monitor.md
       - SynoCli Net: packages/synocli-net.md
       - SynoCli VideoDriver: packages/synocli-videodriver.md
+      - SynoCli WiFi Tools: packages/synocli-wifi-tools.md
     - Development:
       - Git: packages/git.md
       - PostgreSQL: packages/postgresql.md

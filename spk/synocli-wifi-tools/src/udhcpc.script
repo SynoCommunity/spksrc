@@ -1,5 +1,5 @@
 #!/bin/sh
-# udhcpc script of synokernel-wifi: the address of the interface, and with
+# udhcpc script of synocli-wifi-tools: the address of the interface, and with
 # WIFI_DEFAULT_ROUTE=1 its default route and DNS servers, for a NAS on WiFi alone
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
