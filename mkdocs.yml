@@ -106,6 +106,7 @@ nav:
     - user-guide/index.md
     - Installation: user-guide/installation.md
     - SSH Access: user-guide/ssh.md
+    - DSM Configuration: user-guide/dsm-configuration.md
     - Troubleshooting: user-guide/troubleshooting.md
     - Compatibility: user-guide/compatibility.md
     - Permissions: user-guide/permissions.md
@@ -237,8 +238,6 @@ nav:
       - MinIO: packages/minio.md
     - Sync:
       - Syncthing: packages/syncthing.md
-    - Utilities:
-      - DSM Utilities: packages/dsm-utilities.md
     - Web Apps:
       - Actual Budget: packages/actual-budget.md
       - Adminer: packages/adminer.md
