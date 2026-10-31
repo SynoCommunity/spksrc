@@ -1,0 +1,3 @@
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/webhook -nopanic -port ${SERVICE_PORT} -hooks ${SYNOPKG_PKGVAR}/hooks.json"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
