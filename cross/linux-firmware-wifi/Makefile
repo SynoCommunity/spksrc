@@ -12,13 +12,30 @@ COMMENT  = Firmware of the USB WiFi adapters of synokernel-wifi, from linux-firm
 LICENSE  = Each firmware is licensed under its own terms, see WHENCE
 
 # Only the firmware of the drivers built, out of a 650 MB archive
-FIRMWARE  = rt2870.bin rt3071.bin
-FIRMWARE += carl9170-1.fw htc_7010.fw htc_9271.fw ath9k_htc/htc_7010-1.4.0.fw ath9k_htc/htc_9271-1.4.0.fw
-FIRMWARE += mediatek/mt7601u.bin mediatek/mt7610u.bin mediatek/mt7662u.bin mediatek/mt7662u_rom_patch.bin
-FIRMWARE += rtlwifi/rtl8192cufw.bin rtlwifi/rtl8192cufw_A.bin rtlwifi/rtl8192cufw_B.bin rtlwifi/rtl8192cufw_TMSC.bin
-FIRMWARE += rtlwifi/rtl8188eufw.bin rtlwifi/rtl8192eu_nic.bin rtlwifi/rtl8192fufw.bin
-FIRMWARE += rtlwifi/rtl8710bufw_SMIC.bin rtlwifi/rtl8710bufw_UMC.bin
-FIRMWARE += rtlwifi/rtl8723aufw_A.bin rtlwifi/rtl8723aufw_B.bin rtlwifi/rtl8723aufw_B_NoBT.bin rtlwifi/rtl8723bu_nic.bin
+FIRMWARE  = rt2870.bin
+FIRMWARE += rt3071.bin
+FIRMWARE += carl9170-1.fw
+FIRMWARE += htc_7010.fw
+FIRMWARE += htc_9271.fw
+FIRMWARE += ath9k_htc/htc_7010-1.4.0.fw
+FIRMWARE += ath9k_htc/htc_9271-1.4.0.fw
+FIRMWARE += mediatek/mt7601u.bin
+FIRMWARE += mediatek/mt7610u.bin
+FIRMWARE += mediatek/mt7662u.bin
+FIRMWARE += mediatek/mt7662u_rom_patch.bin
+FIRMWARE += rtlwifi/rtl8192cufw.bin
+FIRMWARE += rtlwifi/rtl8192cufw_A.bin
+FIRMWARE += rtlwifi/rtl8192cufw_B.bin
+FIRMWARE += rtlwifi/rtl8192cufw_TMSC.bin
+FIRMWARE += rtlwifi/rtl8188eufw.bin
+FIRMWARE += rtlwifi/rtl8192eu_nic.bin
+FIRMWARE += rtlwifi/rtl8192fufw.bin
+FIRMWARE += rtlwifi/rtl8710bufw_SMIC.bin
+FIRMWARE += rtlwifi/rtl8710bufw_UMC.bin
+FIRMWARE += rtlwifi/rtl8723aufw_A.bin
+FIRMWARE += rtlwifi/rtl8723aufw_B.bin
+FIRMWARE += rtlwifi/rtl8723aufw_B_NoBT.bin
+FIRMWARE += rtlwifi/rtl8723bu_nic.bin
 FIRMWARE += WHENCE
 
 EXTRACT_CMD = tar -xJf $(DIST_FILE) -C $(EXTRACT_PATH) $(addprefix $(PKG_DIR)/,$(FIRMWARE))

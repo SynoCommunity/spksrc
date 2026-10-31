@@ -19,10 +19,24 @@ COMPILE_TARGET   = rtw88_compile
 INSTALL_TARGET   = rtw88_install
 
 # The core, and the USB adapters with their chip modules
-RTW88_MODULES  = rtw_core rtw_usb
-RTW88_MODULES += rtw_8822b rtw_8822bu rtw_8822c rtw_8822cu rtw_8821c rtw_8821cu
-RTW88_MODULES += rtw_8723x rtw_8723d rtw_8723du
-RTW88_MODULES += rtw_88xxa rtw_8812a rtw_8812au rtw_8821a rtw_8821au rtw_8814a rtw_8814au
+RTW88_MODULES  = rtw_core
+RTW88_MODULES += rtw_usb
+RTW88_MODULES += rtw_8822b
+RTW88_MODULES += rtw_8822bu
+RTW88_MODULES += rtw_8822c
+RTW88_MODULES += rtw_8822cu
+RTW88_MODULES += rtw_8821c
+RTW88_MODULES += rtw_8821cu
+RTW88_MODULES += rtw_8723x
+RTW88_MODULES += rtw_8723d
+RTW88_MODULES += rtw_8723du
+RTW88_MODULES += rtw_88xxa
+RTW88_MODULES += rtw_8812a
+RTW88_MODULES += rtw_8812au
+RTW88_MODULES += rtw_8821a
+RTW88_MODULES += rtw_8821au
+RTW88_MODULES += rtw_8814a
+RTW88_MODULES += rtw_8814au
 
 include ../../mk/spksrc.driver.mk
 

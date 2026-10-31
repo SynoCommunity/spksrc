@@ -3,12 +3,19 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/synokernel-wifi.png
 
-DEPENDS  = cross/iw cross/linux-firmware-wifi
+DEPENDS  = cross/iw
+DEPENDS += cross/linux-firmware-wifi
 # WPA3 and a DHCP client of its own: DSM's wpa_supplicant 2.6 has neither SAE nor
 # PMF, and its dhclient runs no script but its own
-DEPENDS += cross/wpa_supplicant cross/busybox
-DEPENDS += driver/rtl88x2bu driver/rtl8821cu driver/rtl8821au driver/rtl8812au driver/rtl8814au
-DEPENDS += driver/rtw88 driver/wireless-regdb
+DEPENDS += cross/wpa_supplicant
+DEPENDS += cross/busybox
+DEPENDS += driver/rtl88x2bu
+DEPENDS += driver/rtl8821cu
+DEPENDS += driver/rtl8821au
+DEPENDS += driver/rtl8812au
+DEPENDS += driver/rtl8814au
+DEPENDS += driver/rtw88
+DEPENDS += driver/wireless-regdb
 
 REQUIRE_KERNEL ?= 1
 # No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
@@ -17,39 +24,58 @@ MIN_KERNEL_VERSION = 3.2
 UNSUPPORTED_ARCHS = $(SRM_ARCHS)
 # The wireless stack, which DSM 7 kernels are built without. Wireless extensions stay
 # off: they add fields to struct net_device and struct net of the running kernel.
-REQUIRE_KERNEL_OPTION  = CONFIG_WIRELESS=y CONFIG_WLAN=y
-REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_WEXT=n CONFIG_WIRELESS_EXT=n CONFIG_WEXT_CORE=n
+REQUIRE_KERNEL_OPTION  = CONFIG_WIRELESS=y
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN=y
+REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_WEXT=n
+REQUIRE_KERNEL_OPTION += CONFIG_WIRELESS_EXT=n
+REQUIRE_KERNEL_OPTION += CONFIG_WEXT_CORE=n
 REQUIRE_KERNEL_OPTION += CONFIG_MAC80211_MESH=n
 # The signature check of the regulatory database is built in: the database is
 # read unsigned, an option offered with CERTIFICATION_ONUS only, as the
 # internal database of older kernels
-REQUIRE_KERNEL_OPTION += CONFIG_EXPERT=y CONFIG_CFG80211_CERTIFICATION_ONUS=y
+REQUIRE_KERNEL_OPTION += CONFIG_EXPERT=y
+REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_CERTIFICATION_ONUS=y
 REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_REQUIRE_SIGNED_REGDB=n
 # Kernels before 4.15 compile the regulatory rules in (driver/wireless-regdb)
 REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_INTERNAL_REGDB=y
-REQUIRE_KERNEL_OPTION += CONFIG_SYSTEM_DATA_VERIFICATION=n CONFIG_SYSTEM_TRUSTED_KEYRING=n
+REQUIRE_KERNEL_OPTION += CONFIG_SYSTEM_DATA_VERIFICATION=n
+REQUIRE_KERNEL_OPTION += CONFIG_SYSTEM_TRUSTED_KEYRING=n
 # LED triggers are built in, and missing from some kernels: carl9170 does without,
 # ath9k_htc needs them
-REQUIRE_KERNEL_OPTION += CONFIG_LEDS_TRIGGERS=n CONFIG_CARL9170_LEDS=n
+REQUIRE_KERNEL_OPTION += CONFIG_LEDS_TRIGGERS=n
+REQUIRE_KERNEL_OPTION += CONFIG_CARL9170_LEDS=n
 # The vendor menus of the drivers, as they are named on each kernel
-REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_ATH=y CONFIG_ATH_CARDS=m CONFIG_ATH_COMMON=m
-REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_RALINK=y CONFIG_RT2X00=m
-REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_MEDIATEK=y CONFIG_WL_MEDIATEK=y
-REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_REALTEK=y CONFIG_RTL_CARDS=m
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_ATH=y
+REQUIRE_KERNEL_OPTION += CONFIG_ATH_CARDS=m
+REQUIRE_KERNEL_OPTION += CONFIG_ATH_COMMON=m
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_RALINK=y
+REQUIRE_KERNEL_OPTION += CONFIG_RT2X00=m
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_MEDIATEK=y
+REQUIRE_KERNEL_OPTION += CONFIG_WL_MEDIATEK=y
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_REALTEK=y
+REQUIRE_KERNEL_OPTION += CONFIG_RTL_CARDS=m
 
 REQUIRE_KERNEL_MODULE  = CONFIG_CFG80211:net/wireless:cfg80211
 REQUIRE_KERNEL_MODULE += CONFIG_MAC80211:net/mac80211:mac80211
 
 # USB adapters of the kernel, each module with the option of the driver that
 # selects it, listed once per directory the driver had over time
-RT2X00 = rt2x00:rt2x00lib rt2x00:rt2x00usb rt2x00:rt2800lib rt2x00:rt2800usb
+RT2X00  = rt2x00:rt2x00lib
+RT2X00 += rt2x00:rt2x00usb
+RT2X00 += rt2x00:rt2800lib
+RT2X00 += rt2x00:rt2800usb
 REQUIRE_KERNEL_MODULE += $(foreach m,$(RT2X00),CONFIG_RT2800USB:drivers/net/wireless/$(m))
 REQUIRE_KERNEL_MODULE += $(foreach m,$(RT2X00),CONFIG_RT2800USB:drivers/net/wireless/ralink/$(m))
-ATH9K_HTC = ath:ath ath/ath9k:ath9k_hw ath/ath9k:ath9k_common ath/ath9k:ath9k_htc
+ATH9K_HTC  = ath:ath
+ATH9K_HTC += ath/ath9k:ath9k_hw
+ATH9K_HTC += ath/ath9k:ath9k_common
+ATH9K_HTC += ath/ath9k:ath9k_htc
 REQUIRE_KERNEL_MODULE += $(foreach m,$(ATH9K_HTC),CONFIG_ATH9K_HTC:drivers/net/wireless/$(m):CONFIG_LEDS_TRIGGERS)
 REQUIRE_KERNEL_MODULE += CONFIG_CARL9170:drivers/net/wireless/ath:ath
 REQUIRE_KERNEL_MODULE += CONFIG_CARL9170:drivers/net/wireless/ath/carl9170:carl9170
-RTL8192CU = rtlwifi:rtlwifi rtlwifi/rtl8192c:rtl8192c-common rtlwifi/rtl8192cu:rtl8192cu
+RTL8192CU  = rtlwifi:rtlwifi
+RTL8192CU += rtlwifi/rtl8192c:rtl8192c-common
+RTL8192CU += rtlwifi/rtl8192cu:rtl8192cu
 REQUIRE_KERNEL_MODULE += $(foreach m,$(RTL8192CU),CONFIG_RTL8192CU:drivers/net/wireless/$(m))
 REQUIRE_KERNEL_MODULE += $(foreach m,$(RTL8192CU),CONFIG_RTL8192CU:drivers/net/wireless/realtek/$(m))
 # The USB part of rtlwifi, in rtlwifi.ko on older kernels
@@ -57,7 +83,10 @@ REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI_USB:drivers/net/wireless/rtlwifi:rtl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI_USB:drivers/net/wireless/realtek/rtlwifi:rtl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8XXXU:drivers/net/wireless/realtek/rtl8xxxu:rtl8xxxu
 REQUIRE_KERNEL_MODULE += CONFIG_MT7601U:drivers/net/wireless/mediatek/mt7601u:mt7601u
-MT76 = mt76:mt76 mt76:mt76-usb mt76:mt76x02-lib mt76:mt76x02-usb
+MT76  = mt76:mt76
+MT76 += mt76:mt76-usb
+MT76 += mt76:mt76x02-lib
+MT76 += mt76:mt76x02-usb
 REQUIRE_KERNEL_MODULE += $(foreach m,$(MT76) mt76/mt76x0:mt76x0-common mt76/mt76x0:mt76x0u,CONFIG_MT76x0U:drivers/net/wireless/mediatek/$(m))
 REQUIRE_KERNEL_MODULE += $(foreach m,$(MT76) mt76/mt76x2:mt76x2-common mt76/mt76x2:mt76x2u,CONFIG_MT76x2U:drivers/net/wireless/mediatek/$(m))
 

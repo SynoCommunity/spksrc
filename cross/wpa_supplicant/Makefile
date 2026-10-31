@@ -5,7 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://w1.fi/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libnl cross/openssl3
+DEPENDS  = cross/libnl
+DEPENDS += cross/openssl3
 
 HOMEPAGE = https://w1.fi/wpa_supplicant/
 COMMENT  = WPA supplicant: WPA2 and WPA3 authentication of WiFi stations, with wpa_cli.

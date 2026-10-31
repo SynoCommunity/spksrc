@@ -12,6 +12,8 @@ COMMENT  = Netlink Protocol Library Suite: APIs to the netlink based kernel inte
 LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static --disable-cli --disable-debug
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-cli
+CONFIGURE_ARGS += --disable-debug
 
 include ../../mk/spksrc.cross-cc.mk
