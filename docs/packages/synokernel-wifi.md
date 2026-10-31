@@ -69,7 +69,7 @@ root, with `sudo -i` in front (`sudo` alone does not find the commands of packag
 `synocli-kernelmodule` helper of [SynoCli Kernel Tools](synocli-kernel.md):
 
 ```bash
-sudo -i synocli-kernelmodule list
+synocli-kernelmodule list
 sudo -i synocli-kernelmodule --profile rtl88x2bu start
 sudo -i iw dev
 ```

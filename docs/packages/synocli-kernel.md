@@ -45,7 +45,7 @@ out of its `PATH`; `sudo -i` runs the command in a root login shell, which has i
 ```bash
 # Profiles of every synokernel-* package, and whether the package is installed
 # and this kernel has all their modules (available, or n/a with what is missing)
-sudo -i synocli-kernelmodule list
+synocli-kernelmodule list
 
 # The modules a profile loads, in order, and where each comes from
 sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules

@@ -58,7 +58,7 @@ driver has a profile of its name, which also installs the udev rule that opens
 `/dev/ttyUSB*` and `/dev/ttyACM*` to every user:
 
 ```bash
-sudo -i synocli-kernelmodule list
+synocli-kernelmodule list
 sudo -i synocli-kernelmodule --profile cp210x start
 sudo -i synocli-kernelmodule --profile ch341,cdc-acm status
 ```

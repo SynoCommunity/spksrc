@@ -71,7 +71,7 @@ with the `synocli-kernelmodule` helper of SynoCli Kernel Tools, as root, with
 
 ```bash
 # The device profiles, and which this kernel can load
-sudo -i synocli-kernelmodule list
+synocli-kernelmodule list
 
 # Load the modules of a device, with the modules they depend on
 sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
