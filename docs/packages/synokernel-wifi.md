@@ -95,9 +95,23 @@ sudo -i iw dev wlan0 scan | grep -E 'SSID|freq|signal'
 sudo -i sh -c 'umask 077; wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
 
 # Connect, then check the link
-sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
+sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
 sudo -i iw dev wlan0 link
 ```
+
+To try a network without writing a file, give the output of `wifi-wpa_passphrase`
+to `wpa_supplicant` on its standard input; the control interface (`-C`) lets
+`wifi-wpa_cli` follow and stop it, and refuses a second instance on the same
+interface:
+
+```bash
+wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | sudo -i wifi-wpa_supplicant -B -D nl80211 -i wlan0 -C /var/run/wpa_supplicant -c /dev/stdin
+sudo -i wifi-wpa_cli -i wlan0 status
+sudo -i wifi-wpa_cli -i wlan0 terminate
+```
+
+That configuration cannot be read again (`wpa_cli reconfigure`): at boot, use
+the file.
 
 For a WPA3 network, add `key_mgmt=SAE` and `ieee80211w=2` to the network block
 of the configuration. `wpa_supplicant` may report `rfkill: Cannot open RFKILL
