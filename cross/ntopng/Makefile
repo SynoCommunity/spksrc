@@ -19,6 +19,9 @@ HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
 LICENSE  = GPLv3
 
+# ntopng 7.0 is C++17; GCC < 7 cannot compile it.
+MIN_GCC_VERSION = 7
+
 include ../../mk/spksrc.common.mk
 
 SYNOLOGY_OS = DSM
