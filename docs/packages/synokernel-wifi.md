@@ -65,12 +65,12 @@ kernel itself. Adapters are set up through `nl80211`, with `iw` and
 ## Usage
 
 The modules are not loaded on installation: load those of your adapter, as
-root, with the `synocli-kernelmodule` helper of
-[SynoCli Kernel Tools](synocli-kernel.md):
+root (`sudo -i`: `sudo` alone does not find the commands of packages), with the
+`synocli-kernelmodule` helper of [SynoCli Kernel Tools](synocli-kernel.md):
 
 ```bash
 synocli-kernelmodule list
-sudo synocli-kernelmodule --profile rtl88x2bu start
+synocli-kernelmodule --profile rtl88x2bu start
 iw dev
 ```
 
@@ -80,37 +80,44 @@ iw dev
 
 DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
 the adapters it does not support: the connection is set up from the command
-line, with the `wpa_supplicant` and `dhclient` of DSM and the `iw` of this
-package. Set the [regulatory domain](#regulatory-domain) first.
+line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
+and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
+WPA3, first in the `PATH` of root: call those of the package by their path.
+Set the [regulatory domain](#regulatory-domain) first, as root (`sudo -i`):
 
 ```bash
+WIFI=/var/packages/synokernel-wifi/target
+
 # The networks in range
-sudo ip link set wlan0 up
-sudo iw dev wlan0 scan | grep -E 'SSID|freq|signal'
+ip link set wlan0 up
+$WIFI/sbin/iw dev wlan0 scan | grep -E 'SSID|freq|signal'
 
 # The network and its passphrase, readable by root only, without the clear-text copy
-sudo sh -c 'umask 077; wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf'
+(umask 077; $WIFI/sbin/wpa_passphrase "MyNetwork" "MyPassphrase" | grep -v "#psk" > /var/packages/synokernel-wifi/var/wpa_supplicant.conf)
 
 # Connect, then check the link
-sudo wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf
-iw dev wlan0 link
+$WIFI/sbin/wpa_supplicant -B -D nl80211 -i wlan0 -c /var/packages/synokernel-wifi/var/wpa_supplicant.conf -f /var/packages/synokernel-wifi/var/wpa_supplicant.log
+$WIFI/sbin/iw dev wlan0 link
 ```
 
-`wpa_supplicant` reports `rfkill: Cannot open RFKILL control device`, and with
-some drivers `Could not re-add multicast membership for vendor events`: neither
-matters. DSM's `wpa_supplicant` has no `-f` option to log to a file.
+For a WPA3 network, add `key_mgmt=SAE` and `ieee80211w=2` to the network block
+of the configuration. `wpa_supplicant` may report `rfkill: Cannot open RFKILL
+control device`, and with some drivers `Could not re-add multicast membership
+for vendor events`: neither matters.
 
 Once `iw dev wlan0 link` shows `Connected to`, get an address:
 
 ```bash
-sudo dhclient wlan0
+# The address only: the wired interface keeps the default route and DNS servers
+$WIFI/sbin/udhcpc -i wlan0 -s $WIFI/etc/udhcpc.script -b
+
+# On a NAS on WiFi alone: the default route and DNS servers of the WiFi network too
+env WIFI_DEFAULT_ROUTE=1 $WIFI/sbin/udhcpc -i wlan0 -s $WIFI/etc/udhcpc.script -b
 ```
 
-!!! warning
-    DSM's `dhclient` runs its own script, which sets the default route and the
-    DNS servers of the network it gets an address from; an AppArmor profile
-    forbids any other script (`-sf`). On a NAS that stays wired, give the WiFi
-    interface a static address with `ip addr add` instead.
+`-b` keeps `udhcpc` in the background to renew the lease. DSM's `dhclient` is
+of no use here: an AppArmor profile lets it run its own script only, which
+sets the routes and DNS of every network it joins.
 
 To connect at every startup, add the commands after `synocli-kernelmodule` in
 the task of [Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
@@ -121,7 +128,7 @@ The kernel starts in the world regulatory domain, which leaves out most 5 GHz
 channels. Set the country of the NAS, here Canada, before connecting:
 
 ```bash
-sudo iw reg set CA
+/var/packages/synokernel-wifi/target/sbin/iw reg set CA
 iw reg get
 ```
 

@@ -4,6 +4,9 @@ SPK_REV = 1
 SPK_ICON = src/synokernel-wifi.png
 
 DEPENDS  = cross/iw cross/linux-firmware-wifi
+# WPA3 and a DHCP client of its own: DSM's wpa_supplicant 2.6 has neither SAE nor
+# PMF, and its dhclient runs no script but its own
+DEPENDS += cross/wpa_supplicant cross/busybox
 DEPENDS += driver/rtl88x2bu driver/rtl8821cu driver/rtl8821au driver/rtl8812au driver/rtl8814au
 DEPENDS += driver/rtw88 driver/wireless-regdb
 
@@ -73,4 +76,15 @@ LICENSE  = GPLv2
 SPK_DEPENDS = "synocli-kernel>=2.0-12"
 SPK_COMMANDS = sbin/iw
 
+BUSYBOX_CONFIG = udhcpc
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
+POST_STRIP_TARGET = wifi_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: wifi_extra_install
+wifi_extra_install:
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 755 src/udhcpc.script $(STAGING_DIR)/etc/udhcpc.script
+	ln -sf ../bin/busybox $(STAGING_DIR)/sbin/udhcpc

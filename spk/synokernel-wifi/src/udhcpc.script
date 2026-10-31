@@ -1,0 +1,26 @@
+#!/bin/sh
+# udhcpc script of synokernel-wifi: the address of the interface, and with
+# WIFI_DEFAULT_ROUTE=1 its default route and DNS servers, for a NAS on WiFi alone
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+case "$1" in
+  deconfig)
+    ip addr flush dev "$interface"
+    ip link set "$interface" up
+    ;;
+  bound|renew)
+    ip addr flush dev "$interface"
+    ip addr add "$ip/${mask:-24}" ${broadcast:+broadcast "$broadcast"} dev "$interface"
+    if [ "$WIFI_DEFAULT_ROUTE" = "1" ]; then
+      for r in $router; do
+        ip route replace default via "$r" dev "$interface"
+        break
+      done
+      if [ -n "$dns" ]; then
+        { [ -n "$domain" ] && echo "search $domain"; for d in $dns; do echo "nameserver $d"; done; } > /etc/resolv.conf
+      fi
+    fi
+    echo "$interface: $ip/${mask:-24}${router:+ router $router}${dns:+ dns $dns}"
+    ;;
+esac
+exit 0
