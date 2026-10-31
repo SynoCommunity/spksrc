@@ -7,8 +7,8 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
-DEPENDS += cross/libmaxminddb cross/sqlite cross/mariadb-connector-c
-DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
+DEPENDS += cross/libmaxminddb cross/sqlite
+DEPENDS += cross/libzmq
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 DEPENDS += cross/hiredis
 DEPENDS += cross/ntopng-dist
@@ -27,48 +27,27 @@ ifeq ($(findstring $(ARCH),$(SRM_ARCHS)),$(ARCH))
 SYNOLOGY_OS = SRM
 endif
 
-RW_LOCKS_SUPPORTED = yes
-ADDITIONAL_LIBRARIES = -lcurl -llua
+ADDITIONAL_LDFLAGS = -llua
 # similar to 'uname -m' on the target plattform (not essential, for information only)
 PACKAGE_MACHINE = x86_64
 
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-PACKAGE_MACHINE = armv7l
-RW_LOCKS_SUPPORTED = no
-endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = armv7
-RW_LOCKS_SUPPORTED = no
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = aarch64
-RW_LOCKS_SUPPORTED = no
-endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-PACKAGE_MACHINE = ppc
-RW_LOCKS_SUPPORTED = no
-# for qoriq:
-ADDITIONAL_LIBRARIES += -latomic
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = i686
-RW_LOCKS_SUPPORTED = no
 endif
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = ntopng_pre_configure
-PRE_COMPILE_TARGET = ntopng_pre_compile
 
-CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
+CONFIGURE_ARGS  = --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
 CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
-CONFIGURE_ARGS += my_cv_rw_locks_supported=$(RW_LOCKS_SUPPORTED)
-CONFIGURE_ARGS += ac_cv_prog_ac_ct_MARIADB=mariadb_config
 
 ENV += DESTDIR=$(INSTALL_DIR)
-# add install/bin folder to path to let ./configure find mysql_config (it is a script and works for cross compile)
-MARIADB_BIN_FOLDER = $(realpath $(WORK_DIR)/mariadb-connector-c/build/NATIVE/bin)
-ENV += "PATH=$(PATH):$(MARIADB_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -83,8 +62,3 @@ ntopng_pre_configure:
 	@$(RUN) sed 's|, PACKAGE_OS, PACKAGE_MACHINE|, "Synology $(SYNOLOGY_OS) $(TCVERSION)+", "$(PACKAGE_MACHINE)"|g' -i ./src/LuaEngineNtop.cpp
 	@$(RUN) sed 's|PACKAGE_MACHINE|"$(TC_ARCH)"|g' -i ./src/LuaEngineNtop.cpp
 	@$(RUN) sed 's|PACKAGE_OS|"$(SYNOLOGY_OS) $(TCVERSION)+"|g' -i ./src/LuaEngineNtop.cpp
-
-.PHONY: ntopng_pre_compile
-ntopng_pre_compile:
-	@$(MSG) "- PATCH generated Makefile to link with additional (cross/*) libraries"
-	@$(RUN) sed 's| -lssl  *-lssl | -lssl $(ADDITIONAL_LIBRARIES) |g' -i.orig ./Makefile
