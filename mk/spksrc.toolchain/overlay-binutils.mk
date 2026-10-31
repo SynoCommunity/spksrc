@@ -15,7 +15,7 @@
 #                           ppc853x REQUIRES it: its 2008 ld 2.18 mishandles Rust's TLS/PIE.
 #
 # PRODUCED by native/binutils-<ver>, CONSUMED here by downloading the published .txz through
-# toolchain/syno-<arch>-<dsm>_binutils-<ver>_gcc-<gcc> -- no per-build recompile in CI.
+# overlay/syno-<arch>-<dsm>_binutils-<ver> -- no per-build recompile in CI.
 ###############################################################################
 
 # The extracted cross tools (<target>-ld, <target>-as, ...), inside the CONSUMER's own work
@@ -36,11 +36,13 @@ OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHI
 # generic clean; the consumers go through native-install.mk, so this never recurses. The last
 # message labels the base's own rm, which the generic recipe prints unlabelled right after --
 # otherwise it reads as a second pass over the last consumer.
-ifneq ($(strip $(TC_OVERLAY_RUSTC))$(strip $(TC_OVERLAY_BINUTILS)),)
+# Every rust consumer, as the toolchain provisions every one (spksrc.toolchain.mk): cleaning
+# only the selected one left the others' cached cookies, and their rustup link, never redone.
+ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED) $(TC_OVERLAY_BINUTILS) $(TC_OVERLAY_GCC)),)
 clean: clean-overlay-consumers
 .PHONY: clean-overlay-consumers
 clean-overlay-consumers:
-	@for d in $(TC_OVERLAY_RUSTC) $(TC_OVERLAY_BINUTILS) ; do \
+	@for d in $(_OVERLAY_RUSTC_ENABLED) $(TC_OVERLAY_BINUTILS) $(TC_OVERLAY_GCC) ; do \
 	  if [ -d "$$d" ] ; then $(MSG) "clean consumer $$(basename $$d)" ; $(MAKE) --no-print-directory -C "$$d" clean ; fi ; \
 	done
 	@$(MSG) "clean toolchain $(TC)"
@@ -50,7 +52,17 @@ endif
 # Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
 # builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer).
 ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
-DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
+DEPENDS += overlay/$(notdir $(TC_OVERLAY_BINUTILS))
+endif
+
+# Same reason as overlay-gcc-install: an arch with no rust consumer has nothing else
+# pulling this in once the toolchain cookie exists.
+.PHONY: overlay-binutils-install
+ifeq ($(OVERLAY_BINUTILS_ON),1)
+overlay-binutils-install:
+	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_BINUTILS)
+else
+overlay-binutils-install: ;
 endif
 
 # Report a degraded or risky state. Conditions AND wording both come from
@@ -63,7 +75,7 @@ overlay-binutils-warn:
 else ifeq ($(OVERLAY_BINUTILS_MISSING),1)
 overlay-binutils-warn:
 	@$(OVERLAY_WARN_BINUTILS_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_ON),1)
+else ifeq ($(OVERLAY_BINUTILS_ON)$(OVERLAY_GCC_ON),1)
 overlay-binutils-warn:
 	@$(OVERLAY_WARN_BINUTILS_UNMATCHED)
 else
