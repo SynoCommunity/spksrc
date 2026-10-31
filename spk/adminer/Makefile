@@ -1,6 +1,6 @@
 SPK_NAME = adminer
-SPK_VERS = 5.4.1
-SPK_REV = 9
+SPK_VERS = 6.2.0
+SPK_REV = 10
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -10,11 +10,11 @@ DEPENDS = cross/adminer
 REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = piwi82
-DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
-DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
+DESCRIPTION = Adminer is a full-featured database management tool written in PHP. It supports MySQL/MariaDB, PostgreSQL, CockroachDB, SQLite, MS SQL and Oracle, with plugins for Elasticsearch, OpenSearch, SimpleDB, MongoDB, Redis, Firebird, ClickHouse, IGDB and IMAP.
+DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet écrit en PHP. Il prend en charge MySQL/MariaDB, PostgreSQL, CockroachDB, SQLite, MS SQL et Oracle, avec des plugins pour Elasticsearch, OpenSearch, SimpleDB, MongoDB, Redis, Firebird, ClickHouse, IGDB et IMAP.
 ADMIN_URL = /adminer/
 DISPLAY_NAME = Adminer
-CHANGELOG = "Update to PHP8.4 for DSM >= 7.2."
+CHANGELOG = "Update to v6.2.0."
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache 2.0 or GPLv2
@@ -23,7 +23,7 @@ include ../../mk/spksrc.common.mk
 ##
 ## This package can be built for DSM <6.0, DSM >=6.1;<7.0, DSM >=7.0;<7.2 and DSM >=7.2
 ## To build all versions call:
-## noarch-3.1 && make noarch-6.1 && make noarch-7.0 && make noarch-7.2
+## make arch-noarch-3.1 && make arch-noarch-6.1 && make arch-noarch-7.0 && make arch-noarch-7.2
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
