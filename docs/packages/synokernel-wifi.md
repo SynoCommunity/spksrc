@@ -84,7 +84,21 @@ line, with the tools of this package -- `wpa_supplicant` 2.11, which knows WPA3,
 and a DHCP client, `udhcpc`. DSM has a `wpa_supplicant` of its own, 2.6 without
 WPA3, first in the `PATH` of root: those of the package are `wifi-wpa_supplicant`,
 `wifi-wpa_cli` and `wifi-wpa_passphrase`.
-Set the [regulatory domain](#regulatory-domain) first:
+Set the [regulatory domain](#regulatory-domain) first, and make sure no other
+`wpa_supplicant` runs on `wlan0`: a second one fights the first for the
+interface, and one started without a control interface cannot be stopped by
+`wpa_cli`. The pattern leaves alone a `wpa_supplicant` of DSM on the wired
+interface (802.1X):
+
+```bash
+# Any wpa_supplicant running, and on which interface (-i)
+ps -ef | grep '[w]pa_supplicant'
+
+# Stop those of wlan0
+sudo -i pkill -f 'wpa_supplicant.*-i wlan0'
+```
+
+Then:
 
 ```bash
 # The networks in range
