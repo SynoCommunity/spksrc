@@ -1,6 +1,6 @@
---- configure.ac.in-orig	2025-05-18 16:53:44.000000000 +0000
-+++ configure.ac.in	2025-11-13 00:50:25.701244344 +0000
-@@ -155,8 +155,8 @@ BIN_PATH=/usr/bin
+--- configure.ac.in
++++ configure.ac.in
+@@ -171,8 +171,8 @@
  LIBPCAP=-lpcap
  
  if test $SYSTEM = "FreeBSD" || test $SYSTEM = "Darwin"; then
@@ -11,7 +11,7 @@
  
     dnl> https://github.com/google/sanitizers/wiki/AddressSanitizerFlags
     CC=clang
-@@ -233,23 +233,23 @@ if test "${with_nedge+set}" = set; then
+@@ -251,23 +251,23 @@
    LIBS="${LIBS} -lnetfilter_queue -lnfnetlink -lnetfilter_conntrack"
  fi
  
@@ -19,40 +19,37 @@
 -  CFLAGS="${CFLAGS} -I/usr/local/include"
 -  CXXFLAGS="${CXXFLAGS} -I/usr/local/include"
 -fi
--
--if test -d "/usr/local/lib"; then
--  LIBS="${LIBS} -L/usr/local/lib"
--fi
--
--if test -d /opt/local/include; then :
--  CFLAGS="${CFLAGS} -I/opt/local/include"
--  CXXFLAGS="${CXXFLAGS} -I/opt/local/include"
--fi
--
--if test -d /opt/local/lib; then :
--  LIBS="${LIBS} -L/opt/local/lib"
--fi
 +dnl> if test -d "/usr/local/include"; then
 +dnl>   CFLAGS="${CFLAGS} -I/usr/local/include"
 +dnl>   CXXFLAGS="${CXXFLAGS} -I/usr/local/include"
 +dnl> fi
-+
+ 
+-if test -d "/usr/local/lib"; then
+-  LIBS="${LIBS} -L/usr/local/lib"
+-fi
 +dnl> if test -d "/usr/local/lib"; then
 +dnl>   LIBS="${LIBS} -L/usr/local/lib"
 +dnl> fi
-+
+ 
+-if test -d /opt/local/include; then :
+-  CFLAGS="${CFLAGS} -I/opt/local/include"
+-  CXXFLAGS="${CXXFLAGS} -I/opt/local/include"
+-fi
 +dnl> if test -d /opt/local/include; then :
 +dnl>   CFLAGS="${CFLAGS} -I/opt/local/include"
 +dnl>   CXXFLAGS="${CXXFLAGS} -I/opt/local/include"
 +dnl> fi
-+
+ 
+-if test -d /opt/local/lib; then :
+-  LIBS="${LIBS} -L/opt/local/lib"
+-fi
 +dnl> if test -d /opt/local/lib; then :
 +dnl>   LIBS="${LIBS} -L/opt/local/lib"
 +dnl> fi
  
  if [ test -f /usr/bin/lsb_release ]; then
    CODENAME=`/usr/bin/lsb_release -c|cut -f 2`
-@@ -377,7 +377,8 @@ fi
+@@ -399,7 +399,8 @@
  pkg-config --exists libssl
  if test "$?" -ne 1; then
    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
@@ -62,7 +59,7 @@
    SSL_LIB="`pkg-config --libs libssl` -lssl -lcrypto"
  else
    dnl Workaround for MacOS Brew
-@@ -544,7 +545,8 @@ AS_VAR_IF(with_hiredis, yes, [
+@@ -592,7 +593,8 @@
      else
        pkg-config --exists hiredis
        if test "$?" -ne 1; then

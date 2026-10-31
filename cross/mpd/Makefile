@@ -1,5 +1,5 @@
 PKG_NAME = mpd
-PKG_VERS = 0.24.8
+PKG_VERS = 0.24.18
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/MPD/archive

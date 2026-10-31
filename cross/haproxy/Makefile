@@ -1,9 +1,10 @@
 PKG_NAME = haproxy
-PKG_VERS = 3.0.29
+PKG_VERS = 3.4.7
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.haproxy.org/download/$(PKG_MAIN_VERS)/src
+PKG_DIST_MIRRORS = https://fossies.org/linux/misc
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl3 cross/lua cross/pcre2
@@ -30,5 +31,14 @@ BUILD_OPTIONS += SSL_INC=$(SSL_INC) SSL_LIB=$(SSL_LIB)
 COMPILE_ARGS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
 COMPILE_ARGS += CC=$(call tc,gcc) LD=$(call tc,gcc)
 COMPILE_ARGS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+
+include ../../mk/spksrc.common.mk
+
+# GCC 4.9 on aarch64 hits an internal compiler error on task.c atomic builtins.
+ifeq ($(ARCH),aarch64)
+ifeq ($(call version_lt,$(TC_GCC),5),1)
+ADDITIONAL_CFLAGS += -O1
+endif
+endif
 
 include ../../mk/spksrc.cross-cc.mk

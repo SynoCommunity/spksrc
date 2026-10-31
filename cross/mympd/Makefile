@@ -1,5 +1,5 @@
 PKG_NAME = mympd
-PKG_VERS = 24.0.2
+PKG_VERS = 26.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jcorporation/myMPD/archive

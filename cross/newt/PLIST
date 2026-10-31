@@ -2,5 +2,5 @@ bin:bin/whiptail
 lnk:lib/libnewt.so
 lnk:lib/libnewt.so.0.52
 lib:lib/libnewt.so.0.52.24
-lib:lib/python3.12/site-packages/_snack.so
-rsc:lib/python3.12/site-packages/snack.py
+lib:lib/python3.14/site-packages/_snack.so
+rsc:lib/python3.14/site-packages/snack.py
