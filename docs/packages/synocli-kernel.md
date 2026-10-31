@@ -38,21 +38,20 @@ SPK_DEPENDS = "synocli-kernel>=2.0"
 ## Kernel Module Helper Script
 
 `synocli-kernelmodule` loads the modules of a `synokernel-*` package, one device
-at a time, through the profile of that device. Loading and unloading need root:
-run it with `sudo -i` in front. `sudo` alone does not find the commands of
-packages, linked in `/usr/local/bin`, out of its `PATH`; `sudo -i` runs the
-command in a root login shell, which has it.
+at a time, through the profile of that device. Run it with `sudo -i` in front:
+`sudo` alone does not find the commands of packages, linked in `/usr/local/bin`,
+out of its `PATH`; `sudo -i` runs the command in a root login shell, which has it.
 
 ```bash
 # Profiles of every synokernel-* package, and whether the package is installed
 # and this kernel has all their modules (available, or n/a with what is missing)
-synocli-kernelmodule list
+sudo -i synocli-kernelmodule list
 
 # The modules a profile loads, in order, and where each comes from
-synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
 
-# What start would do, without loading anything (no root needed)
-synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
+# What start would do, without loading anything
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
 
 # Load, check and unload the modules of a device
 sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
