@@ -1,6 +1,6 @@
---- src/mympd_worker/smartpls.c.orig	2026-01-22 17:08:11
-+++ src/mympd_worker/smartpls.c	2026-02-02 16:59:54
-@@ -462,7 +462,7 @@
+--- src/mympd_worker/smartpls.c
++++ src/mympd_worker/smartpls.c
+@@ -468,7 +468,7 @@
      if ((time_t)timerange > value_max) {
          return false;
      }
