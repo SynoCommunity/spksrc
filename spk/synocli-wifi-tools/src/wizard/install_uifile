@@ -3,7 +3,7 @@
         "step_title": "SynoCli WiFi Tools",
         "items": [
             {
-                "desc": "The tools to connect the NAS to a WiFi network, with the adapters of <b>synokernel-wifi</b>: load the driver of the adapter with <b>synocli-kernelmodule</b>, then connect with <b>wifi-connect</b> and the profile of the network:<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i wifi-connect MyNetwork</code><br><br><code>sudo -i wifi-connect --new</code> writes the profile of another network, <code>--list</code>, <code>--status</code> and <code>--stop</code> do what they say. See the <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-wifi-tools/\">package documentation</a>."
+                "desc": "The tools to connect the NAS to a WiFi network, with the adapters of <b>synokernel-wifi</b>: load the driver of the adapter with <b>synocli-kernelmodule</b>, then connect with <b>wifi-connect</b> and the profile of the network:<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i wifi-connect MyNetwork</code><br><br>To write the profile of a WiFi network:<br><code>sudo -i wifi-connect --new</code><br><br>Other options:<br><code>sudo -i wifi-connect --list</code> the profiles<br><code>sudo -i wifi-connect --status</code> the state of the connection<br><code>sudo -i wifi-connect --stop</code> disconnect<br><br>See the <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-wifi-tools/\">package documentation</a>."
             }
         ]
     },
@@ -42,23 +42,6 @@
                 ]
             },
             {
-                "type": "textfield",
-                "subitems": [
-                    {
-                        "key": "wizard_wifi_country",
-                        "desc": "Country, two letters as CA or FR, for the 5 GHz channels",
-                        "defaultValue": "",
-                        "validator": {
-                            "allowBlank": true,
-                            "regex": {
-                                "expr": "/^[A-Za-z]{2}$/",
-                                "errorText": "Two letters, as CA or FR"
-                            }
-                        }
-                    }
-                ]
-            },
-            {
                 "type": "singleselect",
                 "desc": "<b>Security</b>",
                 "subitems": [
@@ -80,6 +63,23 @@
                 ]
             },
             {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_country",
+                        "desc": "Country, two letters as CA or FR, for the 5 GHz channels",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[A-Za-z]{2}$/",
+                                "errorText": "Two letters, as CA or FR"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
                 "type": "singleselect",
                 "desc": "<b>Address</b>",
                 "subitems": [
@@ -94,6 +94,9 @@
                         "defaultValue": false
                     }
                 ]
+            },
+            {
+                "desc": "<hr><b>Static address only</b>"
             },
             {
                 "type": "textfield",
@@ -130,7 +133,7 @@
             },
             {
                 "type": "multiselect",
-                "desc": "The default route and the DNS servers of the WiFi replace those of the NAS: for a NAS on WiFi alone, not one with a cable.",
+                "desc": "<hr>The default route and the DNS servers of the WiFi replace those of the NAS: for a NAS on WiFi alone, not one with a cable.<br><b>Warning:</b> a wrong setting can leave the NAS out of reach of the network. A restart undoes it, unless a boot task connects; otherwise refer to the documentation of your NAS for a reset of its network configuration (on Synology NAS, the RESET button held for about 4 seconds).",
                 "subitems": [
                     {
                         "key": "wizard_wifi_default_route",
