@@ -120,8 +120,9 @@ wifi_stop() {
       sleep 1
    fi
    ${SBIN}/wpa_cli -p ${CTRL_DIR} -i ${IFACE} terminate >/dev/null 2>&1
-   # A wpa_supplicant without control interface: by its command line, where
-   # pkill does not find this script
+   # Those started otherwise, without PID file nor control interface: by their
+   # command line, where pkill does not find this script
+   pkill -f "udhcpc .*-i ${IFACE}( |$)" 2>/dev/null
    pkill -f "wpa_supplicant .*-i ${IFACE}( |$)" 2>/dev/null
    ip addr flush dev ${IFACE} 2>/dev/null
    # The default route and DNS servers the network replaced
