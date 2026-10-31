@@ -32,4 +32,13 @@ COMPILE_ARGS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
 COMPILE_ARGS += CC=$(call tc,gcc) LD=$(call tc,gcc)
 COMPILE_ARGS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
+include ../../mk/spksrc.common.mk
+
+# GCC 4.9 on aarch64 hits an internal compiler error on task.c atomic builtins.
+ifeq ($(ARCH),aarch64)
+ifeq ($(call version_lt,$(TC_GCC),5),1)
+ADDITIONAL_CFLAGS += -O1
+endif
+endif
+
 include ../../mk/spksrc.cross-cc.mk
