@@ -62,8 +62,8 @@ sudo -i synocli-wifi --profile MyNetwork stop       # disconnect
 Every connection starts from a clean state: the DHCP client and
 `wpa_supplicant` of the interface are stopped first, and a second connection
 replaces the first. `-i wlan1` picks the interface, the first one of `iw dev`
-otherwise. When connections go through the interface, which resetting it cuts,
-`synocli-wifi` goes on in the background; its log is
+otherwise. When the SSH session running it goes through the interface, which
+resetting it cuts, `synocli-wifi` goes on in the background; its log is
 `/var/log/packages/synocli-wifi.log`.
 
 A profile holds the network, its security, and its address:
