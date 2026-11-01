@@ -105,8 +105,8 @@ REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76:mt76x
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2-common
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2u
 
-# The profiles of the WiFi adapters come with synocli-kernel 2.0-12, and the
+# The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
 # tools to connect with synocli-wifi-tools
-SPK_DEPENDS = "synocli-kernel>=2.0-12:synocli-wifi-tools>=1.0-1"
+SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi-tools>=1.0-1"
 
 include ../../mk/spksrc.spk.mk

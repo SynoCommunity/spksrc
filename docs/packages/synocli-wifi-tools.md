@@ -22,7 +22,7 @@ and come in a package of their own.
 |----------|-------|
 | Package Name | synocli-wifi-tools |
 | License | Each tool under its own license |
-| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.0-12 or newer |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.1 or newer |
 
 ## Included Tools
 

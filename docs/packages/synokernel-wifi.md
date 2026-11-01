@@ -29,7 +29,7 @@ own wireless stack.
 |----------|-------|
 | Package Name | synokernel-wifi |
 | License | GPLv2 |
-| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.0-12 or newer (module loading and device profiles), [SynoCli WiFi Tools](synocli-wifi-tools.md) (connection) |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.1 or newer (module loading and device profiles), [SynoCli WiFi Tools](synocli-wifi-tools.md) (connection) |
 
 ## Included Drivers
 

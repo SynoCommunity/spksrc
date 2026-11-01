@@ -25,7 +25,7 @@ HOMEPAGE = https://docs.synocommunity.com/packages/synocli-wifi-tools/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 # synocli-kernelmodule loads the driver of the adapter
-SPK_DEPENDS = "synocli-kernel>=2.0-12"
+SPK_DEPENDS = "synocli-kernel>=2.1"
 
 SPK_COMMANDS  = bin/synocli-wifi
 SPK_COMMANDS += sbin/iw
