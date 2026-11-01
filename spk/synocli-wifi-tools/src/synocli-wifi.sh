@@ -302,7 +302,13 @@ if [ "${ACTION}" = "list" ]; then
 fi
 mkdir -p ${RUN_DIR}
 if [ -z "${IFACE}" ]; then
-   IFACE=$(${SBIN}/iw dev 2>/dev/null | sed -n 's/^\s*Interface \(.*\)/\1/p' | head -1)
+   # Right after the driver loads, as at boot, the interface comes in a few seconds
+   n=0
+   while [ ${n} -lt 10 ]; do
+      IFACE=$(${SBIN}/iw dev 2>/dev/null | sed -n 's/^\s*Interface \(.*\)/\1/p' | head -1)
+      [ -n "${IFACE}" ] && break
+      sleep 1; n=$((n+1))
+   done
    [ -n "${IFACE}" ] || die "no WiFi interface: load the driver of the adapter first (synocli-kernelmodule)"
 fi
 

@@ -35,6 +35,9 @@ holds the profiles:
 SPK_DEPENDS = "synocli-kernel>=2.0"
 ```
 
+The profiles of the WiFi adapters of synokernel-wifi come with 2.1
+(`synocli-kernel>=2.1`).
+
 ## Kernel Module Helper Script
 
 `synocli-kernelmodule` loads the modules of a `synokernel-*` package, one device
@@ -315,4 +318,5 @@ DSM version. Install the build of the package for that DSM version.
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
 - [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
 - [SynoKernel WiFi](synokernel-wifi.md) - USB WiFi adapter drivers
+- [SynoCli WiFi Tools](synocli-wifi-tools.md) - WiFi connection tools
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities

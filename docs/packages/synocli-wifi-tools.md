@@ -56,6 +56,7 @@ sudo -i synocli-wifi new          # asks for a network, writes its profile
 sudo -i synocli-wifi list         # the profiles
 sudo -i synocli-wifi status       # the state of the connection
 sudo -i synocli-wifi stop         # disconnect
+sudo -i synocli-wifi --profile MyNetwork restart
 ```
 
 Every connection starts from a clean state: the DHCP client and
@@ -92,7 +93,14 @@ A profile holds the network, its security, and its address:
   connecting.
 
 To connect at every startup, add the two commands to the task of
-[Loading modules at boot](synocli-kernel.md#loading-modules-at-boot).
+[Loading modules at boot](synocli-kernel.md#loading-modules-at-boot), which
+runs as root; `synocli-wifi` waits a few seconds for the interface the driver
+creates:
+
+```bash
+synocli-kernelmodule --profile rtl88x2bu start
+synocli-wifi --profile MyNetwork start
+```
 
 ## Connecting by hand
 
@@ -117,3 +125,8 @@ with some drivers `Could not re-add multicast membership for vendor events`:
 neither matters. DSM's `dhclient` is of no use here: an AppArmor profile lets
 it run its own script only, which sets the routes and DNS of every network it
 joins.
+
+## Related Packages
+
+- [SynoKernel WiFi](synokernel-wifi.md) - USB WiFi adapter drivers
+- [SynoCli Kernel Tools](synocli-kernel.md) - Kernel module loading and device profiles
