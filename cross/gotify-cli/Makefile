@@ -1,36 +1,20 @@
 PKG_NAME = gotify-cli
-PKG_VERS = 2.3.2
-PKG_DIST_NAME = gotify-cli-linux-$(PKG_DIST_ARCH)
-PKG_DIST_SITE = https://github.com/gotify/cli/releases/download/v$(PKG_VERS)
-PKG_DIST_FILE = gotify-cli-$(PKG_VERS)-linux-$(PKG_DIST_ARCH)
-
-# No binaries available for these architectures
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+PKG_VERS = 2.4.0
+PKG_COMMIT = 1a3712544653db1ca4d12bb52779be80ea152c79
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/gotify/cli/archive/refs/tags
+PKG_DIST_FILE = gotify-cli-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = cli-$(PKG_VERS)
 
 HOMEPAGE = https://gotify.net/
 COMMENT  = A command line interface for pushing messages to gotify/server.
 LICENSE  = MIT
 
-INSTALL_TARGET = gotify-cli_install
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
+GO_BIN_DIR = $(GO_SRC_DIR)/gotify-cli
+GO_BUILD_ARGS = -trimpath
+BUILD_DATE = $(shell date -u -d @$(or $(SOURCE_DATE_EPOCH),$(shell date +%s)) +%Y-%m-%dT%H:%M:%SZ)
+GO_LDFLAGS = -s -w -X main.Version=$(PKG_VERS) -X main.Commit=$(PKG_COMMIT) -X main.BuildDate=$(BUILD_DATE)
 
-# use digests with multiple files
-PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
-
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = amd64
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = 386
-else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = arm-7
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = arm64
-endif
-
-include ../../mk/spksrc.cross-install.mk
-
-.PHONY: gotify-cli_install
-gotify-cli_install:
-	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	@cp -f $(DIST_FILE) $(STAGING_INSTALL_PREFIX)/bin/gotify-cli
-	@chmod +x $(STAGING_INSTALL_PREFIX)/bin/gotify-cli
+include ../../mk/spksrc.cross-go.mk
