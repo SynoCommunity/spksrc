@@ -79,18 +79,18 @@ sudo -i iw dev
 ### Connecting to a network
 
 [SynoCli WiFi Tools](synocli-wifi-tools.md) connects the NAS, a dependency of
-this package: `wifi-connect` and a profile per network, written by its
-installation wizard or by `wifi-connect new`:
+this package: `synocli-wifi` and a profile per network, written by its
+installation wizard or by `synocli-wifi new`:
 
 ```bash
 sudo -i synocli-kernelmodule --profile rtl88x2bu start
-sudo -i wifi-connect --profile MyNetwork start
+sudo -i synocli-wifi --profile MyNetwork start
 ```
 
 ### Regulatory domain
 
 The kernel starts in the world regulatory domain, which leaves out most 5 GHz
-channels. The `country` of a profile of `wifi-connect` sets it; by hand, here for Canada:
+channels. The `country` of a profile of `synocli-wifi` sets it; by hand, here for Canada:
 
 ```bash
 sudo -i iw reg set CA

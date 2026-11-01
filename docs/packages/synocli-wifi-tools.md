@@ -12,7 +12,7 @@ tags:
 The `synocli-wifi-tools` package provides the command-line tools to connect a
 NAS to a WiFi network, with the USB adapters of
 [SynoKernel WiFi](synokernel-wifi.md): `iw`, `wpa_supplicant` 2.11 with WPA3,
-the DHCP client `udhcpc`, and `wifi-connect`, which connects by network
+the DHCP client `udhcpc`, and `synocli-wifi`, which connects by network
 profile. They change more often than the drivers, which follow the kernels,
 and come in a package of their own.
 
@@ -28,7 +28,7 @@ and come in a package of their own.
 
 | Command | Description |
 |---------|-------------|
-| `wifi-connect` | Connects by network profile |
+| `synocli-wifi` | Connects by network profile |
 | `iw` | Shows and sets the WiFi interfaces, scans, sets the regulatory domain |
 | `wifi-wpa_supplicant` | `wpa_supplicant` 2.11, WPA2 and WPA3 (SAE) |
 | `wifi-wpa_cli` | Its control client |
@@ -41,29 +41,29 @@ root: those of the package are linked as `wifi-*`.
 ## Connecting to a network
 
 DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
-the adapters it does not support: `wifi-connect` connects the NAS from the
+the adapters it does not support: `synocli-wifi` connects the NAS from the
 command line, by profile -- one JSON file per network in
 `/var/packages/synocli-wifi-tools/var/networks`, written by the installation wizard
-or by `wifi-connect new`:
+or by `synocli-wifi new`:
 
 ```bash
 sudo -i synocli-kernelmodule --profile rtl88x2bu start
-sudo -i wifi-connect --profile MyNetwork start
+sudo -i synocli-wifi --profile MyNetwork start
 ```
 
 ```bash
-sudo -i wifi-connect new          # asks for a network, writes its profile
-sudo -i wifi-connect list         # the profiles
-sudo -i wifi-connect status       # the state of the connection
-sudo -i wifi-connect stop         # disconnect
+sudo -i synocli-wifi new          # asks for a network, writes its profile
+sudo -i synocli-wifi list         # the profiles
+sudo -i synocli-wifi status       # the state of the connection
+sudo -i synocli-wifi stop         # disconnect
 ```
 
 Every connection starts from a clean state: the DHCP client and
 `wpa_supplicant` of the interface are stopped first, and a second connection
 replaces the first. `-i wlan1` picks the interface, the first one of `iw dev`
 otherwise. When connections go through the interface, which resetting it cuts,
-`wifi-connect` goes on in the background; its log is
-`/var/log/packages/wifi-connect.log`.
+`synocli-wifi` goes on in the background; its log is
+`/var/log/packages/synocli-wifi.log`.
 
 A profile holds the network, its security, and its address:
 
@@ -96,7 +96,7 @@ To connect at every startup, add the two commands to the task of
 
 ## Connecting by hand
 
-What `wifi-connect` does, with the tools of the package:
+What `synocli-wifi` does, with the tools of the package:
 
 ```bash
 # The configuration on the standard input; the control interface (-C) lets

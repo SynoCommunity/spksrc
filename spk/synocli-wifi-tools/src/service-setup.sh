@@ -20,7 +20,7 @@ service_postinst ()
     route=no
     [ "${wizard_wifi_default_route}" = "true" ] && route=yes
 
-    ${SYNOPKG_PKGDEST}/bin/wifi-connect --write-profile "${wizard_wifi_ssid}" "${security}" "${psk}" \
+    ${SYNOPKG_PKGDEST}/bin/synocli-wifi --write-profile "${wizard_wifi_ssid}" "${security}" "${psk}" \
         "${wizard_wifi_passphrase}" "${dhcp}" "${wizard_wifi_address}" "${wizard_wifi_gateway}" \
         "${wizard_wifi_dns}" "${route}" "${wizard_wifi_country}"
 }

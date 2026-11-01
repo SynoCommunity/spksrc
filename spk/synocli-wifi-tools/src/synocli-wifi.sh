@@ -28,7 +28,7 @@ RUN_DIR=/var/run/${PACKAGE}
 CTRL_DIR=/var/run/wpa_supplicant
 SBIN=${TARGET}/sbin
 UDHCPC_SCRIPT=${TARGET}/etc/udhcpc.script
-LOG=/var/log/packages/wifi-connect.log
+LOG=/var/log/packages/synocli-wifi.log
 
 usage() {
    cat <<EOF
@@ -317,10 +317,10 @@ case "${ACTION}" in
       # Resetting the interface cuts the connections to its address, maybe the
       # session running this: go on detached then, with the output in the log
       address=$(ip addr show ${IFACE} | sed -n 's/.*inet \([0-9.]*\).*/\1/p' | head -1)
-      if [ -z "${WIFI_CONNECT_DETACHED}" ] && [ -n "${address}" ] \
+      if [ -z "${SYNOCLI_WIFI_DETACHED}" ] && [ -n "${address}" ] \
          && netstat -tn 2>/dev/null | awk '$6 == "ESTABLISHED" { print $4 }' | grep -q "^${address}:"; then
          echo "Connections go through ${IFACE}, and may be cut: going on in the background, see ${LOG}"
-         WIFI_CONNECT_DETACHED=1 nohup $0 -i ${IFACE} --profile "${NETWORK}" start >> ${LOG} 2>&1 &
+         SYNOCLI_WIFI_DETACHED=1 nohup $0 -i ${IFACE} --profile "${NETWORK}" start >> ${LOG} 2>&1 &
          exit 0
       fi
       wifi_stop
