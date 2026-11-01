@@ -1,6 +1,6 @@
 SPK_NAME = mono
-SPK_VERS = 6.12.0.199
-SPK_REV = 21
+SPK_VERS = 6.14.1
+SPK_REV = 22
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/mono
@@ -13,7 +13,7 @@ MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework.
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to version 6.12.0.199."
+CHANGELOG = "Update to version 6.14.1."
 
 HOMEPAGE = https://mono-project.com
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
