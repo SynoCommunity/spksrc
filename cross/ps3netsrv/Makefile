@@ -1,5 +1,5 @@
 PKG_NAME = ps3netsrv
-PKG_VERS = 20250501
+PKG_VERS = 20260913
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/aldostools/ps3netsrv/archive
@@ -15,7 +15,7 @@ LICENSE = GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = ps3netsrv_install
 
-COMPILE_ARGS = -f Makefile.linux
+COMPILE_ARGS = -f Makefile.linux BUILD_DATE=$(PKG_VERS)
 
 include ../../mk/spksrc.cross-cc.mk
 
