@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-wifi
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synokernel-wifi.png
 
 MAINTAINER = th0ma7

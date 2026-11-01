@@ -1,7 +1,7 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.4.8
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 52
+SPK_REV = 53
 SPK_ICON = src/ffmpeg.png
 CHANGELOG  = "1. Update to version 4.4.8<br/>"
 CHANGELOG += "2. Update to jellyfin-ffmpeg v4.4.1-4 patchset<br/>"
