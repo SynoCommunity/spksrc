@@ -363,15 +363,23 @@ service_save ()
     if [ -f "${WEB_ROOT}/config/installed_version.php" ]; then
         mv "${WEB_ROOT}/config/installed_version.php" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/"
     fi
-    mkdir "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/"
-    cp -r "${WEB_ROOT}/upload"/*/ "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/"
+    mkdir -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/"
+    if [ -d "${WEB_ROOT}/upload" ]; then
+        cp -a "${WEB_ROOT}/upload/." "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/"
+    fi
 }
 
 service_restore ()
 {
     # Restore configuration
     mv "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config.php" "${WEB_ROOT}/config/"
-    cp -r "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload"/*/ "${WEB_ROOT}/upload/"
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/installed_version.php" ]; then
+        mv "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/installed_version.php" "${WEB_ROOT}/config/"
+    fi
+    mkdir -p "${WEB_ROOT}/upload"
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload" ]; then
+        cp -a "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/." "${WEB_ROOT}/upload/"
+    fi
     ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
 
     # Fix permissions
