@@ -124,6 +124,21 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
+
+    - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to
+      `overlay/`, four lines each (`PKG_VERS`, `PKG_REV`, `include
+      ../../mk/spksrc.overlay.mk`), the directory name giving arch, DSM and component. A
+      generic arch downloads the archive of the real arch whose toolchain it shares.
+    - **145 consumers:** gcc 8.5 and binutils 2.30 for 65 toolchains of DSM 5.2 to 7.1, the
+      rust of the five legacy archs, and the rust built with gcc 8.5.
+    - **Installed and cleaned with the toolchain, used or not.** A base toolchain installs
+      every overlay its arch ships, and `make clean` on it cleans them. Builds are
+      unchanged: C keeps the vendor gcc and `as`/`ld`, rust the build made with the vendor
+      gcc, its link through the binutils overlay. `make dist-clean` gains `overlay-clean`.
+    - See [Custom From-Source Rust Toolchains](toolchain.md#custom-from-source-rust-toolchains).
+    - Pull request: [#7701](https://github.com/SynoCommunity/spksrc/pull/7701)
+
 ??? note "October 29th 2026 — Kernel options for the modules, and their symbols across directories (#7678)"
 
     - **`REQUIRE_KERNEL_OPTION`** sets `CONFIG_<option>=y|m|n` before the modules of

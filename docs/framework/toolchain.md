@@ -278,8 +278,19 @@ A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853
 | Piece | Role |
 |-------|------|
 | `native/rustc-<vers>/` | Producer — builds the `rust-<id>-<rev>.txz`. |
-| `toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
-| `toolchain/syno-<arch>-<dsm>_binutils-2.30_gcc-<gcc>/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
+| `overlay/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
+| `overlay/syno-<arch>-<dsm>_binutils-2.30/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
+
+Overlays have their own directory, `overlay/`. A consumer is four lines -- `PKG_VERS`,
+`PKG_REV`, `include ../../mk/spksrc.overlay.mk` -- the directory name giving arch, DSM and
+component; `mk/spksrc.overlay/` holds what each component installs. A generic arch (`x64`,
+`armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares
+(`mk/spksrc.overlay/dist-arch.mk`).
+
+Beside the rust ones, `overlay/` holds gcc 8.5 and binutils 2.30 for 65 toolchains of DSM
+5.2 to 7.1, and the rust built with gcc 8.5. A base toolchain installs every overlay its
+arch ships, and `make clean` on it cleans them, but builds do not use them yet: C keeps the
+vendor gcc and `as`/`ld`, and rust the build made with the vendor gcc.
 
 A base toolchain (`syno-<arch>-<dsm>/`) opts in simply by having a rust consumer dir beside it (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
 
@@ -337,9 +348,9 @@ The `.txz` name carries a revision. When re-publishing a rebuilt archive under t
 
 1. Build (optionally with `PKG_REV=vN`).
 2. Upload the `.txz` to the release (`pre-releases`, or the `rust/…` asset path).
-3. Bump `PKG_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc> digests`).
+3. Bump `PKG_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc> digests`).
 
-`make clean` on the base toolchain cascades to its rust + binutils overlay consumers, so a rebuild re-extracts them fresh.
+`make clean` on the base toolchain cascades to every overlay consumer of its arch, so a rebuild re-extracts them fresh.
 
 ## Troubleshooting
 
