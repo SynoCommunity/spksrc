@@ -1,27 +1,19 @@
 ---
-title: DSM Utilities
-description: Helpful DSM configuration for SynoCommunity packages
+title: DSM Configuration
+description: Common DSM configuration tasks for SynoCommunity packages
 tags:
   - dsm
-  - utilities
+  - configuration
   - ssh
 ---
 
-# DSM Utilities
+# DSM Configuration
 
 This page covers common DSM configuration tasks that many SynoCommunity packages require.
 
-## Enable SSH Access
+## SSH Access
 
-SSH service allows you to gain access to your system with shell command line:
-
-1. In Control Panel, navigate to **Terminal & SNMP**
-2. Check **Enable SSH service**
-3. Click **Apply**
-
-Use an SSH client like PuTTY or KiTTY on Windows, or the `ssh` command on Linux/macOS to connect to your DiskStation using its hostname or IP address with your username and password.
-
-For more details, see [Synology KB: How to login to DSM with root permission via SSH/Telnet](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/General/How_to_login_to_DSM_with_root_permission_via_SSH_Telnet).
+Many packages require SSH access for configuration or troubleshooting. See [SSH Access](ssh.md) for enabling SSH, connecting from your computer, running commands as root, and security recommendations.
 
 ## Enable User Home Directories
 
