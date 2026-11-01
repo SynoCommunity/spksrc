@@ -5,15 +5,13 @@ SPK_ICON = src/gotify.png
 
 DEPENDS = cross/gotify-server cross/gotify-cli
 
-REQUIRED_MIN_DSM = 7.2
-
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Gotify
 DESCRIPTION = A simple server for sending and receiving messages. Includes gotify-cli for pushing messages to gotify/server.
 HOMEPAGE = https://gotify.net/
 HELPURL = https://github.com/gotify/server/issues
 LICENSE = MIT
-CHANGELOG = "Update Gotify server to 3.1.1 and CLI to 2.4.0. Requires DSM 7.2+."
+CHANGELOG = "Update Gotify server to 3.1.1 and CLI to 2.4.0."
 
 STARTABLE = yes
 SERVICE_USER = auto

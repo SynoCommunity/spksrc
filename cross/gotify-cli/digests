@@ -1,12 +1,3 @@
-gotify-cli-2.4.0-linux-amd64 SHA1 2e1067f8ecdfc912beaf2465f354965255ee8ecf
-gotify-cli-2.4.0-linux-amd64 SHA256 251b8d72eddf11317a63ceefd98f655065c62a5ac9a632c5d09709bd747d02af
-gotify-cli-2.4.0-linux-amd64 MD5 003d07de22b139c52fb044b65a2ada26
-gotify-cli-2.4.0-linux-386 SHA1 c3d80dcf41064fd479770ac2d8c6440f6b6c7326
-gotify-cli-2.4.0-linux-386 SHA256 ad89d13e9f1f41e4ca2029f963414cbd5a8109e6acad694324c4d973fc5b6680
-gotify-cli-2.4.0-linux-386 MD5 2ed44cb0a608767d6e86b3d3eaafa148
-gotify-cli-2.4.0-linux-arm-7 SHA1 4496d915609349a80dec8c1cf52c6a34f23ed13a
-gotify-cli-2.4.0-linux-arm-7 SHA256 59748038c26c13e87c43f49f1b93d6fd5c932aed46f20c46177e6dff8e2ab085
-gotify-cli-2.4.0-linux-arm-7 MD5 afe45dfe4c9aa7f612b42858f1fb674c
-gotify-cli-2.4.0-linux-arm64 SHA1 155a347fdaae3cac4698c68f64e3fb64c985b072
-gotify-cli-2.4.0-linux-arm64 SHA256 46353135090c1116f3609e8e4ae99b3b3127f98bf9441566a7aff7eb79343f17
-gotify-cli-2.4.0-linux-arm64 MD5 30d138bf7c046f2642e6d98d759f63e7
+gotify-cli-2.4.0.tar.gz SHA1 7f990a486c25117fbd65997b3ab38118f80ce117
+gotify-cli-2.4.0.tar.gz SHA256 d33622db87549355b8ccc3d4a4e342cfc769fa96c45213e682b53a0971c8c41d
+gotify-cli-2.4.0.tar.gz MD5 64b71d34d43baa32eeca5e2b1b95bdf7
