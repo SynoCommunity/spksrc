@@ -80,11 +80,11 @@ sudo -i iw dev
 
 [SynoCli WiFi Tools](synocli-wifi-tools.md) connects the NAS, a dependency of
 this package: `wifi-connect` and a profile per network, written by its
-installation wizard or by `wifi-connect --new`:
+installation wizard or by `wifi-connect new`:
 
 ```bash
 sudo -i synocli-kernelmodule --profile rtl88x2bu start
-sudo -i wifi-connect MyNetwork
+sudo -i wifi-connect --profile MyNetwork start
 ```
 
 ### Regulatory domain

@@ -44,18 +44,18 @@ DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
 the adapters it does not support: `wifi-connect` connects the NAS from the
 command line, by profile -- one JSON file per network in
 `/var/packages/synocli-wifi-tools/var/networks`, written by the installation wizard
-or by `wifi-connect --new`:
+or by `wifi-connect new`:
 
 ```bash
 sudo -i synocli-kernelmodule --profile rtl88x2bu start
-sudo -i wifi-connect MyNetwork
+sudo -i wifi-connect --profile MyNetwork start
 ```
 
 ```bash
-sudo -i wifi-connect --new        # asks for a network, writes its profile
-sudo -i wifi-connect --list       # the profiles
-sudo -i wifi-connect --status     # the state of the connection
-sudo -i wifi-connect --stop       # disconnect
+sudo -i wifi-connect new          # asks for a network, writes its profile
+sudo -i wifi-connect list         # the profiles
+sudo -i wifi-connect status       # the state of the connection
+sudo -i wifi-connect stop         # disconnect
 ```
 
 Every connection starts from a clean state: the DHCP client and

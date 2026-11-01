@@ -33,18 +33,22 @@ LOG=/var/log/packages/wifi-connect.log
 usage() {
    cat <<EOF
 
-Usage: $(basename $0) [-i <interface>] <network>
-       $(basename $0) [-i <interface>] --new | --stop | --status
-       $(basename $0) --list
+Usage: $(basename $0) [options] <list|new|start|stop|restart|status>
 
 Run as root: sudo -i $(basename $0) ...
 
-  <network>    connect with the profile of that network
-  --new        ask for a network, and write its profile
-  --stop       disconnect: stop the DHCP client and wpa_supplicant
-  --status     the state of the connection
-  --list       the profiles
-  -i <iface>   the WiFi interface, the first one of 'iw dev' otherwise
+  list                 the profiles
+  new                  ask for a network, and write its profile
+  start                connect with the profile, from a clean interface
+  stop                 disconnect: stop the DHCP client and wpa_supplicant
+  restart              the same as start
+  status               the state of the connection
+
+Options:
+  --profile <network>  the profile of the network, for start and restart
+  -i <interface>       the WiFi interface, the first one of 'iw dev' otherwise
+
+Example: sudo -i $(basename $0) --profile MyNetwork start
 
 Profiles: ${NETWORKS_DIR}/<network>.json
 Log: ${LOG}
@@ -266,25 +270,33 @@ write_profile() {
         + {default_route: ($route == "yes")}
         + (if $country == "" then {} else {country: ($country | ascii_upcase)} end)' > "${file}" ) || die "cannot write ${file}"
    echo "Profile written: ${file}"
-   echo "Connect with: sudo -i $(basename $0) $(basename "${file}" .json)"
+   echo "Connect with: sudo -i $(basename $0) --profile $(basename "${file}" .json) start"
 }
 
 #
 # Main
 #
 IFACE=
-case "$1" in
-   -i) IFACE=$2; shift 2 ;;
-esac
-[ $# -eq 1 ] || [ "$1" = "--write-profile" ] || usage
+NETWORK=
+ACTION=
+while [ $# -gt 0 ]; do
+   case "$1" in
+      -i)              IFACE=$2; shift 2 ;;
+      --profile)       NETWORK=$2; shift 2 ;;
+      # The profile of the installation wizard, written as the package user
+      --write-profile) shift; ACTION=write-profile; break ;;
+      -*)              usage ;;
+      *)               [ -z "${ACTION}" ] || usage; ACTION=$1; shift ;;
+   esac
+done
+[ -n "${ACTION}" ] || usage
 command -v jq >/dev/null || die "jq is needed to read the profiles"
 
-# The profile of the installation wizard, written as the package user
-if [ "$1" = "--write-profile" ]; then
-   shift; write_profile "$@"; exit 0
+if [ "${ACTION}" = "write-profile" ]; then
+   write_profile "$@"; exit 0
 fi
-[ "$(id -u)" = "0" ] || die "run as root: sudo -i $(basename $0) $*"
-if [ "$1" = "--list" ]; then
+[ "$(id -u)" = "0" ] || die "run as root: sudo -i $(basename $0) ..."
+if [ "${ACTION}" = "list" ]; then
    list_profiles
    exit 0
 fi
@@ -294,24 +306,25 @@ if [ -z "${IFACE}" ]; then
    [ -n "${IFACE}" ] || die "no WiFi interface: load the driver of the adapter first (synocli-kernelmodule)"
 fi
 
-case "$1" in
-   --stop)   wifi_stop; log "stopped" ;;
-   --status) wifi_status ;;
-   --new)    wifi_new ;;
-   -*)       usage ;;
-   *)
-      PROFILE=$(find_profile "$1")
-      [ -n "${PROFILE}" ] || die "no profile for $1: sudo -i $(basename $0) --list, or --new"
+case "${ACTION}" in
+   stop)    wifi_stop; log "stopped" ;;
+   status)  wifi_status ;;
+   new)     wifi_new ;;
+   start|restart)
+      [ -n "${NETWORK}" ] || die "which network: --profile <network>, see sudo -i $(basename $0) list"
+      PROFILE=$(find_profile "${NETWORK}")
+      [ -n "${PROFILE}" ] || die "no profile for ${NETWORK}: sudo -i $(basename $0) list, or new"
       # Resetting the interface cuts the connections to its address, maybe the
       # session running this: go on detached then, with the output in the log
       address=$(ip addr show ${IFACE} | sed -n 's/.*inet \([0-9.]*\).*/\1/p' | head -1)
       if [ -z "${WIFI_CONNECT_DETACHED}" ] && [ -n "${address}" ] \
          && netstat -tn 2>/dev/null | awk '$6 == "ESTABLISHED" { print $4 }' | grep -q "^${address}:"; then
          echo "Connections go through ${IFACE}, and may be cut: going on in the background, see ${LOG}"
-         WIFI_CONNECT_DETACHED=1 nohup $0 -i ${IFACE} "$1" >> ${LOG} 2>&1 &
+         WIFI_CONNECT_DETACHED=1 nohup $0 -i ${IFACE} --profile "${NETWORK}" start >> ${LOG} 2>&1 &
          exit 0
       fi
       wifi_stop
       wifi_start "${PROFILE}"
       ;;
+   *)       usage ;;
 esac
