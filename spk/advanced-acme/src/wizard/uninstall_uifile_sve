@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Avinstallera Advanced ACME",
+    "items": [
+      {
+        "desc": "Certifikaten som installerats i DSM finns kvar men förnyas inte längre. Om du raderar data tas även DSM-användaren ”advanced-acme” som Advanced ACME har skapat bort."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Ta bort sparade inloggningsuppgifter och certifikatdata för Advanced ACME (DSM-konto, DNS-nycklar, ACME-konton)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,42 @@
+Wait longer for certificates that the CA is still issuing.
+
+After finalizing an order, acme.sh polls for the certificate only 30 times,
+2 seconds apart, when the CA sends no Retry-After header. The IONOS ACME
+server (certificates by Sectigo) often needs several minutes, so acme.sh
+gave up while the order was still "processing". Keep the polling loop but
+wait with the backoff acme.sh uses elsewhere (2, 5, 10, then 20 seconds),
+about 9 minutes in total, and make the number of polls adjustable through
+MAX_CERT_RETRY_TIMES (default unchanged: 30).
+
+Same change as src/lib/acmepatch.sh in Advanced ACME, which also applies it
+to acme.sh releases installed later.
+
+--- acme.sh.orig
++++ acme.sh
+@@ -6186,7 +6186,7 @@
+   _savedomainconf "Le_LinkOrder" "$Le_LinkOrder"
+ 
+   _link_cert_retry=0
+-  _MAX_CERT_RETRY=30
++  _MAX_CERT_RETRY="${MAX_CERT_RETRY_TIMES:-30}"
+   while [ "$_link_cert_retry" -lt "$_MAX_CERT_RETRY" ]; do
+     if _contains "$response" "\"status\":\"valid\""; then
+       _debug "Order status is valid."
+@@ -6207,7 +6207,7 @@
+         _info "Sleeping for $_retryafter seconds then retrying"
+         _sleep $_retryafter
+       else
+-        _sleep 2
++        _sleep "$(_retry_backoff_sec "$(_math "$_link_cert_retry" + 1)")"
+       fi
+     elif _contains "$response" "\"processing\""; then
+       _info "Order status is 'processing', let's sleep and retry."
+@@ -6217,7 +6217,7 @@
+         _info "Sleeping for $_retryafter seconds then retrying"
+         _sleep $_retryafter
+       else
+-        _sleep 2
++        _sleep "$(_retry_backoff_sec "$(_math "$_link_cert_retry" + 1)")"
+       fi
+     else
+       _err "Signing error: wrong status"
