@@ -213,6 +213,22 @@ wifi_status() {
    ip route | sed -n 's/^default/Route:     default/p'
 }
 
+# True when a process this one runs under, sshd of the session, holds a
+# connection to the address of the interface
+session_through_iface() {
+   local address pids pid
+   address=$(ip addr show ${IFACE} | sed -n 's/.*inet \([0-9.]*\).*/\1/p' | head -1)
+   [ -n "${address}" ] || return 1
+   pids=" $(netstat -tnp 2>/dev/null | awk -v a="${address}:" '$6 == "ESTABLISHED" && index($4, a) == 1 { split($7, p, "/"); print p[1] }' | tr '\n' ' ') "
+   [ "${pids}" != "  " ] || return 1
+   pid=$$
+   while [ -n "${pid}" ] && [ "${pid}" -gt 1 ]; do
+      case "${pids}" in *" ${pid} "*) return 0 ;; esac
+      pid=$(sed -n 's/^PPid:\s*//p' /proc/${pid}/status 2>/dev/null)
+   done
+   return 1
+}
+
 ask() {
    local answer
    read -r -p "$1${2:+ [$2]}: " answer
@@ -326,12 +342,10 @@ case "${ACTION}" in
       [ -n "${NETWORK}" ] || die "which network: --profile <network>, see sudo -i $(basename $0) list"
       PROFILE=$(find_profile "${NETWORK}")
       [ -n "${PROFILE}" ] || die "no profile for ${NETWORK}: sudo -i $(basename $0) list, or new"
-      # Resetting the interface cuts the connections to its address, maybe the
-      # session running this: go on detached then, with the output in the log
-      address=$(ip addr show ${IFACE} | sed -n 's/.*inet \([0-9.]*\).*/\1/p' | head -1)
-      if [ -z "${SYNOCLI_WIFI_DETACHED}" ] && [ -n "${address}" ] \
-         && netstat -tn 2>/dev/null | awk '$6 == "ESTABLISHED" { print $4 }' | grep -q "^${address}:"; then
-         echo "Connections go through ${IFACE}, and may be cut: going on in the background, see ${LOG}"
+      # Resetting the interface cuts the connections to its address: when the
+      # session running this is one of them, go on detached, the output in the log
+      if [ -z "${SYNOCLI_WIFI_DETACHED}" ] && session_through_iface; then
+         echo "This session goes through ${IFACE}, and may be cut: going on in the background, see ${LOG}"
          SYNOCLI_WIFI_DETACHED=1 nohup $0 -i ${IFACE} --profile "${NETWORK}" start >> ${LOG} 2>&1 &
          exit 0
       fi
