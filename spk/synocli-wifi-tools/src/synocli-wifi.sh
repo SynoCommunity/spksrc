@@ -35,7 +35,7 @@ usage() {
 
 Usage: $(basename $0) [options] <list|new|start|stop|restart|status>
 
-Run as root: sudo -i $(basename $0) ...
+Run as root, but list: sudo -i $(basename $0) ...
 
   list                 the profiles
   new                  ask for a network, and write its profile
@@ -90,6 +90,11 @@ list_profiles() {
    printf '%-24s %-10s %s\n' "PROFILE" "SECURITY" "ADDRESS"
    for file in ${NETWORKS_DIR}/*.json; do
       [ -f "${file}" ] || continue
+      # The names only to a regular user: a profile is readable by root alone
+      if [ ! -r "${file}" ]; then
+         printf '%-24s %-10s %s\n' "$(basename "${file}" .json)" "-" "- (as root: sudo -i $(basename $0) list)"
+         continue
+      fi
       printf '%-24s %-10s %s\n' "$(basename "${file}" .json)" \
          "$(jq -r '.security // "wpa2"' "${file}")" \
          "$(jq -r 'if .dhcp != false then "dhcp" else .address end + (if .default_route then ", default route" else "" end)' "${file}")"
@@ -296,11 +301,11 @@ command -v jq >/dev/null || die "jq is needed to read the profiles"
 if [ "${ACTION}" = "write-profile" ]; then
    write_profile "$@"; exit 0
 fi
-[ "$(id -u)" = "0" ] || die "run as root: sudo -i $(basename $0) ..."
 if [ "${ACTION}" = "list" ]; then
    list_profiles
    exit 0
 fi
+[ "$(id -u)" = "0" ] || die "run as root: sudo -i $(basename $0) ..."
 mkdir -p ${RUN_DIR}
 if [ -z "${IFACE}" ]; then
    # Right after the driver loads, as at boot, the interface comes in a few seconds

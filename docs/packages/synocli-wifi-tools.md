@@ -53,7 +53,7 @@ sudo -i synocli-wifi --profile MyNetwork start
 
 ```bash
 sudo -i synocli-wifi new                            # asks for a network, writes its profile
-sudo -i synocli-wifi list                           # the profiles
+synocli-wifi list                                   # the profiles, without sudo
 sudo -i synocli-wifi --profile MyNetwork status     # the state of the connection
 sudo -i synocli-wifi --profile MyNetwork restart    # reconnect, from a clean interface
 sudo -i synocli-wifi --profile MyNetwork stop       # disconnect
