@@ -3,21 +3,6 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/synokernel-wifi.png
 
-DEPENDS  = cross/linux-firmware-wifi
-DEPENDS += driver/rtl88x2bu
-DEPENDS += driver/rtl8821cu
-DEPENDS += driver/rtl8821au
-DEPENDS += driver/rtl8812au
-DEPENDS += driver/rtl8814au
-DEPENDS += driver/rtw88
-DEPENDS += driver/wireless-regdb
-
-REQUIRE_KERNEL ?= 1
-# No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
-MIN_KERNEL_VERSION = 3.2
-# SRM has a wireless stack of its own, cfg80211 loaded for the radios of the router
-UNSUPPORTED_ARCHS = $(SRM_ARCHS)
-
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides drivers of USB WiFi adapters for DSM6 and DSM7, with the wireless stack of the Linux kernel, cfg80211 and mac80211, that DSM7 no longer ships."
 CHANGELOG = "1. Initial release"
@@ -28,6 +13,25 @@ DISPLAY_NAME = SynoKernel WiFi drivers
 
 HOMEPAGE = https://wireless.docs.kernel.org/
 LICENSE  = GPLv2
+
+# The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
+# tools to connect with synocli-wifi-tools
+SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi-tools>=1.0-1"
+
+REQUIRE_KERNEL ?= 1
+# No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
+MIN_KERNEL_VERSION = 3.2
+# SRM has a wireless stack of its own, cfg80211 loaded for the radios of the router
+UNSUPPORTED_ARCHS = $(SRM_ARCHS)
+
+DEPENDS  = cross/linux-firmware-wifi
+DEPENDS += driver/rtl88x2bu
+DEPENDS += driver/rtl8821cu
+DEPENDS += driver/rtl8821au
+DEPENDS += driver/rtl8812au
+DEPENDS += driver/rtl8814au
+DEPENDS += driver/rtw88
+DEPENDS += driver/wireless-regdb
 
 # The wireless stack, which DSM 7 kernels are built without. Wireless extensions stay
 # off: they add fields to struct net_device and struct net of the running kernel.
@@ -104,9 +108,5 @@ REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76:mt76x
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76:mt76x02-usb
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2-common
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2u
-
-# The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
-# tools to connect with synocli-wifi-tools
-SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi-tools>=1.0-1"
 
 include ../../mk/spksrc.spk.mk
