@@ -21,7 +21,6 @@
 #
 #   degraded  OVERLAY_BINUTILS_MISSING      wanted, arch ships none
 #             OVERLAY_<c>_VERSION_MISSING   ships one, but not that version
-#             OVERLAY_BINUTILS_PROVISION    download it (either use needs it)
 #             OVERLAY_WARN_*                the matching banner text
 #
 #   internal  _OVERLAY_TC                the toolchain dir name
@@ -47,10 +46,17 @@ OVERLAY_BINUTILS_VERS  ?= 2.30
 # ---- AVAILABLE ---------------------------------------------------------------------
 # Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
 # "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
-_OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
-_OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
-TC_OVERLAY_RUSTC      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
-TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS)_gcc-*)
+_OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-*)
+_OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-*)
+_OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_gcc-*)
+# The rust built with a gcc overlay is installed but not selected: builds use the vendor gcc.
+TC_OVERLAY_RUSTC      := $(filter-out $(patsubst $(_OVERLAY_TC)_gcc-%,\%_gcc-%,$(notdir $(_OVERLAY_GCC_ANY))),\
+                           $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*))
+TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
+
+# Every overlay of the arch, installed and cleaned with its base toolchain whether a build
+# uses it or not. binutils first: the gcc overlay links its as/ld at install time.
+TC_OVERLAY_ALL        := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_ANY)
 
 # The as/ld version the GLOBAL overlay supplies, as the consumer's own PKG_VERS -- what
 # tc-capability.mk reports for TC_BINUTILS when the overlay drives this build, so a
@@ -89,9 +95,8 @@ FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS
 OVERLAY_RUSTC_ON     = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),1))
 OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS))),1))
 
-# Both uses pull the same archive; they differ only in scope.
+# Both uses read the same archive; they differ only in scope.
 _OVERLAY_BINUTILS_WANTED    = $(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(filter 1,$(strip $(RUST_LINK_VIA_BINUTILS))),1)
-OVERLAY_BINUTILS_PROVISION  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_WANTED))
 
 # ---- Degraded states, and what to say about them ------------------------------------
 # Disjoint by construction, so the order they are reported in carries no meaning. There is
