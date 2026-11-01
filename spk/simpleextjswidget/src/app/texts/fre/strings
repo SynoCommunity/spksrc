@@ -1,0 +1,5 @@
+[app]
+app_name = "SimpleExtJSWidget"
+description = "Widget ExtJS de démonstration"
+index_title = "Aide"
+message = "Widget simple !"
