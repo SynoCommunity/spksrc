@@ -45,7 +45,8 @@ Run as root: sudo -i $(basename $0) ...
   status               the state of the connection
 
 Options:
-  --profile <network>  the profile of the network, for start and restart
+  --profile <network>  the profile of the network: needed by start and restart,
+                       accepted by status and stop, which act on the interface
   -i <interface>       the WiFi interface, the first one of 'iw dev' otherwise
 
 Example: sudo -i $(basename $0) --profile MyNetwork start

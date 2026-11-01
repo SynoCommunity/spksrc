@@ -52,11 +52,11 @@ sudo -i synocli-wifi --profile MyNetwork start
 ```
 
 ```bash
-sudo -i synocli-wifi new          # asks for a network, writes its profile
-sudo -i synocli-wifi list         # the profiles
-sudo -i synocli-wifi status       # the state of the connection
-sudo -i synocli-wifi stop         # disconnect
-sudo -i synocli-wifi --profile MyNetwork restart
+sudo -i synocli-wifi new                            # asks for a network, writes its profile
+sudo -i synocli-wifi list                           # the profiles
+sudo -i synocli-wifi --profile MyNetwork status     # the state of the connection
+sudo -i synocli-wifi --profile MyNetwork restart    # reconnect, from a clean interface
+sudo -i synocli-wifi --profile MyNetwork stop       # disconnect
 ```
 
 Every connection starts from a clean state: the DHCP client and
