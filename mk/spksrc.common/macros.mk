@@ -14,6 +14,10 @@
 #  version_lt  : true if version A <  version B
 #  version_gt  : true if version A >  version B
 #
+#  is_true     : non-empty when a switch is on (1, y, yes, true, on -- any case)
+#  is_false    : non-empty when a switch is off (0, n, no, false, off, or empty)
+#  bool        : TRUE or FALSE; stops the build on any other value
+#
 #  uniq        : removes duplicate words while preserving order
 #  dedup       : de-duplicates delimiter-separated strings
 #  dedup-files : removes duplicate files while preserving order (via md5sum)
@@ -34,6 +38,24 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+
+# Macro: boolean values
+#
+#   ifeq ($(call bool,$(OVERLAY_GCC),OVERLAY_GCC),TRUE)
+#   ACTIVE = $(if $(call is_true,$(OVERLAY_GCC)),1)
+#
+# A switch may be written 1/0, y/n, yes/no, true/false or on/off, in any case. is_true and
+# is_false return a non-empty word or nothing, for $(if); bool returns TRUE or FALSE, for
+# ifeq, and stops the build on any other value -- naming the variable when given one, as a
+# typo must not read as "off". Empty is false: an unset switch is off. Pure make, no fork.
+TRUE_VALUES  := 1 y yes true on
+FALSE_VALUES := 0 n no false off
+lower       = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$(1)))))))))))))))))))))))))))
+is_true     = $(filter $(TRUE_VALUES),$(call lower,$(strip $(1))))
+is_false    = $(or $(filter $(FALSE_VALUES),$(call lower,$(strip $(1)))),$(if $(strip $(1)),,1))
+assert_bool = $(if $(or $(call is_true,$(1)),$(call is_false,$(1))),,$(error \
+                $(if $(2),$(2): )invalid boolean value '$(strip $(1))' -- expected one of: $(TRUE_VALUES) $(FALSE_VALUES)))
+bool        = $(call assert_bool,$(1),$(2))$(if $(call is_true,$(1)),TRUE,FALSE)
 
 # Append $(2) to the comma-separated list $(1), or return $(1) when there is nothing to add.
 # Reasons accumulate rather than overwrite: an arch can miss several capabilities at once.

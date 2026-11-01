@@ -118,8 +118,9 @@ CONFIGURE_ARGS += -Dsvtav1=disabled
 PLIST_TRANSFORM_SED_ARGS += -e '/libgstsvtav1\.so/d'
 endif
 
-# Linux 3.2 headers carry DVB API 5.4, and the dvb plugin wants a newer one
-ifeq ($(call version_ge, $(TC_KERNEL), 3.3),1)
+# The dvb plugin needs DVB API 5.10 (QAM_4_NR), in the headers of 3.10 kernels;
+# those of 3.2.101 and 3.4.35 have 5.4 and 5.5
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 CONFIGURE_ARGS += -Ddvb=enabled
 else
 CONFIGURE_ARGS += -Ddvb=disabled
