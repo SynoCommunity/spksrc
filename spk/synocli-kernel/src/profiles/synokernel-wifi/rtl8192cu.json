@@ -1,0 +1,5 @@
+{
+  "name": "rtl8192cu",
+  "description": "Realtek RTL8188CUS, RTL8188RU, RTL8191CU and RTL8192CU adapters: Edimax EW-7811Un and other nano adapters",
+  "modules": ["rtl8192cu"]
+}

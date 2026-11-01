@@ -1,0 +1,6 @@
+{
+  "name": "rtw88-8821cu",
+  "description": "Realtek RTL8811CU and RTL8821CU adapters, with rtw88",
+  "comments": "rtw88, the mac80211 driver of these chips in Linux, built for kernels 5.4 and newer. An alternative to the rtl8821cu profile: load one or the other.",
+  "modules": ["rtw_8821cu"]
+}

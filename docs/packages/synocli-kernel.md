@@ -35,10 +35,15 @@ holds the profiles:
 SPK_DEPENDS = "synocli-kernel>=2.0"
 ```
 
+The profiles of the WiFi adapters of synokernel-wifi come with 2.1
+(`synocli-kernel>=2.1`).
+
 ## Kernel Module Helper Script
 
 `synocli-kernelmodule` loads the modules of a `synokernel-*` package, one device
-at a time, through the profile of that device. Run as root:
+at a time, through the profile of that device. Run it with `sudo -i` in front:
+`sudo` alone does not find the commands of packages, linked in `/usr/local/bin`,
+out of its `PATH`; `sudo -i` runs the command in a root login shell, which has it.
 
 ```bash
 # Profiles of every synokernel-* package, and whether the package is installed
@@ -46,21 +51,21 @@ at a time, through the profile of that device. Run as root:
 synocli-kernelmodule list
 
 # The modules a profile loads, in order, and where each comes from
-synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc modules
 
-# What start would do, without loading anything (no root needed)
-synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
+# What start would do, without loading anything
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc --dry-run start
 
 # Load, check and unload the modules of a device
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc status
-sudo synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc start
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc status
+sudo -i synocli-kernelmodule --profile hauppauge-wintv-dualhd-atsc stop
 
 # Several profiles of one package
-sudo synocli-kernelmodule --spk synokernel-usbserial --profile ch341,cp210x start
+sudo -i synocli-kernelmodule --spk synokernel-usbserial --profile ch341,cp210x start
 
 # Modules by name, without a profile
-sudo synocli-kernelmodule --spk synokernel-cdrom sr_mod start
+sudo -i synocli-kernelmodule --spk synokernel-cdrom sr_mod start
 ```
 
 | Option | Use |
@@ -188,7 +193,7 @@ applies to the devices that appear once it is in place: plug the device after
    board).
 4. Try it before packaging it: put the profile in
    `/var/packages/synocli-kernel/target/etc/profiles/<package>/` on the NAS,
-   and run `sudo synocli-kernelmodule --profile <name> --verbose start`.
+   and run `sudo -i synocli-kernelmodule --profile <name> --verbose start`.
 5. Check `dmesg` and `/dev/dvb`, then `stop`, which must leave no module of
    the profile loaded (`status`).
 6. Put the file in `spk/synocli-kernel/src/profiles/<package>/`, with what was
@@ -213,7 +218,14 @@ Each configuration option consists of 3 sub-variables, and an optional fourth:
 2. **Kernel directory tree** - Path where the module source is located
 3. **Module name** - Without `.ko` extension
 4. **Kernel feature it needs** (optional) - a `CONFIG_*` symbol the kernel must
-   have built in (`=y`); on a kernel without it, the module is skipped
+   have built in (`=y`), read from the kernel's own config; on a kernel without
+   it, the module is neither enabled nor built
+
+A kernel that does not offer the option, or has no such directory, skips the
+module: a driver that moved between kernels is listed once per directory, as
+`drivers/net/wireless/rt2x00` became `drivers/net/wireless/ralink/rt2x00`. The
+modules of a directory can use those of the directories built before it:
+`depends=` names them, and `synocli-kernelmodule` loads them first.
 
 A module that builds on a bool feature of the kernel cannot work where the kernel
 lacks that feature: `regmap-i2c` needs the regmap core, which some kernels do not
@@ -221,6 +233,20 @@ have and which cannot be built as a module.
 
 ```makefile
 REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c:CONFIG_REGMAP
+```
+
+Where the modules sit behind a menu the kernel is built without,
+`REQUIRE_KERNEL_OPTION` sets options before them, `CONFIG_<option>=y|m|n`. An
+`=n` names a built-in option the modules must not turn on, as it changes the
+structures of the running kernel: it is left as the kernel has it, and the build
+stops if `olddefconfig` turns it on all the same. The build log lists the
+built-in options the modules turned on and off, to check that only menus did:
+
+```makefile
+# The wireless stack, without the wireless extensions that add fields to
+# struct net_device
+REQUIRE_KERNEL_OPTION  = CONFIG_WIRELESS=y CONFIG_WLAN=y
+REQUIRE_KERNEL_OPTION += CONFIG_CFG80211_WEXT=n CONFIG_WIRELESS_EXT=n CONFIG_WEXT_CORE=n
 ```
 
 ### Module Installation Structure
@@ -291,4 +317,6 @@ DSM version. Install the build of the package for that DSM version.
 
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
 - [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
+- [SynoKernel WiFi](synokernel-wifi.md) - USB WiFi adapter drivers
+- [SynoCli WiFi Tools](synocli-wifi-tools.md) - WiFi connection tools
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities

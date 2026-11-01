@@ -190,6 +190,7 @@ nav:
       - SynoCli Monitor: packages/synocli-monitor.md
       - SynoCli Net: packages/synocli-net.md
       - SynoCli VideoDriver: packages/synocli-videodriver.md
+      - SynoCli WiFi Tools: packages/synocli-wifi-tools.md
     - Development:
       - Git: packages/git.md
       - PostgreSQL: packages/postgresql.md
@@ -204,6 +205,7 @@ nav:
     - Kernel:
       - SynoKernel LinuxTV: packages/synokernel-linuxtv.md
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
+      - SynoKernel WiFi: packages/synokernel-wifi.md
     - Media:
       - Beets: packages/beets.md
       - Comskip: packages/comskip.md

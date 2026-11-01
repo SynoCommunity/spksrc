@@ -1,0 +1,147 @@
+[
+    {
+        "step_title": "SynoCli WiFi Tools",
+        "items": [
+            {
+                "desc": "Les outils pour connecter le NAS à un réseau WiFi, avec les adaptateurs de <b>synokernel-wifi</b> : chargez le pilote de l'adaptateur avec <b>synocli-kernelmodule</b>, puis connectez-vous avec <b>synocli-wifi</b> et le profil du réseau :<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile rtl88x2bu start</code><br><code>sudo -i synocli-wifi --profile MonReseau start</code><br><br>Pour créer le profil d'un réseau WiFi :<br><code>sudo -i synocli-wifi new</code><br><br>Lister les profils :<br><code>synocli-wifi list</code><br><br>Afficher l'état de la connexion :<br><code>sudo -i synocli-wifi --profile MonReseau status</code><br><br>Reconnecter, à partir d'une interface remise à zéro :<br><code>sudo -i synocli-wifi --profile MonReseau restart</code><br><br>Déconnecter :<br><code>sudo -i synocli-wifi --profile MonReseau stop</code><br><br>Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-wifi-tools/\">documentation du paquet</a>."
+            }
+        ]
+    },
+    {
+        "step_title": "Réseau WiFi",
+        "items": [
+            {
+                "desc": "Facultatif : le profil d'un réseau auquel se connecter, dans <code>/var/packages/synocli-wifi-tools/var/networks</code>, à son nom. Laissez le réseau vide pour passer. La phrase de passe est conservée sous forme de clé WPA2, pas en clair, sauf pour WPA3, qui en a besoin."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_ssid",
+                        "desc": "Réseau (SSID)",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_passphrase",
+                        "desc": "Phrase de passe",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "minLength": 8,
+                            "maxLength": 63
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>Sécurité</b>",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_wpa2",
+                        "desc": "WPA2",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_wifi_wpa3",
+                        "desc": "WPA3, ou WPA2/WPA3",
+                        "defaultValue": false
+                    },
+                    {
+                        "key": "wizard_wifi_open",
+                        "desc": "Ouvert, sans phrase de passe",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_country",
+                        "desc": "Pays, deux lettres comme CA ou FR, pour les canaux 5 GHz",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[A-Za-z]{2}$/",
+                                "errorText": "Deux lettres, comme CA ou FR"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>Adresse</b>",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_dhcp",
+                        "desc": "Par DHCP",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_wifi_static",
+                        "desc": "Statique, ci-dessous",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "desc": "<hr><b>Adresse statique seulement</b>"
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_address",
+                        "desc": "Adresse, avec son masque (192.168.1.50/24)",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[0-9]{1,3}(\\.[0-9]{1,3}){3}\\/[0-9]{1,2}$/",
+                                "errorText": "Une adresse avec son masque, comme 192.168.1.50/24"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_wifi_gateway",
+                        "desc": "Passerelle",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    },
+                    {
+                        "key": "wizard_wifi_dns",
+                        "desc": "Serveurs DNS, séparés par des espaces",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "multiselect",
+                "desc": "<hr>La route par défaut et les serveurs DNS du WiFi remplacent ceux du NAS : pour un NAS en WiFi seulement, pas un NAS câblé.<br><b>Attention :</b> un mauvais réglage peut rendre le NAS injoignable sur le réseau. Un redémarrage l'annule, sauf si une tâche au démarrage se connecte ; sinon, consultez la documentation de votre NAS pour réinitialiser sa configuration réseau (sur un NAS Synology, le bouton RESET maintenu environ 4 secondes).",
+                "subitems": [
+                    {
+                        "key": "wizard_wifi_default_route",
+                        "desc": "Route par défaut par le WiFi",
+                        "defaultValue": false
+                    }
+                ]
+            }
+        ]
+    }
+]

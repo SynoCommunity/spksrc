@@ -1,0 +1,8 @@
+rsc:etc/libnl/classid
+rsc:etc/libnl/pktloc
+lnk:lib/libnl-3.so
+lnk:lib/libnl-3.so.200
+lib:lib/libnl-3.so.200.26.0
+lnk:lib/libnl-genl-3.so
+lnk:lib/libnl-genl-3.so.200
+lib:lib/libnl-genl-3.so.200.26.0

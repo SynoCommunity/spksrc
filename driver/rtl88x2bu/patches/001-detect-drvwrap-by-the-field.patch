@@ -1,0 +1,11 @@
+--- Makefile.orig
++++ Makefile
+@@ -2422,7 +2422,7 @@
+ ccflags-y += -DRTW_CFG80211_TDLS_LINK_ID
+ endif
+ 
+-ifeq ($(shell awk '/@drvwrap/ { print "y"; exit }' $(srctree)/include/linux/usb.h), y)
++ifeq ($(shell awk '/struct usbdrv_wrap[ \t]+drvwrap;/ { print "y"; exit }' $(srctree)/include/linux/usb.h), y)
+ ccflags-y += -DRTW_USB_HAS_DRVWRAP
+ endif
+ 
