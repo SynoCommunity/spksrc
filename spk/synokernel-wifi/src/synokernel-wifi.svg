@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- circle -->
+  <circle cx="256" cy="186" r="158" fill="#2b2f33"/>
+  <circle cx="256" cy="186" r="148" fill="#45ade6"/>
+  <circle cx="256" cy="186" r="112" fill="#2f8fc7"/>
+  <!-- waves, quarter circles around the dot -->
+  <g fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round">
+    <path d="M 178 172 A 110 110 0 0 1 334 172"/>
+    <path d="M 205 199 A 72 72 0 0 1 307 199"/>
+    <path d="M 231 225 A 36 36 0 0 1 281 225"/>
+  </g>
+  <circle cx="256" cy="262" r="17" fill="#ffffff"/>
+  <!-- USB plug -->
+  <rect x="198" y="426" width="116" height="66" rx="6" fill="#c9ced3" stroke="#2b2f33" stroke-width="6"/>
+  <rect x="222" y="448" width="22" height="16" fill="#2b2f33"/>
+  <rect x="268" y="448" width="22" height="16" fill="#2b2f33"/>
+  <!-- dongle -->
+  <rect x="96" y="318" width="320" height="116" rx="22" fill="#45ade6" stroke="#2b2f33" stroke-width="6"/>
+  <!-- status LEDs, lit: a halo around each -->
+  <circle cx="116" cy="350" r="14" fill="#4cd964" opacity="0.35"/>
+  <circle cx="116" cy="350" r="8" fill="#4cd964"/>
+  <circle cx="148" cy="350" r="14" fill="#ff9f1a" opacity="0.35"/>
+  <circle cx="148" cy="350" r="8" fill="#ff9f1a"/>
+  <rect x="360" y="343" width="36" height="14" rx="7" fill="#ffffff"/>
+  <!-- plate -->
+  <path d="M 168 304 H 344 V 400 L 320 424 H 192 L 168 400 Z" fill="#e8ecef" stroke="#2b2f33" stroke-width="6"/>
+  <text x="256" y="385" text-anchor="middle" font-family="DejaVu Sans, Verdana, sans-serif"
+        font-size="60" font-weight="bold" fill="#2b2f33" letter-spacing="2">WIFI</text>
+</svg>

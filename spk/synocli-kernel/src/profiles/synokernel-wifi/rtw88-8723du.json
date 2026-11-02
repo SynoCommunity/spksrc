@@ -1,0 +1,6 @@
+{
+  "name": "rtw88-8723du",
+  "description": "Realtek RTL8723DU adapters, with rtw88",
+  "comments": "rtw88, the mac80211 driver of these chips in Linux, built for kernels 5.4 and newer.",
+  "modules": ["rtw_8723du"]
+}

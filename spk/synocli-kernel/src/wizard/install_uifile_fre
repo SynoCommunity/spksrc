@@ -1,0 +1,13 @@
+[
+    {
+        "step_title": "SynoCli Kernel Tools",
+        "items": [
+            {
+                "desc": "<b>Expérimental, à vos risques.</b> Les modules noyau des paquets SynoCommunity sortent du cadre pris en charge par Synology : un module qui ne convient pas au noyau peut planter le NAS, et les mises à jour de DSM peuvent les briser. Le soutien est limité : lisez la documentation, et vérifiez les issues déjà ouvertes, avant d'en ouvrir une. Ne les utilisez pas sur un NAS que vous ne pouvez pas vous permettre de redémarrer ou de restaurer."
+            },
+            {
+                "desc": "<b>synocli-kernelmodule</b> charge les modules noyau des paquets <b>synokernel-*</b>, un périphérique à la fois, par son profil ; il contient les profils de tous ces paquets. Il ne charge rien de lui-même, ni à l'installation ni au démarrage. Lancez-le avec <b>sudo -i</b> devant : sudo seul ne trouve pas les commandes des paquets.<br><br><code>synocli-kernelmodule list</code><br><code>sudo -i synocli-kernelmodule --profile cdrom start</code><br><br>Voir la <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/\">documentation du paquet</a>, et <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-kernel/#loading-modules-at-boot\">Loading modules at boot</a> pour la tâche planifiée qui les charge à chaque démarrage."
+            }
+        ]
+    }
+]
