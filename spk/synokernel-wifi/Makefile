@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-wifi
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synokernel-wifi.png
 
 MAINTAINER = th0ma7
@@ -16,7 +16,7 @@ LICENSE  = GPLv2
 
 # The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
 # tools to connect with synocli-wifi
-SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi>=1.0-1"
+SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi>=1.0-2"
 
 REQUIRE_KERNEL ?= 1
 # No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu

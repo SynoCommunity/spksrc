@@ -1,6 +1,6 @@
 SPK_NAME = synocli-wifi
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/SynoPackagegreen-wifi.png
 
 DEPENDS  = cross/iw
