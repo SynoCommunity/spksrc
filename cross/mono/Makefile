@@ -1,8 +1,8 @@
 PKG_NAME = mono
-PKG_VERS = 6.12.0.199
+PKG_VERS = 6.14.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.mono-project.com/sources/mono
+PKG_DIST_SITE = https://dl.winehq.org/mono/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # native/mono must be of the same version

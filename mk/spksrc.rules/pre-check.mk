@@ -22,7 +22,7 @@ ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check download-wheels,$(MAKEC
 # SPK_FOLDER    
 # name of the spk package folder
 # github status check does not rely on the (SPK) NAME but uses the folder name
-# required for packages that have folder name different to SPK_NAME (sonarr -> nzbget, mono_58 -> mono)
+# required for packages that have folder name different to SPK_NAME (sonarr -> nzbget, mono-58 -> mono)
 SPK_FOLDER = $(notdir $(CURDIR))
 
 # Report a fatal pre-check, then stop. Three destinations, because each has a different

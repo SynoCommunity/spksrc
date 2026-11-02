@@ -1264,7 +1264,7 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Also in this PR:** `dependency-list` now keys its output on the package
       **folder** instead of `$(NAME)`. Three packages set `SPK_NAME` to something
       else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix-22` (`mkvtoolnix`),
-      `spk/mono_58` (`mono`) — while every consumer of the list already looked the
+      `spk/mono-58` (`mono`) — while every consumer of the list already looked the
       key up as a directory (`.github/actions/prepare.sh`, `spk-meta/base.mk`). The
       three silently fell out of the CI build matrix, and the latter two collided
       with the `mkvtoolnix` / `mono` folders that still exist beside them. This is

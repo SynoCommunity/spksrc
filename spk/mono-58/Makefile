@@ -3,7 +3,7 @@ SPK_VERS = 5.8.0.108
 SPK_REV = 11
 SPK_ICON = src/mono.png
 
-DEPENDS = cross/mono_58
+DEPENDS = cross/mono-58
 
 REQUIRED_MIN_DSM = 5.0
 
@@ -25,7 +25,7 @@ SERVICE_SETUP = src/service-setup.sh
 POST_STRIP_TARGET = mono_extra_install
 PRE_COPY_TARGET = mono_pre_copy
 
-MONO_NATIVE_INSTALL = $(realpath $(WORK_DIR)/../../../native/mono_58/work-native/install)
+MONO_NATIVE_INSTALL = $(realpath $(WORK_DIR)/../../../native/mono-58/work-native/install)
 
 SPK_COMMANDS = bin/mono bin/mcs bin/gacutil bin/gacutil2 bin/makecert
 
