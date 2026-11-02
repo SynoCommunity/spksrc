@@ -51,8 +51,6 @@ override WORK_DIR = $(CURDIR)/work
 # Not a cross build: no stage0 bootstrap, no toolchain identity, nothing keyed on ARCH.
 override ARCH =
 override TCVERSION =
-# A compiler, not package payload: nothing ever reads its plist.
-INSTALL_PLIST_SKIP = 1
 
 include ../../mk/spksrc.overlay/$(OVERLAY_COMPONENT).mk
 include ../../mk/spksrc.native-install.mk
