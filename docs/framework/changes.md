@@ -138,7 +138,7 @@ If you only read one thing, read this. The details are in the dated log below.
       every overlay its arch ships, and `make clean` on it cleans them. Builds are
       unchanged: C keeps the vendor gcc and `as`/`ld`, rust the build made with the vendor
       gcc, its link through the binutils overlay. `make dist-clean` gains `overlay-clean`.
-    - See [Custom From-Source Rust Toolchains](toolchain.md#custom-from-source-rust-toolchains).
+    - See [Toolchain Overlays](toolchain.md#toolchain-overlays).
     - Pull request: [#7701](https://github.com/SynoCommunity/spksrc/pull/7701)
 
 ??? note "October 29th 2026 — Kernel options for the modules, and their symbols across directories (#7678)"

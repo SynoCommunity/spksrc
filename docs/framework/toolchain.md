@@ -269,37 +269,51 @@ distrib/
 
 Once downloaded, toolchains are reused across builds. Delete from `distrib/` to force re-download.
 
-## Custom From-Source Rust Toolchains
+## Toolchain Overlays
 
-A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc.
+An overlay is a toolchain component installed **beside** a base toolchain instead of replacing it: a newer compiler, assembler/linker or Rust for a toolchain whose own is too old or missing. The base toolchain stays as Synology shipped it -- glibc, kernel headers, sysroot -- so the binaries built keep running on stock DSM; an overlay only adds tools, and the build decides which ones it uses.
 
-### Producer / consumer split
+| Component | Versions | Toolchains | Used by builds |
+|-----------|----------|------------|----------------|
+| rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
+| binutils | 2.30 | 65 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
+| gcc | 8.5 | the same 65 | not yet: installed only |
 
-| Piece | Role |
-|-------|------|
-| `native/rustc-<vers>/` | Producer — builds the `rust-<id>-<rev>.txz`. |
-| `overlay/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
-| `overlay/syno-<arch>-<dsm>_binutils-2.30/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
+### The overlay/ directories
 
-Overlays have their own directory, `overlay/`. A consumer is four lines -- `PKG_VERS`,
-`PKG_REV`, `include ../../mk/spksrc.overlay.mk` -- the directory name giving arch, DSM and
-component; `mk/spksrc.overlay/` holds what each component installs. A generic arch (`x64`,
-`armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares
-(`mk/spksrc.overlay/dist-arch.mk`). The archives are kept in `distrib/overlay/<dsm>/`, as the
-toolchains in `distrib/toolchain/<dsm>/`.
+Each overlay is a directory of `overlay/`, named `syno-<arch>-<dsm>_<component>-<version>` -- a rust one adds the gcc it was built with, `_rust-1.82_gcc-4.9.3`. Its Makefile is four lines; the directory name says the rest:
 
-Beside the rust ones, `overlay/` holds gcc 8.5 and binutils 2.30 for 65 toolchains of DSM
-5.2 to 7.1, and the rust built with gcc 8.5. A base toolchain installs every overlay its
-arch ships, and `make clean` on it cleans them, but builds do not use them yet: C keeps the
-vendor gcc and `as`/`ld`, and rust the build made with the vendor gcc.
+```makefile
+PKG_VERS = 8.5.0
+PKG_REV  = v5
 
-A base toolchain (`syno-<arch>-<dsm>/`) opts in simply by having a rust consumer dir beside it (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
+include ../../mk/spksrc.overlay.mk
+```
 
-Each overlay is self-contained: it unpacks into its **own** consumer directory (`…_rust-…/work/`, `…_binutils-…/work/`), never into the base toolchain's. That is what lets a second build of a component sit beside the first — only the generated pointers then decide which one is used.
+It downloads one archive into `distrib/overlay/<dsm>/`, as a toolchain does into `distrib/toolchain/<dsm>/`, and extracts it into its **own** `work/`, never the base toolchain's: that is what lets two builds of a component sit side by side, only the generated pointers deciding which one is used. A generic arch (`x64`, `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares -- `x64-6.2.4` that of `x86-6.2.4`, `x64-7.1` that of `apollolake-7.1` (`mk/spksrc.overlay/dist-arch.mk`).
+
+An arch has an overlay exactly when such a directory exists for it: adding one is adding the directory and its `digests`.
+
+### Installed and cleaned with the toolchain
+
+A base toolchain (`toolchain/syno-<arch>-<dsm>/`) `DEPENDS` on every overlay of its arch (`TC_OVERLAY_ALL`), binutils first since the gcc overlay links its `as`/`ld` at install time, whether a build uses them or not. `make clean` on the base toolchain cleans them too, so a rebuild re-extracts them; `make dist-clean` at the top level runs `overlay-clean` over every one.
+
+### Where the overlay code lives
+
+Overlay code sits at four levels, by role, each read by a different Makefile:
+
+| Level | Files | Read by | See |
+|-------|-------|---------|-----|
+| **Decide** | `mk/spksrc.common/overlay.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
+| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk`, `dist-arch.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
+| **Use** | `mk/spksrc.toolchain/overlay-binutils.mk`, `overlay-rustc.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
+| **Produce** | `native/rustc-<version>`, `native/binutils-2.30` | a maintainer, by hand: build an archive to publish | [Publishing an archive](#publishing-an-archive), [Building Rust](#building-rust) |
+
+The base toolchain ties the first three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the active ones. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
 
 ### Overlay switches
 
-Every overlay decision is resolved in one place, `mk/spksrc.common/overlay.mk`, read by the toolchain and the package side alike. It keeps three questions apart:
+Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide* level above), read by the toolchain and the package side alike. It keeps three questions apart:
 
 | | Variable | Meaning |
 |---|---|---|
@@ -336,22 +350,28 @@ TC_OVERLAY_BINUTILS :=          # empty: the narrow rust link only, not the glob
 
 Both carry **active** semantics — the path when that overlay drives the build, empty otherwise. The narrow rust-link use shows up instead as a `-Clink-arg=-B<shim>` in the Rust link flags. The `OVERLAY_<c>` switches are deliberately not exported: a package includes `tc_vars.mk`, so it would inherit the previous run's choice and the switch would go sticky.
 
-### (Re)building and publishing
+### Publishing an archive
+
+The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
+
+1. Build the archive with its producer in `native/`, under the new revision (`PKG_REV=vN`).
+2. Upload the `.txz` to its release.
+3. Bump `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`).
+
+## Custom From-Source Rust Toolchains
+
+A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
+
+An arch opts in simply by having a rust overlay (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
+
+### Building Rust
 
 ```bash
 make -C native/rustc-1.82 arch-ppc853x-5.2  # one arch
 make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 ```
 
-You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` — a `DEPENDS` cannot carry the per-arch parametrization — so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so.
-
-The `.txz` name carries a revision. When re-publishing a rebuilt archive under the same id, bump the rev so caches don't serve the stale artifact — pass `PKG_REV=vN` (then rename). The current rev lives **statically** in each consumer Makefile (`PKG_REV ?= vN`), not in a shared file. To publish a rebuild:
-
-1. Build (optionally with `PKG_REV=vN`).
-2. Upload the `.txz` to the release (`pre-releases`, or the `rust/…` asset path).
-3. Bump `PKG_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc> digests`).
-
-`make clean` on the base toolchain cascades to every overlay consumer of its arch, so a rebuild re-extracts them fresh.
+You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Publishing an archive](#publishing-an-archive).
 
 ## Troubleshooting
 
