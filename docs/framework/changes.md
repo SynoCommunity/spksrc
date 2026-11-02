@@ -129,7 +129,9 @@ If you only read one thing, read this. The details are in the dated log below.
     - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to
       `overlay/`, four lines each (`PKG_VERS`, `PKG_REV`, `include
       ../../mk/spksrc.overlay.mk`), the directory name giving arch, DSM and component. A
-      generic arch downloads the archive of the real arch whose toolchain it shares.
+      generic arch downloads the archive of the real arch whose toolchain it shares. The
+      archives are kept in `distrib/overlay/<dsm>/`, as the toolchains in
+      `distrib/toolchain/<dsm>/`.
     - **145 consumers:** gcc 8.5 and binutils 2.30 for 65 toolchains of DSM 5.2 to 7.1, the
       rust of the five legacy archs, and the rust built with gcc 8.5.
     - **Installed and cleaned with the toolchain, used or not.** A base toolchain installs

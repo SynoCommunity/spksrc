@@ -285,7 +285,8 @@ Overlays have their own directory, `overlay/`. A consumer is four lines -- `PKG_
 `PKG_REV`, `include ../../mk/spksrc.overlay.mk` -- the directory name giving arch, DSM and
 component; `mk/spksrc.overlay/` holds what each component installs. A generic arch (`x64`,
 `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares
-(`mk/spksrc.overlay/dist-arch.mk`).
+(`mk/spksrc.overlay/dist-arch.mk`). The archives are kept in `distrib/overlay/<dsm>/`, as the
+toolchains in `distrib/toolchain/<dsm>/`.
 
 Beside the rust ones, `overlay/` holds gcc 8.5 and binutils 2.30 for 65 toolchains of DSM
 5.2 to 7.1, and the rust built with gcc 8.5. A base toolchain installs every overlay its

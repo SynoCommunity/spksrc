@@ -48,6 +48,8 @@ OVERLAY_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 # a DEPENDS passes WORK_DIR= and ARCH= on its command line, and both would reach here. The
 # name is fixed because the overlay pointers name it (spksrc.common/overlay.mk).
 override WORK_DIR = $(CURDIR)/work
+# Its archive beside the toolchains', per DSM version: distrib/overlay/<dsm>/.
+override DISTRIB_DIR = $(OVERLAY_DIR)/$(TC_VERS)
 # Not a cross build: no stage0 bootstrap, no toolchain identity, nothing keyed on ARCH.
 override ARCH =
 override TCVERSION =
