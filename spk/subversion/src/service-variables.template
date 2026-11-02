@@ -1,0 +1,2 @@
+# variables for service command
+SHARE_PATH=@@share_path@@
