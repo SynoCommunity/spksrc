@@ -144,7 +144,7 @@ If you only read one thing, read this. The details are in the dated log below.
       pointed there; it now declares `$(TC_TARGET)/libc`, and names its
       `TC_INCLUDE`/`TC_LIBRARY` tooldir directly, so its `-I`/`-L` are unchanged.
 
-??? note "November 2nd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#NEWPR)"
+??? note "November 2nd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
 
     - **What:** the producers of the overlay archives that master downloads since
       #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
@@ -167,7 +167,7 @@ If you only read one thing, read this. The details are in the dated log below.
       uses that gcc (#7391).
     - See [Building and publishing an
       overlay](toolchain.md#building-and-publishing-an-overlay).
-    - Pull request: [#NEWPR](https://github.com/SynoCommunity/spksrc/pull/NEWPR)
+    - Pull request: [#7707](https://github.com/SynoCommunity/spksrc/pull/7707)
 
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 
