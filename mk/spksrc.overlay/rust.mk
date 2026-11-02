@@ -33,7 +33,3 @@ rust-post_install:
 	rustup --version ; \
 	rustup toolchain link $(RUST_TC_ID) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
 	rustup show
-
-.PHONY: idc
-idc:
-	@echo "$(RUST_TC_ID)"
