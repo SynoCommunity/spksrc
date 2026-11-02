@@ -9,18 +9,18 @@ tags:
 
 # SynoCli WiFi Tools
 
-The `synocli-wifi-tools` package provides the command-line tools to connect a
+The `synocli-wifi` package provides the command-line tools to connect a
 NAS to a WiFi network, with the USB adapters of
 [SynoKernel WiFi](synokernel-wifi.md): `iw`, `wpa_supplicant` 2.11 with WPA3,
-the DHCP client `udhcpc`, and `synocli-wifi`, which connects by network
-profile. They change more often than the drivers, which follow the kernels,
+the DHCP client `udhcpc`, and the `synocli-wifi` command, which connects by
+network profile. They change more often than the drivers, which follow the kernels,
 and come in a package of their own.
 
 ## Package Information
 
 | Property | Value |
 |----------|-------|
-| Package Name | synocli-wifi-tools |
+| Package Name | synocli-wifi |
 | License | Each tool under its own license |
 | Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.1 or newer |
 
@@ -43,7 +43,7 @@ root: those of the package are linked as `wifi-*`.
 DSM 7 does not show WiFi interfaces in its network settings, nor DSM 6 those of
 the adapters it does not support: `synocli-wifi` connects the NAS from the
 command line, by profile -- one JSON file per network in
-`/var/packages/synocli-wifi-tools/var/networks`, written by the installation wizard
+`/var/packages/synocli-wifi/var/networks`, written by the installation wizard
 or by `synocli-wifi new`:
 
 ```bash
@@ -113,7 +113,7 @@ wifi-wpa_passphrase "MyNetwork" "MyPassphrase" | sudo -i wifi-wpa_supplicant -B 
 sudo -i wifi-wpa_cli -i wlan0 status
 
 # The address only; WIFI_DEFAULT_ROUTE=1 in front for the default route and DNS too
-sudo -i udhcpc -i wlan0 -s /var/packages/synocli-wifi-tools/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
+sudo -i udhcpc -i wlan0 -s /var/packages/synocli-wifi/target/etc/udhcpc.script -b -R -p /var/run/udhcpc-wlan0.pid
 
 # Disconnect: udhcpc releases its lease (-R)
 sudo -i sh -c 'kill $(cat /var/run/udhcpc-wlan0.pid)'

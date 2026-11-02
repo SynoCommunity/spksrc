@@ -1,6 +1,6 @@
-SPK_NAME = synocli-wifi-tools
+SPK_NAME = synocli-wifi
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/SynoPackagegreen-wifi.png
 
 DEPENDS  = cross/iw
@@ -21,7 +21,7 @@ STARTABLE     = no
 WIZARDS_DIR   = src/wizard/
 CHANGELOG     = "1. Initial release"
 
-HOMEPAGE = https://docs.synocommunity.com/packages/synocli-wifi-tools/
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-wifi/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 # synocli-kernelmodule loads the driver of the adapter
@@ -39,12 +39,12 @@ BUSYBOX_CONFIG = udhcpc
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 SERVICE_SETUP = src/service-setup.sh
-POST_STRIP_TARGET = synocli-wifi-tools_extra_install
+POST_STRIP_TARGET = synocli-wifi_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: synocli-wifi-tools_extra_install
-synocli-wifi-tools_extra_install:
+.PHONY: synocli-wifi_extra_install
+synocli-wifi_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin $(STAGING_DIR)/etc
 	install -m 755 src/synocli-wifi.sh $(STAGING_DIR)/bin/synocli-wifi
 	install -m 755 src/udhcpc.script $(STAGING_DIR)/etc/udhcpc.script

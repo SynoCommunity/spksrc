@@ -318,5 +318,5 @@ DSM version. Install the build of the package for that DSM version.
 - [SynoKernel USB Serial](synokernel-usbserial.md) - USB serial drivers
 - [SynoKernel LinuxTV](synokernel-linuxtv.md) - TV tuner drivers
 - [SynoKernel WiFi](synokernel-wifi.md) - USB WiFi adapter drivers
-- [SynoCli WiFi Tools](synocli-wifi-tools.md) - WiFi connection tools
+- [SynoCli WiFi Tools](synocli-wifi.md) - WiFi connection tools
 - [SynoCli Misc Tools](synocli-misc.md) - System utilities
