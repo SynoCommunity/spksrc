@@ -124,6 +124,31 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 2nd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#NEWPR)"
+
+    - **What:** the producers of the overlay archives that master downloads since
+      #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
+      `native/binutils-2.30` and `native/rustc-1.82`, which now produce the archives
+      the `overlay/` directories name: binutils `v4`, a generic arch's archive under
+      the real arch it shares a toolchain with, in the `toolchains/dsm<dsm>` releases.
+    - **A producer is a version, a rev and a component name.** The three include
+      `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`,
+      the host optimisation flags and the two profile-guided passes
+      (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5% faster at `-O2` and
+      12.5% at `-O3`, `as` 10%. A generic arch is built as the real arch whose archive
+      it fetches (`arch-x64-7.1` builds `apollolake-7.1`), and an archive that exists
+      is not rebuilt, so `all-<dsm>` builds each one once, **`TOOLCHAIN_JOBS`** at a
+      time, and resumes where it stopped. An archive is written under a temporary
+      name, then renamed.
+    - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
+      `macros.mk`. See [Boolean values](../reference/macros.md#boolean-values).
+    - Nothing a package builds changes: builds keep using the archives as published.
+      The rust built with gcc 8.5 (`native/rustc-1.98`) comes with the switch that
+      uses that gcc (#7391).
+    - See [Building and publishing an
+      overlay](toolchain.md#building-and-publishing-an-overlay).
+    - Pull request: [#NEWPR](https://github.com/SynoCommunity/spksrc/pull/NEWPR)
+
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 
     - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to

@@ -55,6 +55,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
+| `spksrc.native-toolchain.mk` | Toolchain overlay producer (`native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-*`): `arch-<arch>-<dsm>`, `all-<dsm>`, profile-guided builds |
 | `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
 
@@ -187,10 +188,15 @@ spksrc.native-cc.mk
 spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
+spksrc.native-toolchain.mk    # toolchain overlay producer front-end
 spksrc.native/
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
-└── env-meson.mk
+├── env-meson.mk
+├── toolchain-binutils.mk     # NATIVE_TOOLCHAIN = binutils
+├── toolchain-gcc.mk          # NATIVE_TOOLCHAIN = gcc
+├── toolchain-pgo-sources.sh  # generates the PGO training sources
+└── toolchain-rust.mk         # NATIVE_TOOLCHAIN = rust
 
 # SPK assembly entry point
 spksrc.spk.mk
