@@ -1,0 +1,6 @@
+{
+  "name": "rtw88-8814au",
+  "description": "Realtek RTL8814AU adapters, with rtw88",
+  "comments": "rtw88, the mac80211 driver of these chips in Linux, built for kernels 5.4 and newer. An alternative to the rtl8814au profile: load one or the other.",
+  "modules": ["rtw_8814au"]
+}

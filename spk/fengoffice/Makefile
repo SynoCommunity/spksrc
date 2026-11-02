@@ -1,6 +1,6 @@
 SPK_NAME = fengoffice
 SPK_VERS = 3.11.13.11
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/fengoffice.png
 
 DEPENDS = cross/fengoffice
@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 DISPLAY_NAME = Feng Office
-CHANGELOG = "1. Update to v3.11.13.11.<br/>2. Use PHP 8.3 on DSM 7.2."
+CHANGELOG = "1. Update to v3.11.13.11. <br/>2. Use PHP 8.3 on DSM 7.2. <br/>3. Fix clean installs and preserve configuration and uploads during upgrades."
 
 HOMEPAGE = https://www.fengoffice.com/
 LICENSE = AGPL

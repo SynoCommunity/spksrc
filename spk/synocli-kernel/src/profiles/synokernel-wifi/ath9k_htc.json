@@ -1,0 +1,5 @@
+{
+  "name": "ath9k_htc",
+  "description": "Atheros AR9271 and AR7010 adapters: TP-Link TL-WN722N v1, Alfa AWUS036NHA, Netgear WNA1100 and others",
+  "modules": ["ath9k_htc"]
+}

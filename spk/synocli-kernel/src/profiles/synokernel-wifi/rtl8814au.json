@@ -1,0 +1,6 @@
+{
+  "name": "rtl8814au",
+  "description": "Realtek RTL8814AU adapters",
+  "comments": "Driver of the Linux community for the Realtek chip. Kernels 4.4 and newer.",
+  "modules": ["8814au"]
+}

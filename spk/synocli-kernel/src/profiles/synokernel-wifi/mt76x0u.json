@@ -1,0 +1,5 @@
+{
+  "name": "mt76x0u",
+  "description": "MediaTek MT7610U and MT7650U adapters: TP-Link Archer T2U v1 and others",
+  "modules": ["mt76x0u"]
+}

@@ -66,6 +66,10 @@ KERNEL_DEPEND = $(KO_ARCH)-$(KO_TCVERSION)
 else
 KERNEL_DEPEND = $(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(filter $(LEGACY_ARCHS),$(AVAILABLE_KERNEL)))
 REMOVE_FROM_GENERIC_ARCHS += $(filter-out $(patsubst %-$(KO_TCVERSION),%,$(KERNEL_DEPEND)),$(TC_ARCH))
+# A generic arch none of whose sub-archs has a kernel the package supports
+ifeq ($(or $(filter 1,$(DEPENDENCY_WALK)),$(filter check,$(MAKECMDGOALS)),$(if $(KO_TCVERSION),,1),$(strip $(KERNEL_DEPEND))),)
+$(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME): none of its sub-archs is)
+endif
 endif
 
 # end REQUIRE_KERNEL_MODULE
@@ -93,6 +97,7 @@ kernel-depend:
 	      if ! $(MAKE) LOGGING_ENABLED=1 \
 	          WORK_DIR=$(CURDIR)/work$(ARCH_SUFFIX) \
 	          REQUIRE_KERNEL_MODULE="$(REQUIRE_KERNEL_MODULE)" \
+	          REQUIRE_KERNEL_OPTION="$(REQUIRE_KERNEL_OPTION)" \
 	          ARCH=$$(echo $${depend} | cut -f1 -d-) \
 	          TCVERSION=$$(echo $${depend} | cut -f2 -d-) \
 	          -C ../../kernel/syno-$${depend} ; then \

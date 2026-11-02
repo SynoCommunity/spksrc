@@ -124,6 +124,33 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "October 29th 2026 — Kernel options for the modules, and their symbols across directories (#7678)"
+
+    - **`REQUIRE_KERNEL_OPTION`** sets `CONFIG_<option>=y|m|n` before the modules of
+      `REQUIRE_KERNEL_MODULE`: the menus they sit behind (DSM 7 kernels are built
+      without the wireless stack), or, `=n`, a built-in option the modules must not turn
+      on as it changes the structures of the running kernel. Such an option is left as
+      the kernel has it, and the build stops if `olddefconfig` turns it on all the same.
+      A `def_bool y` hiding it is dropped first: Synology's 3.10 BSP kernels force
+      `WIRELESS_EXT` with `WIRELESS`. The log lists the built-in options the modules
+      turned on and off.
+
+    - **The modules of a directory see the symbols of those built before it**:
+      `modules.symvers` gathers them, given to the next directories and to the
+      `driver/*` built against the kernel as `KBUILD_EXTRA_SYMBOLS`. `depends=` now
+      names modules of other directories (`mac80211` needs `cfg80211`), which
+      `synocli-kernelmodule` loads first.
+
+    - **A module whose directory the kernel lacks is skipped**, so a driver that moved
+      between kernels is listed once per directory; the fourth field of
+      `REQUIRE_KERNEL_MODULE` is read from the kernel's own config, and a module
+      without it is not enabled; `scripts/config` keeps the case of option names
+      (`MT76x0U`) where it can.
+
+    - **A generic build none of whose sub-archs the package supports stops**: a package
+      leaving out SRM (`UNSUPPORTED_ARCHS = $(SRM_ARCHS)`) is refused for `armv7-1.3`
+      instead of failing on an empty package.
+
 ??? note "October 29th 2026 — Out-of-tree kernel drivers, built per kernel: driver/ (#7656)"
 
     - **A kernel module spk carries the modules of every kernel of its arch**:

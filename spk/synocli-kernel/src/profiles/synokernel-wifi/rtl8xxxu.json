@@ -1,0 +1,5 @@
+{
+  "name": "rtl8xxxu",
+  "description": "Realtek RTL8188EU, RTL8192EU, RTL8723BU and other 802.11n adapters, with the driver of the kernel",
+  "modules": ["rtl8xxxu"]
+}
