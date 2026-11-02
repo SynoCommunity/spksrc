@@ -1,6 +1,10 @@
 ###############################################################################
 # spksrc.overlay/dist-arch.mk
 #
+# Which arch's archive an overlay downloads. A generic arch (x64, armv7, aarch64) uses the
+# toolchain of a real arch, so it uses that arch's overlay archive too: x64-6.2.4 takes the
+# one of x86-6.2.4, x64-7.1 the one of apollolake-7.1. Any other arch takes its own.
+#
 # $(call overlay_dist_arch,<arch>,<dsm>): the arch an overlay archive for <arch>-<dsm> is
 # named after. <arch> itself, unless its base toolchain is a generic one declaring several
 # TC_ARCH (x64, armv7, aarch64): then the real arch of the same DSM version whose base
