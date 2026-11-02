@@ -29,7 +29,7 @@ own wireless stack.
 |----------|-------|
 | Package Name | synokernel-wifi |
 | License | GPLv2 |
-| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.1 or newer (module loading and device profiles), [SynoCli WiFi Tools](synocli-wifi-tools.md) (connection) |
+| Dependencies | [SynoCli Kernel Tools](synocli-kernel.md) 2.1 or newer (module loading and device profiles), [SynoCli WiFi Tools](synocli-wifi.md) (connection) |
 
 ## Included Drivers
 
@@ -78,8 +78,8 @@ sudo -i iw dev
 
 ### Connecting to a network
 
-[SynoCli WiFi Tools](synocli-wifi-tools.md) connects the NAS, a dependency of
-this package: `synocli-wifi` and a profile per network, written by its
+[SynoCli WiFi Tools](synocli-wifi.md) connects the NAS, a dependency of
+this package: its `synocli-wifi` command and a profile per network, written by its
 installation wizard or by `synocli-wifi new`:
 
 ```bash
