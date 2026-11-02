@@ -134,4 +134,5 @@ Some commands require full paths. SynoCommunity packages install to `/var/packag
 ## See Also
 
 - [Troubleshooting](troubleshooting.md) - Common issues and solutions
+- [DSM Configuration](dsm-configuration.md) - User home directories and Synology diagnostic tools
 - [Synology KB: SSH Access](https://kb.synology.com/en-us/DSM/tutorial/How_to_login_to_DSM_with_root_permission_via_SSH_Telnet)

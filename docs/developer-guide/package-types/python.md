@@ -297,8 +297,33 @@ urllib3
 
 ### Include all dependencies
 
-Do not rely on pip resolving dependencies at install time. Generate the full
-set in a local virtualenv:
+Do not rely on pip resolving dependencies at install time. Use the helper to
+resolve the complete set and split it into pure-python and cross-compiled files:
+
+```bash
+tools/generate_requirements.sh "rdiff-backup[meta]==2.2.7" 314
+tools/generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
+tools/generate_requirements.sh "-r requirements.txt" 314
+```
+
+The helper uses `native/python<version>`, builds it if necessary, and writes:
+
+- `generated_requirements_all.txt`
+- `generated_requirements_crossenv.txt`
+- `generated_requirements_pure.txt`
+
+Packages already provided by the Python meta are written as comments. Use
+`--repo PATH` to point at another spksrc checkout and `--output-dir DIR` to
+write the generated files elsewhere. Copy the `crossenv` and `pure` results
+into the package's `src/` directory after reviewing them.
+
+For requirements containing environment markers or other whitespace-sensitive
+constraints, put them in a `requirements.txt` and use `-r`. The direct package
+argument is treated as simple whitespace-separated requirements. Generated
+files still need review for toolchain-specific holds, such as cryptography or
+orjson versions limited by the available Rust compiler.
+
+If you prefer to do this manually, generate the full set in a local virtualenv:
 
 ```bash
 pip install -r requirements.txt
