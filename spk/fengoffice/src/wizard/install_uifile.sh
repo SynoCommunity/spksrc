@@ -122,20 +122,6 @@ EOF
     echo "$validator" | quote_json
 }
 
-# Check for multiple PHP profiles
-check_php_profiles ()
-{
-    SC_PKG_PREFIX="com-synocommunity-packages-"
-    SC_PKG_NAME="${SC_PKG_PREFIX}${SYNOPKG_PKGNAME}"
-    PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
-        jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-        return 0  # true
-    else
-        return 1  # false
-    fi
-}
-
 PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
 {
 	"step_title": "Feng Office installation type",
@@ -224,22 +210,9 @@ PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
 EOF
 )
 
-PAGE_PHP_PROFILES=$(/bin/cat<<EOF
-{
-    "step_title": "Multiple PHP profiles",
-    "items": [{
-        "desc": "Attention: Multiple PHP profiles detected; the package webpage will not display until a DSM restart is performed to load new configurations."
-    }]
-}
-EOF
-)
-
 main () {
     local install_page=""
     install_page=$(page_append "$install_page" "$PAGE_INSTALL_CONFIG")
-    if check_php_profiles; then
-        install_page=$(page_append "$install_page" "$PAGE_PHP_PROFILES")
-    fi
     echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
 
