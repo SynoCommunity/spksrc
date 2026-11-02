@@ -45,13 +45,13 @@ OVERLAY_BINUTILS_VERS  ?= 2.30
 
 # ---- AVAILABLE ---------------------------------------------------------------------
 # Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
-# "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
+# "this arch has no overlay" (standard arch) from "not that version" (mis-set knob). The
+# rust built with a gcc overlay is installed but not selected: builds use the vendor gcc.
 _OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-*)
 _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-*)
 _OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_gcc-*)
-# The rust built with a gcc overlay is installed but not selected: builds use the vendor gcc.
 TC_OVERLAY_RUSTC      := $(filter-out $(patsubst $(_OVERLAY_TC)_gcc-%,\%_gcc-%,$(notdir $(_OVERLAY_GCC_ANY))),\
-                           $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*))
+                         $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*))
 TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
 
 # Every overlay of the arch, installed and cleaned with its base toolchain whether a build
