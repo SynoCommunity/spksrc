@@ -7,6 +7,7 @@ PKG_DIR = $(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 DEPENDS =
+BUILD_DEPENDS = cross/bicbucstriim-styles
 
 HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim/
 COMMENT  = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
