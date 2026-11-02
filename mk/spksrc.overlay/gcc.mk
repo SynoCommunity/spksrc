@@ -18,21 +18,21 @@ COMMENT  = GNU Compiler Collection
 LICENSE  = GPLv3
 
 INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = gcc-overlay-link
+POST_INSTALL_TARGET = gcc_post_install
 
 # The base toolchain's sysroot, under whichever name its layout uses, and the binutils
 # overlay beside this one.
 GCC_SYSROOT_DIR  = $(firstword $(wildcard $(addprefix $(abspath $(CURDIR)/../../toolchain/$(OVERLAY_TC)/work/$(TC_TARGET)/$(TC_TARGET))/,sys-root sysroot libc)))
 GCC_BINUTILS_DIR = $(firstword $(wildcard $(abspath $(CURDIR)/..)/$(OVERLAY_TC)_binutils-*))
 
-.PHONY: gcc-overlay-link
-gcc-overlay-link: gcc-overlay-sysroot gcc-overlay-as-ld gcc-overlay-drop-la
+.PHONY: gcc_post_install
+gcc_post_install: gcc_link_sysroot gcc_link_as_ld gcc_drop_la
 	@$(MSG) "gcc overlay: linked sysroot + as/ld from $(notdir $(GCC_BINUTILS_DIR))"
 
 # gcc was configured --with-sysroot=<prefix>/<target>/<suffix>, which is what makes it
 # relocatable; this link is what makes that path real.
-.PHONY: gcc-overlay-sysroot
-gcc-overlay-sysroot:
+.PHONY: gcc_link_sysroot
+gcc_link_sysroot:
 	@test -n "$(GCC_SYSROOT_DIR)" || { $(MSG) "gcc overlay: no sysroot under toolchain/$(OVERLAY_TC)" ; exit 1 ; }
 	@mkdir -p $(INSTALL_DIR)/usr/local/$(TC_TARGET)
 	@ln -sfn $(GCC_SYSROOT_DIR) $(INSTALL_DIR)/usr/local/$(TC_TARGET)/$(notdir $(GCC_SYSROOT_DIR))
@@ -40,8 +40,8 @@ gcc-overlay-sysroot:
 # gcc's driver looks in libexec/gcc/<target>/<vers>/ before PATH, and picks up the HOST
 # assembler if nothing is there. The -B shim covers compiles that carry CFLAGS; this
 # covers the ones that do not.
-.PHONY: gcc-overlay-as-ld
-gcc-overlay-as-ld:
+.PHONY: gcc_link_as_ld
+gcc_link_as_ld:
 	@test -n "$(GCC_BINUTILS_DIR)" || { $(MSG) "gcc overlay: no binutils overlay beside $(OVERLAY_TC)" ; exit 1 ; }
 	@gccexec=$(INSTALL_DIR)/usr/local/libexec/gcc/$(TC_TARGET)/$(PKG_VERS) ; \
 	 mkdir -p $${gccexec} ; \
@@ -50,6 +50,6 @@ gcc-overlay-as-ld:
 	 done
 
 # libtool archives bake the producer's DESTDIR into libdir; unusable here.
-.PHONY: gcc-overlay-drop-la
-gcc-overlay-drop-la:
+.PHONY: gcc_drop_la
+gcc_drop_la:
 	@find $(INSTALL_DIR) -name '*.la' -delete

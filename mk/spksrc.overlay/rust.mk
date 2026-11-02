@@ -17,7 +17,7 @@ COMMENT  = A language empowering everyone to build reliable and efficient softwa
 LICENSE  = Apache-2.0, MIT licenses
 
 INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = rust-postinstall
+POST_INSTALL_TARGET = rust_post_install
 
 # The toolchain id, which must match overlay-rustc.mk's _RUST_TC_ID: the triple is the
 # same arch map a package build reads (env-rust.mk), vendor field "synology". The map
@@ -25,8 +25,8 @@ POST_INSTALL_TARGET = rust-postinstall
 OVERLAY_LATE_INCLUDES += ../../mk/spksrc.cross/env-rust.mk
 RUST_TC_ID = $(PKG_VERS)-$(subst -unknown-,-synology-,$(RUST_TARGET))-$(TC_ARCH)-$(TC_VERS)-gcc$(OVERLAY_RUST_GCC)
 
-.PHONY: rust-postinstall
-rust-postinstall:
+.PHONY: rust_post_install
+rust_post_install:
 	@$(MSG) "Rust toolchain $(RUST_TC_ID) staged in $(RUSTUP_HOME)/toolchains"
 	@export PATH="$(CARGO_HOME)/bin:$${PATH}" ; \
 	which rustup ; \
