@@ -33,6 +33,30 @@ ADDITIONAL_CFLAGS += -std=gnu99
 endif
 ```
 
+## Boolean values
+
+A switch may be written `1`/`0`, `y`/`n`, `yes`/`no`, `true`/`false` or `on`/`off`, in any
+case. Empty is false: an unset switch is off.
+
+| Macro | Returns |
+|-------|---------|
+| `$(call is_true,VALUE)` | a non-empty word when VALUE is true, empty otherwise -- for `$(if ...)` |
+| `$(call is_false,VALUE)` | a non-empty word when VALUE is false or empty |
+| `$(call bool,VALUE[,NAME])` | `TRUE` or `FALSE` -- for `ifeq`; **stops the build** on any other value, naming `NAME` |
+
+```makefile
+# Validates as it reads: OVERLAY_GCC=maybe stops with "OVERLAY_GCC: invalid boolean value 'maybe'"
+ifeq ($(call bool,$(OVERLAY_GCC),OVERLAY_GCC),TRUE)
+...
+endif
+
+# Inside an expression
+ACTIVE = $(if $(call is_true,$(PSTAT)),1)
+```
+
+`bool` is the one to use where a typo must not silently read as "off". `$(call lower,TEXT)`,
+which they rely on, lower-cases ASCII letters without a fork.
+
 ## Dependencies
 
 `$(call depend,...)` declares a dependency the build takes **where it can**, with the

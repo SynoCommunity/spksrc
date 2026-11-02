@@ -316,7 +316,7 @@ Overlay code sits at four levels, by role, each read by a different Makefile:
 | **Decide** | `mk/spksrc.common/overlay.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
 | **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk`, `dist-arch.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
 | **Use** | `mk/spksrc.toolchain/overlay-binutils.mk`, `overlay-rustc.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
-| **Produce** | `native/rustc-<version>`, `native/binutils-2.30` | a maintainer, by hand: build an archive to publish | [Publishing an archive](#publishing-an-archive), [Building Rust](#building-rust) |
+| **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
 
 The base toolchain ties the first three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the active ones. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
 
@@ -359,11 +359,30 @@ TC_OVERLAY_BINUTILS :=          # empty: the narrow rust link only, not the glob
 
 Both carry **active** semantics — the path when that overlay drives the build, empty otherwise. The narrow rust-link use shows up instead as a `-Clink-arg=-B<shim>` in the Rust link flags. The `OVERLAY_<c>` switches are deliberately not exported: a package includes `tc_vars.mk`, so it would inherit the previous run's choice and the switch would go sticky.
 
-### Publishing an archive
+### Building and publishing an overlay
+
+```bash
+make -C native/gcc-8.5 arch-qoriq-6.2.4                    # one (arch, DSM): build, then archive
+make -C native/gcc-8.5 TOOLCHAIN_JOBS=4 all-6.2.4          # every arch with an overlay, four at a time
+make -C native/binutils-2.30 TOOLCHAIN_PGO=0 arch-x86-5.2  # one plain pass instead of two
+make -C native/rustc-1.82 all-5.2
+```
+
+A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native/toolchain-<component>.mk`.
+
+A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2.4` builds `x86-6.2.4`, `arch-x64-7.1` builds `apollolake-7.1`. `all-<dsm>` builds every arch that has an overlay of the component, each real arch once. An arch whose archive already exists is skipped -- nothing to do -- so a batch stopped by a failure resumes where it stopped; remove the `.txz` to rebuild one. An archive is written under a temporary name and renamed once complete, so an interrupted build never leaves a truncated file under the final name.
+
+| Knob | Default | Effect |
+|------|---------|--------|
+| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources, rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
+| `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
+
+The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc builds `native/binutils-2.30` for the same `(arch, DSM)` first, and reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain.
 
 The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
 
-1. Build the archive with its producer in `native/`, under the new revision (`PKG_REV=vN`).
+1. Bump `PKG_REV` in the producer (`native/<component>/Makefile`) and build.
 2. Upload the `.txz` to its release.
 3. Bump `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`).
 
@@ -380,7 +399,7 @@ make -C native/rustc-1.82 arch-ppc853x-5.2  # one arch
 make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 ```
 
-You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Publishing an archive](#publishing-an-archive).
+You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).
 
 ## Troubleshooting
 
