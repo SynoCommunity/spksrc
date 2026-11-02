@@ -30,15 +30,10 @@ OVERLAY_GCC_BIN = $(TC_OVERLAY_GCC)/work/install/usr/local/bin
 # gcc-8.5.0 alias with no g++ beside it, which is why PKG_VERS is not the answer here.
 OVERLAY_GCC_SUFFIX = $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
 
-# Provision the gcc overlay as a normal DEPENDS, symmetric with the binutils consumer.
-ifeq ($(OVERLAY_GCC_ON),1)
-DEPENDS += overlay/$(notdir $(TC_OVERLAY_GCC))
-endif
-
-# Provision at tcvars time, not only through the toolchain's DEPENDS above: _all is skipped
-# once the toolchain cookie exists, so a package that switches OVERLAY_GCC on afterwards
-# would otherwise have tc_vars point at a consumer that was never extracted -- and the
-# version suffix, read by wildcard from that directory, would come back empty.
+# Provision at tcvars time too, not only through the toolchain's DEPENDS (TC_OVERLAY_ALL):
+# _all is skipped once the toolchain cookie exists, so a package that switches OVERLAY_GCC
+# on afterwards would otherwise have tc_vars point at a consumer that was never extracted --
+# and the version suffix, read by wildcard from that directory, would come back empty.
 .PHONY: overlay-gcc-install
 ifeq ($(OVERLAY_GCC_ON),1)
 overlay-gcc-install:

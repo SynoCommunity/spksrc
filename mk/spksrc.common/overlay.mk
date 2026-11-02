@@ -112,6 +112,10 @@ TC_OVERLAY_RUSTC      := $(if $(call is_true,$(OVERLAY_GCC)),\
 TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
 TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
+# Every overlay of the arch, installed and cleaned with its base toolchain whether a build
+# uses it or not. binutils first: the gcc overlay links its as/ld at install time.
+TC_OVERLAY_ALL        := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_ENABLED)
+
 # The as/ld version the GLOBAL overlay supplies, as the consumer's own PKG_VERS -- what
 # tc-capability.mk reports for TC_BINUTILS when the overlay drives this build, so a
 # MIN_BINUTILS_VERSION floor measures the linker the compile will really use rather than
@@ -207,7 +211,6 @@ OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(_OVERLAY_BINUTILS_ASKED
 # counts only where the arch ships a gcc overlay: elsewhere the default OVERLAY_GCC=1 asks
 # for nothing, and must not announce a missing binutils on every build of a 7.2 arch.
 _OVERLAY_BINUTILS_WANTED    = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(if $(strip $(TC_OVERLAY_GCC)),$(call is_true,$(OVERLAY_GCC))),1)
-OVERLAY_BINUTILS_PROVISION  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_WANTED))
 
 # ---- Degraded states, and what to say about them ------------------------------------
 # Disjoint by construction, so the order they are reported in carries no meaning. There is

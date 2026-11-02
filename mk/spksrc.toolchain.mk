@@ -187,12 +187,12 @@ ifeq ($(OVERLAY_RUSTC_ON),1)
 TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 endif
 
-# ALL of them, not the one this context happens to select: the choice is per PACKAGE --
-# an spk with the gcc overlay takes the rustc built against it, one without takes the
-# vendor build -- while this toolchain is built once per run. Provisioning only the first
-# left python314 asking rustup for a toolchain nobody had installed.
-ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED)),)
-DEPENDS += $(addprefix overlay/,$(notdir $(_OVERLAY_RUSTC_ENABLED)))
+# Every overlay the arch ships, as a consumer-dir DEPENDS, whether a build uses it or not:
+# installed with the toolchain, cleaned with it (overlay-binutils.mk). The choice of one is
+# per PACKAGE -- the rust built with the gcc overlay or the vendor one -- while this
+# toolchain is built once per run.
+ifneq ($(strip $(TC_OVERLAY_ALL)),)
+DEPENDS += $(addprefix overlay/,$(notdir $(TC_OVERLAY_ALL)))
 endif
 
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the shim

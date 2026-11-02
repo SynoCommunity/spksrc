@@ -17,10 +17,10 @@ COMMENT  = GNU Binutils
 LICENSE  = GPLv3
 
 INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = binutils-shim
+POST_INSTALL_TARGET = binutils-post_install
 
-.PHONY: binutils-shim
-binutils-shim:
+.PHONY: binutils-post_install
+binutils-post_install:
 	@mkdir -p $(WORK_DIR)/shim
 	@ln -sf $(INSTALL_DIR)/usr/local/bin/$(TC_TARGET)-ld $(WORK_DIR)/shim/ld
 	@ln -sf $(INSTALL_DIR)/usr/local/bin/$(TC_TARGET)-as $(WORK_DIR)/shim/as

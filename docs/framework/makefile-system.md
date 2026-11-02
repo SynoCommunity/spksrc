@@ -55,7 +55,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
-| `spksrc.overlay.mk` | Toolchain overlay consumer: the `overlay/syno-<arch>-<dsm>_<component>-<vers>` directory a base toolchain depends on |
+| `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
 
 ### Build System Adapters
@@ -136,7 +136,7 @@ spksrc.common/
 ├── help.mk                   # context-aware `make help` inside a package
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros
-├── overlay.mk                # OVERLAY_<c> switches: available / requested / active
+├── overlay.mk                # overlay decisions: available, requested, active
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
 
 # Build pipeline — the per-package steps
@@ -198,14 +198,6 @@ spksrc.native/
 ├── toolchain-pgo-sources.sh  # generates the PGO training sources
 └── toolchain-rust.mk         # NATIVE_TOOLCHAIN = rust
 
-# Toolchain overlay consumer entry point (an overlay/ directory includes it)
-spksrc.overlay.mk
-spksrc.overlay/
-├── binutils.mk
-├── dist-arch.mk              # the arch an archive is named after (generic archs share)
-├── gcc.mk
-└── rust.mk
-
 # SPK assembly entry point
 spksrc.spk.mk
 spksrc.spk/
@@ -250,9 +242,9 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
-├── overlay-binutils.mk       # binutils 2.30 overlay (as/ld); OVERLAY_ family base
-├── overlay-gcc.mk            # gcc 8.5 overlay (OVERLAY_GCC)
-├── overlay-rustc.mk          # custom from-source rustc overlay (OVERLAY_RUSTC)
+├── overlay-binutils.mk       # uses the binutils overlay (shim, -B), cleans every overlay
+├── overlay-gcc.mk            # uses the gcc overlay (version suffix, OVERLAY_GCC)
+├── overlay-rustc.mk          # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk

@@ -18,29 +18,38 @@ COMMENT  = GNU Compiler Collection
 LICENSE  = GPLv3
 
 INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = gcc-overlay-link
+POST_INSTALL_TARGET = gcc-post_install
 
 # The base toolchain's sysroot, under whichever name its layout uses, and the binutils
 # overlay beside this one.
 GCC_SYSROOT_DIR  = $(firstword $(wildcard $(addprefix $(abspath $(CURDIR)/../../toolchain/$(OVERLAY_TC)/work/$(TC_TARGET)/$(TC_TARGET))/,sys-root sysroot libc)))
 GCC_BINUTILS_DIR = $(firstword $(wildcard $(abspath $(CURDIR)/..)/$(OVERLAY_TC)_binutils-*))
 
-#   sysroot   gcc was configured --with-sysroot=<prefix>/<target>/<suffix>, which is what
-#             makes it relocatable; this link is what makes that path real.
-#   as / ld   gcc's driver looks in libexec/gcc/<target>/<vers>/ before PATH, and picks up
-#             the HOST assembler if nothing is there. The -B shim covers compiles that
-#             carry CFLAGS; this covers the ones that do not.
-#   *.la      libtool archives bake the producer's DESTDIR into libdir; unusable here.
-.PHONY: gcc-overlay-link
-gcc-overlay-link:
-	@test -n "$(GCC_SYSROOT_DIR)"  || { $(MSG) "gcc overlay: no sysroot under toolchain/$(OVERLAY_TC)" ; exit 1 ; }
-	@test -n "$(GCC_BINUTILS_DIR)" || { $(MSG) "gcc overlay: no binutils overlay beside $(OVERLAY_TC)" ; exit 1 ; }
+.PHONY: gcc-post_install
+gcc-post_install: gcc-link_sysroot gcc-link_as_ld gcc-drop_la
+	@$(MSG) "gcc overlay: linked sysroot + as/ld from $(notdir $(GCC_BINUTILS_DIR))"
+
+# gcc was configured --with-sysroot=<prefix>/<target>/<suffix>, which is what makes it
+# relocatable; this link is what makes that path real.
+.PHONY: gcc-link_sysroot
+gcc-link_sysroot:
+	@test -n "$(GCC_SYSROOT_DIR)" || { $(MSG) "gcc overlay: no sysroot under toolchain/$(OVERLAY_TC)" ; exit 1 ; }
 	@mkdir -p $(INSTALL_DIR)/usr/local/$(TC_TARGET)
 	@ln -sfn $(GCC_SYSROOT_DIR) $(INSTALL_DIR)/usr/local/$(TC_TARGET)/$(notdir $(GCC_SYSROOT_DIR))
+
+# gcc's driver looks in libexec/gcc/<target>/<vers>/ before PATH, and picks up the HOST
+# assembler if nothing is there. The -B shim covers compiles that carry CFLAGS; this
+# covers the ones that do not.
+.PHONY: gcc-link_as_ld
+gcc-link_as_ld:
+	@test -n "$(GCC_BINUTILS_DIR)" || { $(MSG) "gcc overlay: no binutils overlay beside $(OVERLAY_TC)" ; exit 1 ; }
 	@gccexec=$(INSTALL_DIR)/usr/local/libexec/gcc/$(TC_TARGET)/$(PKG_VERS) ; \
 	 mkdir -p $${gccexec} ; \
 	 for tool in as ld ; do \
 	   ln -sf $(GCC_BINUTILS_DIR)/work/install/usr/local/bin/$(TC_TARGET)-$${tool} $${gccexec}/$${tool} ; \
 	 done
+
+# libtool archives bake the producer's DESTDIR into libdir; unusable here.
+.PHONY: gcc-drop_la
+gcc-drop_la:
 	@find $(INSTALL_DIR) -name '*.la' -delete
-	@$(MSG) "gcc overlay: linked sysroot + as/ld from $(notdir $(GCC_BINUTILS_DIR))"

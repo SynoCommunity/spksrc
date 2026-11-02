@@ -36,24 +36,16 @@ OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHI
 # generic clean; the consumers go through native-install.mk, so this never recurses. The last
 # message labels the base's own rm, which the generic recipe prints unlabelled right after --
 # otherwise it reads as a second pass over the last consumer.
-# Every rust consumer, as the toolchain provisions every one (spksrc.toolchain.mk): cleaning
-# only the selected one left the others' cached cookies, and their rustup link, never redone.
-ifneq ($(strip $(_OVERLAY_RUSTC_ENABLED) $(TC_OVERLAY_BINUTILS) $(TC_OVERLAY_GCC)),)
+ifneq ($(strip $(TC_OVERLAY_ALL)),)
 clean: clean-overlay-consumers
 .PHONY: clean-overlay-consumers
 clean-overlay-consumers:
-	@for d in $(_OVERLAY_RUSTC_ENABLED) $(TC_OVERLAY_BINUTILS) $(TC_OVERLAY_GCC) ; do \
+	@for d in $(TC_OVERLAY_ALL) ; do \
 	  if [ -d "$$d" ] ; then $(MSG) "clean consumer $$(basename $$d)" ; $(MAKE) --no-print-directory -C "$$d" clean ; fi ; \
 	done
 	@$(MSG) "clean toolchain $(TC)"
 endif
 
-
-# Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
-# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer).
-ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
-DEPENDS += overlay/$(notdir $(TC_OVERLAY_BINUTILS))
-endif
 
 # Same reason as overlay-gcc-install: an arch with no rust consumer has nothing else
 # pulling this in once the toolchain cookie exists.
