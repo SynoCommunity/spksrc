@@ -37,12 +37,12 @@ pre_status_target:
 status_target:  $(PRE_STATUS_TARGET)
 ifeq ($(notdir $(abspath $(CURDIR)/..)),native)
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(STATUS_LOG)
-else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
+else ifneq ($(filter toolchain overlay,$(notdir $(abspath $(CURDIR)/..))),)
 	@# The directory name carries the whole identity, overlays included: syno-aarch64-6.2.4
 	@# -> aarch64-6.2.4, syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3 -> qoriq-6.2.4_rust-1.82_gcc-4.9.3.
 	@# TC_NAME/TC_ARCH cannot do this: a consumer sets no TC_NAME, and on the generic toolchains
 	@# TC_ARCH is the reference model (rtd1296, apollolake) rather than the arch name.
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(patsubst syno-%,%,$(notdir $(CURDIR)))" "toolchain") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(patsubst syno-%,%,$(notdir $(CURDIR)))" "$(notdir $(abspath $(CURDIR)/..))") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TK_NAME)))-$(TK_VERS)" "toolkit") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),kernel)

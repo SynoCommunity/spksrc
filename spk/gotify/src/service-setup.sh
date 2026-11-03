@@ -10,6 +10,6 @@ if [ -r "${ENV_VARIABLES}" ]; then
     . "${ENV_VARIABLES}"
 fi
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/gotify-server"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/gotify-server serve"
 SVC_BACKGROUND=yes
 SVC_WRITE_PID=yes
