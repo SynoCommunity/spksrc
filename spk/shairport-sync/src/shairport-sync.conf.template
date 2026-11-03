@@ -18,7 +18,6 @@ general =
 
 diagnostics =
 {
-  log_output_to = "syslog";
   // log_verbosity = 1; // Uncomment for detailed logging
   // statistics = "yes"; // Uncomment to see audio frame statistics
 };
