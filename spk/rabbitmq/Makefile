@@ -10,7 +10,7 @@ SPK_DEPENDS = "erlang>=26.2:erlang<29.2"
 MAINTAINER = DigitalBox98
 DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. From T-Mobile to Runtastic, RabbitMQ is used worldwide at small startups and large enterprises. RabbitMQ is lightweight and easy to deploy on premises and in the cloud. It supports multiple messaging protocols. RabbitMQ can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements.
 DISPLAY_NAME = RabbitMQ
-CHANGELOG = "1. Widen Erlang dependency for upgrade to RabbitMQ 4.3.7. <br/>2. Intermediate upgrade step for RabbitMQ 4.4.0."
+CHANGELOG = "1. Update to v4.2.8. <br/>2. Intermediate upgrade step for RabbitMQ 4.4.0."
 
 HOMEPAGE = https://www.rabbitmq.com
 LICENSE = MPL 2.0
