@@ -111,7 +111,7 @@ RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils
 _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
-# name. Must match the consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
+# name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # overlay-rustc.mk's _RUST_TC_ID on the package-build side.
 _RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 

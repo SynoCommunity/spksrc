@@ -2,7 +2,7 @@
 # 
 --- ./mcs/class/corlib/System/Environment.cs.orig	2018-02-17 20:23:18.195842002 +0100
 +++ ./mcs/class/corlib/System/Environment.cs	2018-02-17 20:27:50.300067318 +0100
-@@ -676,7 +676,7 @@
+@@ -677,7 +677,7 @@
  			case SpecialFolder.MyVideos:
  				return ReadXdgUserDir (config, home, "XDG_VIDEOS_DIR", "Videos");
  			case SpecialFolder.CommonTemplates:
@@ -11,7 +11,7 @@
  			case SpecialFolder.Fonts:
  				if (Platform == PlatformID.MacOSX)
  					return Path.Combine (home, "Library", "Fonts");
-@@ -739,7 +739,7 @@
+@@ -740,7 +740,7 @@
  				return String.Empty;
  			// This is where data common to all users goes
  			case SpecialFolder.CommonApplicationData:

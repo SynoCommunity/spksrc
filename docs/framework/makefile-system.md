@@ -55,6 +55,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
+| `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
 
 ### Build System Adapters
@@ -134,6 +135,7 @@ spksrc.common/
 ├── help.mk                   # context-aware `make help` inside a package
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros
+├── overlay.mk                # overlay decisions: available, requested, active
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
 
 # Build pipeline — the per-package steps
@@ -234,8 +236,8 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
-├── overlay-binutils.mk       # binutils 2.30 overlay (as/ld); OVERLAY_ family base
-├── overlay-rustc.mk          # custom from-source rustc overlay (OVERLAY_RUSTC)
+├── overlay-binutils.mk       # uses the binutils overlay (shim, -B), cleans every overlay
+├── overlay-rustc.mk          # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk
@@ -243,6 +245,14 @@ spksrc.toolchain/
 ├── tc-url.mk
 ├── tc-versions.mk
 └── tc_vars.mk                # generates the tc_vars* files
+
+# Overlay consumer entry point (an overlay/ directory includes it)
+spksrc.overlay.mk             # reads arch, DSM and component off the directory name
+spksrc.overlay/
+├── binutils.mk               # download, extract, as/ld shim
+├── dist-arch.mk              # the arch whose archive a generic arch downloads
+├── gcc.mk                    # download, extract, link sysroot and as/ld
+└── rust.mk                   # download, extract, rustup toolchain link
 
 # Toolkit entry point (only via REQUIRE_TOOLKIT)
 spksrc.toolkit.mk
