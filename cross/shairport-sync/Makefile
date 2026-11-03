@@ -17,7 +17,9 @@ ifeq ($(SHAIRPORT_AIRPLAY2),1)
 BUILD_DEPENDS = native/xxd native/libplist
 XXD_PATH = $(abspath $(PWD)/../../native/xxd/work-native/install/usr/local/bin)
 PLISTUTIL_PATH = $(abspath $(PWD)/../../native/libplist/work-native/install/usr/local/bin)
+PLISTUTIL_LIB = $(abspath $(PWD)/../../native/libplist/work-native/install/usr/local/lib)
 ENV += PATH=$(XXD_PATH):$(PLISTUTIL_PATH):$$PATH
+ENV += LD_LIBRARY_PATH=$(PLISTUTIL_LIB):$$LD_LIBRARY_PATH
 DEPENDS += cross/nqptp
 DEPENDS += cross/libplist
 DEPENDS += cross/libsodium
