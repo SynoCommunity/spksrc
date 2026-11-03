@@ -82,7 +82,7 @@ service_postinst ()
     fi
 
     # Generate the configuration only on install; preserve it on upgrade.
-    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ] || [ ! -f "${CFG_FILE}" ]; then
         # Copy config template to var directory and apply wizard settings
         if [ -e "${CFG_TEMPLATE}" ]; then
             cp "${CFG_TEMPLATE}" "${CFG_FILE}"
