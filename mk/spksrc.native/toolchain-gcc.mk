@@ -233,9 +233,11 @@ _GCC_PGO_SFX = -$(basename $(PKG_VERS))
 
 .PHONY: gcc-pgo-train
 gcc-pgo-train: toolchain-pgo-sources
-	@$(MSG) "*** PGO: training on train.c and train.cpp"
+	@$(MSG) "*** PGO: training on train.c, train.cpp and train.f90"
 	@cd $(TOOLCHAIN_PGO_SOURCES) && \
 	  $(_GCC_PGO_BIN)gcc$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O2 -S -o /dev/null train.c && \
 	  $(_GCC_PGO_BIN)gcc$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O3 -S -o /dev/null train.c && \
-	  $(_GCC_PGO_BIN)g++$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O2 -S -o /dev/null train.cpp
+	  $(_GCC_PGO_BIN)g++$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O2 -S -o /dev/null train.cpp && \
+	  $(_GCC_PGO_BIN)gfortran$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O2 -S -o /dev/null train.f90 && \
+	  $(_GCC_PGO_BIN)gfortran$(_GCC_PGO_SFX) --sysroot=$(GCC_BUILD_SYSROOT) -O3 -S -o /dev/null train.f90
 	@$(MSG) "*** PGO: $$(find $(TOOLCHAIN_PGO_DIR) -name '*.gcda' 2>/dev/null | wc -l) counter files"
