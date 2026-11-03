@@ -454,7 +454,7 @@ A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2
 
 | Knob | Default | Effect |
 |------|---------|--------|
-| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources, rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources -- C, C++ and, for gcc, Fortran (`toolchain-pgo-sources.sh`) -- rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
 | `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
 | `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
 
