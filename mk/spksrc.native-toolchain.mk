@@ -24,7 +24,8 @@
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
 #   TC_EXTRACT_DIR  where tc-install lands the gcc toolchain (bin/, sysroot, ...)
 #   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
-#   tc-install   ensures the gcc toolchain (hence its sysroot) is extracted
+#   tc-install   runs the base toolchain's own build, overlays included, whose cookies make
+#                it a no-op once done; not a DEPENDS, which would hand it this WORK_DIR
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
 #   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (spksrc.rules/dist-arch.mk)
@@ -80,10 +81,10 @@ TC_GLIBC   := $(call _tc_get,TC_GLIBC)
 # components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
 TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
-# Prefix for running a binary of that toolchain: the C locale. The gcc 4.7.3 of x86-5.2
-# (and x64-5.2) aborts on a current host's locale data -- "loadlocale.c:129:
-# _nl_intern_locale_data: Assertion ... failed" -- on -v, -print-sysroot and every compile.
-# Inline, as toolchain-rustc.mk does for x.py: an export reaches $(shell) only from make 4.4.
+# Prefix for running a binary of that toolchain from $(shell): the C locale. The gcc 4.7.3
+# of x86-5.2 (and x64-5.2) aborts on a current host's locale data -- "loadlocale.c:129:
+# _nl_intern_locale_data: Assertion ... failed". spksrc.common.mk exports LC_ALL=C, which
+# reaches recipes, but $(shell) only from make 4.4.
 TC_VENDOR_ENV = LC_ALL=C
 
 # The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT

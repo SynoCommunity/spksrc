@@ -377,7 +377,7 @@ PKG_REV  = v5
 include ../../mk/spksrc.overlay.mk
 ```
 
-It downloads one archive into `distrib/overlay/<dsm>/`, as a toolchain does into `distrib/toolchain/<dsm>/`, and extracts it into its **own** `work/`, never the base toolchain's: that is what lets two builds of a component sit side by side, only the generated pointers deciding which one is used. A generic arch (`x64`, `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares -- `x64-6.2.4` that of `x86-6.2.4`, `x64-7.1` that of `apollolake-7.1` (`mk/spksrc.overlay/dist-arch.mk`).
+It downloads one archive into `distrib/overlay/<dsm>/`, as a toolchain does into `distrib/toolchain/<dsm>/`, and extracts it into its **own** `work/`, never the base toolchain's: that is what lets two builds of a component sit side by side, only the generated pointers deciding which one is used. A generic arch (`x64`, `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares -- `x64-6.2.4` that of `x86-6.2.4`, `x64-7.1` that of `apollolake-7.1` (`mk/spksrc.rules/dist-arch.mk`).
 
 An arch has an overlay exactly when such a directory exists for it: adding one is adding the directory and its `digests`.
 
@@ -392,7 +392,7 @@ Overlay code sits at four levels, by role, each read by a different Makefile:
 | Level | Files | Read by | See |
 |-------|-------|---------|-----|
 | **Decide** | `mk/spksrc.common/overlay.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
-| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk`, `dist-arch.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
+| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk`, `mk/spksrc.rules/dist-arch.mk` (shared with the producers) | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
 | **Use** | `mk/spksrc.toolchain/overlay-binutils.mk`, `overlay-rustc.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
 | **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
 
@@ -410,10 +410,12 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 
 | Switch | Default | Effect |
 |--------|---------|--------|
+| `OVERLAY_GCC` | `0` | gcc 8.5 beside the vendor gcc, with the binutils overlay it drives. Off for the tree; `native/rustc-1.98`, a rust built with gcc 8.5, turns it on for itself. |
 | `OVERLAY_RUSTC` | `1` | Custom from-source rustc + Synology triple. `0` falls back to stock `rustup` — diagnostic only: the archs that ship an overlay do so precisely because the stock std does not fit them. |
 | `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off. |
 | `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. |
-| `OVERLAY_RUSTC_VERS` | `1.82` | Which build to select, matching the consumer dir name. |
+| `OVERLAY_GCC_VERS` | `8.5` | Which gcc build to select, matching the consumer dir name. |
+| `OVERLAY_RUSTC_VERS` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
 | `OVERLAY_BINUTILS_VERS` | `2.30` | Idem. |
 
 `make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read *before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
@@ -446,7 +448,7 @@ make -C native/binutils-2.30 TOOLCHAIN_PGO=0 arch-x86-5.2  # one plain pass inst
 make -C native/rustc-1.82 all-5.2
 ```
 
-A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native/toolchain-<component>.mk`.
+A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native/toolchain-$(PKG_NAME).mk` (`gcc`, `binutils`, `rustc`).
 
 A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2.4` builds `x86-6.2.4`, `arch-x64-7.1` builds `apollolake-7.1`. `all-<dsm>` builds every arch that has an overlay of the component, each real arch once. An arch whose archive already exists is skipped -- nothing to do -- so a batch stopped by a failure resumes where it stopped; remove the `.txz` to rebuild one. An archive is written under a temporary name and renamed once complete, so an interrupted build never leaves a truncated file under the final name.
 
@@ -475,6 +477,7 @@ An arch opts in simply by having a rust overlay (`TC_OVERLAY_RUSTC`); the Synolo
 ```bash
 make -C native/rustc-1.82 arch-ppc853x-5.2  # one arch
 make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
+make -C native/rustc-1.98 all-6.2.4        # built with the gcc 8.5 overlay (OVERLAY_GCC)
 ```
 
 You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).

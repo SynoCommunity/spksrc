@@ -124,14 +124,14 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "November 2nd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
+??? note "November 3rd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
 
     - **What:** the producers of the overlay archives that master downloads since
       #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
       `native/binutils-2.30` and `native/rustc-1.82`, which now produce the archives
       the `overlay/` directories name: binutils `v4`, a generic arch's archive under
       the real arch it shares a toolchain with, in the `toolchains/dsm<dsm>` releases.
-    - **A producer is a version, a rev and a component name.** The three include
+    - **A producer is a version, a rev and a component name.** The producers include
       `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`,
       the host optimisation flags and the two profile-guided passes
       (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5% faster at `-O2` and
@@ -142,9 +142,19 @@ If you only read one thing, read this. The details are in the dated log below.
       name, then renamed.
     - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
       `macros.mk`. See [Boolean values](../reference/macros.md#boolean-values).
-    - Nothing a package builds changes: builds keep using the archives as published.
-      The rust built with gcc 8.5 (`native/rustc-1.98`) comes with the switch that
-      uses that gcc (#7391).
+    - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERS`, `TC_OVERLAY_GCC`,
+      `OVERLAY_GCC_ON`), off for the tree: the producer turns it on for itself.
+      Packages keep the vendor gcc, and the same rust.
+    - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
+      vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
+      depend on the caller's shell.
+    - `PKG_NAME` picks a producer's component (`toolchain-gcc.mk`,
+      `toolchain-binutils.mk`, `toolchain-rustc.mk`); `dist-arch.mk` moves to
+      `mk/spksrc.rules/`, shared by producers and overlays; `makefile_var`
+      (`macros.mk`) reads one variable a Makefile declares.
+    - Nothing a package builds changes otherwise: builds keep using the archives as
+      published.
     - See [Building and publishing an
       overlay](toolchain.md#building-and-publishing-an-overlay).
     - Pull request: [#7707](https://github.com/SynoCommunity/spksrc/pull/7707)
