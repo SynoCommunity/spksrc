@@ -123,39 +123,84 @@ directory. The `env -i` around an spk meta source is where one tree ends and the
 Two builds may therefore run side by side against the same toolchain — two SPKs, or a cross
 package built directly to test it — each with its own answer and no file to contend for.
 
+Each file has its own role, and a build reads only those it needs (`TC_VARS_ENV`, set in
+`mk/spksrc.cross/env-default.mk`): `tc_vars.mk` always, `tc_vars.autotools.mk` and
+`tc_vars.flags.mk` for an autotools build, `tc_vars.rust.mk` for every package, since any of
+them may build crates. CMake and Meson builds do not read the generic files directly: they get
+a file of their own, generated per dependency (below).
+
+The examples are those of `cross/zlib` for `qoriq-6.2.4`, shortened: `<spksrc>` is the
+checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e500v2-linux-gnuspe`.
+
+| File | Holds | Read by |
+|------|-------|---------|
+| `tc_vars.mk` | the toolchain's identity and versions: no compiler, no flags | every build |
+| `tc_vars.autotools.mk` | `TC_CONFIGURE_ARGS` and the environment of a cross build: `CC`, `CXX`, `AR`, `LD`, … and the `*FLAGS`, as `TC_ENV += …` | autotools builds |
+| `tc_vars.flags.mk` | `CFLAGS`, `CPPFLAGS`, `CXXFLAGS`, `LDFLAGS` as make variables | autotools builds, and the CMake and Meson file generators |
+| `tc_vars.rust.mk` | the cargo and rustup environment, per Rust target triple | every package |
+| `tc_vars.cmake` | the toolchain half of a CMake toolchain file | the per-dependency CMake toolchain file |
+| `tc_vars.meson-cross`, `tc_vars.meson-native` | the toolchain half of a Meson cross file, and the build machine's native file | the per-dependency Meson cross file |
+
 ### tc_vars.mk
 
-Core toolchain identity:
+What the toolchain is, as plain values: where it lives, its target and prefix, the ABI flags it
+declares, and the versions the capability floors compare against (`MIN_GCC_VERSION`,
+`MIN_KERNEL_VERSION`, …). The overlay pointers carry **active** semantics -- the path when that
+overlay drives the build, empty otherwise (see [Toolchain Overlays](#toolchain-overlays)).
 
 ```makefile
-TC_NAME     = x86_64-pc-linux-gnu
-TC_PREFIX   = /path/to/toolchain/work/x86_64-pc-linux-gnu/bin/
-TC_PATH     = $(TC_PREFIX)/bin
-TC_SYSROOT  = x86_64-pc-linux-gnu/sys-root
-TC_CC       = $(TC_PREFIX)x86_64-pc-linux-gnu-gcc
-TC_CXX      = $(TC_PREFIX)x86_64-pc-linux-gnu-g++
-TC_AR       = $(TC_PREFIX)x86_64-pc-linux-gnu-ar
-TC_LD       = $(TC_PREFIX)x86_64-pc-linux-gnu-ld
-TC_STRIP    = $(TC_PREFIX)x86_64-pc-linux-gnu-strip
+TC_TYPE := DSM
+TC_WORK_DIR := <spksrc>/toolchain/syno-qoriq-6.2.4/work
+TC_SYSROOT := powerpc-e500v2-linux-gnuspe/sysroot
+TC_TARGET := powerpc-e500v2-linux-gnuspe
+TC_PREFIX := powerpc-e500v2-linux-gnuspe-
+TC_PATH := <tc>/bin/
+TC_INCLUDE := powerpc-e500v2-linux-gnuspe/sysroot/usr/include
+TC_LIBRARY := powerpc-e500v2-linux-gnuspe/sysroot/lib
+TC_EXTRA_BUILD_FLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_EXTRA_CFLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
+...                                  # TC_EXTRA_CPPFLAGS, CXXFLAGS, FFLAGS, LDFLAGS, RUSTFLAGS
+TC_VERS := 6.2.4
+TC_BUILD := 25556
+TC_OS_MIN_VER := 6.2-25556
+TC_ARCH := qoriq
+TC_GCC := 4.9.3
+TC_GLIBC := 2.20
+TC_BINUTILS := 2.25
+TC_OVERLAY_RUSTC := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
+TC_OVERLAY_BINUTILS :=
+TC_OVERLAY_BINUTILS_PATH :=
+TC_KERNEL := 2.6.32
 ```
 
 ### tc_vars.autotools.mk
 
-Autotools (configure) adapter:
+The configure arguments, and the whole environment an autotools build runs under: every tool
+with its absolute path, the flags, and the `*_FOR_BUILD` set for what runs on the build machine.
 
 ```makefile
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --host=$(TC_NAME) --build=$(TC_BUILD)
+TC_CONFIGURE_ARGS := --host=powerpc-e500v2-linux-gnuspe --build=i686-pc-linux
+TC_ENV += SYSROOT="<tc>/powerpc-e500v2-linux-gnuspe/sysroot"
+TC_ENV += CC="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
+TC_ENV += CXX="<tc>/bin/powerpc-e500v2-linux-gnuspe-g++"
+TC_ENV += LD="<tc>/bin/powerpc-e500v2-linux-gnuspe-ld"
+TC_ENV += LDSHARED="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc -shared"
+...                                  # CPP, AS, AR, NM, RANLIB, STRIP, OBJDUMP, OBJCOPY, READELF
+TC_ENV += CFLAGS="-I<tc>/…/sysroot/usr/include -I<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/include …"
+...                                  # CPPFLAGS, CXXFLAGS, LDFLAGS
+TC_ENV += CC_FOR_BUILD="/usr/bin/gcc"
+...                                  # CXX/CPP_FOR_BUILD and their flags
 ```
 
 ### tc_vars.flags.mk
 
-Compiler and linker flags:
+The same flags as make variables, for the makefiles that compose with them:
 
 ```makefile
-CFLAGS   = -I$(STAGING_INSTALL_PREFIX)/include
-CXXFLAGS = $(CFLAGS)
-LDFLAGS  = -L$(STAGING_INSTALL_PREFIX)/lib -Wl,-rpath,$(INSTALL_PREFIX)/lib
+CFLAGS := -I<tc>/…/sysroot/usr/include -I<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/include -mcpu=8548 …
+CPPFLAGS := …
+CXXFLAGS := …
+LDFLAGS := -L<tc>/…/sysroot/lib -L<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/lib -Wl,--rpath-link,… -Wl,--rpath,/usr/local/zlib/lib …
 ```
 
 Each language's flags end with its own `TC_EXTRA_<LANG>FLAGS` — `CFLAGS` ends with
@@ -165,58 +210,95 @@ ABI (`TC_EXTRA_BUILD_FLAGS`, folded in as described under
 [Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare)), so
 the ABI reaches every compiler *and* the link driver.
 
-### tc_vars.cmake
+### tc_vars.rust.mk
 
-CMake toolchain file for cross-compilation:
+What cargo, rustup and the crates that compile C (`cc-rs`) need: the rustup toolchain and target,
+the linker, archiver and flags under the per-triple names cargo and `cc-rs` read, and the
+`HOST_*` tools for build scripts. `RUST_TARGET`, `TC_RUSTC` and `TC_RUSTUP_TOOLCHAIN` come from
+here too, so a package that calls cargo itself needs no rust mk of its own. On an arch with a
+rust overlay, the toolchain is the overlay's and the target the Synology triple:
+
+```makefile
+TC_ENV += CARGO_HOME="<spksrc>/distrib/cargo"
+TC_ENV += RUSTUP_HOME="<spksrc>/distrib/rustup"
+TC_ENV += RUSTUP_TOOLCHAIN="1.82.0-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc4.9.3"
+TC_ENV += RUST_TARGET_PATH="<spksrc>/distrib/rustup/toolchains/1.82.0-…-gcc4.9.3/target-spec"
+TC_ENV += CARGO_BUILD_TARGET="powerpc-synology-linux-gnuspe"
+TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_LINKER="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
+TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_AR="<tc>/bin/powerpc-e500v2-linux-gnuspe-ar"
+TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_RUSTFLAGS="-Clink-arg=-L… -Clink-arg=-B<spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim …"
+TC_ENV += CC_powerpc_synology_linux_gnuspe="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
+...                                  # CXX_, AR_, RANLIB_, CFLAGS_, CXXFLAGS_<triple>
+TC_ENV += HOST_CC="/usr/bin/gcc"
+...                                  # HOST_CXX, HOST_AR, HOST_RANLIB and their flags
+RUST_TARGET := powerpc-synology-linux-gnuspe
+TC_RUSTC := 1.82.0
+TC_RUSTUP_TOOLCHAIN := 1.82.0-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc4.9.3
+```
+
+### tc_vars.cmake, and the CMake toolchain file of a dependency
+
+`tc_vars.cmake` holds what is the same for every CMake package of the tree: the target system
+and processor, the cross tools and their `*_FOR_BUILD` counterparts, the find-root modes, and the
+Rust settings for CMake projects that build crates (Corrosion).
 
 ```cmake
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR x86_64)
-set(CMAKE_C_COMPILER /path/to/x86_64-pc-linux-gnu-gcc)
-set(CMAKE_CXX_COMPILER /path/to/x86_64-pc-linux-gnu-g++)
-set(CMAKE_FIND_ROOT_PATH /path/to/work/install/usr/local)
+set(CMAKE_SYSTEM_PROCESSOR ppc)
+set(CMAKE_C_COMPILER          <tc>/bin/powerpc-e500v2-linux-gnuspe-gcc)
+set(CMAKE_CXX_COMPILER        <tc>/bin/powerpc-e500v2-linux-gnuspe-g++)
+set(CMAKE_AR                  <tc>/bin/powerpc-e500v2-linux-gnuspe-ar)
+...                           # LINKER, AS, NM, RANLIB, STRIP, OBJDUMP, … and *_FOR_BUILD
+set(CMAKE_FIND_ROOT_PATH <spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(RUST_TARGET  powerpc-synology-linux-gnuspe)
+...
 ```
 
-No `CMAKE_SYSROOT`: the compiler already knows its own. A package's generated toolchain
-file then appends the meta staging roots and, last, the toolchain's sysroot to
-`CMAKE_FIND_ROOT_PATH`, so `find_library`/`find_path` take what is built in the staging
-first and still find what glibc itself provides (`m`, `c`, `sys/epoll.h`).
+It is not handed to CMake as is. At configure time, each CMake dependency generates its own
+toolchain file in its build directory, `$(BUILD_DIR)/<arch>-toolchain.cmake`
+(`mk/spksrc.cross/cmake-toolchainfile.mk`): `tc_vars.cmake`, followed by what that package's
+Makefile sets -- the `CMAKE_C_FLAGS`/`CMAKE_CXX_FLAGS` made of the tree's flags plus its
+`ADDITIONAL_*FLAGS`, the linker flags, `BUILD_SHARED_LIBS`, the install rpath, the
+`PKG_CONFIG_LIBDIR` of its dependencies, `OPENSSL_ROOT_DIR`, the meta packages' find roots, the
+toolchain's sysroot, and the `RUSTFLAGS`. That file is the one passed as `-DCMAKE_TOOLCHAIN_FILE`.
+
+No `CMAKE_SYSROOT`: the compiler already knows its own. The meta roots and then the sysroot are
+appended to `CMAKE_FIND_ROOT_PATH`, so `find_library`/`find_path` take what is built in the
+staging first and still find what glibc itself provides (`m`, `c`, `sys/epoll.h`).
 
 Some sysroots hold more than glibc -- `libbfd` on most, `expat`, `uuid` and `bz2` on
 ppc853x-5.2 -- so a package still declares every library it uses: an undeclared probe
 can find the toolchain's copy instead of failing.
 
-### tc_vars.meson-cross and tc_vars.meson-native
+### tc_vars.meson-cross and tc_vars.meson-native, and the Meson cross file of a dependency
 
-Meson cross and native files:
+`tc_vars.meson-cross` holds the `[host_machine]` and `[binaries]` of the target, the same for
+every Meson package of the tree; `tc_vars.meson-native` the `[binaries]` of the build machine.
 
 ```ini
 # tc_vars.meson-cross
-[binaries]
-c = '/path/to/x86_64-pc-linux-gnu-gcc'
-cpp = '/path/to/x86_64-pc-linux-gnu-g++'
-ar = '/path/to/x86_64-pc-linux-gnu-ar'
-strip = '/path/to/x86_64-pc-linux-gnu-strip'
-pkgconfig = '/usr/bin/pkg-config'
-
 [host_machine]
 system = 'linux'
-cpu_family = 'x86_64'
-cpu = 'x86_64'
-endian = 'little'
+cpu_family = 'ppc'
+cpu = 'ppc'
+endian = 'big'
+
+[binaries]
+c = '<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc'
+cpp = '<tc>/bin/powerpc-e500v2-linux-gnuspe-g++'
+ar = '<tc>/bin/powerpc-e500v2-linux-gnuspe-ar'
+...                                  # ld, as, nm, ranlib, strip, objdump, …, cargo, rust
 ```
 
-### tc_vars.rust.mk
-
-Rust cross-compilation settings:
-
-```makefile
-RUST_TARGET = x86_64-unknown-linux-gnu
-RUSTFLAGS = -C linker=$(TC_CC)
-```
+As for CMake, each Meson dependency generates its own cross file at configure time,
+`$(WORK_DIR)/$(PKG_DIR)/<arch>-crossfile.meson` (`mk/spksrc.cross/meson-crossfile.mk`):
+`tc_vars.meson-cross`, plus `pkg-config` and, for a Python extension, the crossenv's `python`,
+`cython` and `meson`, then its `[properties]` and `[built-in options]` -- `prefix`, and the
+`c_args`, `cpp_args` and link args made of the tree's flags plus the package's `ADDITIONAL_*FLAGS`.
+That file is the one passed as `--cross-file`.
 
 ## Supported Architectures
 
@@ -227,29 +309,35 @@ The complete list of architecture families, platform codenames, architecture gro
 
 ## Adding New Toolchain Support
 
-When Synology releases a new DSM version:
+Synology publishes its toolchains on [archive.synology.com/download/ToolChain/toolchain](https://archive.synology.com/download/ToolChain/toolchain), one directory per DSM release (`<version>-<build>`, e.g. `7.2-72806`), with a subdirectory per platform. When Synology releases a new DSM version:
 
-1. **Create toolchain directory**:
-   ```bash
-   mkdir toolchain/syno-x64-8.0
-   ```
+1. **Add the version** to `TC_VERSION_MAP` in `mk/spksrc.toolchain/tc-versions.mk`: its build number, `DSM` or `SRM`, and where its toolchains are downloaded from. The download URL is then built from it (`mk/spksrc.toolchain/tc-url.mk`): `https://global.synologydownload.com/download/ToolChain/toolchain/<version>-<build>/<TC_DIST_SITE_PATH>/<TC_DIST>.txz`.
 
-2. **Create Makefile**:
+2. **Create the toolchain directory**, one per platform, `toolchain/syno-<arch>-<version>/`, with a Makefile naming the archive and what it holds -- the archive name and its platform directory as Synology publishes them:
    ```makefile
-   TC_NAME  = x86_64-pc-linux-gnu
-   TC_VERS  = 8.0
-   TC_ARCH  = x64
-   TC_DIST_SITE_PATH = $(SYNOLOGY_DOWNLOAD_URL)/toolchain/DSM$(TC_VERS)
-   TC_DIST_NAME = $(TC_DIST_SITE_PATH)/Intel%20x86%20Linux%20...%20%28x86_64-GPL%29.txz
-   
+   TC_ARCH = geminilake
+   TC_VERS = 7.2
+   TC_KERNEL = 4.4.302
+   TC_GLIBC = 2.36
+   TC_GCC = 12.2.0
+   TC_BINUTILS = 2.38
+
+   TC_DIST = geminilake-gcc1220_glibc236_x86_64-GPL
+   TC_DIST_SITE_PATH = Intel%20x86%20Linux%204.4.302%20%28GeminiLake%29
+
+   TC_TARGET = x86_64-pc-linux-gnu
+   TC_SYSROOT = $(TC_TARGET)/sys-root
+
    include ../../mk/spksrc.toolchain.mk
    ```
+   `TC_SYSROOT` is the sysroot its gcc reports (`<target>-gcc -print-sysroot`), relative to the
+   extracted `$(TC_TARGET)`: a package's `tcvars` checks the two agree and stops when they do not.
 
-3. **Create digests file** with SHA256 checksums
+3. **Create its `digests`**, three checksums of the archive -- SHA1, SHA256 and MD5 -- with `make -C toolchain/syno-<arch>-<version> digests`.
 
-4. **Test build**:
+4. **Test a build**:
    ```bash
-   make -C spk/transmission ARCH=x64 TCVERSION=8.0
+   make -C spk/transmission arch-geminilake-7.2
    ```
 
 ## Toolchain Build Process
