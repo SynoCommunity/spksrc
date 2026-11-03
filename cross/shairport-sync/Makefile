@@ -1,5 +1,5 @@
 PKG_NAME = shairport-sync
-PKG_VERS = 4.3.7
+PKG_VERS = 5.6.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
@@ -14,9 +14,10 @@ DEPENDS  = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/p
 # AirPlay 2 requires avahi (provided by cross/avahi-headers which compiles against DSM system avahi)
 SHAIRPORT_AIRPLAY2 ?= 1
 ifeq ($(SHAIRPORT_AIRPLAY2),1)
-BUILD_DEPENDS = native/xxd
+BUILD_DEPENDS = native/xxd native/libplist
 XXD_PATH = $(abspath $(PWD)/../../native/xxd/work-native/install/usr/local/bin)
-ENV += PATH=$(XXD_PATH):$$PATH
+PLISTUTIL_PATH = $(abspath $(PWD)/../../native/libplist/work-native/install/usr/local/bin)
+ENV += PATH=$(XXD_PATH):$(PLISTUTIL_PATH):$$PATH
 DEPENDS += cross/nqptp
 DEPENDS += cross/libplist
 DEPENDS += cross/libsodium
