@@ -7,36 +7,48 @@
 # work-<arch>-<tcversion> (like cross packages), so every (arch, DSM) is visible
 # and independent.
 #
-#   NATIVE_TOOLCHAIN = rust
+#   PKG_NAME = rustc
 #   include ../../mk/spksrc.native-toolchain.mk
 #
 # This file holds only what is common to any component: the (arch, DSM)
-# parametrization, the toolchain-Makefile reader (_tc_get), the extracted-sysroot
-# fields (TC_TARGET / TC_GCC / TC_GLIBC), the per-arch work dir, and tc-install.
-# The component-specific logic (config, build/install targets, archive vars) lives
-# in mk/spksrc.native/toolchain-$(NATIVE_TOOLCHAIN).mk, included below; the front-
-# end include of spksrc.native-cc.mk follows it so that specific file can set the
-# CONFIGURE/COMPILE/INSTALL targets before native-cc.mk wires them.
+# parametrization, the extracted-sysroot fields (TC_TARGET / TC_GCC / TC_GLIBC), the
+# per-arch work dir, and tc-install. The component-specific logic (config,
+# build/install targets, archive vars) lives in mk/spksrc.native/toolchain-$(PKG_NAME).mk,
+# included once the toolchain is known; spksrc.native-cc.mk comes last, so that file can
+# set the CONFIGURE/COMPILE/INSTALL targets before native-cc.mk wires them.
 #
 # Provides to the component mk and the package:
 #   TC_DIR       toolchain/syno-<arch>-<vers>
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
+#                (makefile_var, spksrc.common/macros.mk)
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
 #   TC_EXTRACT_DIR  where tc-install lands the gcc toolchain (bin/, sysroot, ...)
 #   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
 #   tc-install   ensures the gcc toolchain (hence its sysroot) is extracted
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
-#   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (spksrc.overlay/dist-arch.mk)
+#   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (spksrc.rules/dist-arch.mk)
 #
 # And the targets that build it:
 #   make arch-<arch>-<vers>             one toolchain: build, then archive
 #   make all-<vers>                     every toolchain the component has a consumer for
 #   make TOOLCHAIN_JOBS=5 all-<vers>    five at a time, each still at full parallelism
 #
+# all-<vers> concurrency is xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS
+# and propagates into every sub-make, parallelising toolchain targets not written for it.
+# TOOLCHAIN_KEEP_WORK = 0 drops each work dir once its archive exists; a failed one is
+# kept, so a broken arch stays debuggable.
+#
 # A component sets TOOLCHAIN_CONSUMER, the overlay directory suffix its consumers carry
 # (gcc-8.5, binutils-2.30, rust-1.98_gcc-*), which is how all-<vers> knows its archs.
 ###############################################################################
+
+# The arch the archive is named after (overlay_dist_arch): TC_ARCH, or the real arch whose
+# toolchain a generic one shares -- the same answer its consumer gets.
+include ../../mk/spksrc.rules/dist-arch.mk
+
+TOOLCHAIN_JOBS      ?= 1
+TOOLCHAIN_KEEP_WORK ?= 1
 
 ifeq ($(strip $(TC_ARCH)),)
 $(error spksrc.native-toolchain.mk: TC_ARCH is required (e.g. TC_ARCH=ppc853x))
@@ -44,15 +56,21 @@ endif
 ifeq ($(strip $(TC_VERS)),)
 $(error spksrc.native-toolchain.mk: TC_VERS is required (e.g. TC_VERS=5.2))
 endif
-ifeq ($(strip $(NATIVE_TOOLCHAIN)),)
-$(error spksrc.native-toolchain.mk: NATIVE_TOOLCHAIN is required (e.g. NATIVE_TOOLCHAIN=rust))
+ifeq ($(wildcard $(CURDIR)/../../mk/spksrc.native/toolchain-$(PKG_NAME).mk),)
+$(error spksrc.native-toolchain.mk: no component for PKG_NAME '$(PKG_NAME)' (mk/spksrc.native/toolchain-<name>.mk))
 endif
+
+# overlay.mk keys its lookups off _OVERLAY_TC = syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX)),
+# and a native package leaves ARCH_SUFFIX at -native. Declare the real (arch, DSM) before
+# spksrc.common.mk, which brings the arch groups and macros every component reads.
+TC_ARCH_SUFFIX ?= -$(TC_ARCH)-$(TC_VERS)
+include ../../mk/spksrc.common.mk
 
 TC          = syno-$(TC_ARCH)-$(TC_VERS)
 TC_DIR      = $(abspath $(CURDIR)/../../toolchain/$(TC))
 # $(call _tc_get,VAR): value of VAR as declared in the toolchain Makefile -- the
 # single source of truth, so nothing here duplicates the toolchain's own fields.
-_tc_get     = $(shell sed -n 's/^$(1)[[:space:]]*=[[:space:]]*//p' $(TC_DIR)/Makefile 2>/dev/null)
+_tc_get     = $(call makefile_var,$(TC_DIR)/Makefile,$(1))
 
 TC_TARGET  := $(call _tc_get,TC_TARGET)
 TC_GCC     := $(call _tc_get,TC_GCC)
@@ -65,7 +83,7 @@ TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 # Prefix for running a binary of that toolchain: the C locale. The gcc 4.7.3 of x86-5.2
 # (and x64-5.2) aborts on a current host's locale data -- "loadlocale.c:129:
 # _nl_intern_locale_data: Assertion ... failed" -- on -v, -print-sysroot and every compile.
-# Inline, as toolchain-rust.mk does for x.py: an export reaches $(shell) only from make 4.4.
+# Inline, as toolchain-rustc.mk does for x.py: an export reaches $(shell) only from make 4.4.
 TC_VENDOR_ENV = LC_ALL=C
 
 # The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
@@ -79,6 +97,13 @@ $(eval TC_SYSROOT_DIR := $(TC_EXTRACT_DIR)/$(call _tc_get,TC_SYSROOT))
 # native default would be -native).
 WORK_DIR       = $(CURDIR)/work-$(TC_ARCH)-$(TC_VERS)
 INSTALL_PREFIX = /usr/local
+
+# tc_vars.mk supplies these on the cross side and is never generated here, yet
+# tc-capability.mk's libatomic probe composes the compiler path out of them.
+TC_PREFIX   ?= $(TC_TARGET)-
+TC_WORK_DIR ?= $(TC_DIR)/work
+
+TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 
 # ---- How the host compiler builds the component --------------------------------------
 # Probed, not assumed: -march=x86-64-v3 is a GCC 11 spelling and a host without AVX2 must
@@ -105,10 +130,14 @@ HOST_OPTFLAGS  = $(_HOST_OPTFLAGS)
 HOST_OPTFLAGS += $(if $(filter gen,$(PGO_PHASE)),$(_PGO_GEN))
 HOST_OPTFLAGS += $(if $(filter use,$(PGO_PHASE)),$(_PGO_USE))
 
-# The arch the archive is named after: TC_ARCH, or the real arch whose toolchain a generic
-# one shares -- the same answer its consumer gets, so the published name is the fetched one.
-include ../../mk/spksrc.overlay/dist-arch.mk
-TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
+# Pass 1 of a profile-guided build is instrumented: it never reaches the archive name, which
+# is how a finished build is recognised (toolchain-arch below).
+ifneq ($(filter gen,$(PGO_PHASE)),)
+ARCHIVE_TARGET = toolchain-pgo-no-archive
+endif
+
+# Component-specific logic: configuration, build/install targets, archive variables.
+include ../../mk/spksrc.native/toolchain-$(PKG_NAME).mk
 
 # Install the target toolchain, overlays included -- exactly what a cross package gets. A
 # producer needs more than the vendor gcc (a rustc built ON a gcc overlay needs that overlay).
@@ -123,35 +152,12 @@ tc-install:
 	@# TC_WORK_DIR is empty here and the extraction belongs in the sub-make's own default.
 	@$(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
 
-# Component-specific logic: configuration, build/install targets, archive variables.
-include ../../mk/spksrc.native/toolchain-$(NATIVE_TOOLCHAIN).mk
-
-# overlay.mk keys its lookups off _OVERLAY_TC = syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX)),
-# and a native package leaves ARCH_SUFFIX at -native. Declare the real (arch, DSM) here,
-# before common.mk reads it, so TC_OVERLAY_GCC and everything built on it resolve.
-TC_ARCH_SUFFIX ?= -$(TC_ARCH)-$(TC_VERS)
-# tc_vars.mk supplies these on the cross side and is never generated here, yet
-# tc-capability.mk's libatomic probe composes the compiler path out of them.
-TC_PREFIX   ?= $(TC_TARGET)-
-TC_WORK_DIR ?= $(TC_DIR)/work
-
-# Pass 1 of a profile-guided build is instrumented: it never reaches the archive name, which
-# is how a finished build is recognised (toolchain-arch below). Set before native-cc.mk,
-# whose archive step reads it.
-ifneq ($(filter gen,$(PGO_PHASE)),)
-ARCHIVE_TARGET = toolchain-pgo-no-archive
-endif
-
-include ../../mk/spksrc.native-cc.mk
-
 # ---- One toolchain, then a whole DSM version ------------------------------------------
 # TOOLCHAIN_DIST_SHARED (set by a component whose ARCHIVE_NAME carries TOOLCHAIN_DIST_ARCH):
 # a generic arch (x64, armv7, aarch64) shares its toolchain, hence its archive, with a real
 # arch of the same DSM (dist-arch.mk), and is built AS that arch. arch-x64-7.1 builds
-# apollolake-7.1: the file x64-7.1's consumer fetches, from the toolchain it is a copy of.
-toolchain_real = $(if $(call is_true,$(TOOLCHAIN_DIST_SHARED)),$(call overlay_dist_arch,$(firstword \
-                   $(subst -, ,$(1))),$(lastword $(subst -, ,$(1))))-$(lastword $(subst -, ,$(1))),$(1))
-
+# apollolake-7.1: the file x64-7.1's consumer fetches, from the toolchain it is a copy of
+# (toolchain_real, spksrc.common/archs.mk).
 # A variable, so its commas do not split the $(if) below.
 _TC_GENERIC_MSG = $*: a generic arch, built as $(_TC_REAL), whose archive it fetches
 
@@ -164,8 +170,6 @@ arch-%:
 # One (arch, DSM), in the sub-make that knows it, hence its archive name: nothing to do when
 # that archive exists -- an underlying arch already built for another generic one, or an
 # all-<vers> resumed after a failure. Remove the archive to rebuild.
-_TC_SELF = TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
-
 .PHONY: toolchain-arch
 ifneq ($(wildcard $(ARCHIVE_NAME).$(ARCHIVE_EXT)),)
 toolchain-arch:
@@ -176,16 +180,16 @@ toolchain-arch:
 ifneq ($(call is_true,$(TOOLCHAIN_PGO)),)
 	@$(MSG) "===== $(PKG_NAME)-$(PKG_VERS): $(TC_ARCH)-$(TC_VERS) -- PGO pass 1/2 (instrumented) ====="
 	@rm -rf $(WORK_DIR) $(TOOLCHAIN_PGO_DIR)
-	@$(MAKE) --no-print-directory $(_TC_SELF) PGO_PHASE=gen all
-	@$(MAKE) --no-print-directory $(_TC_SELF) PGO_PHASE=gen $(TOOLCHAIN_PGO_TRAIN)
+	@$(MAKE) --no-print-directory TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE=gen all
+	@$(MAKE) --no-print-directory TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE=gen $(TOOLCHAIN_PGO_TRAIN)
 	@$(MSG) "===== $(PKG_NAME)-$(PKG_VERS): $(TC_ARCH)-$(TC_VERS) -- PGO pass 2/2 (optimised) ====="
 	@rm -rf $(WORK_DIR)
-	@$(MAKE) --no-print-directory $(_TC_SELF) PGO_PHASE=use all
+	@$(MAKE) --no-print-directory TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE=use all
 	@rm -rf $(TOOLCHAIN_PGO_DIR)
 else
-	@$(MAKE) --no-print-directory $(_TC_SELF) all
+	@$(MAKE) --no-print-directory TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) all
 endif
-	@$(MAKE) --no-print-directory $(_TC_SELF) build-archive
+	@$(MAKE) --no-print-directory TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) build-archive
 endif
 
 .PHONY: toolchain-pgo-no-archive
@@ -198,22 +202,9 @@ toolchain-pgo-no-archive:
 toolchain-pgo-sources:
 	@sh $(BASEDIR)/mk/spksrc.native/toolchain-pgo-sources.sh $(TOOLCHAIN_PGO_SOURCES)
 
-# The toolchains a component is built for are its consumers (TOOLCHAIN_CONSUMER), each
-# brought back to the arch it builds as (toolchain_real above), once: x64-6.2.4 and
-# x86-6.2.4 are one build of x86-6.2.4, x64-7.1 is apollolake-7.1. An arch whose archive
-# exists is skipped (toolchain-arch), so a batch resumes where it stopped.
-#
-# TOOLCHAIN_KEEP_WORK = 0 drops each work dir once its archive exists; a failed one is
-# kept, so a broken arch stays debuggable.
-#
-# Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
-# propagates into every sub-make, parallelising toolchain targets not written for it.
-TOOLCHAIN_JOBS      ?= 1
-TOOLCHAIN_KEEP_WORK ?= 1
-
-toolchain_archs = $(sort $(foreach d,$(wildcard $(BASEDIR)/overlay/syno-*-$(1)_$(TOOLCHAIN_CONSUMER)),\
-                    $(patsubst %-$(1),%,$(call toolchain_real,$(patsubst syno-%,%,$(firstword $(subst _, ,$(notdir $(d)))))))))
-
+# The toolchains a component is built for are its consumers (toolchain_archs,
+# spksrc.common/archs.mk), once each. An arch whose archive exists is skipped
+# (toolchain-arch), so a batch resumes where it stopped.
 .PHONY: all-%
 all-%:
 	@$(eval _TC_ARCHS := $(call toolchain_archs,$*))
@@ -222,3 +213,6 @@ all-%:
 	   xargs -P $(TOOLCHAIN_JOBS) -I@ sh -c '$(MAKE) --no-print-directory arch-@-$* && \
 	     { $(if $(call is_true,$(TOOLCHAIN_KEEP_WORK)),true,rm -rf work-@-$*) ; }'
 	@$(MSG) "===== $(PKG_NAME)-$(PKG_VERS): all-$* complete ====="
+
+# Last: native-cc.mk wires the targets the component set above.
+include ../../mk/spksrc.native-cc.mk

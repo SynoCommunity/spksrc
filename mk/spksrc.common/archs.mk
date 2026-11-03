@@ -111,3 +111,18 @@ LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .
 # legacy: used for all-legacy and when kernel support is used
 #         all archs except generic archs
 LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
+
+# Toolchains of a producer (native/gcc-8.5, binutils-2.30, rustc-*), as <arch>-<dsm>.
+#
+# $(call toolchain_real,<arch>-<dsm>): the toolchain it is built as. Where the component
+# sets TOOLCHAIN_DIST_SHARED, a generic arch (x64, armv7, aarch64) is built as the real arch
+# whose toolchain, hence archive, it shares (overlay_dist_arch, spksrc.rules/dist-arch.mk):
+# x64-7.1 as apollolake-7.1.
+toolchain_real = $(if $(call is_true,$(TOOLCHAIN_DIST_SHARED)),$(call overlay_dist_arch,$(firstword \
+                   $(subst -, ,$(1))),$(lastword $(subst -, ,$(1))))-$(lastword $(subst -, ,$(1))),$(1))
+
+# $(call toolchain_archs,<dsm>): the archs of that DSM version with an overlay of the
+# component (TOOLCHAIN_CONSUMER, the overlay directory suffix), each as the arch it is
+# built as, once.
+toolchain_archs = $(sort $(foreach d,$(wildcard $(BASEDIR)/overlay/syno-*-$(1)_$(TOOLCHAIN_CONSUMER)),\
+                    $(patsubst %-$(1),%,$(call toolchain_real,$(patsubst syno-%,%,$(firstword $(subst _, ,$(notdir $(d)))))))))

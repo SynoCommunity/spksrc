@@ -1,7 +1,7 @@
 ###############################################################################
 # spksrc.native/toolchain-binutils.mk
 #
-# Component logic for NATIVE_TOOLCHAIN = binutils (spksrc.native-toolchain.mk): a modern
+# Component logic for PKG_NAME = binutils (spksrc.native-toolchain.mk): a modern
 # cross binutils against an EXISTING Synology toolchain's sysroot, published as the archive
 # the binutils overlay installs (spksrc.overlay/binutils.mk). The tools land in
 # work-<arch>-<vers>/install/usr/local/bin as <target>-{ld,as,ar,...}.
@@ -9,7 +9,7 @@
 #   PKG_NAME = binutils
 #   PKG_VERS = 2.30
 #   PKG_REV ?= v4
-#   NATIVE_TOOLCHAIN = binutils
+#   PKG_NAME = binutils
 #   include ../../mk/spksrc.native-toolchain.mk
 ###############################################################################
 

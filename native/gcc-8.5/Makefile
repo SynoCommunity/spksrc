@@ -28,5 +28,4 @@ PKG_REV ?= v5
 
 # Builds the archive the gcc overlay installs: mk/spksrc.native/toolchain-gcc.mk.
 #   make arch-qoriq-6.2.4        make all-6.2.4        make TOOLCHAIN_PGO=0 arch-x86-5.2
-NATIVE_TOOLCHAIN = gcc
 include ../../mk/spksrc.native-toolchain.mk

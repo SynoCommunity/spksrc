@@ -106,6 +106,14 @@ _odepend = $(eval _ODEP_N := $(words $(_ODEP_LIST) x))$(eval _ODEP_LIST += $(_OD
            $(eval OPTIONAL_DEPENDS += $(subst |, ,$(1)))\
            $(eval DEPENDS += _odep_$(_ODEP_N)_)$(eval CONFIGURE_ARGS += _odep_$(_ODEP_N)_)
 
+# Macro: read a variable a Makefile declares
+#
+#   $(call makefile_var,$(TC_DIR)/Makefile,TC_TARGET)
+#
+# The value of VAR as the file assigns it (VAR = value, VAR := value, VAR ?= value), as
+# raw text: a reference inside it is not expanded. Empty when the file or the line is absent.
+makefile_var = $(shell sed -n 's/^$(2)[[:space:]]*[:?]*=[[:space:]]*//p' $(1) 2>/dev/null)
+
 # Macro: locate a toolchain tool
 #
 #   $(call tc,gcc)   $(call tc,ar)   $(call tc,g++)

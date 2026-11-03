@@ -1,7 +1,7 @@
 ###############################################################################
 # spksrc.native/toolchain-gcc.mk
 #
-# Component logic for NATIVE_TOOLCHAIN = gcc (spksrc.native-toolchain.mk): a modern cross
+# Component logic for PKG_NAME = gcc (spksrc.native-toolchain.mk): a modern cross
 # gcc rebuilt against an EXISTING Synology toolchain's sysroot, published as the archive
 # the gcc overlay installs (spksrc.overlay/gcc.mk). One component, one archive: it ships
 # NO as/ld -- those stay binutils', and the consumer wires the two together.
@@ -11,7 +11,7 @@
 #   PKG_NAME = gcc
 #   PKG_VERS = 8.5.0
 #   PKG_REV ?= v5
-#   NATIVE_TOOLCHAIN = gcc
+#   PKG_NAME = gcc
 #   include ../../mk/spksrc.native-toolchain.mk
 ###############################################################################
 
