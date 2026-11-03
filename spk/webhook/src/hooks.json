@@ -1,0 +1,10 @@
+[
+  {
+    "id": "example-hook",
+    "execute-command": "/bin/echo",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command": [
+        { "source": "string", "name": "Hook executed successfully!" }
+    ]
+  }
+]
