@@ -1,5 +1,5 @@
 PKG_NAME = shairport-sync
-PKG_VERS = 4.3.7
+PKG_VERS = 5.6.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
@@ -7,16 +7,19 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Common dependencies for both Classic AirPlay and AirPlay 2
-DEPENDS  = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/popt cross/soxr
+DEPENDS  = cross/alsa-lib cross/libconfig cross/openssl3 cross/popt cross/soxr
 
 # AirPlay 2 dependencies (enabled by default, requires NQPTP daemon and root access)
 # Set SHAIRPORT_AIRPLAY2=0 to build Classic AirPlay only mode
 # AirPlay 2 requires avahi (provided by cross/avahi-headers which compiles against DSM system avahi)
 SHAIRPORT_AIRPLAY2 ?= 1
 ifeq ($(SHAIRPORT_AIRPLAY2),1)
-BUILD_DEPENDS = native/xxd
+BUILD_DEPENDS = native/xxd native/libplist
 XXD_PATH = $(abspath $(PWD)/../../native/xxd/work-native/install/usr/local/bin)
-ENV += PATH=$(XXD_PATH):$$PATH
+PLISTUTIL_PATH = $(abspath $(PWD)/../../native/libplist/work-native/install/usr/local/bin)
+PLISTUTIL_LIB = $(abspath $(PWD)/../../native/libplist/work-native/install/usr/local/lib)
+ENV += PATH=$(XXD_PATH):$(PLISTUTIL_PATH):$$PATH
+ENV += LD_LIBRARY_PATH=$(PLISTUTIL_LIB):$$LD_LIBRARY_PATH
 DEPENDS += cross/nqptp
 DEPENDS += cross/libplist
 DEPENDS += cross/libsodium
@@ -38,7 +41,6 @@ CONFIGURE_ARGS += --with-pipe
 CONFIGURE_ARGS += --with-ssl=openssl
 CONFIGURE_ARGS += --with-soxr
 CONFIGURE_ARGS += --with-metadata
-CONFIGURE_ARGS += --with-libdaemon
 CONFIGURE_ARGS += --without-configfiles
 CONFIGURE_ARGS += --with-piddir=/var/packages/shairport-sync/var
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
