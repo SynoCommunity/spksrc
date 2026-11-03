@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Common dependencies for both Classic AirPlay and AirPlay 2
-DEPENDS  = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/popt cross/soxr
+DEPENDS  = cross/alsa-lib cross/libconfig cross/openssl3 cross/popt cross/soxr
 
 # AirPlay 2 dependencies (enabled by default, requires NQPTP daemon and root access)
 # Set SHAIRPORT_AIRPLAY2=0 to build Classic AirPlay only mode
@@ -39,7 +39,6 @@ CONFIGURE_ARGS += --with-pipe
 CONFIGURE_ARGS += --with-ssl=openssl
 CONFIGURE_ARGS += --with-soxr
 CONFIGURE_ARGS += --with-metadata
-CONFIGURE_ARGS += --with-libdaemon
 CONFIGURE_ARGS += --without-configfiles
 CONFIGURE_ARGS += --with-piddir=/var/packages/shairport-sync/var
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
