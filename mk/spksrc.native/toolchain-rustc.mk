@@ -1,7 +1,7 @@
 ###############################################################################
-# spksrc.native/toolchain-rust.mk
+# spksrc.native/toolchain-rustc.mk
 #
-# Rust component for spksrc.native-toolchain.mk (NATIVE_TOOLCHAIN = rust). Builds
+# Rust component for spksrc.native-toolchain.mk (PKG_NAME = rustc). Builds
 # a custom Rust toolchain FROM SOURCE (rustc + cargo + host/target std, LLVM from
 # the bundled source) against the (arch, DSM) toolchain's gcc + sysroot, for
 # targets rustup ships no usable prebuilt rust-std for (Tier-3 PowerPC e500:
@@ -24,7 +24,7 @@
 # Synology-vendored triple (uniform marker in ids/archive names, and it sidesteps the
 # host==target collision on x86). Base triple from the central arch map (keyed on TC_ARCH
 # since ARCH is empty here) -- the same source the consumer uses -- then unknown -> synology.
-include ../../mk/spksrc.common/archs.mk
+# The arch groups it reads come with spksrc.common.mk, which the front-end includes first.
 include ../../mk/spksrc.cross/env-rust.mk
 RUST_TARGET_JSON_BASE := $(RUST_TARGET)
 RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))

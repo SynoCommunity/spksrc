@@ -20,5 +20,4 @@ PKG_REV ?= v4
 
 # Builds the archive the binutils overlay installs: mk/spksrc.native/toolchain-binutils.mk.
 #   make arch-ppc853x-5.2        make all-6.2.4        make TOOLCHAIN_PGO=0 arch-x86-5.2
-NATIVE_TOOLCHAIN = binutils
 include ../../mk/spksrc.native-toolchain.mk

@@ -21,7 +21,7 @@
 #   OVERLAY_COMPONENT   gcc, binutils or rust
 #   OVERLAY_RUST_GCC    the _gcc-<version> suffix, when there is one
 #   TC_TARGET           the base toolchain's target triple
-#   OVERLAY_DIST_ARCH   the arch the archive is named after (spksrc.overlay/dist-arch.mk)
+#   OVERLAY_DIST_ARCH   the arch the archive is named after (spksrc.rules/dist-arch.mk)
 ###############################################################################
 
 _OVERLAY_DIR_WORDS := $(subst _, ,$(notdir $(CURDIR)))
@@ -39,9 +39,10 @@ ifeq ($(wildcard $(CURDIR)/../../mk/spksrc.overlay/$(OVERLAY_COMPONENT).mk),)
 $(error $(notdir $(CURDIR)): no overlay component '$(OVERLAY_COMPONENT)' (mk/spksrc.overlay/))
 endif
 
-TC_TARGET := $(shell sed -n 's/^TC_TARGET *= *//p' $(_OVERLAY_TC_MK))
+include ../../mk/spksrc.common/macros.mk
+TC_TARGET := $(call makefile_var,$(_OVERLAY_TC_MK),TC_TARGET)
 
-include ../../mk/spksrc.overlay/dist-arch.mk
+include ../../mk/spksrc.rules/dist-arch.mk
 OVERLAY_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 
 # Installed into its own work/, never the base toolchain's: the toolchain pulling this in as

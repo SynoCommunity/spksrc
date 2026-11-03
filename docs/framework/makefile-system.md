@@ -193,10 +193,10 @@ spksrc.native/
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 ├── env-meson.mk
-├── toolchain-binutils.mk     # NATIVE_TOOLCHAIN = binutils
-├── toolchain-gcc.mk          # NATIVE_TOOLCHAIN = gcc
+├── toolchain-binutils.mk     # PKG_NAME = binutils
+├── toolchain-gcc.mk          # PKG_NAME = gcc
 ├── toolchain-pgo-sources.sh  # generates the PGO training sources
-└── toolchain-rust.mk         # NATIVE_TOOLCHAIN = rust
+└── toolchain-rustc.mk        # PKG_NAME = rustc
 
 # SPK assembly entry point
 spksrc.spk.mk

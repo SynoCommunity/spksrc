@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.overlay/dist-arch.mk
+# spksrc.rules/dist-arch.mk
 #
 # Which arch's archive an overlay downloads. A generic arch (x64, armv7, aarch64) uses the
 # toolchain of a real arch, so it uses that arch's overlay archive too: x64-6.2.4 takes the
