@@ -4,6 +4,22 @@ CFG_FILE="${SYNOPKG_PKGVAR}/icecast.xml"
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/icecast -b -c ${CFG_FILE}"
 SVC_WRITE_PID=y
 
+escape_sed ()
+{
+    printf '%s' "$1" | sed 's/[\/&#\\]/\\&/g'
+}
+
+escape_value ()
+{
+    escape_sed "$(printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')"
+}
+
+replace_config_value ()
+{
+    [ -n "$2" ] || return 0
+    sed -i "s#<$1>.*</$1>#<$1>$(escape_value "$2")</$1>#" "${CFG_FILE}"
+}
+
 service_postupgrade ()
 {
     [ -f "${CFG_FILE}" ] || return 0
@@ -35,9 +51,9 @@ service_postupgrade ()
         { print }
     ' "${CFG_FILE}" > "${CFG_FILE}.tmp" && mv "${CFG_FILE}.tmp" "${CFG_FILE}"
 
-    [ -n "${wizard_ic_hostname}" ] && sed -i "s#<hostname>.*</hostname>#<hostname>${wizard_ic_hostname}</hostname>#" "${CFG_FILE}"
-    [ -n "${wizard_ic_location}" ] && sed -i "s#<location>.*</location>#<location>${wizard_ic_location}</location>#" "${CFG_FILE}"
-    [ -n "${wizard_ic_admin}" ] && sed -i "s#<admin>.*</admin>#<admin>${wizard_ic_admin}</admin>#" "${CFG_FILE}"
+    replace_config_value hostname "${wizard_ic_hostname}"
+    replace_config_value location "${wizard_ic_location}"
+    replace_config_value admin "${wizard_ic_admin}"
 
     if [ -n "${EFF_USER}" ] && chown "${EFF_USER}" "${CFG_FILE}"; then
         chmod 600 "${CFG_FILE}"
@@ -48,12 +64,12 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then  
         # Edit the configuration according to the wizard
-        sed -e "s/@username@/${wizard_ic_username:=admin}/g" \
-            -e "s/@password@/${wizard_ic_password:=changepassword}/g" \
-            -e "s/@hostname@/${wizard_ic_hostname:=localhost}/g" \
-            -e "s/@location@/${wizard_ic_location:=Earth}/g" \
-            -e "s/@admin@/${wizard_ic_admin:=icemaster@localhost}/g" \
-            -i ${CFG_FILE}
+        sed -e "s/@username@/$(escape_value "${wizard_ic_username:=admin}")/g" \
+            -e "s/@password@/$(escape_value "${wizard_ic_password:=changepassword}")/g" \
+            -e "s/@hostname@/$(escape_value "${wizard_ic_hostname:=localhost}")/g" \
+            -e "s/@location@/$(escape_value "${wizard_ic_location:=Earth}")/g" \
+            -e "s/@admin@/$(escape_value "${wizard_ic_admin:=icemaster@localhost}")/g" \
+            -i "${CFG_FILE}"
 
         # Add an explicit IPv6 listener only when requested.
         if [ "${wizard_ic_ipv6}" = "true" ]; then
