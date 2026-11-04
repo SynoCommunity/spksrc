@@ -6,18 +6,9 @@
 # (OVERLAY_BINUTILS_SHIM, spksrc.toolchain/overlay/binutils.mk).
 ###############################################################################
 
-PKG_NAME = binutils
-PKG_EXT  = txz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(OVERLAY_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm$(TC_VERS)
-EXTRACT_PATH  = $(INSTALL_DIR)
-
 HOMEPAGE = https://www.gnu.org/software/binutils/
 COMMENT  = GNU Binutils
 LICENSE  = GPLv3
-
-INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = binutils-post_install
 
 .PHONY: binutils-post_install
 binutils-post_install:
