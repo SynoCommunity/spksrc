@@ -344,17 +344,29 @@ The toolchain does not generate `tc_vars*`; the build tree does, into its own wo
 
 ## Caching
 
-Toolchains are cached in the `distrib/` directory:
+Toolchains and their [overlays](#toolchain-overlays) are cached in the `distrib/` directory, per DSM version:
 
 ```
 distrib/
-└── toolchain/
-    ├── Intel x86 Linux 4.4.302 (x86_64-GPL).txz
-    ├── Realtek RTD1296 Linux 4.4.180 (aarch64-GPL).txz
-    └── ...
+├── toolchain/
+│   ├── 6.2.4/
+│   │   ├── Intel x86 Linux 4.4.302 (x86_64-GPL).txz
+│   │   └── ...
+│   └── 7.1/
+│       └── ...
+└── overlay/
+    ├── 6.2.4/
+    │   ├── binutils-2.30-powerpc-e500v2-linux-gnuspe-qoriq-6.2.4-v4.txz
+    │   ├── gcc-8.5.0-powerpc-e500v2-linux-gnuspe-qoriq-6.2.4-v5.txz
+    │   ├── rust-1.98.1-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc8.5-v1.txz
+    │   └── ...
+    └── 7.1/
+        └── ...
 ```
 
-Once downloaded, toolchains are reused across builds. Delete from `distrib/` to force re-download.
+Once downloaded, archives are reused across builds; delete one from `distrib/` to force its re-download. The archive name carries the revision of the build (`-v5`), so a new revision is downloaded beside the old one rather than over it, and the old one can be deleted by hand.
+
+What is extracted is not under `distrib/`: a toolchain into `toolchain/syno-<arch>-<dsm>/work/`, each of its overlays into its own `overlay/syno-<arch>-<dsm>_<component>/work/`. `make clean` on the toolchain removes both, and the next build extracts them again from `distrib/` without downloading. The CI caches those `work/` directories as well, keyed on the `digests` of the toolchain and of its overlays: a new overlay revision, which changes its `digests`, invalidates the cache of its arch.
 
 ## Toolchain Overlays
 
@@ -377,7 +389,7 @@ PKG_REV  = v5
 include ../../mk/spksrc.overlay.mk
 ```
 
-It downloads one archive into `distrib/overlay/<dsm>/`, as a toolchain does into `distrib/toolchain/<dsm>/`, and extracts it into its **own** `work/`, never the base toolchain's: that is what lets two builds of a component sit side by side, only the generated pointers deciding which one is used. A generic arch (`x64`, `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares -- `x64-6.2.4` that of `x86-6.2.4`, `x64-7.1` that of `apollolake-7.1` (`mk/spksrc.rules/dist-arch.mk`).
+It downloads one archive into `distrib/overlay/<dsm>/`, as a toolchain does into `distrib/toolchain/<dsm>/`, and extracts it into its **own** `work/`, never the base toolchain's: that is what lets two builds of a component sit side by side, only the generated pointers deciding which one is used. A generic arch (`x64`, `armv7`, `aarch64`) downloads the archive of the real arch whose toolchain it shares -- `x64-6.2.4` that of `x86-6.2.4`, `x64-7.1` that of `apollolake-7.1` (`overlay_dist_arch`, `mk/spksrc.common/macros/archs.mk`).
 
 An arch has an overlay exactly when such a directory exists for it: adding one is adding the directory and its `digests`.
 
@@ -391,9 +403,9 @@ Overlay code sits at four levels, by role, each read by a different Makefile:
 
 | Level | Files | Read by | See |
 |-------|-------|---------|-----|
-| **Decide** | `mk/spksrc.common/overlay.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
-| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk`, `mk/spksrc.rules/dist-arch.mk` (shared with the producers) | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
-| **Use** | `mk/spksrc.toolchain/overlay-binutils.mk`, `overlay-rustc.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
+| **Decide** | `mk/spksrc.common/overlay.mk`, `mk/spksrc.common/overlay/<component>.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
+| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
+| **Use** | `mk/spksrc.toolchain/overlay/<component>.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
 | **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
 
 The base toolchain ties the first three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the active ones. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
@@ -448,7 +460,7 @@ make -C native/binutils-2.30 TOOLCHAIN_PGO=0 arch-x86-5.2  # one plain pass inst
 make -C native/rustc-1.82 all-5.2
 ```
 
-A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native/toolchain-$(PKG_NAME).mk` (`gcc`, `binutils`, `rustc`).
+A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native-toolchain/$(PKG_NAME).mk` (`gcc`, `binutils`, `rustc`).
 
 A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2.4` builds `x86-6.2.4`, `arch-x64-7.1` builds `apollolake-7.1`. `all-<dsm>` builds every arch that has an overlay of the component, each real arch once. An arch whose archive already exists is skipped -- nothing to do -- so a batch stopped by a failure resumes where it stopped; remove the `.txz` to rebuild one. An archive is written under a temporary name and renamed once complete, so an interrupted build never leaves a truncated file under the final name.
 

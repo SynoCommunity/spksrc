@@ -3,7 +3,7 @@
 #
 # The binutils overlay, as native/binutils-<version> publishes it: <target>-{as,ld,...}
 # under usr/local/bin, plus the unprefixed as/ld shim a compile reaches through -B
-# (OVERLAY_BINUTILS_SHIM, spksrc.toolchain/overlay-binutils.mk).
+# (OVERLAY_BINUTILS_SHIM, spksrc.toolchain/overlay/binutils.mk).
 ###############################################################################
 
 PKG_NAME = binutils

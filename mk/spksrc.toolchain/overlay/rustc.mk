@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.toolchain/overlay-rustc.mk
+# spksrc.toolchain/overlay/rustc.mk
 #
 # OVERLAY_RUSTC, consumer side: pick the custom from-source rustc for a cross rust PACKAGE
 # build. Member of the OVERLAY_<component> family; the decisions are in
@@ -56,9 +56,10 @@ RUST_TARGET         := $(_RUST_BASE_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(TC_RUSTC)
 endif
 
-# Where libatomic exists the spec was widened to 64 (toolchain-rustc.mk, same probe), so the
-# widened atomics lower to __atomic_*_N libcalls the Rust link must resolve. Lazy like
-# _tc_ld_syslibs: TC_HAS_LIBATOMIC runs the cross gcc, absent while the toolchain bootstraps.
+# Where libatomic exists the spec was widened to 64 (spksrc.native-toolchain/rustc.mk, same
+# probe), so the widened atomics lower to __atomic_*_N libcalls the Rust link must
+# resolve. Lazy like _tc_ld_syslibs: TC_HAS_LIBATOMIC runs the cross gcc, absent while the
+# toolchain bootstraps.
 RUSTFLAGS += $(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic)
 
 # RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on

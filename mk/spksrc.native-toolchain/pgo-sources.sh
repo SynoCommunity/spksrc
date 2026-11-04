@@ -1,6 +1,6 @@
 #!/bin/sh
 ###############################################################################
-# spksrc.native/toolchain-pgo-sources.sh <dir>
+# spksrc.native-toolchain/pgo-sources.sh <dir>
 #
 # Writes <dir>/train.c, <dir>/train.cpp and <dir>/train.f90, the inputs the toolchain
 # producers run their instrumented tools on (TOOLCHAIN_PGO, spksrc.native-toolchain.mk): gcc

@@ -13,14 +13,14 @@
 # This file holds only what is common to any component: the (arch, DSM)
 # parametrization, the extracted-sysroot fields (TC_TARGET / TC_GCC / TC_GLIBC), the
 # per-arch work dir, and tc-install. The component-specific logic (config,
-# build/install targets, archive vars) lives in mk/spksrc.native/toolchain-$(PKG_NAME).mk,
+# build/install targets, archive vars) lives in mk/spksrc.native-toolchain/$(PKG_NAME).mk,
 # included once the toolchain is known; spksrc.native-cc.mk comes last, so that file can
 # set the CONFIGURE/COMPILE/INSTALL targets before native-cc.mk wires them.
 #
 # Provides to the component mk and the package:
 #   TC_DIR       toolchain/syno-<arch>-<vers>
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
-#                (makefile_var, spksrc.common/macros.mk)
+#                (read_makefile_var, spksrc.common/macros.mk)
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
 #   TC_EXTRACT_DIR  where tc-install lands the gcc toolchain (bin/, sysroot, ...)
 #   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
@@ -28,7 +28,7 @@
 #                it a no-op once done; not a DEPENDS, which would hand it this WORK_DIR
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
-#   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (spksrc.rules/dist-arch.mk)
+#   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (overlay_dist_arch, spksrc.common/macros/archs.mk)
 #
 # And the targets that build it:
 #   make arch-<arch>-<vers>             one toolchain: build, then archive
@@ -44,10 +44,6 @@
 # (gcc-8.5, binutils-2.30, rust-1.98_gcc-*), which is how all-<vers> knows its archs.
 ###############################################################################
 
-# The arch the archive is named after (overlay_dist_arch): TC_ARCH, or the real arch whose
-# toolchain a generic one shares -- the same answer its consumer gets.
-include ../../mk/spksrc.rules/dist-arch.mk
-
 TOOLCHAIN_JOBS      ?= 1
 TOOLCHAIN_KEEP_WORK ?= 1
 
@@ -57,8 +53,8 @@ endif
 ifeq ($(strip $(TC_VERS)),)
 $(error spksrc.native-toolchain.mk: TC_VERS is required (e.g. TC_VERS=5.2))
 endif
-ifeq ($(wildcard $(CURDIR)/../../mk/spksrc.native/toolchain-$(PKG_NAME).mk),)
-$(error spksrc.native-toolchain.mk: no component for PKG_NAME '$(PKG_NAME)' (mk/spksrc.native/toolchain-<name>.mk))
+ifeq ($(wildcard $(CURDIR)/../../mk/spksrc.native-toolchain/$(PKG_NAME).mk),)
+$(error spksrc.native-toolchain.mk: no component for PKG_NAME '$(PKG_NAME)' (mk/spksrc.native-toolchain/<name>.mk))
 endif
 
 # overlay.mk keys its lookups off _OVERLAY_TC = syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX)),
@@ -71,7 +67,7 @@ TC          = syno-$(TC_ARCH)-$(TC_VERS)
 TC_DIR      = $(abspath $(CURDIR)/../../toolchain/$(TC))
 # $(call _tc_get,VAR): value of VAR as declared in the toolchain Makefile -- the
 # single source of truth, so nothing here duplicates the toolchain's own fields.
-_tc_get     = $(call makefile_var,$(TC_DIR)/Makefile,$(1))
+_tc_get     = $(call read_makefile_var,$(TC_DIR)/Makefile,$(1))
 
 TC_TARGET  := $(call _tc_get,TC_TARGET)
 TC_GCC     := $(call _tc_get,TC_GCC)
@@ -138,7 +134,7 @@ ARCHIVE_TARGET = toolchain-pgo-no-archive
 endif
 
 # Component-specific logic: configuration, build/install targets, archive variables.
-include ../../mk/spksrc.native/toolchain-$(PKG_NAME).mk
+include ../../mk/spksrc.native-toolchain/$(PKG_NAME).mk
 
 # Install the target toolchain, overlays included -- exactly what a cross package gets. A
 # producer needs more than the vendor gcc (a rustc built ON a gcc overlay needs that overlay).
@@ -156,9 +152,9 @@ tc-install:
 # ---- One toolchain, then a whole DSM version ------------------------------------------
 # TOOLCHAIN_DIST_SHARED (set by a component whose ARCHIVE_NAME carries TOOLCHAIN_DIST_ARCH):
 # a generic arch (x64, armv7, aarch64) shares its toolchain, hence its archive, with a real
-# arch of the same DSM (dist-arch.mk), and is built AS that arch. arch-x64-7.1 builds
+# arch of the same DSM (overlay_dist_arch), and is built AS that arch. arch-x64-7.1 builds
 # apollolake-7.1: the file x64-7.1's consumer fetches, from the toolchain it is a copy of
-# (toolchain_real, spksrc.common/archs.mk).
+# (toolchain_real, spksrc.common/macros/archs.mk).
 # A variable, so its commas do not split the $(if) below.
 _TC_GENERIC_MSG = $*: a generic arch, built as $(_TC_REAL), whose archive it fetches
 
@@ -201,7 +197,7 @@ toolchain-pgo-no-archive:
 # clobbered one another.
 .PHONY: toolchain-pgo-sources
 toolchain-pgo-sources:
-	@sh $(BASEDIR)/mk/spksrc.native/toolchain-pgo-sources.sh $(TOOLCHAIN_PGO_SOURCES)
+	@sh $(BASEDIR)/mk/spksrc.native-toolchain/pgo-sources.sh $(TOOLCHAIN_PGO_SOURCES)
 
 # The toolchains a component is built for are its consumers (toolchain_archs,
 # spksrc.common/archs.mk), once each. An arch whose archive exists is skipped

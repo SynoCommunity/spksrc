@@ -5,8 +5,9 @@
 #
 ###############################################################################
 
-# Include guard: overlay-rustc.mk sources this early (to get RUST_TARGET from the arch
-# map before deriving the synology triple); tc_vars.mk / cross-rust.mk include it again.
+# Include guard: spksrc.toolchain/overlay/rustc.mk sources this early (to get RUST_TARGET
+# from the arch map before deriving the synology triple); tc_vars.mk / cross-rust.mk
+# include it again.
 ifndef __ENV_RUST_MK__
 __ENV_RUST_MK__ := 1
 

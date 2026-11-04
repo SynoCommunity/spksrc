@@ -121,9 +121,9 @@ endif
 # one version and one gcc variant, so firstword just unwraps. Else a toolchain's own pin.
 _TC_CAP_RUST_MK := $(wildcard $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
-_TC_CAP_RUSTC := $(call makefile_var,$(_TC_CAP_RUST_MK),PKG_VERS)
+_TC_CAP_RUSTC := $(call read_makefile_var,$(_TC_CAP_RUST_MK),PKG_VERS)
 else
-_TC_CAP_RUSTC := $(call makefile_var,$(_TC_CAP_MK),TC_RUSTC)
+_TC_CAP_RUSTC := $(call read_makefile_var,$(_TC_CAP_MK),TC_RUSTC)
 endif
 
 # Published beside TC_GCC/TC_GLIBC/TC_KERNEL, and never empty: only an ACTIVE overlay pins a

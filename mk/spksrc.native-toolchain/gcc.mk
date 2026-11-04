@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.native/toolchain-gcc.mk
+# spksrc.native-toolchain/gcc.mk
 #
 # Component logic for PKG_NAME = gcc (spksrc.native-toolchain.mk): a modern cross
 # gcc rebuilt against an EXISTING Synology toolchain's sysroot, published as the archive
@@ -184,7 +184,7 @@ CONFIGURE_ARGS += --with-mpc=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-isl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --program-prefix=$(TC_TARGET)-
 # What gives the drivers their -<major.minor> suffix, which is how tc_vars selects this
-# compiler over the stock one (spksrc.toolchain/overlay-gcc.mk).
+# compiler over the stock one (spksrc.toolchain/overlay/gcc.mk).
 CONFIGURE_ARGS += --program-suffix=-$(basename $(PKG_VERS))
 CONFIGURE_ARGS += $(GCC_TARGET_ABI)
 # Fortran to match DSM 7.1, which ships gfortran; its gmp/mpfr/mpc/isl are already here.

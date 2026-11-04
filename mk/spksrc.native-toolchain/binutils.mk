@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.native/toolchain-binutils.mk
+# spksrc.native-toolchain/binutils.mk
 #
 # Component logic for PKG_NAME = binutils (spksrc.native-toolchain.mk): a modern
 # cross binutils against an EXISTING Synology toolchain's sysroot, published as the archive

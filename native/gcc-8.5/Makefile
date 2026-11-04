@@ -26,6 +26,6 @@ LICENSE  = GPLv3
 # cached. v5: profile-guided. Every consumer pins the same rev (overlay/*_gcc-8.5).
 PKG_REV ?= v5
 
-# Builds the archive the gcc overlay installs: mk/spksrc.native/toolchain-gcc.mk.
+# Builds the archive the gcc overlay installs: mk/spksrc.native-toolchain/gcc.mk.
 #   make arch-qoriq-6.2.4        make all-6.2.4        make TOOLCHAIN_PGO=0 arch-x86-5.2
 include ../../mk/spksrc.native-toolchain.mk
