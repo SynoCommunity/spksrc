@@ -51,15 +51,5 @@ endif
 # spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):
 # the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-binutils-warn
-ifeq ($(OVERLAY_BINUTILS_VERSION_MISSING),1)
 overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_VERSION_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_MISSING),1)
-overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_ON),1)
-overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_UNMATCHED)
-else
-overlay-binutils-warn: ;
-endif
+	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING UNMATCHED)

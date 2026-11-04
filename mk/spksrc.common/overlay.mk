@@ -20,8 +20,15 @@
 #             OVERLAY_<c>_ON      requested AND available
 #
 #   degraded  OVERLAY_BINUTILS_MISSING      wanted, arch ships none
+#             OVERLAY_BINUTILS_UNMATCHED    active beside the vendor gcc
+#             OVERLAY_GCC_NO_BINUTILS       wanted, but no binutils overlay to drive
+#             OVERLAY_RUSTC_GCC_FALLBACK    the vendor-gcc rust taken for the gcc overlay
 #             OVERLAY_<c>_VERSION_MISSING   ships one, but not that version
-#             OVERLAY_WARN_*                the matching banner text
+#             OVERLAY_WARN_<c>_<state>      the matching banner text
+#
+#   created by OVERLAY_COMPONENT_TEMPLATE, for every <c> -- no assignment to search for:
+#             _OVERLAY_<c>_ANY, TC_OVERLAY_<c> (but RUSTC), OVERLAY_<c>_VERSION_MISSING,
+#             OVERLAY_WARN_<c>_VERSION_MISSING
 #
 #   internal  _OVERLAY_TC                the toolchain dir name
 #             _OVERLAY_<c>_ANY           any version, ignoring OVERLAY_<c>_VERS
@@ -83,6 +90,25 @@ OVERLAY_GCC            ?= 0
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
 
 _OVERLAY_DIR := $(dir $(lastword $(MAKEFILE_LIST)))overlay
+
+# ---- The names every component shares ----------------------------------------------
+# $(eval $(call OVERLAY_COMPONENT_TEMPLATE,<C>,<dir>[,select])), first thing in each
+# component file, <C> its upper-case name and <dir> its overlay directory name. Creates:
+#
+#   _OVERLAY_<C>_ANY                  every <dir> dir the arch ships, any version
+#   TC_OVERLAY_<C>                    the one of OVERLAY_<C>_VERS -- unless select: the
+#                                     component picks it itself (rustc: by gcc variant)
+#   OVERLAY_<C>_VERSION_MISSING       ships one, but not that version
+#   OVERLAY_WARN_<C>_VERSION_MISSING  the banner for it (warnings.mk)
+#
+# so the same state carries the same name in every component. What differs -- ACTIVE, and
+# the states only one of them has -- stays in its own file.
+define OVERLAY_COMPONENT_TEMPLATE
+_OVERLAY_$(1)_ANY := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-*)
+$(if $(3),,TC_OVERLAY_$(1) := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-$$(OVERLAY_$(1)_VERS)))
+OVERLAY_$(1)_VERSION_MISSING = $$(if $$(_OVERLAY_$(1)_ANY),$$(if $$(strip $$(TC_OVERLAY_$(1))),,1))
+OVERLAY_WARN_$(1)_VERSION_MISSING = $$(call overlay_warn_version_missing,$(2),OVERLAY_$(1)_VERS,$$(OVERLAY_$(1)_VERS),$$(_OVERLAY_$(1)_ANY))
+endef
 
 include $(_OVERLAY_DIR)/binutils.mk
 include $(_OVERLAY_DIR)/gcc.mk

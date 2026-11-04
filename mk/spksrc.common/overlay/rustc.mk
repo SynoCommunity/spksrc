@@ -7,9 +7,10 @@
 ###############################################################################
 
 # ---- AVAILABLE ---------------------------------------------------------------------
-# Non-empty doubles as the path. _ANY ignores the requested version, which is what tells
-# "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
-_OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-*)
+# _OVERLAY_RUSTC_ANY, OVERLAY_RUSTC_VERSION_MISSING and its banner; TC_OVERLAY_RUSTC is
+# picked below. Non-empty doubles as the path. _ANY ignores the requested version, which is
+# what tells "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
+$(eval $(call OVERLAY_COMPONENT_TEMPLATE,RUSTC,rust,select))
 # A rust toolchain is built against a specific gcc, and its directory says which. Both
 # variants coexist, so the _gcc-* glob alone would match two; these split them -- first
 # across EVERY version the arch ships, to choose the default version from the right pool.
@@ -68,9 +69,7 @@ endif
 # Lazy (=), like the other components' ACTIVE.
 OVERLAY_RUSTC_ON     = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))
 
-# Degraded states (spksrc.common/overlay.mk).
-OVERLAY_RUSTC_VERSION_MISSING    = $(if $(_OVERLAY_RUSTC_ANY),$(if $(strip $(TC_OVERLAY_RUSTC)),,1))
-# Not a failure: the gcc overlay is on, this arch ships no rustc built against it, and the
-# vendor-gcc one was taken instead. Worth saying, because the rust std then comes from a
-# different compiler than the C around it.
+# Degraded state (spksrc.common/overlay.mk), not a failure: the gcc overlay is on, this
+# arch ships no rustc built against it, and the vendor-gcc one was taken instead. Worth
+# saying, because the rust std then comes from a different compiler than the C around it.
 OVERLAY_RUSTC_GCC_FALLBACK       = $(if $(call is_true,$(OVERLAY_GCC)),$(if $(strip $(_OVERLAY_RUSTC_MATCHED)),,$(if $(strip $(_OVERLAY_RUSTC_VENDOR)),1)))

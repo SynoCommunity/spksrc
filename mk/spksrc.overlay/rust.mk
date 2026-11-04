@@ -6,8 +6,7 @@
 # into rustup under the id a package build asks for (spksrc.toolchain/overlay/rustc.mk).
 ###############################################################################
 
-PKG_NAME = rust
-PKG_EXT  = txz
+# Its own release, and named after the rustup id rather than the toolchain.
 PKG_DIST_NAME = $(PKG_NAME)-$(RUST_TC_ID)-$(PKG_REV).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/rust/qoriq
 EXTRACT_PATH  = $(INSTALL_DIR)/$(INSTALL_PREFIX)
@@ -15,9 +14,6 @@ EXTRACT_PATH  = $(INSTALL_DIR)/$(INSTALL_PREFIX)
 HOMEPAGE = https://www.rust-lang.org/
 COMMENT  = A language empowering everyone to build reliable and efficient software.
 LICENSE  = Apache-2.0, MIT licenses
-
-INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = rust-post_install
 
 # The toolchain id, which must match spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID: the
 # triple is the same arch map a package build reads (env-rust.mk), vendor field

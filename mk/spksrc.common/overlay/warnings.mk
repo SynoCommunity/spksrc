@@ -4,6 +4,16 @@
 # What to say about each degraded state of spksrc.common/overlay.mk.
 ###############################################################################
 
+# Macro: the banner of a component's first degraded state
+#
+#   overlay-binutils-warn:
+#   	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING UNMATCHED)
+#
+# The first <STATE> of the list, in order, whose OVERLAY_<C>_<STATE> is 1, as the text of
+# OVERLAY_WARN_<C>_<STATE>; nothing when none is. The order is the priority: one banner
+# per component, the most specific first.
+overlay_warn = $(OVERLAY_WARN_$(1)_$(firstword $(foreach s,$(2),$(if $(filter 1,$(OVERLAY_$(1)_$(s))),$(s)))))
+
 # Text only; a define is inert, so it costs the packages reading this file nothing. Emitted
 # from a recipe: this file is re-parsed several times per build, so $(warning) would repeat.
 # Banner style follows spksrc.spk-meta/base.mk.
@@ -14,7 +24,8 @@ $(MSG) "*** Falling back to this toolchain's own as/ld" ; \
 $(MSG) "*********************************************************************"
 endef
 
-# $(1) component, $(2) knob name, $(3) requested version, $(4) dirs the arch ships.
+# $(1) component, $(2) knob name, $(3) requested version, $(4) dirs the arch ships. Each
+# component's OVERLAY_WARN_<C>_VERSION_MISSING calls it (OVERLAY_COMPONENT_TEMPLATE).
 define overlay_warn_version_missing
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** No $(1) overlay $(3) for [$(_OVERLAY_TC)]" ; \
@@ -23,7 +34,6 @@ $(MSG) "*** Overlay disabled -- set $(2) to one of the above" ; \
 $(MSG) "*********************************************************************"
 endef
 
-OVERLAY_WARN_RUSTC_VERSION_MISSING    = $(call overlay_warn_version_missing,rust,OVERLAY_RUSTC_VERS,$(OVERLAY_RUSTC_VERS),$(_OVERLAY_RUSTC_ANY))
 
 define OVERLAY_WARN_RUSTC_GCC_FALLBACK
 $(MSG) "*********************************************************************" ; \
@@ -32,8 +42,6 @@ $(MSG) "*** Using $(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(_OVERLAY_RUSTC_VENDOR
 $(MSG) "*** The rust std is built against the vendor gcc, the C around it is not" ; \
 $(MSG) "*********************************************************************"
 endef
-OVERLAY_WARN_BINUTILS_VERSION_MISSING = $(call overlay_warn_version_missing,binutils,OVERLAY_BINUTILS_VERS,$(OVERLAY_BINUTILS_VERS),$(_OVERLAY_BINUTILS_ANY))
-OVERLAY_WARN_GCC_VERSION_MISSING      = $(call overlay_warn_version_missing,gcc,OVERLAY_GCC_VERS,$(OVERLAY_GCC_VERS),$(_OVERLAY_GCC_ANY))
 
 define OVERLAY_WARN_BINUTILS_UNMATCHED
 $(MSG) "*********************************************************************" ; \

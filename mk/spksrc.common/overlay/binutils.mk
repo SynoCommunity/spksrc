@@ -5,8 +5,8 @@
 # after the switches and before gcc.mk, whose OVERLAY_GCC_ON this reads lazily.
 ###############################################################################
 
-_OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-*)
-TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
+# _OVERLAY_BINUTILS_ANY, TC_OVERLAY_BINUTILS, OVERLAY_BINUTILS_VERSION_MISSING and its banner.
+$(eval $(call OVERLAY_COMPONENT_TEMPLATE,BINUTILS,binutils))
 
 # The as/ld version the GLOBAL overlay supplies, as the consumer's own PKG_VERS -- what
 # tc-capability.mk reports for TC_BINUTILS when the overlay drives this build, so a
@@ -53,7 +53,7 @@ OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(_OVERLAY_BINUTILS_ASKED
 # for nothing, and must not announce a missing binutils on every build of a 7.2 arch.
 _OVERLAY_BINUTILS_WANTED    = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(if $(strip $(TC_OVERLAY_GCC)),$(call is_true,$(OVERLAY_GCC))),1)
 
-# Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or not
-# that version.
+# Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or active
+# beside the vendor gcc, which it is not matched to.
 OVERLAY_BINUTILS_MISSING         = $(if $(_OVERLAY_BINUTILS_ANY),,$(_OVERLAY_BINUTILS_WANTED))
-OVERLAY_BINUTILS_VERSION_MISSING = $(if $(_OVERLAY_BINUTILS_ANY),$(if $(strip $(TC_OVERLAY_BINUTILS)),,1))
+OVERLAY_BINUTILS_UNMATCHED       = $(if $(OVERLAY_BINUTILS_ON),$(if $(OVERLAY_GCC_ON),,1))

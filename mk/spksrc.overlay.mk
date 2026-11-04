@@ -53,6 +53,18 @@ override DISTRIB_DIR = $(OVERLAY_DIR)/$(TC_VERS)
 override ARCH =
 override TCVERSION =
 
+# What every component shares, before its own file: an archive named after its producer's
+# toolchain, published in the toolchains/dsm<dsm> release, extracted as is, nothing to
+# install but its own <component>-post_install step. A component sets only what differs
+# (rust: its own release and name, under INSTALL_PREFIX).
+PKG_NAME            = $(OVERLAY_COMPONENT)
+PKG_EXT             = txz
+PKG_DIST_NAME       = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(OVERLAY_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
+PKG_DIST_SITE       = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm$(TC_VERS)
+EXTRACT_PATH        = $(INSTALL_DIR)
+INSTALL_TARGET      = nop
+POST_INSTALL_TARGET = $(PKG_NAME)-post_install
+
 include ../../mk/spksrc.overlay/$(OVERLAY_COMPONENT).mk
 include ../../mk/spksrc.native-install.mk
 

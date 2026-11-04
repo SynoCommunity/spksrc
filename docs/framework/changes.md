@@ -182,6 +182,11 @@ If you only read one thing, read this. The details are in the dated log below.
       `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to
       `mk/spksrc.toolchain/overlay/`. `overlay_dist_arch` joins the macros, replacing
       `dist-arch.mk`.
+    - **What the overlay components share is written once:** `OVERLAY_COMPONENT_TEMPLATE`
+      creates the names every component has, `spksrc.overlay.mk` the archive and install
+      defaults, and `overlay_warn` picks a component's banner from its states.
+      `OVERLAY_BINUTILS_UNMATCHED` names the binutils overlay active beside the vendor
+      gcc, which no longer warns when the gcc overlay is active too.
     - Nothing a package builds changes otherwise: builds keep using the archives as
       published.
     - See [Building and publishing an

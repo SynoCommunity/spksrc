@@ -420,6 +420,12 @@ Overlay code sits at four levels, by role, each read by a different Makefile:
 
 The base toolchain ties the first three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the active ones. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
 
+What the components have in common is written once, so a state carries the same name in each:
+
+- **Decide:** each component file starts with `$(eval $(call OVERLAY_COMPONENT_TEMPLATE,<C>,<dir>))`, which creates `_OVERLAY_<C>_ANY`, `TC_OVERLAY_<C>`, `OVERLAY_<C>_VERSION_MISSING` and its banner `OVERLAY_WARN_<C>_VERSION_MISSING`. Only what differs, such as when the component is active, is written in the file. The header of `mk/spksrc.common/overlay.mk` lists the names the template creates, for a search that finds no assignment.
+- **Install:** `mk/spksrc.overlay.mk` sets the archive name, release, extract path and `<component>-post_install` step; a component file sets only what differs (rust has its own release and archive name).
+- **Use:** a component's `overlay-<c>-warn` target prints `$(call overlay_warn,<C>,<STATE> ...)`, the banner `OVERLAY_WARN_<C>_<STATE>` of the first state of the list whose `OVERLAY_<C>_<STATE>` is 1.
+
 ### Overlay switches
 
 Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide* level above), read by the toolchain and the package side alike. It keeps three questions apart:
