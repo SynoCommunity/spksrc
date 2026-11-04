@@ -156,9 +156,9 @@ ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 	      ;; \
 	  esac ; \
 	done
-	@if [ -n "$$(find $(STAGING_DIR) -type f -name '*.ko' -print -quit)" ]; then \
+	@if [ -n "$$(find $(STAGING_DIR) -type f -path '*/lib/modules/*' -name '*.ko' -print -quit)" ]; then \
 	  echo "Stripping debug symbols of kernel modules" ; \
-	  find $(STAGING_DIR) -type f -name '*.ko' -exec chmod u+w {} + -exec $(STRIP) --strip-debug {} + ; \
+	  find $(STAGING_DIR) -type f -path '*/lib/modules/*' -name '*.ko' -exec chmod u+w {} + -exec $(STRIP) --strip-debug {} + ; \
 	fi
 else
 	@$(MSG) GCC_DEBUG_INFO enabled: Skipping strip_target
