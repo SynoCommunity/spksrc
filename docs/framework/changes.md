@@ -174,8 +174,9 @@ If you only read one thing, read this. The details are in the dated log below.
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
       (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
       macro documented the same way; `upper` and `lower` change case without a fork,
-      for the switches and the Rust triple suffixes; `TRUE` and `FALSE` hold every
-      spelling of a switch; `read_makefile_var` reads one variable a Makefile
+      for the switches, the Rust triple suffixes, the arch-group patch directories and
+      the translated descriptions of INFO; `TRUE` and `FALSE` hold every spelling of a
+      switch; `read_makefile_var` reads one variable a Makefile
       declares, and `dedup-files` is now `dedup_files`. The overlay decisions are split
       the same way, `overlay.mk` reading `mk/spksrc.common/overlay/` (`binutils`,
       `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to

@@ -39,8 +39,8 @@ PATCHES += $(sort $(wildcard patches/$(ARCH)-$(TCVERSION)/*.patch \
 	                     patches/$(ARCH)/*.patch))
 PATCHES += $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
 	   $(if $(filter $(ARCH),$($(group))), \
-	   $(wildcard patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')/*.patch \
-	              patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')-$(TCVERSION)/*.patch))))
+	   $(wildcard patches/$(call lower,$(firstword $(subst _, ,$(group))))/*.patch \
+	              patches/$(call lower,$(firstword $(subst _, ,$(group))))-$(TCVERSION)/*.patch))))
 endif
 PATCHES := $(call dedup_files,$(call uniq,$(realpath $(PATCHES))))
 
