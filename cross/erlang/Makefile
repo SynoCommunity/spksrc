@@ -34,6 +34,12 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, $(TC_GCC), 9),1)
 CONFIGURE_ARGS += --disable-jit
 endif
+
+# OTP 27 requires 64-bit time_t by default. 32-bit DSM toolchains only
+# provide 32-bit time_t, so allow the upstream-supported opt-out.
+ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),)
+CONFIGURE_ARGS += --disable-year2038
+endif
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 

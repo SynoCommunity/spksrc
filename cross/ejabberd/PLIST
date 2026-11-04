@@ -364,7 +364,7 @@ rsc:lib/ejabberd-25.10/include/mod_vcard.hrl
 rsc:lib/ejabberd-25.10/include/mqtt.hrl
 rsc:lib/ejabberd-25.10/include/pubsub.hrl
 rsc:lib/ejabberd-25.10/include/translate.hrl
-bin:lib/ejabberd-25.10/priv/bin/captcha.sh
+rsc:lib/ejabberd-25.10/priv/bin/captcha.sh
 rsc:lib/ejabberd-25.10/priv/css/admin.css
 rsc:lib/ejabberd-25.10/priv/css/bosh.css
 rsc:lib/ejabberd-25.10/priv/css/muc.css
