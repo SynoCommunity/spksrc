@@ -2,12 +2,15 @@
 // AirPlay 2 enabled with NQPTP timing daemon
 //
 // For full configuration options see:
-// https://github.com/mikebrady/shairport-sync/blob/master/scripts/shairport-sync.conf
-
+// https://github.com/mikebrady/shairport-sync/blob/5.6.2/scripts/shairport-sync.conf
+//
 general =
 {
   @@SERVER_NAME@@
   output_backend = "@@OUTPUT_BACKEND@@"; // Options: "alsa", "dummy", "pipe"
+  service_type = "auto"; // "auto", "airplay2" or "classic"
+  alac_decoder = "ffmpeg"; // Classic AirPlay only; AirPlay 2 always uses FFmpeg
+  lossless_mode = "on"; // AirPlay 2 lossless playback
   port = 8303; // SynoCommunity assigned port (default 5000 conflicts with DSM)
   udp_port_base = 8304;
   udp_port_range = 10;
@@ -15,7 +18,6 @@ general =
 
 diagnostics =
 {
-  log_output_to = "syslog";
   // log_verbosity = 1; // Uncomment for detailed logging
   // statistics = "yes"; // Uncomment to see audio frame statistics
 };
@@ -42,4 +44,5 @@ metadata =
   include_cover_art = "yes";
   pipe_name = "/tmp/shairport-sync-metadata";
   pipe_timeout = 5000;
+  // bitrate_stats_interval = 0.0; // Non-zero sends bitrate/retry statistics
 };
