@@ -29,8 +29,9 @@ CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.common.mk
 
-# OTP 27 JIT triggers a GCC ICE with the DSM 7.1 toolchain (GCC 7.x)
-ifeq ($(call version_lt, $(TCVERSION), 7.2),1)
+# OTP 27 JIT (asmjit) requires GCC 9+; GCC 8.5 and older crash while
+# compiling asmjit/core/virtmem.cpp
+ifeq ($(call version_lt, $(TC_GCC), 9),1)
 CONFIGURE_ARGS += --disable-jit
 endif
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
