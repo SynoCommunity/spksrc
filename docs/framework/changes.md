@@ -172,8 +172,10 @@ If you only read one thing, read this. The details are in the dated log below.
     - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
       (`gcc.mk`, `binutils.mk`, `rustc.mk`).
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
-      (`version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each macro
-      documented the same way; `read_makefile_var` reads one variable a Makefile
+      (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
+      macro documented the same way; `upper` and `lower` change case without a fork,
+      for the switches and the Rust triple suffixes; `TRUE` and `FALSE` hold every
+      spelling of a switch; `read_makefile_var` reads one variable a Makefile
       declares, and `dedup-files` is now `dedup_files`. The overlay decisions are split
       the same way, `overlay.mk` reading `mk/spksrc.common/overlay/` (`binutils`,
       `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to

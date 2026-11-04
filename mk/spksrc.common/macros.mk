@@ -6,6 +6,10 @@
 # when its body spans several; a name starting with _ is internal to its file.
 #
 # Macros:
+#  string.mk
+#   upper             : upper-cases ASCII letters, no fork
+#   lower             : lower-cases ASCII letters, no fork
+#
 #  version.mk
 #   version_le        : true if version A <= version B
 #   version_ge        : true if version A >= version B
@@ -13,6 +17,7 @@
 #   version_gt        : true if version A >  version B
 #
 #  bool.mk
+#   TRUE, FALSE       : every spelling of a switch on / off, lower and upper case
 #   is_true           : non-empty when a switch is on (1, y, yes, true, on -- any case)
 #   is_false          : non-empty when a switch is off (0, n, no, false, off, or empty)
 #   assert_bool       : stops the build when a switch is neither
@@ -51,6 +56,7 @@
 
 _MACROS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))macros
 
+include $(_MACROS_DIR)/string.mk
 include $(_MACROS_DIR)/version.mk
 include $(_MACROS_DIR)/bool.mk
 include $(_MACROS_DIR)/list.mk
