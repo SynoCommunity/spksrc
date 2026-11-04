@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 26.2.5.19
+PKG_VERS = 27.3.4.19
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -28,6 +28,11 @@ CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
 CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.common.mk
+
+# OTP 27 JIT triggers a GCC ICE with the DSM 7.1 toolchain (GCC 7.x)
+ifeq ($(call version_lt, $(TCVERSION), 7.2),1)
+CONFIGURE_ARGS += --disable-jit
+endif
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 
