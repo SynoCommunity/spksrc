@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.native/toolchain-rustc.mk
+# spksrc.native-toolchain/rustc.mk
 #
 # Rust component for spksrc.native-toolchain.mk (PKG_NAME = rustc). Builds
 # a custom Rust toolchain FROM SOURCE (rustc + cargo + host/target std, LLVM from
@@ -75,7 +75,8 @@ TC_EXTRA_CFLAGS    := $(call _tc_get,TC_EXTRA_CFLAGS)
 TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
 # Widen the spec to 64 wherever the gcc ships libatomic: 64-bit atomics then lower to
 # __atomic_*_8 libcalls, exposing AtomicU64 on a 32-bit arch. Derived, not declared -- the
-# same probe gates the -latomic link flag (overlay-rustc.mk). Lazy: it runs the cross gcc.
+# same probe gates the -latomic link flag (spksrc.toolchain/overlay/rustc.mk). Lazy: it
+# runs the cross gcc.
 RUST_MAX_ATOMIC_WIDTH = $(if $(TC_HAS_LIBATOMIC),64)
 
 # PKG_REV is set by the native producer Makefile (PKG_REV ?= v1,
@@ -121,7 +122,7 @@ TOOLCHAIN_CONSUMER = rust-$(basename $(PKG_VERS))_gcc-*
 
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
-# overlay-rustc.mk's _RUST_TC_ID on the package-build side.
+# spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID on the package-build side.
 _RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
@@ -231,8 +232,8 @@ rustc_binutils_cobuild:
 	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
 	@$(MSG) "*** PATH: $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
 	@$(MSG) "*********************************************************************"
-	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see overlay-binutils.mk) so it
-	@# cannot re-bootstrap a toolchain and recurse.
+	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see
+	@# spksrc.toolchain/overlay/binutils.mk) so it cannot re-bootstrap a toolchain and recurse.
 	$(MAKE) --no-print-directory -C $(RUST_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
 	@mkdir -p $(RUST_BINUTILS_SHIM)
 	@ln -sf $(RUST_BINUTILS_BIN)/$(TC_TARGET)-ld $(RUST_BINUTILS_SHIM)/ld

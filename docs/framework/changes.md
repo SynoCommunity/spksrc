@@ -161,7 +161,7 @@ If you only read one thing, read this. The details are in the dated log below.
       time, and resumes where it stopped. An archive is written under a temporary
       name, then renamed.
     - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
-      `macros.mk`. See [Boolean values](../reference/macros.md#boolean-values).
+      the macros. See [Boolean values](../reference/macros.md#boolean-values).
     - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
       `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERS`, `TC_OVERLAY_GCC`,
       `OVERLAY_GCC_ON`), off for the tree: the producer turns it on for itself.
@@ -169,10 +169,16 @@ If you only read one thing, read this. The details are in the dated log below.
     - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
       vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
       depend on the caller's shell.
-    - `PKG_NAME` picks a producer's component (`toolchain-gcc.mk`,
-      `toolchain-binutils.mk`, `toolchain-rustc.mk`); `dist-arch.mk` moves to
-      `mk/spksrc.rules/`, shared by producers and overlays; `makefile_var`
-      (`macros.mk`) reads one variable a Makefile declares.
+    - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
+      (`gcc.mk`, `binutils.mk`, `rustc.mk`).
+    - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
+      (`version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each macro
+      documented the same way; `read_makefile_var` reads one variable a Makefile
+      declares, and `dedup-files` is now `dedup_files`. The overlay decisions are split
+      the same way, `overlay.mk` reading `mk/spksrc.common/overlay/` (`binutils`,
+      `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to
+      `mk/spksrc.toolchain/overlay/`. `overlay_dist_arch` joins the macros, replacing
+      `dist-arch.mk`.
     - Nothing a package builds changes otherwise: builds keep using the archives as
       published.
     - See [Building and publishing an

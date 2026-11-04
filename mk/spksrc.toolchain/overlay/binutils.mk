@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.toolchain/overlay-binutils.mk
+# spksrc.toolchain/overlay/binutils.mk
 #
 # OVERLAY_BINUTILS, consumer side: a modern GNU binutils for this (arch, DSM). Member of the
 # OVERLAY_<component> family; the switches and their defaults are in spksrc.common/overlay.mk,

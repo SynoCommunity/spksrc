@@ -18,6 +18,6 @@ LICENSE  = GPLv3
 # v4: same again, profile-guided. Every consumer pins the same rev (overlay/*_binutils-2.30).
 PKG_REV ?= v4
 
-# Builds the archive the binutils overlay installs: mk/spksrc.native/toolchain-binutils.mk.
+# Builds the archive the binutils overlay installs: mk/spksrc.native-toolchain/binutils.mk.
 #   make arch-ppc853x-5.2        make all-6.2.4        make TOOLCHAIN_PGO=0 arch-x86-5.2
 include ../../mk/spksrc.native-toolchain.mk

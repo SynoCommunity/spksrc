@@ -33,7 +33,8 @@
 #       ├── stage0.mk  : bootstrap toolchain & load its tc_vars (TC_GCC, ...)
 #       ├── archs.mk   : architecture and toolchain classification
 #       ├── logs.mk    : build log paths and logging helpers
-#       └── macros.mk  : generic GNU Make helper macros
+#       ├── macros.mk  : generic GNU Make helper macros, one file per theme in macros/
+#       └── overlay.mk : overlay decisions, one file per component in overlay/
 #
 ###############################################################################
 

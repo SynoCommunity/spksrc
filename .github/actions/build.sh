@@ -57,7 +57,7 @@ done
 
 # Cleanup toolchains to enforce re-building including cargo/rust. For a custom-rust
 # arch, `make clean` cascades to its rust std + binutils overlay consumers (see
-# mk/spksrc.toolchain/overlay-binutils.mk); a non-rust arch just cleans itself.
+# mk/spksrc.toolchain/overlay/binutils.mk); a non-rust arch just cleans itself.
 (cd toolchain/syno-${GH_ARCH} && make clean)
 
 # ===========================================================================
