@@ -13,5 +13,7 @@ LICENSE  = LGPLv2+
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
+# Avoid configure-time host file checks in cross builds.
+CONFIGURE_ARGS += --without-machine-id --without-boot-id --with-urandom=/dev/urandom
 
 include ../../mk/spksrc.cross-cc.mk
