@@ -173,6 +173,8 @@ SPK_COMMANDS += bin/whirlpool-hash
 SPK_COMMANDS += bin/xstow bin/merge-info
 SPK_COMMANDS += bin/patch
 
+PLIST_TRANSFORM = sed -e '/^rsc:include\/rhash\.h$$/d'
+
 include ../../mk/spksrc.spk.mk
 
 ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
