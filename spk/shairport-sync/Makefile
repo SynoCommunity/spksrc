@@ -1,6 +1,6 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 4.3.7
-SPK_REV = 3
+SPK_VERS = 5.6.2
+SPK_REV = 4
 SPK_ICON = src/shairport-sync.png
 
 DEPENDS = cross/shairport-sync
@@ -19,7 +19,7 @@ REQUIRED_MAX_DSM = 6.999
 MAINTAINER = SynoCommunity
 DESCRIPTION = AirPlay 2 audio player. Stream audio wirelessly from Apple devices to your Synology NAS using Apple\'s latest AirPlay 2 protocol. Features include multi-room audio, Siri integration, and improved reliability. Requires USB soundcard or speakers connected to your NAS.
 DISPLAY_NAME = Shairport Sync
-CHANGELOG = "1. Update to v4.3.7 with AirPlay 2 support.<br/>2. Added NQPTP daemon for AirPlay 2 timing.<br/>3. DSM 6 only - requires AudioStation for USB audio drivers."
+CHANGELOG = "1. Update to v5.6.2 with security fixes.<br/>2. Update NQPTP to v1.2.9 (smi11)."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE = GPL
