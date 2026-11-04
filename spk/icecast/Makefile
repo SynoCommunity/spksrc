@@ -38,5 +38,5 @@ include ../../mk/spksrc.spk.mk
 .PHONY: icecast_extra_install
 icecast_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/var/log
-	@install -m 644 src/icecast.xml $(STAGING_DIR)/var/icecast.xml
+	@install -m 600 src/icecast.xml $(STAGING_DIR)/var/icecast.xml
 	@install -m 644 src/mime.types  $(STAGING_DIR)/var/mime.types

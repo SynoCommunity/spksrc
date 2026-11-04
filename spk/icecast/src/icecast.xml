@@ -19,16 +19,8 @@
         <client-timeout>30</client-timeout>
         <header-timeout>15</header-timeout>
         <source-timeout>10</source-timeout>
-        <!-- If enabled, this will provide a burst of data when a client 
-             first connects, thereby significantly reducing the startup 
-             time for listeners that do substantial buffering. However,
-             it also significantly increases latency between the source
-             client and listening client.  For low-latency setups, you
-             might want to disable this. -->
-        <burst-on-connect>1</burst-on-connect>
-        <!-- same as burst-on-connect, but this allows for being more
-             specific on how much to burst. Most people won't need to
-             change from the default 64k. Applies to all mountpoints  -->
+        <!-- This sets the burst size in bytes. Most people won't need to
+             change from the default 64k. Applies to all mountpoints. -->
         <burst-size>65535</burst-size>
     </limits>
 
@@ -189,10 +181,9 @@
 
     <fileserve>1</fileserve>
 
-    <!-- location of mime types file used for file serving -->
-    <mime-types>/var/packages/icecast/var/mime.types</mime-types>
-
     <paths>
+        <!-- location of mime types file used for file serving -->
+        <mime-types>/var/packages/icecast/var/mime.types</mime-types>
         <!-- basedir is only used if chroot is enabled -->
         <basedir>/var/packages/icecast/target/share/icecast</basedir>
 

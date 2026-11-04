@@ -12,4 +12,9 @@ service_postinst ()
             -e "s/@password@/${wizard_ic_password:=changepassword}/g" \
             -i ${CFG_FILE}
     fi
+
+    if [ -f "${CFG_FILE}" ]; then
+        chown "${EFF_USER}:$(id -gn "${EFF_USER}")" "${CFG_FILE}"
+        chmod 600 "${CFG_FILE}"
+    fi
 }
