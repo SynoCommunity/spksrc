@@ -138,10 +138,11 @@ spksrc.common/
 ├── macros.mk                 # GNU Make helper macros, one file per theme:
 ├── macros/
 │   ├── archs.mk              #   which toolchain an overlay or its producer stands for
-│   ├── bool.mk               #   is_true, is_false, assert_bool, bool
+│   ├── bool.mk               #   TRUE, FALSE, is_true, is_false, assert_bool, bool
 │   ├── depend.mk             #   depend, dep_seen
 │   ├── list.mk               #   uniq, dedup, dedup_files, merge, comma_append
 │   ├── runlog.mk             #   _runlog, RUNLOG
+│   ├── string.mk             #   upper, lower
 │   ├── tools.mk              #   tc, native, read_makefile_var
 │   └── version.mk            #   version_le/ge/lt/gt
 ├── overlay.mk                # overlay decisions: available, requested, active

@@ -5,7 +5,7 @@ description: GNU Make helper macros provided by spksrc and how to use them
 
 # Macros
 
-spksrc ships a small set of GNU Make helper macros in `mk/spksrc.common/macros.mk`, which includes one file per theme from `mk/spksrc.common/macros/` (`version.mk`, `bool.mk`, `list.mk`, `depend.mk`, `tools.mk`, `archs.mk`, `runlog.mk`). They are **loaded automatically**: `spksrc.common.mk` includes `spksrc.common/macros.mk` first, so the macros are available in any package Makefile that includes a spksrc entry point (`spksrc.cross-cc.mk`, `spksrc.spk.mk`, ...).
+spksrc ships a small set of GNU Make helper macros in `mk/spksrc.common/macros.mk`, which includes one file per theme from `mk/spksrc.common/macros/` (`string.mk`, `version.mk`, `bool.mk`, `list.mk`, `depend.mk`, `tools.mk`, `archs.mk`, `runlog.mk`). They are **loaded automatically**: `spksrc.common.mk` includes `spksrc.common/macros.mk` first, so the macros are available in any package Makefile that includes a spksrc entry point (`spksrc.cross-cc.mk`, `spksrc.spk.mk`, ...).
 
 !!! note "Architecture awareness is loaded early too"
     The same `spksrc.common.mk` also pulls in the parse-time toolchain pre-bootstrap (`spksrc.common/stage0.mk`) and the architecture classification (`spksrc.common/archs.mk`). That is what makes `TC_GCC` and the [architecture groups](architectures.md#architecture-groups) available **while a package's `DEPENDS` are parsed**, so version- and arch-gated dependencies resolve correctly on a cold tree.
@@ -54,7 +54,11 @@ endif
 ACTIVE = $(if $(call is_true,$(PSTAT)),1)
 ```
 
-`bool` is the one to use where a typo must not silently read as "off". `$(call assert_bool,VALUE,NAME)` only validates, for a switch read with `is_true` / `is_false` elsewhere. All of them lower-case the value without a fork.
+`bool` is the one to use where a typo must not silently read as "off". `$(call assert_bool,VALUE,NAME)` only validates, for a switch read with `is_true` / `is_false` elsewhere. `$(TRUE)` and `$(FALSE)` hold every spelling, in lower and upper case.
+
+## Case conversion
+
+`$(call upper,TEXT)` and `$(call lower,TEXT)` change the case of ASCII letters in pure make, without a fork. The switches above are read through `lower`, and the Rust triple becomes an environment suffix through both: `CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER`, `CC_x86_64_unknown_linux_gnu`.
 
 ## Dependencies
 
