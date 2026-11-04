@@ -1,6 +1,6 @@
 SPK_NAME = icecast
-SPK_VERS = 2.4.4
-SPK_REV = 9
+SPK_VERS = 2.5.0
+SPK_REV = 10
 SPK_ICON = src/icecast.png
 DSM_UI_DIR = app
 
@@ -8,7 +8,7 @@ DEPENDS = cross/icecast
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icecast is a streaming media server which currently supports Ogg \(Vorbis and Theora\), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction. This package includes Ezstream, a command line source client for Icecast media streaming servers.
-CHANGELOG = "1. Update openssl to v3.1.7. <br/>2. Update to libcurl of curl v8.4.0. <br/>3. Update taglib to v1.13.1."
+CHANGELOG = "Update to v2.5.0."
 DISPLAY_NAME = Icecast2
 
 HOMEPAGE = https://www.icecast.org/
@@ -25,6 +25,11 @@ STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = icecast_extra_install
+
+# Keep libigloo/rhash development files for the build, but not in the package.
+PLIST_TRANSFORM = sed -e '/^rsc:include\/igloo\//d' \
+                       -e '/^rsc:include\/rhash\.h$$/d' \
+                       -e '/^rsc:lib\/pkgconfig\/igloo\.pc$$/d'
 
 SPK_COMMANDS = bin/ezstream bin/ezstream-cfgmigrate bin/ezstream-file.sh
 

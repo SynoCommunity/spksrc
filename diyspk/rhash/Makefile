@@ -27,6 +27,8 @@ SPK_COMMANDS += bin/tiger-hash
 SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
+PLIST_TRANSFORM = sed -e '/^rsc:include\/rhash\.h$$/d'
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: rhash_extra_install
