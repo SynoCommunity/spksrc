@@ -2,7 +2,7 @@
 # spksrc.common/overlay/rustc.mk
 #
 # The rust overlay: available, requested, active. Read by spksrc.common/overlay.mk, last
-# of the components: which build is picked depends on OVERLAY_GCC and OVERLAY_GCC_VERS,
+# of the components: which build is picked depends on OVERLAY_GCC and OVERLAY_GCC_VERSION,
 # both set before any component is read.
 ###############################################################################
 
@@ -18,8 +18,8 @@ $(eval $(call OVERLAY_COMPONENT_TEMPLATE,RUSTC,rust,select))
 # escape hatch packages use. The base toolchain provisions all of them (TC_OVERLAY_ALL).
 _OVERLAY_RUSTC_ENABLED := $(foreach d,$(_OVERLAY_RUSTC_ANY),\
                             $(if $(wildcard $(d)/BROKEN $(d)/DISABLED),,$(d)))
-_RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
-_RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ANY))
+_RUSTC_ANY_MATCHED    := $(filter %_gcc-$(OVERLAY_GCC_VERSION),$(_OVERLAY_RUSTC_ANY))
+_RUSTC_ANY_VENDOR     := $(filter-out %_gcc-$(OVERLAY_GCC_VERSION),$(_OVERLAY_RUSTC_ANY))
 
 # The pool the default is picked from: the gcc-overlay builds when that overlay is on and
 # this arch has any, the vendor-gcc ones otherwise. Same preference as the selection below,
@@ -36,11 +36,11 @@ _RUSTC_POOL_VERS      := $(shell printf '%s\n' $(patsubst $(_OVERLAY_TC)_rust-%,
 # Newest available, unless the caller pinned one. `?=` is the whole mechanism: a command
 # line, the environment or a package Makefile all win over it, which is what "default"
 # means here -- nothing below can tell the difference.
-OVERLAY_RUSTC_VERS    ?= $(firstword $(_RUSTC_POOL_VERS))
+OVERLAY_RUSTC_VERSION    ?= $(firstword $(_RUSTC_POOL_VERS))
 
-_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
-_OVERLAY_RUSTC_MATCHED := $(filter %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
-_OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERS),$(_OVERLAY_RUSTC_ALL))
+_OVERLAY_RUSTC_ALL    := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERSION)_gcc-*)
+_OVERLAY_RUSTC_MATCHED := $(filter %_gcc-$(OVERLAY_GCC_VERSION),$(_OVERLAY_RUSTC_ALL))
+_OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERSION),$(_OVERLAY_RUSTC_ALL))
 
 # With the gcc overlay ON, PREFER the rustc built against it, and fall back to the vendor
 # one where that arch has none: a rust toolchain built with the vendor gcc still links
@@ -53,18 +53,6 @@ TC_OVERLAY_RUSTC      := $(if $(call is_true,$(OVERLAY_GCC)),\
 
 # NARROW: only the Rust link takes the overlay ld; C keeps the vendor's.
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
-
-# OVERLAY_RUSTC_VERS is exported ONLY once it has a value. It is derived from the rust
-# consumer dirs this arch ships, and there are contexts where that list is legitimately
-# empty -- a toolchain consumer directory resolves _OVERLAY_TC to syno-native, which owns
-# no rust overlay. Exporting it there would put an EMPTY value in the environment of every
-# sub-make, and `?=` cannot override an environment variable that is set, even to nothing:
-# the child would inherit "no version" and disable its own overlay. `export` alone is
-# enough to create that empty value, so the guard has to be on the export, not the
-# assignment.
-ifneq ($(strip $(OVERLAY_RUSTC_VERS)),)
-export OVERLAY_RUSTC_VERS
-endif
 
 # Lazy (=), like the other components' ACTIVE.
 OVERLAY_RUSTC_ON     = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))

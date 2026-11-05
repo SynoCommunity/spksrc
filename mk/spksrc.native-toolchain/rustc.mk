@@ -37,8 +37,8 @@ RUST_POSTFIX_ALIASES  := $(RUST_TARGET_JSON_BASE) $(RUST_TARGET)
 # ppc853x needs it: its 2008 ld 2.18 leaves std's TLS TPREL16 relocs dynamic and glibc-2.8
 # mis-applies them. Default ON for every custom-rustc arch; set =0 to opt out.
 RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),1)
-RUST_BINUTILS_VERS     := $(or $(call _tc_get,OVERLAY_BINUTILS_VERS),2.30)
-RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERS))
+RUST_BINUTILS_VERSION     := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
+RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERSION))
 RUST_BINUTILS_BIN       = $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 # Build-time: link the target through the co-built ld (so std's own dynamic objects use
@@ -103,7 +103,7 @@ RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 #
 # gcc and g++ only: the overlay archive ships no binutils, so ar and ranlib keep coming
 # from the toolchain that has them.
-TC_GCC_SUFFIX ?= $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERS))
+TC_GCC_SUFFIX ?= $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERSION))
 _RUST_GCC_BIN  = $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
 RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
 RUST_CC       ?= $(_RUST_GCC_BIN)$(TC_TARGET)-gcc$(TC_GCC_SUFFIX)
@@ -123,7 +123,7 @@ TOOLCHAIN_CONSUMER = rust-$(basename $(PKG_VERS))_gcc-*
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID on the package-build side.
-_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
+_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
 # are trackable in status-build.log: NAME: native-rust-<step>.
@@ -204,7 +204,7 @@ rustc_prepare: tc-install rustc_gcc_overlay $(if $(filter 1,$(RUST_LINK_VIA_BINU
 # is a plain passthrough (GNU ld accepts -Qy, so no arg filtering is needed).
 define RUST_BINUTILS_CC_SCRIPT
 #!/bin/sh
-# The cross gcc with ld/as redirected to the co-built binutils $(RUST_BINUTILS_VERS)
+# The cross gcc with ld/as redirected to the co-built binutils $(RUST_BINUTILS_VERSION)
 # via -B. Used as the [target.*] linker for the from-source build.
 exec "$(RUST_CC)" -B"$(RUST_BINUTILS_SHIM)" "$$@"
 endef
@@ -219,7 +219,7 @@ endef
 rustc_gcc_overlay:
 	@if [ -n "$(OVERLAY_GCC_ON)" ]; then \
 	  $(call rustc_status,gcc-overlay) ; \
-	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERS) for $(TC_ARCH)-$(TC_VERS)" ; \
+	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERSION) for $(TC_ARCH)-$(TC_VERS)" ; \
 	  $(MSG) "*** PATH: $(TC_OVERLAY_GCC)" ; \
 	  $(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC) ; \
 	fi
@@ -228,7 +228,7 @@ rustc_gcc_overlay:
 rustc_binutils_cobuild:
 	@$(call rustc_status,binutils-cobuild)
 	@$(MSG) "*********************************************************************"
-	@$(MSG) "*** Co-building binutils $(RUST_BINUTILS_VERS) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
+	@$(MSG) "*** Co-building binutils $(RUST_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
 	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
 	@$(MSG) "*** PATH: $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
 	@$(MSG) "*********************************************************************"
