@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "local.DantamiRepoSync.Application": {
+      "type": "url",
+      "icon": "images/DantamiRepoSync-{0}.png",
+      "title": "Dantami Repo Sync",
+      "desc": "GitHub and Gitea repository synchronization",
+      "url": "/webman/3rdparty/DantamiRepoSync/index.cgi",
+      "allUsers": true
+    }
+  }
+}
