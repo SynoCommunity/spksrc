@@ -216,7 +216,7 @@ rustc_gcc_overlay:
 	  $(call rustc_status,gcc-overlay) ; \
 	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERSION) for $(TC_ARCH)-$(TC_VERS)" ; \
 	  $(MSG) "*** PATH: $(TC_OVERLAY_GCC)" ; \
-	  $(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC) ; \
+	  MAKEFLAGS= $(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC) ; \
 	fi
 
 .PHONY: rustc_binutils_cobuild
@@ -227,9 +227,7 @@ rustc_binutils_cobuild:
 	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
 	@$(MSG) "*** PATH: $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
 	@$(MSG) "*********************************************************************"
-	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see
-	@# spksrc.toolchain/overlay/binutils.mk) so it cannot re-bootstrap a toolchain and recurse.
-	$(MAKE) --no-print-directory -C $(TOOLCHAIN_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
+	$(TOOLCHAIN_BINUTILS_MAKE)
 	@mkdir -p $(RUST_BINUTILS_SHIM)
 	@ln -sf $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-ld $(RUST_BINUTILS_SHIM)/ld
 	@ln -sf $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-as $(RUST_BINUTILS_SHIM)/as

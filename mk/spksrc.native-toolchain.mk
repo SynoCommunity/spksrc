@@ -31,7 +31,8 @@
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
 #   TOOLCHAIN_DIST_ARCH     the arch the archive is named after (overlay_dist_arch)
 #   TOOLCHAIN_BINUTILS_*    the binutils a component builds against, co-built for the same
-#                           (arch, DSM): _VERSION, _DIR (native/binutils-<v>), _BIN
+#                           (arch, DSM): _VERSION, _DIR (native/binutils-<v>), _BIN, and
+#                           _MAKE, the command that builds it
 #   TOOLCHAIN_PGO_SOURCES   the generated training sources (toolchain-pgo-sources)
 #
 # What a component sets:
@@ -120,6 +121,13 @@ TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 TOOLCHAIN_BINUTILS_VERSION := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
 TOOLCHAIN_BINUTILS_DIR      = $(BASEDIR)/native/binutils-$(TOOLCHAIN_BINUTILS_VERSION)
 TOOLCHAIN_BINUTILS_BIN      = $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
+# The command that co-builds it: build tools, not a published binutils. MAKEFLAGS= keeps
+# this producer's command line (PKG_REV=vN) out of it, PGO_PHASE= its pass (pass 1 would
+# leave an instrumented binutils pass 2 reuses, cookies intact), ARCHIVE_NAME= any archive
+# its own arch- target would take for a finished, profile-guided build. ARCH= TCVERSION=
+# keep its stage0 from bootstrapping a toolchain.
+TOOLCHAIN_BINUTILS_MAKE     = MAKEFLAGS= $(MAKE) --no-print-directory -C $(TOOLCHAIN_BINUTILS_DIR) \
+                              ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE= ARCHIVE_NAME=
 
 # ---- How the host compiler builds the component --------------------------------------
 # Probed, not assumed: -march=x86-64-v3 is a GCC 11 spelling and a host without AVX2 must
@@ -166,7 +174,10 @@ tc-install:
 	@$(MSG) "native-toolchain: ensuring $(TC) is installed ($(TC_ARCH)-$(TC_VERS))"
 	@# No WORK_DIR, alone in its family: a producer is addressed by TC, so the framework's
 	@# TC_WORK_DIR is empty here and the extraction belongs in the sub-make's own default.
-	@$(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@# MAKEFLAGS= : this producer's command line is its own -- a PKG_REV=vN would otherwise
+	@# reach every overlay consumer installed with the toolchain, and name an archive that
+	@# does not exist.
+	@MAKEFLAGS= $(MAKE) $(FWRD_ARGS) --no-print-directory -C ../../toolchain/$(TC) toolchain
 
 # ---- One toolchain, then a whole DSM version ------------------------------------------
 # TOOLCHAIN_DIST_SHARED (set by a component whose ARCHIVE_NAME carries TOOLCHAIN_DIST_ARCH):
