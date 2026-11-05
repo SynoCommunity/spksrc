@@ -233,31 +233,41 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed spk_packages and dependency_folders for pull request
-        if: github.event_name == 'pull_request'
-        id: getchanges_pr
+      - name: Get changed spk_packages and dependency_folders
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        id: getchanges
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_SHA: ${{ github.sha }}
         run: |
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
-          echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          if [ "${EVENT_NAME}" = "pull_request" ]; then
+            CHANGED_FILES=$(git diff --no-commit-id --name-only -r "origin/master...${PR_HEAD_SHA}")
+          elif [ -n "${BEFORE_SHA}" ] && \
+               [ "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ] && \
+               git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            # Use the full pushed range so multi-commit and merge pushes are
+            # not reduced to the final commit.
+            CHANGED_FILES=$(git diff --name-only "${BEFORE_SHA}" "${PUSH_SHA}")
+          else
+            # New branch or unavailable pre-push SHA: inspect the final commit.
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${PUSH_SHA}")
+          fi
 
-      - name: Get changed spk_packages and dependency_folders of last commit for push
-        if: github.event_name == 'push'
-        id: getchanges_push
-        run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
-          echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          SPK_PACKAGES=$(printf '%s\n' "${CHANGED_FILES}" | grep -oP '^spk/\K[^/]*' | sort -u | xargs || true)
+          echo "spk_packages=${SPK_PACKAGES}" >> "${GITHUB_OUTPUT}"
+
+          DEPENDENCY_FOLDERS=$(printf '%s\n' "${CHANGED_FILES}" | grep -oP '^(cross|driver|python|native)/[^/]*' | sort -u | xargs || true)
+          echo "dependency_folders=${DEPENDENCY_FOLDERS}" >> "${GITHUB_OUTPUT}"
 
       - name: Evaluate dependencies
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
-          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
+          GH_SPK_PACKAGES: ${{ steps.getchanges.outputs.spk_packages }}
+          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges.outputs.dependency_folders }}
           USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Restore distrib cache
