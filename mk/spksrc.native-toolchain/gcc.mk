@@ -91,16 +91,16 @@ _GCC_ABI_E500  = $(filter --enable-e500_double,$(_GCC_ABI_RAW))
 
 # cpu wins over arch/tune; marvell-f is a vendor name mainline GCC does not know
 _GCC_ABI_BASE = $(if $(_GCC_ABI_CPU),\
-                  $(if $(findstring marvell-f,$(_GCC_ABI_CPU)),--with-arch=armv5te,$(_GCC_ABI_CPU)),\
-                  $(_GCC_ABI_ARCH))
+                     $(if $(findstring marvell-f,$(_GCC_ABI_CPU)),--with-arch=armv5te,$(_GCC_ABI_CPU)),\
+                     $(_GCC_ABI_ARCH))
 # The stock gcc does not always DECLARE its float ABI -- ppc853x-5.2's 2008 compiler leans
 # on --with-cpu=8548 implying it, which a modern gcc no longer does. Fall back to what the
 # toolchain asserts: getting this wrong is silent, and yields soft-float runtime libs
 # against a hard-float glibc.
 _GCC_ABI_TC_FLAGS = $(call _tc_get,TC_EXTRA_BUILD_FLAGS)
 _GCC_ABI_FLOAT2   = $(or $(_GCC_ABI_FLOAT),\
-                      $(if $(filter -mhard-float -mfloat-abi=hard,$(_GCC_ABI_TC_FLAGS)),--with-float=hard),\
-                      $(if $(filter -msoft-float -mfloat-abi=soft,$(_GCC_ABI_TC_FLAGS)),--with-float=soft))
+                         $(if $(filter -mhard-float -mfloat-abi=hard,$(_GCC_ABI_TC_FLAGS)),--with-float=hard),\
+                         $(if $(filter -msoft-float -mfloat-abi=soft,$(_GCC_ABI_TC_FLAGS)),--with-float=soft))
 
 # The fpu, in order of authority: what the stock gcc declares, then what the toolchain
 # tells packages to use, then a guess. No Synology ARM gcc declares one, and the guess
@@ -117,7 +117,7 @@ _GCC_ABI_DEF_FPU = $(if $(findstring arm,$(TC_TARGET)),$(patsubst %,--with-fpu=%
 # compiling PACKAGES: it is per-model, and alpine's neon-vfpv4 would give this compiler a
 # libstdc++ that no longer serves the generic armv7 arch every ARMv7 package builds through.
 _GCC_ABI_FPU2 = $(or $(_GCC_ABI_FPU),$(_GCC_ABI_DEF_FPU),\
-                  $(if $(and $(findstring hard,$(_GCC_ABI_FLOAT2)),$(findstring arm,$(TC_TARGET))),--with-fpu=neon))
+                     $(if $(and $(findstring hard,$(_GCC_ABI_FLOAT2)),$(findstring arm,$(TC_TARGET))),--with-fpu=neon))
 _GCC_ABI_OBS  = $(if $(findstring gnuspe,$(TC_TARGET)),--enable-obsolete)
 
 # Default-PIE follows the stock compiler: DSM 7.1 and SRM 1.3 turn it on, everything

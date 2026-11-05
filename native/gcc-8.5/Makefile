@@ -3,7 +3,7 @@ PKG_VERS = 8.5.0
 PKG_EXT  = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gcc/gcc-$(PKG_VERS)
-PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Target toolchain to rebuild gcc-8.5 for (per-arch work dir).
 TC_ARCH ?= qoriq

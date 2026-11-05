@@ -3,7 +3,7 @@ PKG_VERS = 3.1.4
 PKG_EXT  = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/mpfr
-PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # NATIVE_DEPENDS installs gmp into THIS package's own prefix, so --with-gmp is
 # just $(STAGING_INSTALL_PREFIX) (no absolute cross-package path). This also

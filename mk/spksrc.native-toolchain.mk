@@ -76,11 +76,11 @@ endif
 TC_ARCH_SUFFIX ?= -$(TC_ARCH)-$(TC_VERS)
 include ../../mk/spksrc.common.mk
 
-TC          = syno-$(TC_ARCH)-$(TC_VERS)
-TC_DIR      = $(abspath $(CURDIR)/../../toolchain/$(TC))
+TC      = syno-$(TC_ARCH)-$(TC_VERS)
+TC_DIR  = $(abspath $(CURDIR)/../../toolchain/$(TC))
 # $(call _tc_get,VAR): value of VAR as declared in the toolchain Makefile -- the
 # single source of truth, so nothing here duplicates the toolchain's own fields.
-_tc_get     = $(call read_makefile_var,$(TC_DIR)/Makefile,$(1))
+_tc_get = $(call read_makefile_var,$(TC_DIR)/Makefile,$(1))
 
 TC_TARGET  := $(call _tc_get,TC_TARGET)
 TC_GCC     := $(call _tc_get,TC_GCC)

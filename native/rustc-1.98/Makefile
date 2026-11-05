@@ -4,7 +4,7 @@ PKG_EXT  = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://static.rust-lang.org/dist
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
-PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)-src
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)-src
 
 # Target toolchain to (re)build this custom rustc for (per-arch work dir).
 TC_ARCH ?= ppc853x

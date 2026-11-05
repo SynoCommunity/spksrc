@@ -44,12 +44,12 @@ _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC
 # default live in spksrc.common/overlay.mk.
 ifeq ($(OVERLAY_RUSTC_ON),1)
 # Overlay ON (default): our custom toolchain, synology triple.
-RUST_TARGET         := $(_RUST_SYNO_TARGET)
-TC_RUSTUP_TOOLCHAIN  = $(_RUST_TC_ID)
+RUST_TARGET        := $(_RUST_SYNO_TARGET)
+TC_RUSTUP_TOOLCHAIN = $(_RUST_TC_ID)
 else
 # Overlay OFF: stock rustup rustc + in-tree unknown triple.
-RUST_TARGET         := $(_RUST_BASE_TARGET)
-TC_RUSTUP_TOOLCHAIN  = $(TC_RUSTC)
+RUST_TARGET        := $(_RUST_BASE_TARGET)
+TC_RUSTUP_TOOLCHAIN = $(TC_RUSTC)
 endif
 
 # Where libatomic exists the spec was widened to 64 (spksrc.native-toolchain/rustc.mk, same
