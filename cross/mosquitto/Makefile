@@ -23,4 +23,14 @@ CONFIGURE_ARGS += -DWITH_SRV=ON
 CONFIGURE_ARGS += -DDOCUMENTATION=OFF
 CONFIGURE_ARGS += -DWITH_TESTS=OFF
 
+# Upstream's src/CMakeLists.txt enables epoll with
+# find_path(HAVE_SYS_EPOLL_H sys/epoll.h), but sys/epoll.h is a toolchain header.
+# Our CMake toolchain deliberately restricts find_*() to the staging prefix
+# (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE = ONLY) for hermetic dependency resolution,
+# so the probe never sees the sysroot and the broker silently builds the poll
+# backend, which can spin on POLLNVAL for closed descriptors. Every DSM target is
+# Linux with epoll, so force the detection (a compiler-based
+# check_include_file() would be the correct upstream fix).
+CONFIGURE_ARGS += -DHAVE_SYS_EPOLL_H=1
+
 include ../../mk/spksrc.cross-cmake.mk
