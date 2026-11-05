@@ -115,6 +115,21 @@ RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils
 # (spksrc.native-toolchain.mk).
 TOOLCHAIN_CONSUMER = rust-$(basename $(PKG_VERS))_gcc-*
 
+# Profile-guided, both halves of the compiler a cargo build runs: rustc through x.py's own
+# PGO, LLVM -- which does most of a release build's work -- through gcc's, like the gcc
+# producer. The official dist trains LLVM with clang's IR instrumentation; with gcc it
+# needs LLVM as a shared library, which gcc itself then links (llvm.link-shared). The
+# instrumented pass builds the host's profiler runtime and links libgcov: the C++ shims
+# rustc compiles against LLVM take its flags, -fprofile-generate included.
+TOOLCHAIN_PGO       ?= 1
+TOOLCHAIN_PGO_TRAIN  = rustc-pgo-train
+_RUST_PGO_PROFRAW    = $(TOOLCHAIN_PGO_DIR)/rustc
+_RUST_PGO_PROFDATA   = $(TOOLCHAIN_PGO_DIR)/rustc.profdata
+_RUST_PGO_ARGS       = $(if $(filter gen,$(PGO_PHASE)),--rust-profile-generate=$(_RUST_PGO_PROFRAW)) \
+                       $(if $(filter use,$(PGO_PHASE)),--rust-profile-use=$(_RUST_PGO_PROFDATA))
+# Every x.py since before 1.82 reads it, unlike a [target] rustflags.
+_RUST_PGO_ENV        = $(if $(filter gen,$(PGO_PHASE)),RUSTFLAGS_NOT_BOOTSTRAP="-Clink-arg=-lgcov")
+
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID on the package-build side.
@@ -128,9 +143,16 @@ rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s
 # C in optimized-compiler-builtins is compiled by the `cc` crate with -gdwarf-4, an
 # output level gcc predating 4.7 rejects. Below the floor we use the pure-Rust
 # builtins (optimized-compiler-builtins = false) instead, which need no C at all.
+#
+# The dist profile, as the published rustup toolchains are built -- not "compiler", the
+# profile for working ON rustc, whose debug assertions and logging made every package
+# build 2.4x slower and shipped a std with its debug checks on. Then what the official
+# x86_64 dist adds: jemalloc, ThinLTO over rustc_driver, one codegen unit for the compiler
+# and std. extended and the bitcode linker, which dist turns on, build tools never shipped.
+# The channel stays our version string, which rustc reports as `dev`: it takes -Z flags.
 
 define RUST_CONFIG_TOML
-profile = "compiler"
+profile = "dist"
 
 [build]
 build = "$(RUST_BUILD_HOST)"
@@ -139,15 +161,24 @@ target = ["$(RUST_BUILD_HOST)", "$(RUST_TARGET)"]
 build-stage = $(TC_RUSTC_STAGE)
 docs = false
 compiler-docs = false
+extended = false
 $(if $(call version_lt,$(TC_GCC),4.7),optimized-compiler-builtins = false)
 
 [rust]
 channel = "$(TC_RUSTC)"
-lto = "off"
+lto = "thin"
+codegen-units = 1
+codegen-units-std = 1
+jemalloc = true
+llvm-bitcode-linker = false
 debuginfo-level = 0
 
 [llvm]
 download-ci-llvm = false
+link-shared = true
+cflags = "$(HOST_OPTFLAGS)"
+cxxflags = "$(HOST_OPTFLAGS)"
+ldflags = "$(HOST_OPTFLAGS)"
 
 [target.$(RUST_BUILD_HOST)]
 cc = "$(call native,gcc)"
@@ -155,6 +186,7 @@ cxx = "$(call native,g++)"
 ar = "$(call native,ar)"
 ranlib = "$(call native,ranlib)"
 linker = "$(call native,gcc)"
+$(if $(filter gen,$(PGO_PHASE)),profiler = true)
 
 [target.$(RUST_TARGET)]
 cc = "$(RUST_CC)"
@@ -168,8 +200,8 @@ endef
 # carries them (passing them again only triggers rustc's "unknown feature" warning).
 _X = cd $(RUST_SRC) && \
      CFLAGS_$(RUST_TARGET_LENV)="$(TC_EXTRA_CFLAGS)" CC_$(RUST_TARGET_LENV)="$(RUST_CC)" CXX_$(RUST_TARGET_LENV)="$(RUST_CXX)" \
-     RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" \
-     CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py
+     RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" $(_RUST_PGO_ENV) \
+     CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py $(_RUST_PGO_ARGS)
 
 # ---------------------------------------------------------------------------
 # Framework hooks: the source pipeline (download/extract/patch) is stock; only
@@ -288,3 +320,47 @@ rustc_install:
 	@# there.
 	@mkdir -p $(RUST_STAGE_DIR)/target-spec
 	@cp -f $(RUST_TARGET_JSON) $(RUST_STAGE_DIR)/target-spec/
+
+##############################################################################
+# PGO training: the instrumented stage2 toolchain over the crates the official dist trains
+# on -- rustc-perf's compile benchmarks, shipped in the source tarball, the same for every
+# arch. Recent ones carry their dependencies; older ones (1.82) fetch them from crates.io,
+# at the versions their Cargo.lock pins, so no --offline. The lists are read from this
+# version's own build_helper (src/tools/build_helper in older ones); each crate is built
+# check, debug and release for this arch's target, which also runs the host backend on its
+# build scripts and proc macros. A crate
+# that cannot cross-compile (a C library it needs for the target) is built for the host.
+# The counters the bootstrap itself wrote are dropped first: the profile describes
+# compiling packages, not compiling rustc.
+##############################################################################
+_RUST_PGO_BENCH   = $(RUST_SRC)/src/tools/rustc-perf/collector/compile-benchmarks
+_RUST_PGO_CRATES  = $(sort $(shell sed -n '/PGO_CRATES: &\[&str\] = &\[/,/\];/s/^ *"\([^"]*\)",.*/\1/p' \
+                      $(wildcard $(RUST_SRC)/src/build_helper/src/lib.rs $(RUST_SRC)/src/tools/build_helper/src/lib.rs)))
+_RUST_PGO_PROFDATA_TOOL = $(RUST_BUILD_ROOT)/$(RUST_BUILD_HOST)/llvm/bin/llvm-profdata
+_RUST_PGO_CARGO = cd $(_RUST_PGO_BENCH)/$$c && \
+  CARGO_HOME=$(WORK_DIR)/pgo-cargo-home CARGO_TARGET_DIR=$(WORK_DIR)/pgo-target \
+  RUSTC=$(RUST_STAGE_DIR)/bin/rustc RUST_TARGET_PATH=$(RUST_TARGET_JSON_DIR) \
+  CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=$(RUST_LINKER) \
+  CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS="-Zunstable-options" \
+  CC_$(RUST_TARGET_LENV)="$(RUST_CC)" CXX_$(RUST_TARGET_LENV)="$(RUST_CXX)" AR_$(RUST_TARGET_LENV)="$(RUST_AR)" \
+  CFLAGS_$(RUST_TARGET_LENV)="$(TC_EXTRA_CFLAGS)" CARGO_TERM_PROGRESS_WHEN=never \
+  $(RUST_STAGE_DIR)/bin/cargo
+
+.PHONY: rustc-pgo-train
+rustc-pgo-train:
+	@$(call rustc_status,pgo-train)
+	@test -n "$(_RUST_PGO_CRATES)" || { $(MSG) "*** PGO: no training crate list in $(RUST_SRC)/src/build_helper" ; exit 1 ; }
+	@$(MSG) "*** PGO: training on $(words $(_RUST_PGO_CRATES)) rustc-perf crates: $(_RUST_PGO_CRATES)"
+	@find $(TOOLCHAIN_PGO_DIR) -name '*.gcda' -delete 2>/dev/null ; rm -rf $(_RUST_PGO_PROFRAW)
+	@for c in $(_RUST_PGO_CRATES) ; do \
+	  for mode in check build "build --release" ; do \
+	    rm -rf $(WORK_DIR)/pgo-target ; \
+	    if ( $(_RUST_PGO_CARGO) $$mode -q --target $(RUST_TARGET) ) >/dev/null 2>&1 ; then where=$(RUST_TARGET) ; \
+	    elif ( $(_RUST_PGO_CARGO) $$mode -q ) >/dev/null 2>&1 ; then where=host ; \
+	    else where=FAILED ; fi ; \
+	    $(MSG) "*** PGO: $$c $$mode: $$where" ; \
+	  done ; \
+	done
+	@rm -rf $(WORK_DIR)/pgo-target
+	@$(_RUST_PGO_PROFDATA_TOOL) merge -o $(_RUST_PGO_PROFDATA) $(_RUST_PGO_PROFRAW)
+	@$(MSG) "*** PGO: $$(find $(TOOLCHAIN_PGO_DIR) -name '*.gcda' | wc -l) LLVM counter files, rustc profile $$(du -h $(_RUST_PGO_PROFDATA) | cut -f1)"

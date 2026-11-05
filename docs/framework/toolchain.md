@@ -482,7 +482,7 @@ A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2
 
 | Knob | Default | Effect |
 |------|---------|--------|
-| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`) -- rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_PGO` | `1` | Two passes: build instrumented, run the instrumented tools over training input, rebuild reading the counts. gcc and binutils train on generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`); rust on the crates the official Rust dist trains on, rustc-perf's compile benchmarks, shipped with their dependencies in the rust source tarball, built check, debug and release for the arch's target. For rust both halves are profiled: rustc by x.py, LLVM by gcc. The instrumented pass is never archived, so an archive that exists is always a finished build. |
 | `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
 | `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
 
@@ -512,6 +512,8 @@ A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853
 An arch opts in simply by having a rust overlay (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
 
 ### Building Rust
+
+The toolchain is built as the published rustup ones are, not as a compiler developer's: x.py's `dist` profile, jemalloc, ThinLTO over `rustc_driver`, one codegen unit for the compiler and std, then profile-guided (`TOOLCHAIN_PGO`, above) with LLVM as a shared library, built by gcc with `HOST_OPTFLAGS`. Measured on qoriq-6.2.4 with rust 1.98, release builds of bat and fd -- not among the training crates -- take 38% and 27% less time than with the `compiler` profile used before, within about 10% of the official x86_64 rustc. The `compiler` profile also shipped a std built with its debug assertions on; PGO itself leaves the emitted code unchanged.
 
 ```bash
 make -C native/rustc-1.82 arch-ppc853x-5.2  # one arch
