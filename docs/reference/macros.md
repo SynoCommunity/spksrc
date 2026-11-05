@@ -10,6 +10,42 @@ spksrc ships a small set of GNU Make helper macros in `mk/spksrc.common/macros.m
 !!! note "Architecture awareness is loaded early too"
     The same `spksrc.common.mk` also pulls in the parse-time toolchain pre-bootstrap (`spksrc.common/stage0.mk`) and the architecture classification (`spksrc.common/archs.mk`). That is what makes `TC_GCC` and the [architecture groups](architectures.md#architecture-groups) available **while a package's `DEPENDS` are parsed**, so version- and arch-gated dependencies resolve correctly on a cold tree.
 
+
+## Summary
+
+Every macro, by the file under `mk/spksrc.common/macros/` that defines it. The helpers internal to a file (`_odepend`, `_tc_gcc_tools`, ...) are not listed; `_runlog` is, as the build rules call it directly.
+
+| File | Macro | What it does |
+|------|-------|--------------|
+| `string.mk` | `$(call upper,TEXT)` | Upper-cases the ASCII letters of `TEXT`, without a fork |
+| `string.mk` | `$(call lower,TEXT)` | Lower-cases the ASCII letters of `TEXT`, without a fork |
+| `version.mk` | `$(call version_le,A,B)` | `1` when version `A` <= `B` (GNU `sort -V`) |
+| `version.mk` | `$(call version_ge,A,B)` | `1` when version `A` >= `B` |
+| `version.mk` | `$(call version_lt,A,B)` | `1` when version `A` < `B` |
+| `version.mk` | `$(call version_gt,A,B)` | `1` when version `A` > `B` |
+| `bool.mk` | `$(TRUE)`, `$(FALSE)` | Every spelling of a switch on / off, in lower and upper case |
+| `bool.mk` | `$(call is_true,VALUE)` | Non-empty when `VALUE` is on (`1`, `y`, `yes`, `true`, `on`, any case) |
+| `bool.mk` | `$(call is_false,VALUE)` | Non-empty when `VALUE` is off (`0`, `n`, `no`, `false`, `off`, any case, or empty) |
+| `bool.mk` | `$(call assert_bool,VALUE,NAME)` | Stops the build when `VALUE` is neither, naming `NAME` |
+| `bool.mk` | `$(call bool,VALUE,NAME)` | `TRUE` or `FALSE`, for `ifeq`; stops the build on any other value |
+| `list.mk` | `$(call comma_append,LIST,ITEM)` | Appends `ITEM` to a comma-separated list, or returns it unchanged when `ITEM` is empty |
+| `list.mk` | `$(call uniq,WORDS)` | Removes duplicate words, keeping the first occurrence of each |
+| `list.mk` | `$(call dedup,STRING,DELIMITER)` | De-duplicates a delimiter-separated string, dropping empty entries |
+| `list.mk` | `$(call dedup_files,FILES)` | Removes files whose content (`md5sum`) was already seen, in order |
+| `list.mk` | `$(call merge,ENV,VAR,DELIMITER)` | Every `VAR=` value in `ENV`, last one first, joined with `DELIMITER` |
+| `depend.mk` | `$(call depend,PKGS[,ON[,OFF]])` | Declares a dependency: required, alternatives with `\|`, or optional with its switches |
+| `depend.mk` | `$(call dep_seen,STAMPS,DEP)` | Shell test: true when `DEP` was already visited in a dependency walk |
+| `tools.mk` | `$(call read_makefile_var,FILE,VAR)` | The value `FILE` assigns to `VAR`, unexpanded, without including the file |
+| `tools.mk` | `$(call tc,TOOL)` | Absolute path of a cross tool, honouring the active overlays |
+| `tools.mk` | `$(call native,TOOL)` | Absolute path of a build-host tool, or its bare name when absent |
+| `archs.mk` | `$(call overlay_dist_arch,ARCH,DSM)` | The arch an overlay archive is named after: a generic arch's real arch |
+| `archs.mk` | `$(call toolchain_real,ARCH-DSM)` | The toolchain a producer builds an `<arch>-<dsm>` as |
+| `archs.mk` | `$(call toolchain_archs,DSM)` | The archs a producer builds for a DSM version |
+| `runlog.mk` | `$(call _runlog,COMMAND,LOG)` | Shell fragment: runs `COMMAND` teed into `LOG`, leaving the status to the caller |
+| `runlog.mk` | `$(call RUNLOG,GOAL)` | Recipe line: runs a goal of this Makefile, logged, and reports a failure |
+
+The sections below show them in use.
+
 ## Version comparison
 
 These compare two version strings (natural/`sort -V` order) and return `1` when the test is true, empty otherwise — ideal for `ifeq`:

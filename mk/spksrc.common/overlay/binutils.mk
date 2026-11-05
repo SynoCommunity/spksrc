@@ -28,11 +28,11 @@ overlay_binutils_vers = $(or $(strip $(OVERLAY_BINUTILS_PKG_VERS)),$(strip $(1))
 # What the caller ASKED of OVERLAY_BINUTILS, as opposed to a default: only the command line
 # or the environment of the make they typed express a request -- local.mk holds `?=`
 # defaults like this file, so a "file" origin cannot tell the two apart. Decided once, by the
-# first make, and carried from there (FWRD_VARS, export -- spksrc.common/overlay.mk): every later make receives
-# the switch from its parent, on its command line or in its environment, and would read the
-# forwarded default as a request.
-ifeq ($(origin _OVERLAY_BINUTILS_ASKED),undefined)
-_OVERLAY_BINUTILS_ASKED := $(if $(filter command environment,$(firstword $(origin OVERLAY_BINUTILS))),$(strip $(OVERLAY_BINUTILS)))
+# first make, and carried from there (FWRD_VARS and export, spksrc.common/overlay.mk):
+# every later make receives the switch from its parent, on its command line or in its
+# environment, and would read the forwarded default as a request.
+ifeq ($(origin OVERLAY_BINUTILS_ASKED),undefined)
+OVERLAY_BINUTILS_ASKED := $(if $(filter command environment,$(firstword $(origin OVERLAY_BINUTILS))),$(strip $(OVERLAY_BINUTILS)))
 endif
 
 # A gcc overlay turns this on unconditionally: gcc reaches as/ld only through
@@ -45,7 +45,7 @@ OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(call is_true,
 # OVERLAY_BINUTILS asked off while the gcc overlay is active: the request cannot be obeyed,
 # and building anyway would let the caller believe it was. Stops at parse time, in the
 # first make that knows the arch -- before stage0 touches the toolchain.
-OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(_OVERLAY_BINUTILS_ASKED),$(call is_false,$(_OVERLAY_BINUTILS_ASKED))))
+OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED),$(call is_false,$(OVERLAY_BINUTILS_ASKED))))
 
 # All three uses pull the same archive; they differ only in scope. The gcc overlay ships
 # no as/ld of its own, so without this it would silently drive the vendor ones. The gcc one

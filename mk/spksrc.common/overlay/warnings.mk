@@ -37,7 +37,7 @@ endef
 
 define OVERLAY_WARN_RUSTC_GCC_FALLBACK
 $(MSG) "*********************************************************************" ; \
-$(MSG) "*** No rust $(OVERLAY_RUSTC_VERS) overlay built with gcc $(OVERLAY_GCC_VERS) for [$(_OVERLAY_TC)]" ; \
+$(MSG) "*** No rust $(OVERLAY_RUSTC_VERSION) overlay built with gcc $(OVERLAY_GCC_VERSION) for [$(_OVERLAY_TC)]" ; \
 $(MSG) "*** Using $(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(_OVERLAY_RUSTC_VENDOR))) instead" ; \
 $(MSG) "*** The rust std is built against the vendor gcc, the C around it is not" ; \
 $(MSG) "*********************************************************************"
@@ -45,9 +45,9 @@ endef
 
 define OVERLAY_WARN_BINUTILS_UNMATCHED
 $(MSG) "*********************************************************************" ; \
-$(MSG) "*** OVERLAY_BINUTILS=1: every compile uses binutils $(OVERLAY_BINUTILS_VERS) as/ld" ; \
+$(MSG) "*** OVERLAY_BINUTILS=1: every compile uses binutils $(OVERLAY_BINUTILS_VERSION) as/ld" ; \
 $(MSG) "*** paired with the vendor gcc $(TC_GCC_VENDOR), which it is not matched to." ; \
-$(MSG) "*** Set OVERLAY_GCC=1 to pair it with gcc $(OVERLAY_GCC_VERS) instead." ; \
+$(MSG) "*** Set OVERLAY_GCC=1 to pair it with gcc $(OVERLAY_GCC_VERSION) instead." ; \
 $(MSG) "*********************************************************************"
 endef
 
@@ -56,7 +56,7 @@ endef
 define OVERLAY_WARN_GCC_NO_BINUTILS
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** OVERLAY_GCC=1 for [$(_OVERLAY_TC)], but no binutils overlay is active" ; \
-$(MSG) "*** gcc $(OVERLAY_GCC_VERS) would fall back to the vendor as/ld ($(TC_GCC_VENDOR) era)" ; \
-$(MSG) "*** Overlay disabled -- provide binutils $(OVERLAY_BINUTILS_VERS) for this arch" ; \
+$(MSG) "*** gcc $(OVERLAY_GCC_VERSION) would fall back to the vendor as/ld ($(TC_GCC_VENDOR) era)" ; \
+$(MSG) "*** Overlay disabled -- provide binutils $(OVERLAY_BINUTILS_VERSION) for this arch" ; \
 $(MSG) "*********************************************************************"
 endef

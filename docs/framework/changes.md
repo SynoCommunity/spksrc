@@ -163,7 +163,7 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
       the macros. See [Boolean values](../reference/macros.md#boolean-values).
     - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
-      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERS`, `TC_OVERLAY_GCC`,
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `TC_OVERLAY_GCC`,
       `OVERLAY_GCC_ON`), off for the tree: the producer turns it on for itself.
       Packages keep the vendor gcc, and the same rust.
     - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
@@ -187,6 +187,10 @@ If you only read one thing, read this. The details are in the dated log below.
       defaults, and `overlay_warn` picks a component's banner from its states.
       `OVERLAY_BINUTILS_UNMATCHED` names the binutils overlay active beside the vendor
       gcc, which no longer warns when the gcc overlay is active too.
+    - **`OVERLAY_<C>_VERSION`**, formerly `OVERLAY_<C>_VERS`: binutils and gcc default to
+      the newest the arch ships, like rust, rather than a pinned 2.30 and 8.5 -- the same
+      versions on every arch shipping them today, and empty where an arch ships none.
+      `OVERLAY_BINUTILS_ASKED` loses its leading `_`: it is carried to every sub-make.
     - Nothing a package builds changes otherwise: builds keep using the archives as
       published.
     - See [Building and publishing an

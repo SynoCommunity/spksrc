@@ -442,9 +442,9 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 | `OVERLAY_RUSTC` | `1` | Custom from-source rustc + Synology triple. `0` falls back to stock `rustup` — diagnostic only: the archs that ship an overlay do so precisely because the stock std does not fit them. |
 | `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off. |
 | `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. |
-| `OVERLAY_GCC_VERS` | `8.5` | Which gcc build to select, matching the consumer dir name. |
-| `OVERLAY_RUSTC_VERS` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
-| `OVERLAY_BINUTILS_VERS` | `2.30` | Idem. |
+| `OVERLAY_GCC_VERSION` | newest the arch ships | Which gcc build to select, matching the consumer dir name; empty where the arch ships none. |
+| `OVERLAY_RUSTC_VERSION` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
+| `OVERLAY_BINUTILS_VERSION` | newest the arch ships | Idem. |
 
 `make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read *before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
 
