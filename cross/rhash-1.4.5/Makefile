@@ -45,4 +45,6 @@ CONFIGURE_ARGS += --extra-ldflags="$(LDFLAGS)"
 
 CONFIGURE_ARGS += --enable-openssl
 
+INSTALL_ARGS = install install-lib-headers install-lib-so-link DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+
 include ../../mk/spksrc.cross-cc.mk

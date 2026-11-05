@@ -4,9 +4,9 @@ Adminer (formerly phpMinAdmin) is a full-featured database management tool writt
 
 ## Install Dependencies
 
-Adminer requires Apache 2.2 to run properly, and any version of PHP 5 or PHP 7. Select your PHP version according to requirements from your other running PHP applications.
+Adminer requires Apache 2.4 on DSM 6 and later (Apache 2.2 on older DSM) and PHP 7.4, 8.0, or 8.4 depending on the DSM version. Select your PHP version according to requirements from your other running PHP applications.
 
-Enable the required PHP Extensions in the default profile according to the database products you want to access (mysql, sqlite, pgsql).
+Enable the required PHP extensions in the default profile according to the database products you want to access: `mysqli`/`pdo_mysql`, `pdo_sqlite`/`sqlite3`, and `pdo_pgsql`.
 
 ## PostgreSQL Configuration
 
