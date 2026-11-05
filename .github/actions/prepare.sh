@@ -75,8 +75,14 @@ SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 # Get dependency list
 # Dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
-DEPENDENCY_LIST=./dependency-list.txt
-make dependency-list-spk 2>/dev/null > "${DEPENDENCY_LIST}"
+DEPENDENCY_LIST=$(mktemp)
+DEPENDENCY_LOG=$(mktemp)
+trap 'rm -f "${DEPENDENCY_LIST}" "${DEPENDENCY_LOG}"' EXIT
+if ! make dependency-list-spk > "${DEPENDENCY_LIST}" 2> "${DEPENDENCY_LOG}"; then
+    echo "===> ERROR: failed to generate dependency list" >&2
+    cat "${DEPENDENCY_LOG}" >&2
+    exit 1
+fi
 
 # Search for dependent spk packages
 # Parse the dependency list once, keeping exact package/dependency token
@@ -189,15 +195,13 @@ done
 # Build the combined list of all DSM-restricted packages for exclusion from the
 # standard builds. Each list holds what declares that REQUIRED_MIN_DSM itself, and
 # nothing may be exempt: a package that refuses DSM 7.1 cannot build there.
-all_min_dsm_packages=
+declare -A min_dsm_set
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
     eval "arch_pkgs=\$arch_min_dsm${v}_packages"
     eval "noarch_pkgs=\$noarch_min_dsm${v}_packages"
     for pkg in ${arch_pkgs} ${noarch_pkgs}; do
-        if ! echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${pkg}"; then
-            all_min_dsm_packages+="${pkg} "
-        fi
+        min_dsm_set["${pkg}"]=1
     done
 done
 
@@ -210,7 +214,7 @@ has_arch_packages='false'
 has_noarch_packages='false'
 for package in ${packages}; do
     if [ -f "./spk/${package}/Makefile" ]; then
-        if echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${package}"; then
+        if [ -n "${min_dsm_set[${package}]:-}" ]; then
             continue
         fi
         if [ -z "${noarch_set[${package}]:-}" ]; then
