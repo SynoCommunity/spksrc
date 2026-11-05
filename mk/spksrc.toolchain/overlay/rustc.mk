@@ -46,6 +46,12 @@ ifeq ($(OVERLAY_RUSTC_ON),1)
 # Overlay ON (default): our custom toolchain, synology triple.
 RUST_TARGET        := $(_RUST_SYNO_TARGET)
 TC_RUSTUP_TOOLCHAIN = $(_RUST_TC_ID)
+# The synology triple is a JSON target-spec, and a custom target is gated: 1.82 resolves one
+# from RUST_TARGET_PATH plainly, 1.97+ refuses with "custom targets are unstable and require
+# `-Zunstable-options`". In the per-target rustflags, so cargo's own `rustc --print` target
+# probe carries it too; our rustc is a from-source `dev` channel build, so it takes -Z
+# without RUSTC_BOOTSTRAP.
+RUSTFLAGS          += -Zunstable-options
 else
 # Overlay OFF: stock rustup rustc + in-tree unknown triple.
 RUST_TARGET        := $(_RUST_BASE_TARGET)
