@@ -1,18 +1,21 @@
 SPK_NAME = monit
-SPK_VERS = 5.35.2
-SPK_REV = 12
+SPK_VERS = 6.0.0
+SPK_REV = 13
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/monit
 
-# Monit 5.35+ requires C11 stdatomic.h (GCC 4.9+)
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# Monit uses C11 stdatomic.h, requiring GCC >= 4.9.
+MIN_GCC_VERSION = 4.9
+# The PPC toolchain lacks a usable POSIX thread library.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS_REASON = PPC toolchain lacks a usable POSIX thread library
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 DISPLAY_NAME = Monit
-CHANGELOG = "Update Monit to v5.35.2."
+CHANGELOG = "Update Monit to v6.0.0."
 
 HOMEPAGE = https://mmonit.com/monit
 LICENSE  = AGPLv3
