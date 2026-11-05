@@ -30,7 +30,7 @@ One patch per PR: 400 is the whole of #2249 rather than one patch per commit,
 because that PR carries the series as a unit -- its own commits, LiBe-net's
 shared cache reworked from them, and the fixes on top.
 
-400 is now the entire branch: `51ec612fa..07db38f0c`, the 29 commits of
+400 is now the entire branch: `941d132fd..415f464ad`, the 29 commits of
 th0ma7/tvheadend record-from-buffer.  It used to be only what the branch added
 on top of #2206, with 300 carrying #2206 itself; rebasing onto this base
 dropped #2206's three commits on its own ("patch contents already upstream"),
