@@ -177,6 +177,14 @@ If you only read one thing, read this. The details are in the dated log below.
       parse, only where the arch ships two versions.
     - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
       against.
+    - **Rust is built as the official dist is**, no longer with x.py's `compiler` profile,
+      whose debug assertions made every rust package build slower and shipped a std with
+      its debug checks on: the `dist` profile, jemalloc, ThinLTO, one codegen unit, then
+      profile-guided -- rustc by x.py, LLVM, as a shared library, by gcc with
+      `HOST_OPTFLAGS` -- trained on the rustc-perf crates of the official dist. Release
+      builds of fd and bat for qoriq: 27% and 38% faster with rust 1.98, fd 23% with 1.82.
+    - The custom target takes `-Zunstable-options`, which rust 1.97+ requires for a JSON
+      target-spec.
     - Nothing a package builds changes otherwise: builds keep using the archives as
       published.
     - See [Building and publishing an
