@@ -3,7 +3,7 @@ PKG_VERS = 0.18
 PKG_EXT  = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gcc.gnu.org/pub/gcc/infrastructure
-PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # gmp via NATIVE_DEPENDS into this prefix -> --with-gmp-prefix = $(STAGING_INSTALL_PREFIX)
 NATIVE_DEPENDS = native/gmp

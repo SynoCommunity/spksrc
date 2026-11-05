@@ -85,14 +85,14 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # Defaulted here, before the components: the rust pool and TC_OVERLAY_RUSTC (rustc.mk) are
 # immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
 # unset switch while everything later sees the default.
-OVERLAY_RUSTC          ?= 1
-OVERLAY_BINUTILS       ?= 0
+OVERLAY_RUSTC    ?= 1
+OVERLAY_BINUTILS ?= 0
 # Off by default, tree-wide: packages keep the vendor gcc, and the producer of a rust
 # built with the gcc overlay turns it on for itself (native/rustc-1.98). Tree-wide because a
 # package that selects a meta on TC_GCC must agree with the meta spk-meta-source builds,
 # and FWRD_ARGS_SPK does not carry the switch. OVERLAY_BINUTILS follows through
 # OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
-OVERLAY_GCC            ?= 0
+OVERLAY_GCC      ?= 0
 # A typo must not read as "off": anything neither true nor false (macros.mk) stops here.
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
 
@@ -131,7 +131,7 @@ include $(_OVERLAY_MK_DIR)/rustc.mk
 
 # Every overlay of the arch, installed and cleaned with its base toolchain whether a build
 # uses it or not. binutils first: the gcc overlay links its as/ld at install time.
-TC_OVERLAY_ALL        := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_ENABLED)
+TC_OVERLAY_ALL := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_ENABLED)
 
 # The as/ld version the binutils overlay supplies to every compile -- asked for, or brought
 # by the gcc overlay -- as the consumer's own PKG_VERS: what tc-capability.mk reports for
