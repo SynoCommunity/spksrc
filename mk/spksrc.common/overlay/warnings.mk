@@ -34,7 +34,6 @@ $(MSG) "*** Overlay disabled -- set $(2) to one of the above" ; \
 $(MSG) "*********************************************************************"
 endef
 
-
 define OVERLAY_WARN_RUSTC_GCC_FALLBACK
 $(MSG) "*********************************************************************" ; \
 $(MSG) "*** No rust $(OVERLAY_RUSTC_VERSION) overlay built with gcc $(OVERLAY_GCC_VERSION) for [$(_OVERLAY_TC)]" ; \

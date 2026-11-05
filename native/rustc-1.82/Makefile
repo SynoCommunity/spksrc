@@ -6,8 +6,7 @@ PKG_DIST_SITE = https://static.rust-lang.org/dist
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)-src
 
-# Target toolchain to (re)build this custom rustc for (per-arch work dir). Only
-# archs whose toolchain declares RUST_TARGET are real rust targets (see below).
+# Target toolchain to (re)build this custom rustc for (per-arch work dir).
 TC_ARCH ?= ppc853x
 TC_VERS ?= 5.2
 

@@ -1,7 +1,7 @@
 ###############################################################################
 # spksrc.common/macros/list.mk
 #
-# Lists and strings: de-duplication, appending, merging.
+# Lists: de-duplication, appending, merging.
 ###############################################################################
 
 # Macro: append to a comma-separated list
