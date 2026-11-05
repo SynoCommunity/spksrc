@@ -1,12 +1,14 @@
 PKG_NAME = immich
-PKG_VERS = 3.3.5
+PKG_VERS = 3.3.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs-22 native/pnpm native/extism-js native/binaryen
+# Immich's .nvmrc targets Node 24, but the Synology runtime is Node.js_v22.
+# Build with Node 22 and let Corepack select Immich's pinned pnpm version.
+BUILD_DEPENDS = native/nodejs-22 native/extism-js native/binaryen
 
 DEPENDS = cross/libvips
 
@@ -19,7 +21,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = immich_install
 POST_INSTALL_TARGET = immich_post_install
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs-22/work-native/node/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
@@ -34,6 +36,7 @@ endif
 
 .PHONY: immich_install
 immich_install:
+	$(RUN) corepack enable
 
 	# ------------------------------------------------------------
 	# 1. Disable prepare scripts, save ML subproject
@@ -62,6 +65,8 @@ immich_install:
 	# ------------------------------------------------------------
 	$(RUN) rm -rf immich-deploy
 	$(RUN) pnpm --filter immich deploy immich-deploy --frozen-lockfile --ignore-scripts
+	# pnpm bookkeeping is not used at runtime and carries build timestamps
+	$(RUN) rm -f immich-deploy/node_modules/.modules.yaml immich-deploy/node_modules/.pnpm-workspace-state-v1.json
 
 	# ------------------------------------------------------------
 	# 5. Add web build to deploy dir
