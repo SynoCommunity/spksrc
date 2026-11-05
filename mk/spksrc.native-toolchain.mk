@@ -26,9 +26,25 @@
 #   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
 #   tc-install   runs the base toolchain's own build, overlays included, whose cookies make
 #                it a no-op once done; not a DEPENDS, which would hand it this WORK_DIR
+#   TC_VENDOR_ENV  the prefix a $(shell) running a vendor tool needs (the C locale)
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
-#   TOOLCHAIN_DIST_ARCH  the arch the archive is named after (overlay_dist_arch, spksrc.common/macros/archs.mk)
+#   TOOLCHAIN_DIST_ARCH     the arch the archive is named after (overlay_dist_arch)
+#   TOOLCHAIN_BINUTILS_*    the binutils a component builds against, co-built for the same
+#                           (arch, DSM): _VERSION, _DIR (native/binutils-<v>), _BIN
+#   TOOLCHAIN_PGO_SOURCES   the generated training sources (toolchain-pgo-sources)
+#
+# What a component sets:
+#   TOOLCHAIN_CONSUMER      the overlay directory suffix its consumers carry
+#   ARCHIVE_NAME & co       its archive, named after TOOLCHAIN_DIST_ARCH where
+#   TOOLCHAIN_DIST_SHARED   = 1 says a generic arch shares the real arch's archive
+#   TOOLCHAIN_PGO           ?= 1 to build twice, profile-guided
+#   TOOLCHAIN_PGO_TRAIN     the target running the instrumented tools (pass 1, PGO_PHASE=gen)
+#
+# Knobs, on the command line:
+#   TOOLCHAIN_JOBS          archs all-<vers> builds at once (default 1)
+#   TOOLCHAIN_KEEP_WORK     0 drops a work dir once its archive exists (default 1, gcc 0)
+#   TOOLCHAIN_PGO           0 for one plain pass
 #
 # And the targets that build it:
 #   make arch-<arch>-<vers>             one toolchain: build, then archive
@@ -39,9 +55,6 @@
 # and propagates into every sub-make, parallelising toolchain targets not written for it.
 # TOOLCHAIN_KEEP_WORK = 0 drops each work dir once its archive exists; a failed one is
 # kept, so a broken arch stays debuggable.
-#
-# A component sets TOOLCHAIN_CONSUMER, the overlay directory suffix its consumers carry
-# (gcc-8.5, binutils-2.30, rust-1.98_gcc-*), which is how all-<vers> knows its archs.
 ###############################################################################
 
 TOOLCHAIN_JOBS      ?= 1
@@ -101,6 +114,12 @@ TC_PREFIX   ?= $(TC_TARGET)-
 TC_WORK_DIR ?= $(TC_DIR)/work
 
 TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
+
+# The binutils gcc and rust are built against: native/binutils-<v>, co-built for this
+# (arch, DSM). The version the binutils overlay ships, 2.30 where the arch has none yet.
+TOOLCHAIN_BINUTILS_VERSION := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
+TOOLCHAIN_BINUTILS_DIR      = $(BASEDIR)/native/binutils-$(TOOLCHAIN_BINUTILS_VERSION)
+TOOLCHAIN_BINUTILS_BIN      = $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
 
 # ---- How the host compiler builds the component --------------------------------------
 # Probed, not assumed: -march=x86-64-v3 is a GCC 11 spelling and a host without AVX2 must
@@ -200,7 +219,7 @@ toolchain-pgo-sources:
 	@sh $(BASEDIR)/mk/spksrc.native-toolchain/pgo-sources.sh $(TOOLCHAIN_PGO_SOURCES)
 
 # The toolchains a component is built for are its consumers (toolchain_archs,
-# spksrc.common/archs.mk), once each. An arch whose archive exists is skipped
+# spksrc.common/macros/archs.mk), once each. An arch whose archive exists is skipped
 # (toolchain-arch), so a batch resumes where it stopped.
 .PHONY: all-%
 all-%:

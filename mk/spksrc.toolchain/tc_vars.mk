@@ -443,7 +443,7 @@ tc_vars:
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
-	echo TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS)) ; \
+	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
 	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \

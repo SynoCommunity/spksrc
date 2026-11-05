@@ -21,7 +21,7 @@
 #   OVERLAY_COMPONENT   gcc, binutils or rust
 #   OVERLAY_RUST_GCC    the _gcc-<version> suffix, when there is one
 #   TC_TARGET           the base toolchain's target triple
-#   OVERLAY_DIST_ARCH   the arch the archive is named after (overlay_dist_arch, spksrc.common/macros/archs.mk)
+#   OVERLAY_DIST_ARCH   the arch the archive is named after (overlay_dist_arch)
 ###############################################################################
 
 _OVERLAY_DIR_WORDS := $(subst _, ,$(notdir $(CURDIR)))

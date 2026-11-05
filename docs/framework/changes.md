@@ -171,6 +171,12 @@ If you only read one thing, read this. The details are in the dated log below.
       the newest the arch ships, like rust, rather than a pinned 2.30 and 8.5 -- the same
       versions on every arch shipping them today, and empty where an arch ships none.
       `OVERLAY_BINUTILS_ASKED` loses its leading `_`: it is carried to every sub-make.
+    - **`TC_BINUTILS` follows the gcc overlay:** with `OVERLAY_GCC=1`, whose binutils overlay
+      drives every compile, a `MIN_BINUTILS_VERSION` floor measures that `ld` rather than
+      the vendor one. Picking the default rust version no longer forks a shell on every
+      parse, only where the arch ships two versions.
+    - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
+      against.
     - Nothing a package builds changes otherwise: builds keep using the archives as
       published.
     - See [Building and publishing an

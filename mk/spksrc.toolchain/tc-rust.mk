@@ -113,8 +113,7 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	flock -u 5
 
 # The base rustup install only; the binutils linker wrapper is the rust overlay's own
-# artifact and hangs off overlay-rustc (spksrc.toolchain/overlay/rustc.mk), not this base
-# pipeline.
+# artifact (spksrc.toolchain/overlay/rustc.mk), not this base pipeline's.
 post_rustc_target: $(RUSTC_TARGET)
 
 ifeq ($(wildcard $(RUSTC_COOKIE)),)

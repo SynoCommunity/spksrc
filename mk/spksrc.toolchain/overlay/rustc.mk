@@ -19,7 +19,7 @@
 # and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-rustc-warn
 overlay-rustc-warn:
-	@$(call overlay_warn,RUSTC,VERSION_MISSING)
+	@$(call overlay_warn,RUSTC,VERSION_MISSING GCC_FALLBACK)
 
 # ============================================================================
 # Custom-rust archs only (TC_OVERLAY_RUSTC: a rust consumer dir exists);

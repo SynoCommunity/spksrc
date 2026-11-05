@@ -472,11 +472,22 @@ A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2
 
 | Knob | Default | Effect |
 |------|---------|--------|
-| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources -- C, C++ and, for gcc, Fortran (`toolchain-pgo-sources.sh`) -- rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_PGO` | `1` for gcc and binutils | Two passes: build instrumented, run the instrumented tools over generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`) -- rebuild reading the counts. The instrumented pass is never archived, so an archive that exists is always a finished build. |
 | `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
 | `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
 
 The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc builds `native/binutils-2.30` for the same `(arch, DSM)` first, and reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain.
+
+A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of the usual native build variables (`CONFIGURE_ARGS`, `COMPILE_TARGET`, ...):
+
+| A component sets | For |
+|------------------|-----|
+| `TOOLCHAIN_CONSUMER` | The suffix of its consumer directories (`gcc-8.5`, `binutils-2.30`, `rust-1.98_gcc-*`): `all-<dsm>` builds for every arch that has one. |
+| `ARCHIVE_NAME`, `ARCHIVE_EXT`, `ARCHIVE_DIR`, `ARCHIVE_KEEP` | The archive (`mk/spksrc.build/archive.mk`), named after `TOOLCHAIN_DIST_ARCH` for gcc and binutils. |
+| `TOOLCHAIN_DIST_SHARED = 1` | A generic arch is built as the real arch whose archive it shares. |
+| `TOOLCHAIN_PGO ?= 1`, `TOOLCHAIN_PGO_TRAIN` | The two passes, and the target that runs the instrumented tools over `TOOLCHAIN_PGO_SOURCES`. |
+
+In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
 
 The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
 

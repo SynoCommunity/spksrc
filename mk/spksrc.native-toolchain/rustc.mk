@@ -9,12 +9,14 @@
 # DSM toolchain: ARMv5 88f6281).
 #
 # The generic front-end provides TC_DIR / _tc_get / TC_TARGET / TC_GCC / TC_GLIBC /
-# WORK_DIR / tc-install and includes spksrc.native-cc.mk after this file. Only the
+# WORK_DIR / tc-install / TOOLCHAIN_BINUTILS_* and includes spksrc.native-cc.mk after this
+# file. Only the
 # x.py-specific steps are custom targets; the source pipeline (download/extract/
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
-# Read from toolchain/syno-<arch>-<vers>/Makefile: TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS,
-# RUST_MAX_ATOMIC_WIDTH (triple and tool aliases derive from the arch map).
+# Read from toolchain/syno-<arch>-<vers>/Makefile: TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS. The
+# triple and tool aliases derive from the arch map, RUST_MAX_ATOMIC_WIDTH from the
+# libatomic probe.
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
@@ -35,11 +37,9 @@ RUST_POSTFIX_ALIASES  := $(RUST_TARGET_JSON_BASE) $(RUST_TARGET)
 # RUST_LINK_VIA_BINUTILS: build the from-source std with a modern binutils 2.30 ld (the same
 # ld the consumer's package link uses), narrow to the Rust link -- C stays on vendor gcc+ld.
 # ppc853x needs it: its 2008 ld 2.18 leaves std's TLS TPREL16 relocs dynamic and glibc-2.8
-# mis-applies them. Default ON for every custom-rustc arch; set =0 to opt out.
-RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),1)
-RUST_BINUTILS_VERSION     := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
-RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERSION))
-RUST_BINUTILS_BIN       = $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
+# mis-applies them. ON for every custom-rustc arch; RUST_LINK_VIA_BINUTILS=0 on the command
+# line opts out. The binutils is the front-end's TOOLCHAIN_BINUTILS_*.
+RUST_LINK_VIA_BINUTILS := 1
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 # Build-time: link the target through the co-built ld (so std's own dynamic objects use
 # the modern ld). A gcc -B wrapper, since gcc < 4.8 has no -fuse-ld.
@@ -79,15 +79,12 @@ TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
 # runs the cross gcc.
 RUST_MAX_ATOMIC_WIDTH = $(if $(TC_HAS_LIBATOMIC),64)
 
-# PKG_REV is set by the native producer Makefile (PKG_REV ?= v1,
-# CLI-overridable), mirroring native/binutils-2.30.
-
 # The rust version is the native package's own PKG_VERS.
 TC_RUSTC        = $(PKG_VERS)
 # Build through stage 2 (the truly-current compiler); overridable.
 # https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html
 TC_RUSTC_STAGE ?= 2
-RUST_BUILD_HOST ?= x86_64-unknown-linux-gnu
+RUST_BUILD_HOST ?= $(RUST_BUILD_TRIPLE)
 
 # The extracted rust source (framework sets PKG_DIR = rustc-<vers>-src).
 RUST_SRC        = $(WORK_DIR)/$(PKG_DIR)
@@ -113,8 +110,6 @@ RUST_RANLIB   ?= $(RUST_TOOL_BIN)ranlib
 # The link driver: the co-built binutils wrapper when the Rust link is routed through the
 # overlay ld, otherwise plain gcc (which calls its own binutils ld).
 RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils-cc,$(RUST_CC))
-
-_RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 
 # The overlay directories this component's consumers carry: all-<vers> builds for them
 # (spksrc.native-toolchain.mk).
@@ -172,7 +167,7 @@ endef
 # ./x wrapper: target CFLAGS + the selected CC/CXX. No -Ctarget-cpu/-feature: the JSON spec
 # carries them (passing them again only triggers rustc's "unknown feature" warning).
 _X = cd $(RUST_SRC) && \
-     CFLAGS_$(_RUST_TARGET_ENV)="$(TC_EXTRA_CFLAGS)" CC_$(_RUST_TARGET_ENV)="$(RUST_CC)" CXX_$(_RUST_TARGET_ENV)="$(RUST_CXX)" \
+     CFLAGS_$(RUST_TARGET_LENV)="$(TC_EXTRA_CFLAGS)" CC_$(RUST_TARGET_LENV)="$(RUST_CC)" CXX_$(RUST_TARGET_LENV)="$(RUST_CXX)" \
      RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" \
      CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py
 
@@ -204,7 +199,7 @@ rustc_prepare: tc-install rustc_gcc_overlay $(if $(filter 1,$(RUST_LINK_VIA_BINU
 # is a plain passthrough (GNU ld accepts -Qy, so no arg filtering is needed).
 define RUST_BINUTILS_CC_SCRIPT
 #!/bin/sh
-# The cross gcc with ld/as redirected to the co-built binutils $(RUST_BINUTILS_VERSION)
+# The cross gcc with ld/as redirected to the co-built binutils $(TOOLCHAIN_BINUTILS_VERSION)
 # via -B. Used as the [target.*] linker for the from-source build.
 exec "$(RUST_CC)" -B"$(RUST_BINUTILS_SHIM)" "$$@"
 endef
@@ -228,16 +223,16 @@ rustc_gcc_overlay:
 rustc_binutils_cobuild:
 	@$(call rustc_status,binutils-cobuild)
 	@$(MSG) "*********************************************************************"
-	@$(MSG) "*** Co-building binutils $(RUST_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
+	@$(MSG) "*** Co-building binutils $(TOOLCHAIN_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
 	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
-	@$(MSG) "*** PATH: $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
+	@$(MSG) "*** PATH: $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
 	@$(MSG) "*********************************************************************"
 	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see
 	@# spksrc.toolchain/overlay/binutils.mk) so it cannot re-bootstrap a toolchain and recurse.
-	$(MAKE) --no-print-directory -C $(RUST_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
+	$(MAKE) --no-print-directory -C $(TOOLCHAIN_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
 	@mkdir -p $(RUST_BINUTILS_SHIM)
-	@ln -sf $(RUST_BINUTILS_BIN)/$(TC_TARGET)-ld $(RUST_BINUTILS_SHIM)/ld
-	@ln -sf $(RUST_BINUTILS_BIN)/$(TC_TARGET)-as $(RUST_BINUTILS_SHIM)/as
+	@ln -sf $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-ld $(RUST_BINUTILS_SHIM)/ld
+	@ln -sf $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-as $(RUST_BINUTILS_SHIM)/as
 	$(file >$(RUST_LINKER),$(RUST_BINUTILS_CC_SCRIPT))
 	@chmod +x $(RUST_LINKER)
 

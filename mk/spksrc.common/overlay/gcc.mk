@@ -5,7 +5,8 @@
 # binutils.mk: this one is active only beside an available binutils overlay.
 ###############################################################################
 
-# _OVERLAY_GCC_ANY, TC_OVERLAY_GCC, OVERLAY_GCC_VERSION_MISSING and its banner.
+# _OVERLAY_GCC_ANY, OVERLAY_GCC_VERSION, TC_OVERLAY_GCC, OVERLAY_GCC_VERSION_MISSING and
+# its banner.
 $(eval $(call OVERLAY_COMPONENT_TEMPLATE,GCC,gcc))
 
 # GCC additionally requires binutils to be available: it drives as/ld through -B into that

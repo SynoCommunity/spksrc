@@ -28,14 +28,23 @@
 #             OVERLAY_<c>_VERSION_MISSING   ships one, but not that version
 #             OVERLAY_WARN_<c>_<state>      the matching banner text
 #
+#   refused   OVERLAY_BINUTILS_REFUSED      OVERLAY_BINUTILS=0 asked beside an active gcc
+#
+#   shared    TC_OVERLAY_ALL                every overlay dir of the arch, installed with it
+#             RUST_LINK_VIA_BINUTILS        the Rust link through the binutils overlay ld
+#             overlay_binutils_version      $(call ...,<vendor>): the as/ld version in use
+#             overlay_warn                  $(call ...,<C>,<states>): the banner to print
+#
 #   created by OVERLAY_COMPONENT_TEMPLATE, for every <c> -- no assignment to search for:
-#             _OVERLAY_<c>_ANY, OVERLAY_<c>_VERSION and TC_OVERLAY_<c> (but RUSTC),
-#             OVERLAY_<c>_VERSION_MISSING, OVERLAY_WARN_<c>_VERSION_MISSING
+#             _OVERLAY_<c>_ANY, OVERLAY_<c>_VERSION_MISSING and its OVERLAY_WARN_<c>_...;
+#             OVERLAY_<c>_VERSION and TC_OVERLAY_<c> too, but for RUSTC (rustc.mk)
 #
 #   internal  _OVERLAY_TC                the toolchain dir name
 #             _OVERLAY_<c>_ANY           any version, ignoring OVERLAY_<c>_VERSION
 #             _OVERLAY_BINUTILS_WANTED   global overlay, the narrow rust link, or a
 #                                        gcc overlay (which has no as/ld of its own)
+#             _OVERLAY_BINUTILS_PKG_VERS the global overlay's PKG_VERS, when it is on
+#             _OVERLAY_RUSTC_*           the rust candidates, by version and gcc variant
 #
 # One file per component under spksrc.common/overlay/, read in a fixed order: the
 # switches and versions first, which every component reads; then binutils, gcc and rustc;
@@ -73,12 +82,9 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix;
 #                        inert where the arch ships none.
 #
-# REQUESTED, defaulted here rather than further down: _RUSTC_POOL and TC_OVERLAY_RUSTC
-# (rustc.mk) are immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave those
-# two seeing an unset switch while everything later sees the default. That was invisible
-# while the default was 0 -- unset and 0 read alike -- and mismatches the moment it is 1:
-# the gcc overlay asked for, the vendor-gcc rust consumer picked, and stage0 then refuses
-# the work dir.
+# Defaulted here, before the components: the rust pool and TC_OVERLAY_RUSTC (rustc.mk) are
+# immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
+# unset switch while everything later sees the default.
 OVERLAY_RUSTC          ?= 1
 OVERLAY_BINUTILS       ?= 0
 # Off by default, tree-wide: packages keep the vendor gcc, and the producer of a rust
@@ -90,7 +96,7 @@ OVERLAY_GCC            ?= 0
 # A typo must not read as "off": anything neither true nor false (macros.mk) stops here.
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
 
-_OVERLAY_DIR := $(dir $(lastword $(MAKEFILE_LIST)))overlay
+_OVERLAY_MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))overlay
 
 # ---- The names every component shares ----------------------------------------------
 # $(eval $(call OVERLAY_COMPONENT_TEMPLATE,<C>,<dir>[,select])), first thing in each
@@ -99,13 +105,12 @@ _OVERLAY_DIR := $(dir $(lastword $(MAKEFILE_LIST)))overlay
 #   _OVERLAY_<C>_ANY                  every <dir> dir the arch ships, any version
 #   OVERLAY_<C>_VERSION               the newest of them, unless already set
 #   TC_OVERLAY_<C>                    the one of OVERLAY_<C>_VERSION
-#
-# select: the component picks its version and directory itself (rustc: by gcc variant),
-# and only the first and the last two are created.
 #   OVERLAY_<C>_VERSION_MISSING       ships one, but not that version
 #   OVERLAY_WARN_<C>_VERSION_MISSING  the banner for it (warnings.mk)
 #
-# so the same state carries the same name in every component. What differs -- ACTIVE, and
+# select: the component picks its version and directory itself (rustc: by gcc variant), so
+# OVERLAY_<C>_VERSION and TC_OVERLAY_<C> are left to it. The same state carries the same
+# name in every component. What differs -- ACTIVE, and
 # the states only one of them has -- stays in its own file.
 define OVERLAY_COMPONENT_TEMPLATE
 _OVERLAY_$(1)_ANY := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-*)
@@ -120,21 +125,39 @@ endef
 # The newest of a list of versions; sorting forks a shell, so only when there are two.
 _overlay_newest = $(if $(word 2,$(1)),$(firstword $(shell printf '%s\n' $(1) | sort -Vr)),$(1))
 
-include $(_OVERLAY_DIR)/binutils.mk
-include $(_OVERLAY_DIR)/gcc.mk
-include $(_OVERLAY_DIR)/rustc.mk
+include $(_OVERLAY_MK_DIR)/binutils.mk
+include $(_OVERLAY_MK_DIR)/gcc.mk
+include $(_OVERLAY_MK_DIR)/rustc.mk
 
 # Every overlay of the arch, installed and cleaned with its base toolchain whether a build
 # uses it or not. binutils first: the gcc overlay links its as/ld at install time.
 TC_OVERLAY_ALL        := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_ENABLED)
 
-# Carried on the command line of every sub-make that resolves a toolchain WITHIN this
-# package: FWRD_ARGS, built from FWRD_VARS in spksrc.common.mk. OVERLAY_BINUTILS_ASKED
-# with them, since it is what the first make was asked (binutils.mk).
-# Deliberately absent from FWRD_ARGS_SPK: which compiler a package builds with belongs
-# to that package and its own work dir, so an spk built as another's meta decides for
-# itself rather than inheriting its caller's choice. Not RUST_LINK_VIA_BINUTILS: it
-# derives from TC_OVERLAY_RUSTC, which the child reads itself.
+# The as/ld version the binutils overlay supplies to every compile -- asked for, or brought
+# by the gcc overlay -- as the consumer's own PKG_VERS: what tc-capability.mk reports for
+# TC_BINUTILS, so a MIN_BINUTILS_VERSION floor measures the linker the compile will really
+# use rather than the vendor one it replaces. Empty when neither, or the arch has none.
+# Here, once the gcc overlay is known.
+#
+# Immediate, and deliberately not read back later: the generated tc_vars.mk emits
+# TC_OVERLAY_BINUTILS with ACTIVE semantics and stage0.mk includes that file ahead of
+# tc-capability.mk, so a work dir generated with the overlay off would hand back an empty
+# one and the floor would see the vendor version.
+_OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(OVERLAY_GCC_ON)),$(call read_makefile_var,$(firstword $(TC_OVERLAY_BINUTILS))/Makefile,PKG_VERS))
+
+# The effective as/ld version, given the vendor one to fall back to. Two callers, because
+# TC_BINUTILS reaches them from different places: tc-capability.mk reads it out of the
+# toolchain's Makefile for a package, while a toolchain declares its own and
+# spksrc.toolchain/tc_vars.mk emits it. One macro so they cannot drift apart.
+overlay_binutils_version = $(or $(strip $(_OVERLAY_BINUTILS_PKG_VERS)),$(strip $(1)))
+
+# The switches, and what the first make was asked (OVERLAY_BINUTILS_ASKED, binutils.mk),
+# on the command line of every sub-make that resolves a toolchain WITHIN this package:
+# FWRD_ARGS, which spksrc.common.mk builds from FWRD_VARS. Deliberately absent from
+# FWRD_ARGS_SPK: which compiler a package builds with belongs to that package and its own
+# work dir, so an spk built as another's meta decides for itself rather than inheriting its
+# caller's choice. Not RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the
+# child reads itself.
 FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 
 # The only way the versions travel: objects from gcc 4.3.7 will not mix with gcc 8.5 C++,
@@ -148,7 +171,8 @@ FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 # overlay. `export` alone creates that empty value, so the guard is on the export.
 $(foreach c,BINUTILS GCC RUSTC,$(if $(strip $(OVERLAY_$(c)_VERSION)),$(eval export OVERLAY_$(c)_VERSION)))
 
-# The switches are exported as well, for what FWRD_ARGS cannot reach. The two are not redundant:
+# The switches are exported too, for what FWRD_ARGS cannot reach. The two are not
+# redundant:
 #   FWRD_ARGS  a command-line variable, so it outranks an `OVERLAY_x = ...` in a dependency's
 #              Makefile -- one compiler across the tree. An exported value would lose there.
 #   export     the sub-makes started with MAKEFLAGS= and no FWRD_ARGS (wheels, crossenv,
@@ -159,7 +183,7 @@ export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 # ---- Degraded states ---------------------------------------------------------------
 # Each component defines its own (<c>_MISSING, <c>_VERSION_MISSING, ...); overlay_warn
 # prints the first of a component's list, so their order there is their priority.
-include $(_OVERLAY_DIR)/warnings.mk
+include $(_OVERLAY_MK_DIR)/warnings.mk
 
 # Once every component is in: the refusal reads OVERLAY_GCC_ON.
 ifneq ($(OVERLAY_BINUTILS_REFUSED),)

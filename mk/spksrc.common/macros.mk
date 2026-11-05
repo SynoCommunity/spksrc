@@ -3,7 +3,8 @@
 #
 # Defines generic GNU Make helper macros used across spksrc, one file per theme under
 # spksrc.common/macros/. A macro is assigned with = when it fits on one line, with define
-# when its body spans several; a name starting with _ is internal to its file.
+# when its body spans several. A name starting with _ is the framework's own: helpers and
+# state a package never sets or calls.
 #
 # Macros:
 #  string.mk

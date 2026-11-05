@@ -11,7 +11,6 @@
 #   PKG_NAME = gcc
 #   PKG_VERS = 8.5.0
 #   PKG_REV ?= v5
-#   PKG_NAME = gcc
 #   include ../../mk/spksrc.native-toolchain.mk
 ###############################################################################
 
@@ -47,7 +46,7 @@ ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
 ARCHIVE_KEEP = usr/local
 ARCHIVE_STRIP = 1
-ARCHIVE_STRIP_TARGET = $(GCC_BINUTILS_BIN)/$(TC_TARGET)-strip
+ARCHIVE_STRIP_TARGET = $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-strip
 ARCHIVE_STRIP_TARGET_DIRS = $(TC_TARGET) lib/gcc/$(TC_TARGET)
 # Host docs and the NATIVE_DEPENDS math libs share this prefix; neither belongs in
 # a compiler archive. An exclusion list rather than a dir allow-list, because the
@@ -131,10 +130,8 @@ GCC_TARGET_ABI = $(strip $(_GCC_ABI_BASE) $(_GCC_ABI_FLOAT2) $(_GCC_ABI_FPU2) $(
 # Build configuration
 ##############################################################################
 
-# The cross-binutils gcc is BUILT against: native/binutils-<vers>'s per-arch output.
-GCC_BINUTILS_DIR = $(BASEDIR)/native/binutils-2.30
-GCC_BINUTILS_BIN = $(GCC_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
-ENV += PATH=$(GCC_BINUTILS_BIN):$$PATH
+# The cross-binutils gcc is BUILT against (TOOLCHAIN_BINUTILS_*, spksrc.native-toolchain.mk).
+ENV += PATH=$(TOOLCHAIN_BINUTILS_BIN):$$PATH
 
 # GCC's build defaults CFLAGS to -g -O2, but only when CFLAGS is unset; spksrc.native
 # exports it empty, which leaves cc1 and cc1plus at -O0 and the compiler ~3x slower.
@@ -177,7 +174,7 @@ GCC_BUILD_SYSROOT   = $(or $(_GCC_STOCK_SYSROOT),$(TC_SYSROOT_DIR))
 # Probe rather than tabulate: whichever of the two layouts actually holds the headers.
 GCC_SYSROOT_HEADERS = $(if $(wildcard $(GCC_BUILD_SYSROOT)/usr/include/stdio.h),/usr/include,/include)
 CONFIGURE_ARGS += --with-native-system-header-dir=$(GCC_SYSROOT_HEADERS)
-CONFIGURE_ARGS += --with-build-time-tools=$(GCC_BINUTILS_BIN)
+CONFIGURE_ARGS += --with-build-time-tools=$(TOOLCHAIN_BINUTILS_BIN)
 CONFIGURE_ARGS += --with-gmp=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-mpfr=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-mpc=$(STAGING_INSTALL_PREFIX)
@@ -216,12 +213,12 @@ gcc-prepare: tc-install
 	  $(MSG) "gcc: no sysroot found under $(TC_EXTRACT_DIR)" ; \
 	  exit 1 ; \
 	}
-	@$(MSG) "gcc-$(PKG_VERS): building binutils for $(TC_ARCH)-$(TC_VERS) to build against"
+	@$(MSG) "gcc-$(PKG_VERS): building binutils $(TOOLCHAIN_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) to build against"
 	@# Build tools, not a publishable binutils. PGO_PHASE emptied: it would reach this
 	@# sub-make through MAKEFLAGS, and pass 1 leave an instrumented binutils that pass 2
 	@# reuses, cookies intact. ARCHIVE_NAME emptied: an archive left here would be taken
 	@# for a finished profile-guided binutils by its own arch- target.
-	@$(MAKE) --no-print-directory -C $(GCC_BINUTILS_DIR) TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE= ARCHIVE_NAME=
+	@$(MAKE) --no-print-directory -C $(TOOLCHAIN_BINUTILS_DIR) TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE= ARCHIVE_NAME=
 
 # PGO training: the instrumented compiler over the generated sources (TOOLCHAIN_PGO_SOURCES),
 # so the counters describe compilation, not just whatever the build happened to do. The
