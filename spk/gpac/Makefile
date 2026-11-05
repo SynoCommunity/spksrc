@@ -1,17 +1,20 @@
 SPK_NAME = gpac
-SPK_VERS = 26.02.0
-SPK_REV = 2
+SPK_VERS = 26.07.0
+SPK_REV = 3
 SPK_ICON = src/gpac.png
 
 DEPENDS = cross/gpac
 
-# Toolchains lacking atomic support
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# quickjs-libc includes stdatomic.h unconditionally, which needs GCC >= 4.9.
+MIN_GCC_VERSION = 4.9
+# The PPC toolchain headers lack SYS_DVBT2.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS_REASON = PPC toolchain headers lack SYS_DVBT2
 
 MAINTAINER = wmanth
 DESCRIPTION = GPAC is an open-source multimedia framework for rich-media and broadcast technologies. It features the MP4 reference muxer MP4Box.
 DISPLAY_NAME = GPAC
-CHANGELOG = "Update to v26.02.0 with HTTP/3, WebAssembly support, IAMF, AC-4, AVS3 codecs, and many improvements."
+CHANGELOG = "Update to v26.07.0."
 
 HOMEPAGE = https://gpac.io
 LICENSE  = LGPLv2
