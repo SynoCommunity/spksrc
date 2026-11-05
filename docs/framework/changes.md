@@ -196,7 +196,8 @@ If you only read one thing, read this. The details are in the dated log below.
       the vendor one. Picking the default rust version no longer forks a shell on every
       parse, only where the arch ships two versions.
     - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
-      against.
+      against, made by binutils' own `arch-<arch>-<dsm>`: profile-guided, and archived
+      under binutils' own revision, ready to publish.
     - **Rust is built as the official dist is**, no longer with x.py's `compiler` profile,
       whose debug assertions made every rust package build slower and shipped a std with
       its debug checks on: the `dist` profile, jemalloc, ThinLTO, one codegen unit, then

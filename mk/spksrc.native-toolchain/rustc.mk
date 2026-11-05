@@ -257,7 +257,7 @@ rustc_binutils_cobuild:
 	@$(MSG) "*********************************************************************"
 	@$(MSG) "*** Co-building binutils $(TOOLCHAIN_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
 	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
-	@$(MSG) "*** PATH: $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
+	@$(MSG) "*** PATH: $(TOOLCHAIN_BINUTILS_WORK)"
 	@$(MSG) "*********************************************************************"
 	$(TOOLCHAIN_BINUTILS_MAKE)
 	@mkdir -p $(RUST_BINUTILS_SHIM)
