@@ -1,0 +1,5 @@
+lnk:lib/libigloo.so
+lnk:lib/libigloo.so.0
+lib:lib/libigloo.so.0.0.0
+rsc:include/igloo/
+rsc:lib/pkgconfig/igloo.pc

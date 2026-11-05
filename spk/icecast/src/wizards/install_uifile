@@ -1,8 +1,10 @@
 [{
-    "step_title": "Setting Icecast server",
+    "step_title": "Icecast administrator",
     "items": [{
+        "desc": "Set the login used for Icecast administration."
+    }, {
         "type": "textfield",
-        "desc": "User's login. Defaults to admin",
+        "desc": "User's login. Defaults to admin.",
         "subitems": [{
             "key": "wizard_ic_username",
             "desc": "Username",
@@ -11,11 +13,63 @@
         ]
       }, {
         "type": "password",
-        "desc": "User's password. Defaults to changepassword",
+        "desc": "User's password. Defaults to changepassword.",
         "subitems": [{
             "key": "wizard_ic_password",
             "desc": "Password",
             "defaultValue": "changepassword"
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "Server information",
+    "items": [{
+        "desc": "These values are shown in the Icecast web interface and are used by directory listings."
+    }, {
+        "type": "textfield",
+        "desc": "Public hostname clients use to reach this server. A fully qualified domain name is preferred.",
+        "subitems": [{
+            "key": "wizard_ic_hostname",
+            "desc": "Hostname",
+            "defaultValue": ""
+          }
+        ]
+      }, {
+        "type": "textfield",
+        "desc": "Location shown in the server information.",
+        "subitems": [{
+            "key": "wizard_ic_location",
+            "desc": "Location",
+            "defaultValue": "Earth"
+          }
+        ]
+      }, {
+        "type": "singleselect",
+        "desc": "Enable the IPv6 listener only if your network supports IPv6.",
+        "subitems": [{
+            "key": "wizard_ic_noipv6",
+            "desc": "Disabled",
+            "defaultValue": true
+          }, {
+            "key": "wizard_ic_ipv6",
+            "desc": "Enabled",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "Directory listing contact",
+    "items": [{
+        "desc": "A valid contact email allows Icecast to submit streams to YP directory listings. Leave blank to keep YP disabled."
+    }, {
+        "type": "textfield",
+        "desc": "Administrator contact email.",
+        "subitems": [{
+            "key": "wizard_ic_admin",
+            "desc": "Admin email",
+            "defaultValue": ""
           }
         ]
       }

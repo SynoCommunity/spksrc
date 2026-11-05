@@ -1,9 +1,9 @@
 # See https://github.com/SynoCommunity/spksrc/issues/2662
 # Remove the extension pgsql because the extension pgsql does not work with the
 # PostgreSQL server from DSM. The Extension pdo_pgsql works perfectly.
---- adminer/drivers/pgsql.inc.php.orig	2025-09-26 15:38:02.000000000 +0000
-+++ adminer/drivers/pgsql.inc.php	2025-10-15 20:58:08.384842825 +0000
-@@ -6,140 +6,7 @@
+--- adminer/drivers/pgsql.inc.php.orig
++++ adminer/drivers/pgsql.inc.php
+@@ -6,155 +6,7 @@
  if (isset($_GET["pgsql"])) {
  	define('Adminer\DRIVER', "pgsql");
  
@@ -11,29 +11,26 @@
 -		class PgsqlDb extends SqlDb {
 -			public $extension = "PgSQL";
 -			public $timeout = 0;
--			private $link, $string, $database = true;
+-			private $link, $string;
 -
+-			// no type declarations, this is passed to set_error_handler()
 -			function _error($errno, $error) {
--				if (ini_bool("html_errors")) {
--					$error = html_entity_decode(strip_tags($error));
--				}
--				$error = preg_replace('~^[^:]*: ~', '', $error);
--				$this->error = $error;
+-				$this->error = preg_replace('~^[^:]*: ~', '', php_error_text($error));
 -			}
 -
--			function attach(string $server, string $username, string $password): string {
+-			function attach(array $server, string $username, string $password): string {
 -				$db = adminer()->database();
 -				set_error_handler(array($this, '_error'));
--				list($host, $port) = host_port(addcslashes($server, "'\\"));
--				$this->string = "host='$host'" . ($port ? " port='$port'" : "") . " user='" . addcslashes($username, "'\\") . "' password='" . addcslashes($password, "'\\") . "'";
+-				$port = $server["port"];
+-				$host = ($server["host"] ?: $server["socket"]); // the socket is passed as the host directory
+-				$this->string = "host='$host'" . ($port ? " port=$port" : "") . " user='" . addcslashes($username, "'\\") . "' password='" . addcslashes($password, "'\\") . "'";
 -				$ssl = adminer()->connectSsl();
 -				if (isset($ssl["mode"])) {
--					$this->string .= " sslmode='" . $ssl["mode"] . "'";
+-					$this->string .= " sslmode=$ssl[mode]";
 -				}
 -				$this->link = @pg_connect("$this->string dbname='" . ($db != "" ? addcslashes($db, "'\\") : "postgres") . "'", PGSQL_CONNECT_FORCE_NEW);
 -				if (!$this->link && $db != "") {
 -					// try to connect directly with database for performance
--					$this->database = false;
 -					$this->link = @pg_connect("$this->string dbname='postgres'", PGSQL_CONNECT_FORCE_NEW);
 -				}
 -				restore_error_handler();
@@ -55,31 +52,44 @@
 -			}
 -
 -			function select_db(string $database) {
--				if ($database == adminer()->database()) {
--					return $this->database;
+-				if ($database == pg_dbname($this->link)) { // the connection is to the database directly or to postgres if it failed
+-					return true;
 -				}
+-				set_error_handler(array($this, '_error'));
 -				$return = @pg_connect("$this->string dbname='" . addcslashes($database, "'\\") . "'", PGSQL_CONNECT_FORCE_NEW);
+-				restore_error_handler();
 -				if ($return) {
 -					$this->link = $return;
 -				}
 -				return $return;
 -			}
 -
--			function close() {
+-			function close(): void {
 -				$this->link = @pg_connect("$this->string dbname='postgres'");
 -			}
 -
 -			function query(string $query, bool $unbuffered = false) {
--				$result = @pg_query($this->link, $query);
+-				if (self::$untrusted) {
+-					// the extended protocol doesn't allow multiple commands, the transaction doesn't allow modifying data
+-					$result = (@pg_query($this->link, "BEGIN READ ONLY")
+-						? @pg_query_params($this->link, $query, array())
+-						: false
+-					);
+-				} else {
+-					$result = @pg_query($this->link, $query);
+-				}
 -				$this->error = "";
 -				if (!$result) {
 -					$this->error = pg_last_error($this->link);
 -					$return = false;
--				} elseif (!pg_num_fields($result)) {
+-				} elseif (!pg_num_fields($result) && pg_result_status($result) != PGSQL_TUPLES_OK) { // SELECT without columns returns rows
 -					$this->affected_rows = pg_affected_rows($result);
 -					$return = true;
 -				} else {
 -					$return = new Result($result);
+-				}
+-				if (self::$untrusted) {
+-					@pg_query($this->link, "COMMIT"); // rollbacks the transaction if the query failed
 -				}
 -				if ($this->timeout) {
 -					$this->timeout = 0;
@@ -89,7 +99,18 @@
 -			}
 -
 -			function warnings() {
--				return h(pg_last_notice($this->link)); // second parameter is available since PHP 7.1.0
+-				if (PHP_VERSION_ID >= 70100) {
+-					$return = implode("\n", pg_last_notice($this->link, PGSQL_NOTICE_ALL));
+-					pg_last_notice($this->link, PGSQL_NOTICE_CLEAR);
+-				} else {
+-					$return = pg_last_notice($this->link);
+-				}
+-				return nl_br(h($return));
+-			}
+-
+-			function inTransaction(): bool {
+-				$status = pg_transaction_status($this->link);
+-				return $status == PGSQL_TRANSACTION_INTRANS || $status == PGSQL_TRANSACTION_INERROR; // not PGSQL_TRANSACTION_UNKNOWN - the connection is bad
 -			}
 -
 -			/** Copy from array into a table
@@ -98,7 +119,7 @@
 -			function copyFrom(string $table, array $rows): bool {
 -				$this->error = '';
 -				set_error_handler(function (int $errno, string $error): bool {
--					$this->error = (ini_bool('html_errors') ? html_entity_decode($error) : $error);
+-					$this->error = php_error_text($error);
 -					return true;
 -				});
 -				$return = pg_copy_from($this->link, $table, $rows);
@@ -129,14 +150,8 @@
 -				$return = new \stdClass;
 -				$return->orgtable = pg_field_table($this->result, $column);
 -				$return->name = pg_field_name($this->result, $column);
--				$type = pg_field_type($this->result, $column);
--				$return->type = (preg_match(number_type(), $type) ? 0 : 15);
--				$return->charsetnr = ($type == "bytea" ? 63 : 0); // 63 - binary
+-				$return->native_type = pg_field_type($this->result, $column);
 -				return $return;
--			}
--
--			function __destruct() {
--				pg_free_result($this->result);
 -			}
 -		}
 -
