@@ -30,9 +30,9 @@
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
 #   TOOLCHAIN_DIST_ARCH     the arch the archive is named after (overlay_dist_arch)
-#   TOOLCHAIN_BINUTILS_*    the binutils a component builds against, co-built for the same
-#                           (arch, DSM): _VERSION, _DIR (native/binutils-<v>), _BIN, and
-#                           _MAKE, the command that builds it
+#   TOOLCHAIN_BINUTILS_*    the binutils a component builds against, profile-guided, for
+#                           the same (arch, DSM): _VERSION, _DIR (native/binutils-<v>), _BIN,
+#                           _ARCHIVE, and _MAKE, the command that makes it
 #   TOOLCHAIN_PGO_SOURCES   the generated training sources (toolchain-pgo-sources)
 #
 # What a component sets:
@@ -116,18 +116,27 @@ TC_WORK_DIR ?= $(TC_DIR)/work
 
 TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 
-# The binutils gcc and rust are built against: native/binutils-<v>, co-built for this
-# (arch, DSM). The version the binutils overlay ships, 2.30 where the arch has none yet.
+# The binutils gcc and rust are built against: native/binutils-<v> for this (arch, DSM),
+# made by its own arch- target -- both PGO passes and the archive, the very file the
+# binutils overlay publishes -- or left as it is when that archive exists. The version the
+# binutils overlay ships, 2.30 where the arch has none yet; named after the real arch
+# (TOOLCHAIN_DIST_ARCH), which binutils builds a generic one as.
 TOOLCHAIN_BINUTILS_VERSION := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
 TOOLCHAIN_BINUTILS_DIR      = $(BASEDIR)/native/binutils-$(TOOLCHAIN_BINUTILS_VERSION)
-TOOLCHAIN_BINUTILS_BIN      = $(TOOLCHAIN_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
-# The command that co-builds it: build tools, not a published binutils. MAKEFLAGS= keeps
-# this producer's command line (PKG_REV=vN) out of it, PGO_PHASE= its pass (pass 1 would
-# leave an instrumented binutils pass 2 reuses, cookies intact), ARCHIVE_NAME= any archive
-# its own arch- target would take for a finished, profile-guided build. ARCH= TCVERSION=
-# keep its stage0 from bootstrapping a toolchain.
+TOOLCHAIN_BINUTILS_REV      = $(call read_makefile_var,$(TOOLCHAIN_BINUTILS_DIR)/Makefile,PKG_REV)
+TOOLCHAIN_BINUTILS_WORK     = $(TOOLCHAIN_BINUTILS_DIR)/work-$(TOOLCHAIN_DIST_ARCH)-$(TC_VERS)
+TOOLCHAIN_BINUTILS_BIN      = $(TOOLCHAIN_BINUTILS_WORK)/install/usr/local/bin
+TOOLCHAIN_BINUTILS_ARCHIVE  = $(TOOLCHAIN_BINUTILS_DIR)/binutils-$(TOOLCHAIN_BINUTILS_VERSION)-$(TC_TARGET)-$(TOOLCHAIN_DIST_ARCH)-$(TC_VERS)-$(TOOLCHAIN_BINUTILS_REV).txz
+# The command. MAKEFLAGS= and binutils' own PKG_REV keep this producer's command line out
+# of it -- a PKG_REV=vN would rename binutils' archive -- PGO_PHASE= this producer's pass,
+# ARCH= TCVERSION= its stage0. An archive whose work dir was dropped since is extracted
+# back where that work dir installed: it is that build.
 TOOLCHAIN_BINUTILS_MAKE     = MAKEFLAGS= $(MAKE) --no-print-directory -C $(TOOLCHAIN_BINUTILS_DIR) \
-                              ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS) PGO_PHASE= ARCHIVE_NAME=
+                              ARCH= TCVERSION= PGO_PHASE= PKG_REV=$(TOOLCHAIN_BINUTILS_REV) \
+                              arch-$(TOOLCHAIN_DIST_ARCH)-$(TC_VERS) && \
+                              { test -x $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-ld || \
+                                { mkdir -p $(TOOLCHAIN_BINUTILS_WORK)/install && \
+                                  tar -xJf $(TOOLCHAIN_BINUTILS_ARCHIVE) -C $(TOOLCHAIN_BINUTILS_WORK)/install ; } ; }
 
 # ---- How the host compiler builds the component --------------------------------------
 # Probed, not assumed: -march=x86-64-v3 is a GCC 11 spelling and a host without AVX2 must

@@ -476,7 +476,7 @@ A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2
 | `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
 | `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
 
-The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc builds `native/binutils-2.30` for the same `(arch, DSM)` first, and reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain.
+The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc first makes `native/binutils-2.30` for the same `(arch, DSM)` with its own `arch-<arch>-<dsm>` target -- both PGO passes and the archive, the very file the binutils overlay publishes -- unless that archive already exists, then reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain. rust does the same. The binutils archive keeps binutils' own `PKG_REV`, whatever revision the gcc or rust build is given.
 
 A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of the usual native build variables (`CONFIGURE_ARGS`, `COMPILE_TARGET`, ...):
 
@@ -511,7 +511,7 @@ make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 make -C native/rustc-1.98 all-6.2.4        # built with the gcc 8.5 overlay (OVERLAY_GCC)
 ```
 
-You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).
+You do **not** build binutils separately: the Rust build makes `native/binutils-2.30` for the same `(arch, DSM)` automatically, profile-guided and archived, as gcc does (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).
 
 ## Troubleshooting
 
