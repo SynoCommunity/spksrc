@@ -3,5 +3,5 @@ bin:bin/gpac
 lib:lib/gpac/gm_validator.so
 lnk:lib/libgpac.so
 lnk:lib/libgpac.so.16
-lib:lib/libgpac.so.16.5.0
+lib:lib/libgpac.so.16.21.0
 rsc:share/gpac/

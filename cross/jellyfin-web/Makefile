@@ -1,5 +1,5 @@
 PKG_NAME = jellyfin-web
-PKG_VERS = 12.3
+PKG_VERS = 12.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin-web/archive
@@ -21,6 +21,7 @@ PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 .PHONY: jellyfin_install
 jellyfin_install:
-	$(RUN) npm install && npm run build:production
+	$(RUN) npm ci --no-audit --no-fund
+	$(RUN) npm run build:production
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
 	cp -R $(WORK_DIR)/$(PKG_DIR)/dist/* $(STAGING_INSTALL_PREFIX)/web/

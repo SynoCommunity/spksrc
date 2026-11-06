@@ -1,0 +1,18 @@
+# Node.js 22 does not expose fs.statfs().frsize. Fall back to bsize, which is
+# identical to frsize on DSM's ext4/Btrfs volumes.
+--- server/src/repositories/storage.repository.ts.orig
++++ server/src/repositories/storage.repository.ts
+@@ -218,9 +218,10 @@
+   async checkDiskUsage(folder: string): Promise<DiskUsage> {
+     const stats = await fs.statfs(folder);
++    const blockSize = stats.frsize ?? stats.bsize;
+     return {
+-      available: stats.bavail * stats.frsize,
+-      free: stats.bfree * stats.frsize,
+-      total: stats.blocks * stats.frsize,
++      available: stats.bavail * blockSize,
++      free: stats.bfree * blockSize,
++      total: stats.blocks * blockSize,
+     };
+   }
+ 

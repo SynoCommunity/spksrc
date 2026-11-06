@@ -93,6 +93,7 @@ install_ml_packages()
     # Version bounds mirror machine-learning/pyproject.toml. uvicorn is
     # plain rather than [standard]; the extra pulls compiled event-loop
     # and http parsers with no place on DSM.
+    export PIP_DISABLE_PIP_VERSION_CHECK=1
     "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
         "onnxruntime>=1.23.2,<2" \
         "onnx>=1.22.0" \
@@ -117,13 +118,16 @@ install_ml_packages()
     # version check for this package only.
     "${ML_VENV}/bin/pip3" install --no-cache-dir --ignore-requires-python \
         "${SYNOPKG_PKGDEST}/share/immich/wheelhouse/immich_model-0.2.0-py3-none-any.whl" 2>&1
-    # Keep the headless variant pinned as above; the GUI variant has
-    # no place on DSM.
-    "${ML_VENV}/bin/pip3" install \
-        --force-reinstall \
-        --no-deps \
-        --no-cache-dir \
-        "opencv-python-headless>=4.7.0.72,<5.0" 2>&1
+    # rapidocr can pull in the GUI opencv-python variant, which needs libGL on
+    # DSM. Only when that variant is present, remove it and restore headless.
+    if "${ML_VENV}/bin/pip3" show opencv-python >/dev/null 2>&1; then
+        "${ML_VENV}/bin/pip3" uninstall -y opencv-python 2>&1 || true
+        "${ML_VENV}/bin/pip3" install \
+            --force-reinstall \
+            --no-deps \
+            --no-cache-dir \
+            "opencv-python-headless>=4.7.0.72,<5.0" 2>&1
+    fi
 }
 
 service_prestart()
