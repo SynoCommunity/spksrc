@@ -124,6 +124,25 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 6th 2026 — The sysroot is the one gcc reports, and CMake finds what it provides"
+
+    - **What:** `TC_SYSROOT` is no longer declared in the toolchain Makefiles: it is the
+      sysroot the toolchain's own gcc reports (`-print-sysroot`), asked once when
+      `tc_vars` is generated, still relative to `$(TC_WORK_DIR)/$(TC_TARGET)`. One source
+      for every toolchain: ppc853x-5.2 declared `$(TC_TARGET)`, the tooldir above its
+      sysroot, so `SYSROOT`, crossenv's `--sysroot` and binutils' `--with-sysroot` all
+      pointed there; it now names its `TC_INCLUDE`/`TC_LIBRARY` tooldir directly, and its
+      `-I`/`-L` are unchanged. `tc_vars` stops when gcc reports none.
+    - **CMake:** the generated toolchain file appends that sysroot to
+      `CMAKE_FIND_ROOT_PATH`, after the staging and the meta roots. With
+      `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY/INCLUDE = ONLY` and the staging as the only root,
+      a `find_library`/`find_path` aimed at glibc itself -- `m`, `c`, `sys/epoll.h` --
+      returned `NOTFOUND` while the build went on: jasper linked `pow`/`sqrt` without
+      `libm` in `DT_NEEDED`, mosquitto fell back from epoll to a busy-looping poll, LLVM
+      dropped libxml2. Found by mreid-tt's audit of the CMake packages. What is built in
+      the staging still wins; ppc853x-5.2's sysroot also carries a few libraries beyond
+      glibc (bz2, expat, uuid), now found where a package probes them undeclared.
+
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 
     - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to
