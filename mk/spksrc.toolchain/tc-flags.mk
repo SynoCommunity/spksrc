@@ -129,24 +129,59 @@ TC_EXTRA_FFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
 # Define regular build flags -- each language reads its own residual list, ABI
 # already folded in, kept last so a package/toolchain addition stays at the end.
 
-CFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+# The toolchain's declared include dir. Under a gcc overlay it moves to -idirafter, the
+# END of the search chain, instead of -I at the front.
+#
+# It cannot simply be dropped: it carries headers the sysroot does not (FlexLexer.h,
+# sysfs/ on ppc853x-5.2), and packages do use them. But it cannot stay in front either.
+# On most archs it names the very directory gcc already ends on and is merely redundant;
+# on ppc853x-5.2 it names a different tree -- TC_INCLUDE is <target>/include, the gcc
+# 4.3.7 headers, while the real sysroot is <target>/libc/usr/include -- and ahead of gcc
+# 8.5's own it redeclares what the compiler provides: "redundant redeclaration of
+# 'ftruncate64'", "'INT32_MAX' was not declared". Its stale c++/ subtree is the same trap.
+#
+# -idirafter keeps every header that is only there, and lets gcc's own win wherever both
+# have one. Unlike -L this is not a reordering: gcc orders its include chain correctly by
+# itself, it just must not be overruled from the front.
+TC_INCLUDE_FLAG = $(if $(OVERLAY_GCC_ON),-idirafter ,-I)$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+
+CFLAGS += $(TC_INCLUDE_FLAG)
 CFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CFLAGS += $(TC_EXTRA_CFLAGS)
 
-CPPFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+CPPFLAGS += $(TC_INCLUDE_FLAG)
 CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CPPFLAGS += $(TC_EXTRA_CPPFLAGS)
 
-CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+CXXFLAGS += $(TC_INCLUDE_FLAG)
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CXXFLAGS += $(TC_EXTRA_CXXFLAGS)
 
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
-FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+FFLAGS += $(TC_INCLUDE_FLAG)
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 FFLAGS += $(TC_EXTRA_FFLAGS)
 endif
 
+# The gcc overlay's own runtimes come FIRST. --enable-version-specific-runtime-libs puts
+# them in lib/gcc/<target>/<vers>/, and the sysroot below still holds the vendor gcc's
+# libstdc++ -- 2008-era on ppc853x. Left in the default order the link picks that one and
+# fails on the C++11 ABI ("undefined reference to std::__cxx11::basic_string"), because
+# gcc 8.5 compiles into the __cxx11 namespace the old library never had. Wildcard rather
+# than a composed path: the directory only exists once the consumer is extracted.
+#
+# --rpath-link as well as -L: ld does NOT use -L to resolve a shared library's transitive
+# DT_NEEDED. Without it, a C program linking a C++ .so finds libstdc++.so.6 through the
+# sysroot instead -- the vendor's -- and fails on __cxx11 even though -L was right.
+# A literal comma would split the argument of the $(addprefix) below, so it goes through a
+# variable. Plain assignments (a few lines down) can spell it out.
+_tc_comma := ,
+
+ifeq ($(OVERLAY_GCC_ON),1)
+_TC_OVERLAY_GCC_LIBS = $(wildcard $(TC_OVERLAY_GCC)/work/install/usr/local/lib/gcc/$(TC_TARGET)/*)
+LDFLAGS += $(addprefix -L,$(_TC_OVERLAY_GCC_LIBS))
+LDFLAGS += $(addprefix -Wl$(_tc_comma)--rpath-link$(_tc_comma),$(_TC_OVERLAY_GCC_LIBS))
+endif
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)

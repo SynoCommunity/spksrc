@@ -84,6 +84,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
 | `spksrc.native-install.mk` | Install-only native build (skip configure/compile) |
+| `spksrc.native-toolchain.mk` | Toolchain overlay producer (`native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-*`): `arch-<arch>-<dsm>`, `all-<dsm>`, profile-guided builds |
 
 ### Python/Wheel System
 
@@ -187,10 +188,15 @@ spksrc.native-cc.mk
 spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
+spksrc.native-toolchain.mk    # toolchain overlay producer front-end
 spksrc.native/
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
-└── env-meson.mk
+├── env-meson.mk
+├── toolchain-binutils.mk     # NATIVE_TOOLCHAIN = binutils
+├── toolchain-gcc.mk          # NATIVE_TOOLCHAIN = gcc
+├── toolchain-pgo-sources.sh  # generates the PGO training sources
+└── toolchain-rust.mk         # NATIVE_TOOLCHAIN = rust
 
 # SPK assembly entry point
 spksrc.spk.mk
@@ -237,6 +243,7 @@ spksrc.wheel/
 spksrc.toolchain.mk
 spksrc.toolchain/
 ├── overlay-binutils.mk       # uses the binutils overlay (shim, -B), cleans every overlay
+├── overlay-gcc.mk            # uses the gcc overlay (version suffix, OVERLAY_GCC)
 ├── overlay-rustc.mk          # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk
