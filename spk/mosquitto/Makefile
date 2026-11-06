@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
 SPK_VERS = 2.1.2
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/mosquitto.png
 
 DEPENDS = cross/mosquitto
