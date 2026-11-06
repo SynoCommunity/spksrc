@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Advanced ACME 제거",
+    "items": [
+      {
+        "desc": "DSM에 설치된 인증서는 남지만 더 이상 갱신되지 않습니다. 데이터를 삭제하면 Advanced ACME가 만든 DSM 사용자 'advanced-acme'도 함께 제거됩니다."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Advanced ACME에 저장된 접속 정보와 인증서 데이터 삭제 (DSM 계정, DNS 키, ACME 계정)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

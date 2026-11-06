@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Удаление Advanced ACME",
+    "items": [
+      {
+        "desc": "Сертификаты, установленные в DSM, останутся, но больше не будут продлеваться. Если удалить данные, будет удалён и пользователь DSM «advanced-acme», созданный Advanced ACME."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Удалить сохранённые данные доступа и данные сертификатов Advanced ACME (учётная запись DSM, ключи DNS, учётные записи ACME)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

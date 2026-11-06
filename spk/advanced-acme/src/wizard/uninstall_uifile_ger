@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Advanced ACME deinstallieren",
+    "items": [
+      {
+        "desc": "Die in DSM installierten Zertifikate bleiben erhalten, werden aber nicht mehr erneuert. Wenn Sie die Daten löschen, wird auch der von Advanced ACME angelegte DSM-Benutzer „advanced-acme“ entfernt."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Gespeicherte Zugangsdaten und Zertifikatsdaten von Advanced ACME löschen (DSM-Konto, DNS-Schlüssel, ACME-Konten)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

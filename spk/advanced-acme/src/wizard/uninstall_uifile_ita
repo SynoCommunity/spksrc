@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Disinstalla Advanced ACME",
+    "items": [
+      {
+        "desc": "I certificati installati in DSM restano, ma non verranno più rinnovati. Se elimini i dati, viene rimosso anche l'utente DSM «advanced-acme» creato da Advanced ACME."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Elimina i dati di accesso e i dati dei certificati salvati da Advanced ACME (account DSM, chiavi DNS, account ACME)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

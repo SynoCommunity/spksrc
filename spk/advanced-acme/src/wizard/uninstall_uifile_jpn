@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Advanced ACME のアンインストール",
+    "items": [
+      {
+        "desc": "DSM にインストールされた証明書は残りますが、今後は更新されません。データを削除すると、Advanced ACME が作成した DSM ユーザー「advanced-acme」も削除されます。"
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Advanced ACME に保存されたアクセス情報と証明書データを削除する (DSM アカウント、DNS キー、ACME アカウント)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

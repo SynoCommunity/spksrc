@@ -1,0 +1,6 @@
+rsc:bin/advanced-acme
+rsc:lib/
+rsc:share/
+rsc:ui/
+rsc:LICENSE
+rsc:VERSION

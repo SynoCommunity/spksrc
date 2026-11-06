@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "ถอนการติดตั้ง Advanced ACME",
+    "items": [
+      {
+        "desc": "ใบรับรองที่ติดตั้งใน DSM จะยังคงอยู่ แต่จะไม่ถูกต่ออายุอีก หากคุณลบข้อมูล ผู้ใช้ DSM “advanced-acme” ที่ Advanced ACME สร้างไว้จะถูกนำออกด้วย"
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "ลบข้อมูลเข้าถึงและข้อมูลใบรับรองที่ Advanced ACME บันทึกไว้ (บัญชี DSM, คีย์ DNS, บัญชี ACME)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

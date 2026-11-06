@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Odinstalovat Advanced ACME",
+    "items": [
+      {
+        "desc": "Certifikáty nainstalované v DSM zůstanou, ale už se nebudou obnovovat. Pokud data smažete, odebere se také uživatel DSM „advanced-acme“, kterého vytvořil Advanced ACME."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Smazat uložené přístupové údaje a data certifikátů Advanced ACME (účet DSM, klíče DNS, účty ACME)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "卸载 Advanced ACME",
+    "items": [
+      {
+        "desc": "已安装到 DSM 的证书会保留，但不再续期。如果删除数据，由 Advanced ACME 创建的 DSM 用户“advanced-acme”也会被移除。"
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "删除 Advanced ACME 保存的访问信息和证书数据（DSM 账户、DNS 密钥、ACME 账户）",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]
