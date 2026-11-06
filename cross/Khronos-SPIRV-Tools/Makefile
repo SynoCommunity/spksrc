@@ -10,8 +10,9 @@ HOMEPAGE = https://github.com/KhronosGroup/SPIRV-Tools
 COMMENT = The SPIR-V Tools project provides an API and commands for processing SPIR-V modules.
 LICENSE = Apache-2.0 license
 
-# Needs gcc >= 7.5: C++17 with std::filesystem (in libstdc++fs until gcc 9, linked below)
-MIN_GCC_VERSION = 7.5
+# Needs gcc >= 8: C++17 with std::filesystem (in libstdc++fs until gcc 9, linked below) and
+# <charconv>, whose integer std::from_chars libstdc++ ships from gcc 8
+MIN_GCC_VERSION = 8
 
 BUILD_DEPENDS = cross/Khronos-SPIRV-Headers
 
