@@ -174,11 +174,16 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 set(CMAKE_C_COMPILER /path/to/x86_64-pc-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /path/to/x86_64-pc-linux-gnu-g++)
-set(CMAKE_SYSROOT /path/to/sysroot)
+set(CMAKE_FIND_ROOT_PATH /path/to/work/install/usr/local)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 ```
+
+No `CMAKE_SYSROOT`: the compiler already knows its own. A package's generated toolchain
+file then appends the meta staging roots and, last, the toolchain's sysroot to
+`CMAKE_FIND_ROOT_PATH`, so `find_library`/`find_path` take what is built in the staging
+first and still find what glibc itself provides (`m`, `c`, `sys/epoll.h`).
 
 ### tc_vars.meson-cross and tc_vars.meson-native
 
