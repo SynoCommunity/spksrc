@@ -203,8 +203,8 @@ CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
 # Enable OpenCL and Vulkan acceleration: where the videodriver meta ships ocl-icd, the
-# Vulkan loader and shaderc -- gcc 7.5, their C++17 floor (videodriver-depends.mk)
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# Vulkan loader and shaderc -- gcc 8, SPIRV-Tools' <charconv> (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
 #CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
 CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
