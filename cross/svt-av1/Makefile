@@ -21,8 +21,10 @@ MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.cross-cmake.mk
 
+# The AArch64 NEON code uses the multi-vector loads (vld1q_u8_x2, vld1q_s16_x4, ...), which
+# arm_neon.h declares from gcc 8: below it, the C code only.
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-ifeq ($(call version_lt, ${TC_GCC}, 5),1)
+ifeq ($(call version_lt, ${TC_GCC}, 8),1)
 CONFIGURE_ARGS += -DCOMPILE_C_ONLY=ON
 endif
 endif
