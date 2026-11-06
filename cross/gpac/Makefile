@@ -1,5 +1,5 @@
 PKG_NAME = gpac
-PKG_VERS = 26.02.0
+PKG_VERS = 26.07.0
 GPAC_GIT_REVISION = "1 (SynoCommunity)"
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -11,8 +11,11 @@ HOMEPAGE = https://gpac.io
 COMMENT  = Home of MP4Box.
 LICENSE  = LGPLv2
 
-# toolchains lacking atomic support
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# quickjs-libc includes stdatomic.h unconditionally, which needs GCC >= 4.9.
+MIN_GCC_VERSION = 4.9
+# The PPC toolchain headers lack SYS_DVBT2.
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS_REASON = PPC toolchain headers lack SYS_DVBT2
 
 DEPENDS = cross/zlib
 
@@ -26,7 +29,7 @@ PRE_COMPILE_TARGET = gpac_pre_compile
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: gpac_pre_compile 
+.PHONY: gpac_pre_compile
 gpac_pre_compile:
-	@$(MSG) "Patch revision.h to avoid UNKNOWN_REV (used when build is not in gpac git repository)"
-	@sed -e 's/"UNKNOWN_REV"/$(GPAC_GIT_REVISION)/' -i $(WORK_DIR)/$(PKG_DIR)/include/gpac/revision.h
+	@$(MSG) "Stamp the SynoCommunity revision into revision.h"
+	@sed -e 's|^#define GPAC_GIT_REVISION .*|#define GPAC_GIT_REVISION $(GPAC_GIT_REVISION)|' -i $(WORK_DIR)/$(PKG_DIR)/include/gpac/revision.h
