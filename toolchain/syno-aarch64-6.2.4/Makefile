@@ -11,6 +11,5 @@ TC_DIST = rtd1296-gcc494_glibc220_armv8-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = aarch64-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.toolchain.mk

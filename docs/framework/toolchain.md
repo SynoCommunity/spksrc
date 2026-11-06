@@ -131,7 +131,7 @@ Core toolchain identity:
 TC_NAME     = x86_64-pc-linux-gnu
 TC_PREFIX   = /path/to/toolchain/work/x86_64-pc-linux-gnu/bin/
 TC_PATH     = $(TC_PREFIX)/bin
-TC_SYSROOT  = $(TC_PREFIX)/x86_64-pc-linux-gnu/sysroot
+TC_SYSROOT  = x86_64-pc-linux-gnu/sys-root    # what its gcc reports (-print-sysroot)
 TC_CC       = $(TC_PREFIX)x86_64-pc-linux-gnu-gcc
 TC_CXX      = $(TC_PREFIX)x86_64-pc-linux-gnu-g++
 TC_AR       = $(TC_PREFIX)x86_64-pc-linux-gnu-ar

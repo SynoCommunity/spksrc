@@ -422,6 +422,9 @@ tc_flags:
 # overlay's as/ld when that is what every compile goes through, like TC_GCC under a gcc
 # overlay -- through the same macro tc-capability.mk resolves a package's with.
 tc_vars:
+	@# Every path below is built on the sysroot gcc reports: without one, stop here rather
+	@# than emit -I/-L into the work dir's own top.
+	@test -n "$(TC_SYSROOT)" || { echo "tc_vars: $(TC_PREFIX)gcc reports no sysroot (-print-sysroot)" >&2 ; exit 1 ; }
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
 	echo TC_SYSROOT := $(TC_SYSROOT) ; \

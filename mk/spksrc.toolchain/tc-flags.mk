@@ -31,6 +31,15 @@ ifeq ($(strip $(TC_PREFIX)),)
 TC_PREFIX = $(TC_TARGET)-
 endif
 
+# The sysroot is the one the toolchain's gcc reports (-print-sysroot): no declaration to
+# keep in step with it. Relative to $(TC_WORK_DIR)/$(TC_TARGET), like the paths built on
+# it. Asked when first read -- when tc_vars is generated, the toolchain extracted -- then
+# kept. LC_ALL=C for the DSM 5.2 gcc, which aborts under any other locale. Both sides
+# resolved: gcc answers from where its binary really is.
+_tc_sysroot_ask = $(patsubst $(realpath $(TC_WORK_DIR)/$(TC_TARGET))/%,%,\
+                    $(realpath $(shell LC_ALL=C $(TC_PATH)$(TC_PREFIX)gcc -print-sysroot 2>/dev/null)))
+TC_SYSROOT = $(or $(_TC_SYSROOT),$(eval _TC_SYSROOT := $(_tc_sysroot_ask))$(_TC_SYSROOT))
+
 ifeq ($(strip $(TC_INCLUDE)),)
 TC_INCLUDE = $(TC_SYSROOT)/usr/include
 endif

@@ -23,7 +23,7 @@
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
 #   TC_EXTRACT_DIR  where tc-install lands the gcc toolchain (bin/, sysroot, ...)
-#   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
+#   TC_SYSROOT_DIR  the extracted toolchain's sysroot (its gcc's -print-sysroot)
 #   tc-install   ensures the gcc toolchain (hence its sysroot) is extracted
 ###############################################################################
 
@@ -51,12 +51,10 @@ TC_GLIBC   := $(call _tc_get,TC_GLIBC)
 # components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
 TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
-# The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
-# (single source of truth -- the same value tc_vars emits as SYSROOT). A plain string, so
-# valid before extraction too, unlike a wildcard probe. Used e.g. for binutils --with-sysroot.
-# TC_SYSROOT's declared value references $(TC_TARGET); _tc_get returns it as raw text, so run
-# it through $(eval) to expand that reference (a single make pass would leak a literal $$).
-$(eval TC_SYSROOT_DIR := $(TC_EXTRACT_DIR)/$(call _tc_get,TC_SYSROOT))
+# The extracted toolchain's sysroot, as its gcc reports it -- the same answer tc_vars emits
+# as SYSROOT. Lazy: read once tc-install has extracted the toolchain, e.g. for binutils'
+# --with-sysroot at configure.
+TC_SYSROOT_DIR = $(abspath $(shell LC_ALL=C $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-gcc -print-sysroot 2>/dev/null))
 
 # Per-(arch,dsm) work dir, cross-style; pre-set so native-cc.mk keeps it (the
 # native default would be -native).

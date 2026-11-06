@@ -12,6 +12,5 @@ TC_DIST_SITE_PATH = toolchains%2Fsrm1.2
 TC_DIST_FILE = $(TC_ARCH)-$(TC_DIST_NAME)
 
 TC_TARGET = arm-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.toolchain.mk

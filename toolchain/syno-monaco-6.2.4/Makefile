@@ -9,7 +9,6 @@ TC_DIST = monaco-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = arm-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_BUILD_FLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 
 include ../../mk/spksrc.toolchain.mk

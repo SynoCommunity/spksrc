@@ -9,6 +9,5 @@ TC_DIST = rtd1619b-gcc1220_glibc236_armv8-GPL
 TC_DIST_SITE_PATH = Realtek%20RTD16xxb%20Linux%205.10.55
 
 TC_TARGET = aarch64-unknown-linux-gnu
-TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.toolchain.mk
