@@ -55,6 +55,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
+| `spksrc.native-toolchain.mk` | Toolchain overlay producer (`native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-*`): `arch-<arch>-<dsm>`, `all-<dsm>`, profile-guided builds |
 | `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
 
@@ -134,8 +135,22 @@ spksrc.common/
 ├── directories.mk            # work/staging/distrib directory layout
 ├── help.mk                   # context-aware `make help` inside a package
 ├── logs.mk                   # logging helpers
-├── macros.mk                 # GNU Make helper macros
+├── macros.mk                 # GNU Make helper macros, one file per theme:
+├── macros/
+│   ├── archs.mk              #   which toolchain an overlay or its producer stands for
+│   ├── bool.mk               #   TRUE, FALSE, is_true, is_false, assert_bool, bool
+│   ├── depend.mk             #   depend, dep_seen
+│   ├── list.mk               #   uniq, dedup, dedup_files, merge, comma_append
+│   ├── runlog.mk             #   _runlog, RUNLOG
+│   ├── string.mk             #   upper, lower
+│   ├── tools.mk              #   tc, native, read_makefile_var
+│   └── version.mk            #   version_le/ge/lt/gt
 ├── overlay.mk                # overlay decisions: available, requested, active
+├── overlay/
+│   ├── binutils.mk           #   per component, read by overlay.mk in this order:
+│   ├── gcc.mk                #   binutils, gcc, rustc
+│   ├── rustc.mk
+│   └── warnings.mk           #   banner text for the degraded states
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
 
 # Build pipeline — the per-package steps
@@ -187,10 +202,16 @@ spksrc.native-cc.mk
 spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
+spksrc.native-toolchain.mk    # toolchain overlay producer front-end
 spksrc.native/
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 └── env-meson.mk
+spksrc.native-toolchain/      # one file per producer component, picked by PKG_NAME
+├── binutils.mk               # PKG_NAME = binutils
+├── gcc.mk                    # PKG_NAME = gcc
+├── pgo-sources.sh            # generates the PGO training sources
+└── rustc.mk                  # PKG_NAME = rustc
 
 # SPK assembly entry point
 spksrc.spk.mk
@@ -236,8 +257,9 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
-├── overlay-binutils.mk       # uses the binutils overlay (shim, -B), cleans every overlay
-├── overlay-rustc.mk          # uses the rust overlay (synology triple, rustup toolchain)
+├── overlay/
+│   ├── binutils.mk           # uses the binutils overlay (shim, -B), cleans every overlay
+│   └── rustc.mk              # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk
@@ -250,7 +272,6 @@ spksrc.toolchain/
 spksrc.overlay.mk             # reads arch, DSM and component off the directory name
 spksrc.overlay/
 ├── binutils.mk               # download, extract, as/ld shim
-├── dist-arch.mk              # the arch whose archive a generic arch downloads
 ├── gcc.mk                    # download, extract, link sysroot and as/ld
 └── rust.mk                   # download, extract, rustup toolchain link
 

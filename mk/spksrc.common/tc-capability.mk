@@ -57,7 +57,7 @@ TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
 # OVERLAY_BINUTILS=1, and for a gcc overlay, which turns it on because gcc 8.5 needs its
 # own assembler. overlay.mk resolves the version, where the consumer path is known.
 TC_BINUTILS_VENDOR := $(call _tc_cap_of,TC_BINUTILS)
-TC_BINUTILS := $(call overlay_binutils_vers,$(TC_BINUTILS_VENDOR))
+TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS_VENDOR))
 
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and
@@ -121,9 +121,9 @@ endif
 # one version and one gcc variant, so firstword just unwraps. Else a toolchain's own pin.
 _TC_CAP_RUST_MK := $(wildcard $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
-_TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
+_TC_CAP_RUSTC := $(call read_makefile_var,$(_TC_CAP_RUST_MK),PKG_VERS)
 else
-_TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+_TC_CAP_RUSTC := $(call read_makefile_var,$(_TC_CAP_MK),TC_RUSTC)
 endif
 
 # Published beside TC_GCC/TC_GLIBC/TC_KERNEL, and never empty: only an ACTIVE overlay pins a

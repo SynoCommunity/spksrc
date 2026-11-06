@@ -5,8 +5,9 @@
 #
 ###############################################################################
 
-# Include guard: overlay-rustc.mk sources this early (to get RUST_TARGET from the arch
-# map before deriving the synology triple); tc_vars.mk / cross-rust.mk include it again.
+# Include guard: spksrc.toolchain/overlay/rustc.mk sources this early (to get RUST_TARGET
+# from the arch map before deriving the synology triple); tc_vars.mk / cross-rust.mk
+# include it again.
 ifndef __ENV_RUST_MK__
 __ENV_RUST_MK__ := 1
 
@@ -73,11 +74,10 @@ TC_RUSTUP_TOOLCHAIN = $(TC_RUSTC)
 endif
 
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
-RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
+RUST_TARGET_UENV = $(subst -,_,$(call upper,$(RUST_TARGET)))
 
-# And as a cc-rs CC_/CXX_/AR_<triple> suffix. RUST_TARGET is already lower case, so the
-# underscores are the whole conversion -- no shell, and it is read three times.
-RUST_TARGET_LENV = $(subst -,_,$(RUST_TARGET))
+# And as a cc-rs CC_/CXX_/AR_<triple> suffix: lower-case, - -> _.
+RUST_TARGET_LENV = $(subst -,_,$(call lower,$(RUST_TARGET)))
 
 # The build machine's own rust triple, to compare RUST_TARGET against. Stated rather
 # than asked: every Synology toolchain ships x86_64 host binaries, so a machine that can

@@ -184,20 +184,20 @@ rustup-rustc: patch
 # (single source of truth, never hardcoded per base toolchain); otherwise left to env-rust.mk's
 # 'stable'. Availability/request/active are resolved in spksrc.common/overlay.mk.
 ifeq ($(OVERLAY_RUSTC_ON),1)
-TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+TC_RUSTC := $(call read_makefile_var,$(firstword $(TC_OVERLAY_RUSTC))/Makefile,PKG_VERS)
 endif
 
 # Every overlay the arch ships, as a consumer-dir DEPENDS, whether a build uses it or not:
-# installed with the toolchain, cleaned with it (overlay-binutils.mk).
+# installed with the toolchain, cleaned with it (spksrc.toolchain/overlay/binutils.mk).
 ifneq ($(strip $(TC_OVERLAY_ALL)),)
 DEPENDS += $(addprefix overlay/,$(notdir $(TC_OVERLAY_ALL)))
 endif
 
-# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
-# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
-# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
-include ../../mk/spksrc.toolchain/overlay-binutils.mk
-include ../../mk/spksrc.toolchain/overlay-rustc.mk
+# OVERLAY_<component> family together, base layer first: overlay/binutils.mk sets the
+# shim path / -B flag that overlay/rustc.mk and tc_vars read, and overlay/rustc.mk
+# resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust.mk then consumes.
+include ../../mk/spksrc.toolchain/overlay/binutils.mk
+include ../../mk/spksrc.toolchain/overlay/rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 
 include ../../mk/spksrc.toolchain/tc_vars.mk

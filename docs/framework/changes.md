@@ -124,6 +124,74 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 3rd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
+
+    - **What:** the producers of the overlay archives that master downloads since
+      #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
+      `native/binutils-2.30` and `native/rustc-1.82`, which now produce the archives
+      the `overlay/` directories name: binutils `v4`, a generic arch's archive under
+      the real arch it shares a toolchain with, in the `toolchains/dsm<dsm>` releases.
+    - **A producer is a version, a rev and a component name.** The producers include
+      `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`,
+      the host optimisation flags and the two profile-guided passes
+      (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5% faster at `-O2` and
+      12.5% at `-O3`, `as` 10%. A generic arch is built as the real arch whose archive
+      it fetches (`arch-x64-7.1` builds `apollolake-7.1`), and an archive that exists
+      is not rebuilt, so `all-<dsm>` builds each one once, **`TOOLCHAIN_JOBS`** at a
+      time, and resumes where it stopped. An archive is written under a temporary
+      name, then renamed.
+    - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
+      the macros. See [Boolean values](../reference/macros.md#boolean-values).
+    - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `TC_OVERLAY_GCC`,
+      `OVERLAY_GCC_ON`), off for the tree: the producer turns it on for itself.
+      Packages keep the vendor gcc, and the same rust.
+    - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
+      vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
+      depend on the caller's shell.
+    - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
+      (`gcc.mk`, `binutils.mk`, `rustc.mk`).
+    - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
+      (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
+      macro documented the same way; `upper` and `lower` change case without a fork,
+      for the switches, the Rust triple suffixes, the arch-group patch directories and
+      the translated descriptions of INFO; `TRUE` and `FALSE` hold every spelling of a
+      switch; `read_makefile_var` reads one variable a Makefile
+      declares, and `dedup-files` is now `dedup_files`. The overlay decisions are split
+      the same way, `overlay.mk` reading `mk/spksrc.common/overlay/` (`binutils`,
+      `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to
+      `mk/spksrc.toolchain/overlay/`. `overlay_dist_arch` joins the macros, replacing
+      `dist-arch.mk`.
+    - **What the overlay components share is written once:** `OVERLAY_COMPONENT_TEMPLATE`
+      creates the names every component has, `spksrc.overlay.mk` the archive and install
+      defaults, and `overlay_warn` picks a component's banner from its states.
+      `OVERLAY_BINUTILS_UNMATCHED` names the binutils overlay active beside the vendor
+      gcc, which no longer warns when the gcc overlay is active too.
+    - **`OVERLAY_<C>_VERSION`**, formerly `OVERLAY_<C>_VERS`: binutils and gcc default to
+      the newest the arch ships, like rust, rather than a pinned 2.30 and 8.5 -- the same
+      versions on every arch shipping them today, and empty where an arch ships none.
+      `OVERLAY_BINUTILS_ASKED` loses its leading `_`: it is carried to every sub-make.
+    - **`TC_BINUTILS` follows the gcc overlay:** with `OVERLAY_GCC=1`, whose binutils overlay
+      drives every compile, a `MIN_BINUTILS_VERSION` floor measures that `ld` rather than
+      the vendor one. Picking the default rust version no longer forks a shell on every
+      parse, only where the arch ships two versions.
+    - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
+      against, made by binutils' own `arch-<arch>-<dsm>`: profile-guided, and archived
+      under binutils' own revision, ready to publish.
+    - **Rust is built as the official dist is**, no longer with x.py's `compiler` profile,
+      whose debug assertions made every rust package build slower and shipped a std with
+      its debug checks on: the `dist` profile, jemalloc, ThinLTO, one codegen unit, then
+      profile-guided -- rustc by x.py, LLVM, as a shared library, by gcc with
+      `HOST_OPTFLAGS` -- trained on the rustc-perf crates of the official dist. Release
+      builds of fd and bat for qoriq: 27% and 38% faster with rust 1.98, fd 23% with 1.82.
+    - The custom target takes `-Zunstable-options`, which rust 1.97+ requires for a JSON
+      target-spec.
+    - Nothing a package builds changes otherwise: builds keep using the archives as
+      published.
+    - See [Building and publishing an
+      overlay](toolchain.md#building-and-publishing-an-overlay).
+    - Pull request: [#7707](https://github.com/SynoCommunity/spksrc/pull/7707)
+
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 
     - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to

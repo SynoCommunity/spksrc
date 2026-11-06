@@ -5,10 +5,46 @@ description: GNU Make helper macros provided by spksrc and how to use them
 
 # Macros
 
-spksrc ships a small set of GNU Make helper macros in `mk/spksrc.common/macros.mk`. They are **loaded automatically**: `spksrc.common.mk` includes `spksrc.common/macros.mk` first, so the macros are available in any package Makefile that includes a spksrc entry point (`spksrc.cross-cc.mk`, `spksrc.spk.mk`, ...).
+spksrc ships a small set of GNU Make helper macros in `mk/spksrc.common/macros.mk`, which includes one file per theme from `mk/spksrc.common/macros/` (`string.mk`, `version.mk`, `bool.mk`, `list.mk`, `depend.mk`, `tools.mk`, `archs.mk`, `runlog.mk`). They are **loaded automatically**: `spksrc.common.mk` includes `spksrc.common/macros.mk` first, so the macros are available in any package Makefile that includes a spksrc entry point (`spksrc.cross-cc.mk`, `spksrc.spk.mk`, ...).
 
 !!! note "Architecture awareness is loaded early too"
     The same `spksrc.common.mk` also pulls in the parse-time toolchain pre-bootstrap (`spksrc.common/stage0.mk`) and the architecture classification (`spksrc.common/archs.mk`). That is what makes `TC_GCC` and the [architecture groups](architectures.md#architecture-groups) available **while a package's `DEPENDS` are parsed**, so version- and arch-gated dependencies resolve correctly on a cold tree.
+
+
+## Summary
+
+Every macro, by the file under `mk/spksrc.common/macros/` that defines it. The helpers internal to a file (`_odepend`, `_tc_gcc_tools`, ...) are not listed; `_runlog` is, as the build rules call it directly.
+
+| File | Macro | What it does |
+|------|-------|--------------|
+| `string.mk` | `$(call upper,TEXT)` | Upper-cases the ASCII letters of `TEXT`, without a fork |
+| `string.mk` | `$(call lower,TEXT)` | Lower-cases the ASCII letters of `TEXT`, without a fork |
+| `version.mk` | `$(call version_le,A,B)` | `1` when version `A` <= `B` (GNU `sort -V`) |
+| `version.mk` | `$(call version_ge,A,B)` | `1` when version `A` >= `B` |
+| `version.mk` | `$(call version_lt,A,B)` | `1` when version `A` < `B` |
+| `version.mk` | `$(call version_gt,A,B)` | `1` when version `A` > `B` |
+| `bool.mk` | `$(TRUE)`, `$(FALSE)` | Every spelling of a switch on / off, in lower and upper case |
+| `bool.mk` | `$(call is_true,VALUE)` | Non-empty when `VALUE` is on (`1`, `y`, `yes`, `true`, `on`, any case) |
+| `bool.mk` | `$(call is_false,VALUE)` | Non-empty when `VALUE` is off (`0`, `n`, `no`, `false`, `off`, any case, or empty) |
+| `bool.mk` | `$(call assert_bool,VALUE,NAME)` | Stops the build when `VALUE` is neither, naming `NAME` |
+| `bool.mk` | `$(call bool,VALUE,NAME)` | `TRUE` or `FALSE`, for `ifeq`; stops the build on any other value |
+| `list.mk` | `$(call comma_append,LIST,ITEM)` | Appends `ITEM` to a comma-separated list, or returns it unchanged when `ITEM` is empty |
+| `list.mk` | `$(call uniq,WORDS)` | Removes duplicate words, keeping the first occurrence of each |
+| `list.mk` | `$(call dedup,STRING,DELIMITER)` | De-duplicates a delimiter-separated string, dropping empty entries |
+| `list.mk` | `$(call dedup_files,FILES)` | Removes files whose content (`md5sum`) was already seen, in order |
+| `list.mk` | `$(call merge,ENV,VAR,DELIMITER)` | Every `VAR=` value in `ENV`, last one first, joined with `DELIMITER` |
+| `depend.mk` | `$(call depend,PKGS[,ON[,OFF]])` | Declares a dependency: required, alternatives with `\|`, or optional with its switches |
+| `depend.mk` | `$(call dep_seen,STAMPS,DEP)` | Shell test: true when `DEP` was already visited in a dependency walk |
+| `tools.mk` | `$(call read_makefile_var,FILE,VAR)` | The value `FILE` assigns to `VAR`, unexpanded, without including the file |
+| `tools.mk` | `$(call tc,TOOL)` | Absolute path of a cross tool, honouring the active overlays |
+| `tools.mk` | `$(call native,TOOL)` | Absolute path of a build-host tool, or its bare name when absent |
+| `archs.mk` | `$(call overlay_dist_arch,ARCH,DSM)` | The arch an overlay archive is named after: a generic arch's real arch |
+| `archs.mk` | `$(call toolchain_real,ARCH-DSM)` | The toolchain a producer builds an `<arch>-<dsm>` as |
+| `archs.mk` | `$(call toolchain_archs,DSM)` | The archs a producer builds for a DSM version |
+| `runlog.mk` | `$(call _runlog,COMMAND,LOG)` | Shell fragment: runs `COMMAND` teed into `LOG`, leaving the status to the caller |
+| `runlog.mk` | `$(call RUNLOG,GOAL)` | Recipe line: runs a goal of this Makefile, logged, and reports a failure |
+
+The sections below show them in use.
 
 ## Version comparison
 
@@ -32,6 +68,33 @@ ifeq ($(call version_lt,$(TC_GCC),5.0),1)
 ADDITIONAL_CFLAGS += -std=gnu99
 endif
 ```
+
+## Boolean values
+
+A switch may be written `1`/`0`, `y`/`n`, `yes`/`no`, `true`/`false` or `on`/`off`, in any
+case. Empty is false: an unset switch is off.
+
+| Macro | Returns |
+|-------|---------|
+| `$(call is_true,VALUE)` | a non-empty word when VALUE is true, empty otherwise -- for `$(if ...)` |
+| `$(call is_false,VALUE)` | a non-empty word when VALUE is false or empty |
+| `$(call bool,VALUE[,NAME])` | `TRUE` or `FALSE` -- for `ifeq`; **stops the build** on any other value, naming `NAME` |
+
+```makefile
+# Validates as it reads: OVERLAY_GCC=maybe stops with "OVERLAY_GCC: invalid boolean value 'maybe'"
+ifeq ($(call bool,$(OVERLAY_GCC),OVERLAY_GCC),TRUE)
+...
+endif
+
+# Inside an expression
+ACTIVE = $(if $(call is_true,$(PSTAT)),1)
+```
+
+`bool` is the one to use where a typo must not silently read as "off". `$(call assert_bool,VALUE,NAME)` only validates, for a switch read with `is_true` / `is_false` elsewhere. `$(TRUE)` and `$(FALSE)` hold every spelling, in lower and upper case.
+
+## Case conversion
+
+`$(call upper,TEXT)` and `$(call lower,TEXT)` change the case of ASCII letters in pure make, without a fork. The switches above are read through `lower`, and the Rust triple becomes an environment suffix through both: `CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER`, `CC_x86_64_unknown_linux_gnu`.
 
 ## Dependencies
 
@@ -243,12 +306,22 @@ former is a POSIX shell builtin, the latter an external binary a minimal image m
 |-------|---------|
 | `$(call uniq,<list>)` | Remove duplicate words, preserving order |
 | `$(call dedup,<string>,<delimiter>)` | De-duplicate a delimiter-separated string, preserving order |
-| `$(call dedup-files,<files>)` | Remove duplicate files (compared by `md5sum`), preserving order |
+| `$(call dedup_files,<files>)` | Remove duplicate files (compared by `md5sum`), preserving order |
+| `$(call merge,<env>,<var>,<delimiter>)` | Every value of `<var>=` in `<env>`, last one first, joined with `<delimiter>` |
+| `$(call comma_append,<list>,<item>)` | Append to a comma-separated list, or return it unchanged when `<item>` is empty |
 
 ```makefile
 BUILD_DEPENDS := $(call uniq,spk/$(FFMPEG_PACKAGE) $(BUILD_DEPENDS))
 
 SPK_DEPENDS := $(call dedup,$(PYTHON_PACKAGE):$(SPK_DEPENDS),:)
+```
+
+## Reading a Makefile
+
+`$(call read_makefile_var,<file>,<VAR>)` returns the value `<file>` assigns to `<VAR>` (`=`, `:=` or `?=`), as raw text, without including the file: a reference inside the value is not expanded. It is empty when the file or the line is absent. The toolchain producers and overlays read a base toolchain's `TC_TARGET` or `TC_GCC` this way.
+
+```makefile
+TC_TARGET := $(call read_makefile_var,$(TC_DIR)/Makefile,TC_TARGET)
 ```
 
 ## See also
