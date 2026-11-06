@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver-tools
 SPK_VERS = 1.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
@@ -22,7 +22,8 @@ VIDEODRIVER = on
 VIDEODRV_PACKAGE = synocli-videodriver
 
 CHANGELOG  = "1. Initial release: diagnostic and monitoring tools split out of synocli-videodriver.<br/>"
-CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+."
+CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+.<br/>"
+CHANGELOG += "3. clinfo, vulkaninfo and the igt tools from DSM 7.1 only, as gcc 8 requires."
 
 include ../../mk/spksrc.common.mk
 
@@ -32,9 +33,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS  = cross/libva-utils
 SPK_COMMANDS  = bin/vainfo
 
-# OpenCL / Vulkan / VPL tools require the newer stack the videodriver meta ships from
-# gcc 7.5 (videodriver-depends.mk); clinfo and vulkaninfo are C++17 themselves
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# clinfo and vulkaninfo where the videodriver meta ships the OpenCL and Vulkan runtime
+# they query: gcc 8 (videodriver-depends.mk)
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
 
 # OpenCL
 DEPENDS += cross/clinfo
@@ -44,15 +45,17 @@ SPK_COMMANDS += bin/clinfo
 DEPENDS += cross/Khronos-Vulkan-Tools
 SPK_COMMANDS += bin/vulkaninfo
 
+endif
+
 # Intel Video Processing Library (Intel VPL) tools
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 DEPENDS += cross/intel-libvpl-tools
 SPK_COMMANDS += bin/vpl-inspect
-
 endif
 
 # Intel GPU Tools (igt): libudev 219 must match the udev the system runs, DSM 7's --
-# a platform fact, not a compiler one (DSM 6 runs udev 204).
-ifeq ($(call version_ge, $(TCVERSION), 7),1)
+# a platform fact (DSM 6 runs udev 204) -- and gcc 8, igt's own floor.
+ifeq ($(call version_ge, $(TCVERSION), 7)$(call version_ge, $(TC_GCC), 8),11)
 DEPENDS += cross/intel-gpu-tools
 SPK_COMMANDS += bin/lsgpu
 SPK_COMMANDS += bin/intel_gpu_top
