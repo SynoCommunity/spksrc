@@ -9,6 +9,7 @@ TC_DIST = qoriq-gcc493_glibc220_hard_qoriq-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = powerpc-e500v2-linux-gnuspe
+TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
 # e500 SPE FP for f32+f64 (efs*/efd*), matching the C toolchain's SPE ABI. NOT +efpu2

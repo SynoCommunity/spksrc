@@ -9,5 +9,6 @@ TC_DIST = armada37xx-gcc850_glibc226_armv8-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%2037xx%20Linux%204.4.180
 
 TC_TARGET = aarch64-unknown-linux-gnu
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.toolchain.mk

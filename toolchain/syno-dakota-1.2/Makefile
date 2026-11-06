@@ -11,6 +11,7 @@ TC_EXT = tgz
 TC_DIST_SITE_PATH = toolchains%2Fsrm1.2
 
 TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_BUILD_FLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
 
 include ../../mk/spksrc.toolchain.mk

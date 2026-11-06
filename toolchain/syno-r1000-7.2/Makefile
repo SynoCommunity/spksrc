@@ -9,5 +9,6 @@ TC_DIST = r1000-gcc1220_glibc236_x86_64-GPL
 TC_DIST_SITE_PATH = AMD%20x86%20Linux%204.4.302%20%28r1000%29
 
 TC_TARGET = x86_64-pc-linux-gnu
+TC_SYSROOT = $(TC_TARGET)/sys-root
 
 include ../../mk/spksrc.toolchain.mk

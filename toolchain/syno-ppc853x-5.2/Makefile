@@ -10,8 +10,9 @@ TC_DIST_SITE_URL = https://github.com/SynoCommunity/spksrc/releases/download/
 TC_DIST_SITE_PATH = toolchains%2Fdsm5.2
 
 TC_TARGET = powerpc-none-linux-gnuspe
-# Headers and libraries from the tooldir above the sysroot (<target>/libc), which gcc
-# searches first: its kernel headers differ from the sysroot's.
+TC_SYSROOT = $(TC_TARGET)/libc
+# Headers and libraries from the tooldir above the sysroot, which gcc searches first: its
+# kernel headers differ from the sysroot's.
 TC_INCLUDE = $(TC_TARGET)/include
 TC_LIBRARY = $(TC_TARGET)/lib
 TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double

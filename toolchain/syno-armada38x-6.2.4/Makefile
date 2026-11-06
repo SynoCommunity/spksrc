@@ -9,6 +9,7 @@ TC_DIST = armada38x-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 # ensure gnu/hard-float.h is used
 TC_EXTRA_BUILD_FLAGS = -D__ARM_PCS_VFP=1

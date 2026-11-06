@@ -9,5 +9,6 @@ TC_DIST = evansport-gcc750_glibc226_i686-GPL
 TC_DIST_SITE_PATH = Intel%20x86%20Linux%203.2.101%20%28Evansport%29
 
 TC_TARGET = i686-pc-linux-gnu
+TC_SYSROOT = $(TC_TARGET)/sys-root
 
 include ../../mk/spksrc.toolchain.mk

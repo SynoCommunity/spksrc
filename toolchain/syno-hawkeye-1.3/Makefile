@@ -20,5 +20,6 @@ TC_EXT = tar.xz
 TC_DIST_SITE_PATH = toolchains%2Fsrm1.3
 
 TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.toolchain.mk

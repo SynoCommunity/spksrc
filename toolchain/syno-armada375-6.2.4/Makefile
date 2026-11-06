@@ -9,6 +9,7 @@ TC_DIST = armada375-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_BUILD_FLAGS = -mhard-float -mfpu=vfpv3
 
 include ../../mk/spksrc.toolchain.mk

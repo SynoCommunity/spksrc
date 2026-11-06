@@ -9,6 +9,7 @@ TC_DIST = armadaxp-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%20XP%20Linux%203.2.40
 
 TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_BUILD_FLAGS = -mhard-float -mfpu=vfpv3-d16
 
 include ../../mk/spksrc.toolchain.mk

@@ -10,6 +10,7 @@ TC_DIST_SITE_URL = https://github.com/SynoCommunity/spksrc/releases/download/
 TC_DIST_SITE_PATH = toolchains%2Fdsm5.2
 
 TC_TARGET = arm-marvell-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 
 # glibc 2.15 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
