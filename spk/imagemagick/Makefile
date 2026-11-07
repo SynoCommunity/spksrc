@@ -1,6 +1,6 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.1.2
-SPK_REV = 17
+SPK_REV = 16
 SPK_ICON = src/imagemagick.png
 
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
@@ -12,7 +12,7 @@ DEPENDS += cross/jpegoptim cross/pngcrush cross/optipng
 MAINTAINER = hgy59
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images. This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; OptiPNG is a PNG optimizer that recompresses image files to a smaller size, without losing any information; pngcrush an optimizer for png files; pngquant for lossy compression of PNG images.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "Rebuild: jasper links libm, which its CMake build did not find since 7.1.0-9."
+CHANGELOG = "Update ImageMagick to v7.1.2-33 (security fixes)."
 
 STARTABLE = no
 
