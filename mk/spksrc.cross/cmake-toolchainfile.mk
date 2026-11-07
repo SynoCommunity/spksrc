@@ -100,3 +100,9 @@ ifneq ($(strip $(CMAKE_META_FIND_ROOTS)),)
 	@echo "# meta staging roots for find_library/find_path/find_package" ; \
 	$(foreach r,$(CMAKE_META_FIND_ROOTS),echo 'list(APPEND CMAKE_FIND_ROOT_PATH "$(r)")' ;)
 endif
+# The toolchain's sysroot, last: what glibc itself provides -- libm, libc, sys/epoll.h --
+# which a find_library/find_path re-rooted to the staging alone (MODE ONLY) never sees,
+# returning NOTFOUND while the build goes on. After the staging and the metas, so what is
+# built here still wins.
+	@echo "# toolchain sysroot, last: glibc's own libraries and headers" ; \
+	echo 'list(APPEND CMAKE_FIND_ROOT_PATH "$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT))")'

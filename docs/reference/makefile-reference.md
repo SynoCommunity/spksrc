@@ -204,7 +204,7 @@ Available after toolchain is loaded:
 | `TC_LIBRARY` | Toolchain library path |
 | `TC_PREFIX` | Cross-compiler prefix |
 | `TC_TARGET` | Target triplet (x86_64-pc-linux-gnu) |
-| `TC_SYSROOT` | Toolchain sysroot path |
+| `TC_SYSROOT` | Toolchain sysroot, relative to `$(TC_WORK_DIR)/$(TC_TARGET)`: the one its gcc reports (`-print-sysroot`), which `tcvars` checks |
 | `CC` | C compiler path |
 | `CXX` | C++ compiler path |
 | `LD` | Linker path |

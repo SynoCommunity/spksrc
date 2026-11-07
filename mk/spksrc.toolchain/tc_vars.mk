@@ -458,10 +458,21 @@ endif
 
 #####
 
+# The declared TC_SYSROOT has to be the sysroot the toolchain's gcc searches: every -I/-L,
+# SYSROOT and the CMake find root are built on it. Checked here, once gcc exists -- stage0
+# writes tc_vars.mk before it does. LC_ALL=C for the DSM 5.2 gcc.
+.PHONY: tcvars-sysroot-check
+tcvars-sysroot-check:
+	@gcc_sysroot=$$(LC_ALL=C $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-sysroot 2>/dev/null) ; \
+	test -n "$$gcc_sysroot" && \
+	  test "$$(realpath -m "$$gcc_sysroot")" = "$$(realpath -m "$(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)")" || \
+	  { echo "TC_SYSROOT = $(TC_SYSROOT) is not the sysroot $(TC_PREFIX)gcc reports: $${gcc_sysroot:-none}" >&2 ; exit 1 ; }
+
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
 tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
-$(TCVARS_COOKIE): $(POST_TCVARS_TARGET)
+# The check before the cookie: a failed one is not skipped next time.
+$(TCVARS_COOKIE): tcvars-sysroot-check $(POST_TCVARS_TARGET)
 	$(create_target_dir)
 	@touch -f $@
 
