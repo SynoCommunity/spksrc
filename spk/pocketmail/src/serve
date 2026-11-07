@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+umask 077
+base=/var/packages/pocketmail
+private=$base/etc/private
+# env -i prevents inherited service variables from enabling optional features.
+set -- "SSM_DATA_DIR=$base/var/store" "SSM_WEB_LISTEN=off" "SSM_IMAP_LISTEN=127.0.0.1:9993"
+if [ -e "$private/cert.pem" ] || [ -e "$private/key.pem" ]; then
+    [ -r "$private/cert.pem" ] && [ -r "$private/key.pem" ] || exit 1
+    set -- "$@" "SSM_TLS_CERT=$private/cert.pem" "SSM_TLS_KEY=$private/key.pem"
+fi
+# One literal KEY=value per line. Only named service settings are accepted.
+if [ -f "$private/settings.env" ]; then
+    while IFS= read -r setting || [ -n "$setting" ]; do
+        case "$setting" in
+            ''|'#'*) continue ;;
+            SSM_WEB_LISTEN=*|SSM_WEBMAIL_LISTEN=*|SSM_IMAP_LISTEN=*|SSM_SENDMAIL=*|SSM_VERIFIED_FORWARD_TO=*|SSM_FORWARD_FROM=*|SSM_FORWARD_POLICY=*|SSM_PULL_URL=*|SSM_PULL_TOKEN_FILE=*) set -- "$@" "$setting" ;;
+            *) exit 1 ;;
+        esac
+    done < "$private/settings.env"
+fi
+exec env -i PATH=/usr/bin:/bin "$@" "$base/target/bin/synology-mail-server" serve
