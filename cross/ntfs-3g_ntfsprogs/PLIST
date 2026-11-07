@@ -8,8 +8,8 @@ bin:bin/ntfsfix
 bin:bin/ntfsinfo
 bin:bin/ntfsls
 lnk:lib/libntfs-3g.so
-lnk:lib/libntfs-3g.so.89
-lib:lib/libntfs-3g.so.89.0.0
+lnk:lib/libntfs-3g.so.91
+lib:lib/libntfs-3g.so.91.0.0
 bin:sbin/mkntfs
 bin:sbin/ntfsclone
 bin:sbin/ntfscp
