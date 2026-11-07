@@ -127,9 +127,30 @@ service_postinst ()
 
 service_postupgrade ()
 {
+    CONFIG_FILE="${SYNOPKG_PKGVAR}/ejabberd.yml"
+
+    # WebAdmin in ejabberd 24.06+ obtains page data through the API.
+    # Older configs lack the permissions used by ejabberd_web_admin.
+    if [ -f "${CONFIG_FILE}" ] && ! grep -q '"webadmin commands"' "${CONFIG_FILE}"; then
+        awk '
+            /^api_permissions:/ {
+                print
+                print "  \"webadmin commands\":"
+                print "    from: ejabberd_web_admin"
+                print "    who: admin"
+                print "    what: \"*\""
+                print "  \"adhoc commands\":"
+                print "    from: mod_adhoc_api"
+                print "    who: admin"
+                print "    what: \"*\""
+                next
+            }
+            { print }
+        ' "${CONFIG_FILE}" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "${CONFIG_FILE}"
+    fi
+
     # Add admin ACL if wizard provided credentials (wizard only shown when ACL not configured)
     if [ -n "${wizard_ejabberd_admin_username}" ] && [ -n "${wizard_ejabberd_hostname}" ]; then
-        CONFIG_FILE="${SYNOPKG_PKGVAR}/ejabberd.yml"
         ADMIN_JID="${wizard_ejabberd_admin_username}@${wizard_ejabberd_hostname}"
         
         # Add admin ACL section if not already configured
