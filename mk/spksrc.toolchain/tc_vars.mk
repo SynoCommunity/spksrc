@@ -359,7 +359,7 @@ endif
 #
 # What was missing is the other axis, the build machine, which autoconf spells *_FOR_BUILD
 # and reads for a generator a package compiles and runs during the build. Having no name
-# for it, each package that needs one invented its own: cross/bind_9.* says BUILD_CC,
+# for it, each package that needs one invented its own: cross/bind-9.* says BUILD_CC,
 # cross/cyrus-sasl patches CC_FOR_BUILD into a Makefile.in, cross/ffmpeg* passes
 # --host-cc. The standard names are emitted here once, so a package can ask instead of
 # improvise. The flags are empty on purpose, as HOST_CFLAGS is in the rust fragment above:

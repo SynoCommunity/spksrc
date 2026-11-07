@@ -1,5 +1,5 @@
 PKG_NAME = bind
-PKG_VERS = 9.20.29
+PKG_VERS = 9.18.50
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
@@ -9,21 +9,21 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # BIND 9:
 # Even version numbers are stable versions (9.16, 9.18, 9.20) with support until EOL
 # Odd version numbers are development versions (9.17, 9.19, 9.21)
+# EOL: no upstream fix for CVE-2026-94300; retained only for legacy DSM/arch support.
 
 DEPENDS  = cross/libuv
 DEPENDS += cross/liburcu
 DEPENDS += cross/openssl3
+DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
 DEPENDS += cross/nghttp2
-# libcap is a hard configure requirement though nothing shipped links it
 DEPENDS += cross/libcap
 
-# needs C11 with some C17 features (gcc >= 7; comcerto2k is the only
-# DSM-7 arch below that and every older DSM is too)
-# gcc folds a const int into a static initializer only from 8; 7.5 refuses:
-#   opensslrsa_link.c:53: error: initializer element is not constant
-MIN_GCC_VERSION = 8
+# lacking support for atomics:
+# netmgr/udp.c uses the C11 _Atomic qualifier, which gcc has from 4.9:
+#   udp.c:813: error: expected declaration specifiers before 'last_udpsends_log'
+MIN_GCC_VERSION = 4.9
 
 
 HOMEPAGE = https://www.isc.org/
