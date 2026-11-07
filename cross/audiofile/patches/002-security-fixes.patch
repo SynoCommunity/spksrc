@@ -1,0 +1,444 @@
+--- libaudiofile/modules/BlockCodec.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/modules/BlockCodec.cpp	2026-11-07 14:02:20.188019228 +0000
+@@ -47,13 +47,14 @@
+ 
+ 	// Read the compressed data.
+ 	ssize_t bytesRead = read(m_inChunk->buffer, m_bytesPerPacket * blockCount);
+-	int blocksRead = bytesRead >= 0 ? bytesRead / m_bytesPerPacket : 0;
++	int blocksRead = (bytesRead >= 0 && m_bytesPerPacket > 0) ? bytesRead / m_bytesPerPacket : 0;
+ 
+ 	// Decompress into m_outChunk.
+ 	for (int i=0; i<blocksRead; i++)
+ 	{
+-		decodeBlock(static_cast<const uint8_t *>(m_inChunk->buffer) + i * m_bytesPerPacket,
+-			static_cast<int16_t *>(m_outChunk->buffer) + i * m_framesPerPacket * m_track->f.channelCount);
++		if (decodeBlock(static_cast<const uint8_t *>(m_inChunk->buffer) + i * m_bytesPerPacket,
++			static_cast<int16_t *>(m_outChunk->buffer) + i * m_framesPerPacket * m_track->f.channelCount)==0)
++			break;
+ 
+ 		framesRead += m_framesPerPacket;
+ 	}
+--- libaudiofile/modules/IMA.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/modules/IMA.cpp	2026-11-07 14:02:20.184019329 +0000
+@@ -169,7 +169,7 @@
+ 		if (encoded[1] & 0x80)
+ 			m_adpcmState[c].previousValue -= 0x10000;
+ 
+-		m_adpcmState[c].index = encoded[2];
++		m_adpcmState[c].index = clamp(encoded[2], 0, 88);
+ 
+ 		*decoded++ = m_adpcmState[c].previousValue;
+ 
+@@ -210,7 +210,7 @@
+ 			predictor -= 0x10000;
+ 
+ 		state.previousValue = clamp(predictor, MIN_INT16, MAX_INT16);
+-		state.index = encoded[1] & 0x7f;
++		state.index = clamp(encoded[1] & 0x7f, 0, 88);
+ 		encoded += 2;
+ 
+ 		for (int n=0; n<m_framesPerPacket; n+=2)
+--- libaudiofile/modules/ModuleState.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/modules/ModuleState.cpp	2026-11-07 14:02:20.192019127 +0000
+@@ -75,6 +75,9 @@
+ 		m_fileModule = unit->initcompress(track, file->m_fh, file->m_seekok,
+ 			file->m_fileFormat == AF_FILE_RAWDATA, &chunkFrames);
+ 
++	if (!m_fileModule)
++		return AF_FAIL;
++
+ 	if (unit->needsRebuffer)
+ 	{
+ 		assert(unit->nativeSampleFormat == AF_SAMPFMT_TWOSCOMP);
+@@ -402,7 +405,7 @@
+ 		addModule(new Transform(outfc, in.pcm, out.pcm));
+ 
+ 	if (in.channelCount != out.channelCount)
+-		addModule(new ApplyChannelMatrix(infc, isReading,
++		addModule(new ApplyChannelMatrix(outfc, isReading,
+ 			in.channelCount, out.channelCount,
+ 			in.pcm.minClip, in.pcm.maxClip,
+ 			track->channelMatrix));
+--- libaudiofile/modules/MSADPCM.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/modules/MSADPCM.cpp	2026-11-07 14:02:20.188019228 +0000
+@@ -101,24 +101,60 @@
+ 	768, 614, 512, 409, 307, 230, 230, 230
+ };
+ 
++int firstBitSet(int x)
++{
++        int position=0;
++        while (x!=0)
++        {
++                x>>=1;
++                ++position;
++        }
++        return position;
++}
++
++#ifndef __has_builtin
++#define __has_builtin(x) 0
++#endif
++
++bool multiplyCheckOverflow(int a, int b, int *result)
++{
++#if (defined __GNUC__ && __GNUC__ >= 5) || ( __clang__ && __has_builtin(__builtin_mul_overflow))
++	return __builtin_mul_overflow(a, b, result);
++#else
++	if (firstBitSet(a)+firstBitSet(b)>31) // int is signed, so we can't use 32 bits
++		return true;
++	*result = a * b;
++	return false;
++#endif
++}
++
++
+ // Compute a linear PCM value from the given differential coded value.
+ static int16_t decodeSample(ms_adpcm_state &state,
+-	uint8_t code, const int16_t *coefficient)
++	uint8_t code, const int16_t *coefficient, bool *ok=NULL)
+ {
+ 	int linearSample = (state.sample1 * coefficient[0] +
+ 		state.sample2 * coefficient[1]) >> 8;
++	int delta;
+ 
+ 	linearSample += ((code & 0x08) ? (code - 0x10) : code) * state.delta;
+ 
+ 	linearSample = clamp(linearSample, MIN_INT16, MAX_INT16);
+ 
+-	int delta = (state.delta * adaptationTable[code]) >> 8;
++	if (multiplyCheckOverflow(state.delta, adaptationTable[code], &delta))
++	{
++                if (ok) *ok=false;
++		_af_error(AF_BAD_COMPRESSION, "Error decoding sample");
++		return 0;
++	}
++	delta >>= 8;
+ 	if (delta < 16)
+ 		delta = 16;
+ 
+ 	state.delta = delta;
+ 	state.sample2 = state.sample1;
+ 	state.sample1 = linearSample;
++	if (ok) *ok=true;
+ 
+ 	return static_cast<int16_t>(linearSample);
+ }
+@@ -212,13 +248,16 @@
+ 	{
+ 		uint8_t code;
+ 		int16_t newSample;
++		bool ok;
+ 
+ 		code = *encoded >> 4;
+-		newSample = decodeSample(*state[0], code, coefficient[0]);
++		newSample = decodeSample(*state[0], code, coefficient[0], &ok);
++		if (!ok) return 0;
+ 		*decoded++ = newSample;
+ 
+ 		code = *encoded & 0x0f;
+-		newSample = decodeSample(*state[1], code, coefficient[1]);
++		newSample = decodeSample(*state[1], code, coefficient[1], &ok);
++		if (!ok) return 0;
+ 		*decoded++ = newSample;
+ 
+ 		encoded++;
+--- libaudiofile/modules/SimpleModule.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/modules/SimpleModule.cpp	2026-11-07 14:02:20.192019127 +0000
+@@ -26,6 +26,7 @@
+ void SimpleModule::runPull()
+ {
+ 	pull(m_outChunk->frameCount);
++	m_outChunk->frameCount = m_inChunk->frameCount;
+ 	run(*m_inChunk, *m_outChunk);
+ }
+ 
+--- libaudiofile/NeXT.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/NeXT.cpp	2026-11-07 14:02:20.196019025 +0000
+@@ -32,6 +32,7 @@
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <limits.h>
+ 
+ #include "File.h"
+ #include "Setup.h"
+@@ -122,6 +123,12 @@
+ 		_af_error(AF_BAD_CHANNELS, "invalid file with 0 channels");
+ 		return AF_FAIL;
+ 	}
++	/* avoid overflow of INT for double size rate */
++	if (channelCount > (INT32_MAX / (sizeof(double))))
++	{
++		_af_error(AF_BAD_CHANNELS, "invalid file with %i channels", channelCount);
++		return AF_FAIL;
++	}
+ 
+ 	Track *track = allocateTrack();
+ 	if (!track)
+--- libaudiofile/WAVE.cpp	2013-03-06 05:30:03.000000000 +0000
++++ libaudiofile/WAVE.cpp	2026-11-07 14:02:20.188019228 +0000
+@@ -281,6 +281,12 @@
+ 
+ 			/* numCoefficients should be at least 7. */
+ 			assert(numCoefficients >= 7 && numCoefficients <= 255);
++			if (numCoefficients < 7 || numCoefficients > 255)
++			{
++				_af_error(AF_BAD_HEADER,
++						"Bad number of coefficients");
++				return AF_FAIL;
++			}
+ 
+ 			m_msadpcmNumCoefficients = numCoefficients;
+ 
+@@ -326,6 +332,7 @@
+ 			{
+ 				_af_error(AF_BAD_NOT_IMPLEMENTED,
+ 					"IMA ADPCM compression supports only 4 bits per sample");
++				return AF_FAIL;
+ 			}
+ 
+ 			int bytesPerBlock = (samplesPerBlock + 14) / 8 * 4 * channelCount;
+@@ -333,6 +340,7 @@
+ 			{
+ 				_af_error(AF_BAD_CODEC_CONFIG,
+ 					"Invalid samples per block for IMA ADPCM compression");
++				return AF_FAIL;
+ 			}
+ 
+ 			track->f.sampleWidth = 16;
+--- sfcommands/printinfo.c	2013-03-06 05:30:03.000000000 +0000
++++ sfcommands/printinfo.c	2026-11-07 14:02:20.196019025 +0000
+@@ -37,6 +37,7 @@
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <limits.h>
+ 
+ static char *copyrightstring (AFfilehandle file);
+ 
+@@ -147,7 +148,11 @@
+ 	int		i, misccount;
+ 
+ 	misccount = afGetMiscIDs(file, NULL);
+-	miscids = (int *) malloc(sizeof (int) * misccount);
++	if(!misccount)
++		return NULL;
++	miscids = (int *) calloc(misccount, sizeof(int));
++	if(!miscids)
++		return NULL;
+ 	afGetMiscIDs(file, miscids);
+ 
+ 	for (i=0; i<misccount; i++)
+@@ -159,13 +164,16 @@
+ 			If this code executes, the miscellaneous chunk is a
+ 			copyright chunk.
+ 		*/
+-		int datasize = afGetMiscSize(file, miscids[i]);
+-		char *data = (char *) malloc(datasize);
++		size_t datasize = afGetMiscSize(file, miscids[i]);
++		if(datasize >= INT_MAX -1 ) {
++			goto error;
++		}
++		char *data = (char *) calloc(datasize + 1, 1);
+ 		afReadMisc(file, miscids[i], data, datasize);
+ 		copyright = data;
+ 		break;
+ 	}
+-
++error:
+ 	free(miscids);
+ 
+ 	return copyright;
+--- sfcommands/sfconvert.c	2013-03-06 05:30:03.000000000 +0000
++++ sfcommands/sfconvert.c	2026-11-07 14:02:20.196019025 +0000
+@@ -45,6 +45,33 @@
+ void usageerror (void);
+ bool copyaudiodata (AFfilehandle infile, AFfilehandle outfile, int trackid);
+ 
++int firstBitSet(int x)
++{
++        int position=0;
++        while (x!=0)
++        {
++                x>>=1;
++                ++position;
++        }
++        return position;
++}
++
++#ifndef __has_builtin
++#define __has_builtin(x) 0
++#endif
++
++bool multiplyCheckOverflow(int a, int b, int *result)
++{
++#if (defined __GNUC__ && __GNUC__ >= 5) || ( __clang__ && __has_builtin(__builtin_mul_overflow))
++	return __builtin_mul_overflow(a, b, result);
++#else
++	if (firstBitSet(a)+firstBitSet(b)>31) // int is signed, so we can't use 32 bits
++		return true;
++	*result = a * b;
++	return false;
++#endif
++}
++
+ int main (int argc, char **argv)
+ {
+ 	if (argc == 2)
+@@ -322,9 +349,13 @@
+ bool copyaudiodata (AFfilehandle infile, AFfilehandle outfile, int trackid)
+ {
+ 	int frameSize = afGetVirtualFrameSize(infile, trackid, 1);
+-
+-	const int kBufferFrameCount = 65536;
+-	void *buffer = malloc(kBufferFrameCount * frameSize);
++	if(frameSize <= 0)
++		return false;
++	int kBufferFrameCount = 65536;
++	int bufferSize;
++	while (multiplyCheckOverflow(kBufferFrameCount, frameSize, &bufferSize))
++		kBufferFrameCount /= 2;
++	void *buffer = malloc(bufferSize);
+ 
+ 	AFframecount totalFrames = afGetFrameCount(infile, AF_DEFAULT_TRACK);
+ 	AFframecount totalFramesWritten = 0;
+--- test/Makefile.am	2013-03-06 05:30:03.000000000 +0000
++++ test/Makefile.am	2026-11-07 14:02:20.184019329 +0000
+@@ -26,6 +26,7 @@
+ 	VirtualFile \
+ 	floatto24 \
+ 	query2 \
++	sixteen-stereo-to-eight-mono \
+ 	sixteen-to-eight \
+ 	testchannelmatrix \
+ 	testdouble \
+@@ -139,6 +140,7 @@
+ printmarkers_LDADD = $(LIBAUDIOFILE) -lm
+ 
+ sixteen_to_eight_SOURCES = sixteen-to-eight.c TestUtilities.cpp TestUtilities.h
++sixteen_stereo_to_eight_mono_SOURCES = sixteen-stereo-to-eight-mono.c TestUtilities.cpp TestUtilities.h
+ 
+ testchannelmatrix_SOURCES = testchannelmatrix.c TestUtilities.cpp TestUtilities.h
+ 
+--- test/sixteen-stereo-to-eight-mono.c	1970-01-01 00:00:00.000000000 +0000
++++ test/sixteen-stereo-to-eight-mono.c	2026-11-07 14:02:20.184019329 +0000
+@@ -0,0 +1,118 @@
++/*
++	Audio File Library
++
++	Copyright 2000, Silicon Graphics, Inc.
++
++	This program is free software; you can redistribute it and/or modify
++	it under the terms of the GNU General Public License as published by
++	the Free Software Foundation; either version 2 of the License, or
++	(at your option) any later version.
++
++	This program is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++	GNU General Public License for more details.
++
++	You should have received a copy of the GNU General Public License along
++	with this program; if not, write to the Free Software Foundation, Inc.,
++	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++*/
++
++/*
++	sixteen-stereo-to-eight-mono.c
++
++	This program tests the conversion from 2-channel 16-bit integers to
++	1-channel 8-bit	integers.
++*/
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <limits.h>
++
++#include <audiofile.h>
++
++#include "TestUtilities.h"
++
++int main (int argc, char **argv)
++{
++	AFfilehandle file;
++	AFfilesetup setup;
++	int16_t frames16[] = {14298, 392, 3923, -683, 958, -1921};
++	int8_t frames8[] = {28, 6, -2};
++	int i, frameCount = 3;
++	int8_t byte;
++	AFframecount result;
++
++	setup = afNewFileSetup();
++
++	afInitFileFormat(setup, AF_FILE_WAVE);
++
++	afInitSampleFormat(setup, AF_DEFAULT_TRACK, AF_SAMPFMT_TWOSCOMP, 16);
++	afInitChannels(setup, AF_DEFAULT_TRACK, 2);
++
++	char *testFileName;
++	if (!createTemporaryFile("sixteen-to-eight", &testFileName))
++	{
++		fprintf(stderr, "Could not create temporary file.\n");
++		exit(EXIT_FAILURE);
++	}
++
++	file = afOpenFile(testFileName, "w", setup);
++	if (file == AF_NULL_FILEHANDLE)
++	{
++		fprintf(stderr, "could not open file for writing\n");
++		exit(EXIT_FAILURE);
++	}
++
++	afFreeFileSetup(setup);
++
++	afWriteFrames(file, AF_DEFAULT_TRACK, frames16, frameCount);
++
++	afCloseFile(file);
++
++	file = afOpenFile(testFileName, "r", AF_NULL_FILESETUP);
++	if (file == AF_NULL_FILEHANDLE)
++	{
++		fprintf(stderr, "could not open file for reading\n");
++		exit(EXIT_FAILURE);
++	}
++
++	afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_TWOSCOMP, 8);
++	afSetVirtualChannels(file, AF_DEFAULT_TRACK, 1);
++
++	for (i=0; i<frameCount; i++)
++	{
++		/* Read one frame. */
++		result = afReadFrames(file, AF_DEFAULT_TRACK, &byte, 1);
++
++		if (result != 1)
++			break;
++
++		/* Compare the byte read with its precalculated value. */
++		if (memcmp(&byte, &frames8[i], 1) != 0)
++		{
++			printf("error\n");
++			printf("expected %d, got %d\n", frames8[i], byte);
++			exit(EXIT_FAILURE);
++		}
++		else
++		{
++#ifdef DEBUG
++			printf("got what was expected: %d\n", byte);
++#endif
++		}
++	}
++
++	afCloseFile(file);
++	unlink(testFileName);
++	free(testFileName);
++
++	exit(EXIT_SUCCESS);
++}
