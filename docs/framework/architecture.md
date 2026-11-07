@@ -183,7 +183,8 @@ A consumer includes `mk/spksrc.spk-meta.mk` (not the per-meta files directly); b
   pkg-config, so the prefix is baked into the toolchain file).
 - **`CMAKE_FIND_ROOT_PATH`** — includes the meta staging roots so cmake's
   `find_package` / `find_path` / `find_library` locate meta-provided headers and
-  libraries (e.g. FFmpeg, EXPAT) without per-package hints.
+  libraries (e.g. FFmpeg, EXPAT) without per-package hints, and, last, the
+  toolchain's sysroot, for what glibc itself provides (`m`, `c`, `sys/epoll.h`).
 
 Because the meta's `lib/pkgconfig` is on `PKG_CONFIG_LIBDIR` directly, a consumer
 needs neither per-`.pc` symlinks nor per-package `-DOPENSSL_*` / `-DEXPAT_*` /

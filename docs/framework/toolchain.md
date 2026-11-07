@@ -184,6 +184,7 @@ No `CMAKE_SYSROOT`: the compiler already knows its own. A package's generated to
 file then appends the meta staging roots and, last, the toolchain's sysroot to
 `CMAKE_FIND_ROOT_PATH`, so `find_library`/`find_path` take what is built in the staging
 first and still find what glibc itself provides (`m`, `c`, `sys/epoll.h`).
+
 Some sysroots hold more than glibc -- `libbfd` on most, `expat`, `uuid` and `bz2` on
 ppc853x-5.2 -- so a package still declares every library it uses: an undeclared probe
 can find the toolchain's copy instead of failing.
