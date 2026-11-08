@@ -12,6 +12,25 @@ Index: FFmpeg/libavcodec/av1dec.c
      av_refstruct_unref(&f->header_ref);
      f->raw_frame_header = NULL;
      f->spatial_id = f->temporal_id = 0;
+@@ -1151,12 +1151,12 @@ static int export_film_grain(AVCodecCont
+         aom->ar_coeffs_uv[1][i] = film_grain->ar_coeffs_cr_plus_128[i] - 128;
+     }
+ 
+-    aom->uv_mult[0] = film_grain->cb_mult;
+-    aom->uv_mult[1] = film_grain->cr_mult;
+-    aom->uv_mult_luma[0] = film_grain->cb_luma_mult;
+-    aom->uv_mult_luma[1] = film_grain->cr_luma_mult;
+-    aom->uv_offset[0] = film_grain->cb_offset;
+-    aom->uv_offset[1] = film_grain->cr_offset;
++    aom->uv_mult[0] = film_grain->cb_mult - 128;
++    aom->uv_mult[1] = film_grain->cr_mult - 128;
++    aom->uv_mult_luma[0] = film_grain->cb_luma_mult - 128;
++    aom->uv_mult_luma[1] = film_grain->cr_luma_mult - 128;
++    aom->uv_offset[0] = film_grain->cb_offset - 256;
++    aom->uv_offset[1] = film_grain->cr_offset - 256;
+ 
+     return 0;
+ }
 Index: FFmpeg/libavcodec/h264_picture.c
 ===================================================================
 --- libavcodec/h264_picture.c
@@ -224,12 +243,12 @@ Index: FFmpeg/libavcodec/vulkan_decode.c
 -                                                           VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR);
 +        void *profile_list = (void *)ff_vk_find_struct(ctx->s.hwfc->create_pnext,
 +                                                       VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR);
-+        /* Reference (DPB) images use the same tiling and pNext chain as output.
-+         * If VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR is 0, the
-+         * driver does not support separate output and DPB with different layouts/tiling. */
++        /* With DPB_AND_OUTPUT_DISTINCT, DPB images never leave the decoder,
++         * so they don't need the output's DRM modifiers. */
 +        void *drm_create_pnext = ff_vk_find_struct(ctx->s.hwfc->create_pnext,
 +                                                   VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_LIST_CREATE_INFO_EXT);
-+        if (drm_create_pnext) {
++        if (drm_create_pnext &&
++            !(ctx->dec_caps.flags & VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR)) {
 +            dpb_hwfc->create_pnext = drm_create_pnext;
 +            dpb_hwfc->tiling       = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
 +            av_assert2(ff_vk_find_struct(drm_create_pnext, VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR));
@@ -378,7 +397,48 @@ Index: FFmpeg/libavcodec/vulkan_encode_av1.c
 ===================================================================
 --- libavcodec/vulkan_encode_av1.c
 +++ libavcodec/vulkan_encode_av1.c
-@@ -593,7 +593,6 @@ static int init_profile(AVCodecContext *
+@@ -188,6 +188,7 @@ static int init_pic_params(AVCodecContex
+ 
+     uint32_t ref_name_mask = 0x0;
+     int name_slots[STD_VIDEO_AV1_REFS_PER_FRAME];
++    int name;
+ 
+     StdVideoAV1Segmentation *segmentation = &ap->segmentation;
+     StdVideoAV1LoopFilter  *loop_filter = &ap->loop_filter;
+@@ -355,6 +356,7 @@ static int init_pic_params(AVCodecContex
+         av_assert0(pic->nb_refs[0] == 0 || pic->nb_refs[1]);
+         ap->av1pic_info.frame_type = STD_VIDEO_AV1_FRAME_TYPE_KEY;
+         ap->av1pic_info.refresh_frame_flags = 0xFF;
++        ap->av1pic_info.primary_ref_frame = STD_VIDEO_AV1_PRIMARY_REF_NONE;
+         quantization->base_q_idx = enc->q_idx_idr;
+         ap->slot = 0;
+         ap->last_idr_frame = pic->display_order;
+@@ -396,10 +398,10 @@ static int init_pic_params(AVCodecContex
+             }
+             ref = pic->refs[0][pic->nb_refs[0] - 2];
+             ap_ref = ref->codec_priv;
+-            ap->av1pic_info.ref_frame_idx[3] = ap_ref->slot;
+             ap->av1pic_info.ref_order_hint[ap_ref->slot] = ref->display_order - ap_ref->last_idr_frame;
+-//            vpic->ref_frame_ctrl_l0.fields.search_idx1 = AV1_REF_FRAME_GOLDEN;
+-            set_name_slot(ap_ref->av1pic_info.current_frame_id, name_slots, ref_name_mask, 0);
++            /* The header must name the same reference the encoder uses for it. */
++            name = set_name_slot(ap_ref->av1pic_info.current_frame_id, name_slots, ref_name_mask, 0);
++            ap->av1pic_info.ref_frame_idx[name] = ap_ref->slot;
+         }
+         break;
+     case FF_HW_PICTURE_TYPE_B:
+@@ -451,6 +453,10 @@ static int init_pic_params(AVCodecContex
+         .primaryReferenceCdfOnly = 0,
+         .generateObuExtensionHeader = 0,
+     };
++    /* With rate control on, the driver picks the quantiser; constantQIndex must be 0
++     * (VUID-vkCmdEncodeVideoKHR-constantQIndex-10320). */
++    if (ctx->opts.rc_mode != VK_VIDEO_ENCODE_RATE_CONTROL_MODE_DISABLED_BIT_KHR)
++        ap->vkav1pic_info.constantQIndex = 0;
+     encode_info->pNext = &ap->vkav1pic_info;
+ 
+     for (int i = 0; i < FF_ARRAY_ELEMS(ap->vkav1pic_info.referenceNameSlotIndices); i++)
+@@ -593,7 +599,6 @@ static int init_profile(AVCodecContext *
      FFVulkanEncodeContext *ctx = &enc->common;
      FFVulkanContext *s = &ctx->s;
      FFVulkanFunctions *vk = &ctx->s.vkfn;
@@ -386,7 +446,7 @@ Index: FFmpeg/libavcodec/vulkan_encode_av1.c
  
      VkVideoEncodeAV1CapabilitiesKHR av1_caps = {
          .sType = VK_STRUCTURE_TYPE_VIDEO_ENCODE_AV1_CAPABILITIES_KHR,
-@@ -631,31 +630,6 @@ static int init_profile(AVCodecContext *
+@@ -631,31 +636,6 @@ static int init_profile(AVCodecContext *
      };
      profile->pNext = &enc->profile;
  
@@ -418,7 +478,7 @@ Index: FFmpeg/libavcodec/vulkan_encode_av1.c
      /* User has explicitly specified a profile. */
      if (avctx->profile != AV_PROFILE_UNKNOWN)
          return 0;
-@@ -750,6 +724,32 @@ static av_cold int init_sequence_headers
+@@ -750,6 +730,32 @@ static av_cold int init_sequence_headers
      if (!desc)
          return AVERROR(EINVAL);
  
@@ -451,7 +511,7 @@ Index: FFmpeg/libavcodec/vulkan_encode_av1.c
      seq_obu->header.obu_type = AV1_OBU_SEQUENCE_HEADER;
      *seq = (AV1RawSequenceHeader) {
          .seq_profile = avctx->profile,
-@@ -1231,6 +1231,8 @@ static av_cold int vulkan_encode_av1_ini
+@@ -1231,6 +1237,8 @@ static av_cold int vulkan_encode_av1_ini
  
      if (avctx->profile == AV_PROFILE_UNKNOWN)
          avctx->profile = enc->common.opts.profile;
@@ -460,7 +520,7 @@ Index: FFmpeg/libavcodec/vulkan_encode_av1.c
  
      enc->caps = (VkVideoEncodeAV1CapabilitiesKHR) {
          .sType = VK_STRUCTURE_TYPE_VIDEO_ENCODE_AV1_CAPABILITIES_KHR,
-@@ -1361,6 +1363,10 @@ static av_cold int vulkan_encode_av1_ini
+@@ -1361,6 +1369,10 @@ static av_cold int vulkan_encode_av1_ini
  static av_cold int vulkan_encode_av1_close(AVCodecContext *avctx)
  {
      VulkanEncodeAV1Context *enc = avctx->priv_data;
@@ -638,6 +698,21 @@ Index: FFmpeg/libavcodec/vulkan_encode_h265.c
      ff_vulkan_encode_uninit(&enc->common);
      return 0;
  }
+Index: FFmpeg/libavcodec/vulkan_h264.c
+===================================================================
+--- libavcodec/vulkan_h264.c
++++ libavcodec/vulkan_h264.c
+@@ -272,8 +272,8 @@ static void set_pps(const PPS *pps, cons
+         .num_ref_idx_l0_default_active_minus1 = pps->ref_count[0] - 1,
+         .num_ref_idx_l1_default_active_minus1 = pps->ref_count[1] - 1,
+         .weighted_bipred_idc = pps->weighted_bipred_idc,
+-        .pic_init_qp_minus26 = pps->init_qp - 26,
+-        .pic_init_qs_minus26 = pps->init_qs - 26,
++        .pic_init_qp_minus26 = pps->init_qp - 26 - 6 * (sps->bit_depth_luma - 8),
++        .pic_init_qs_minus26 = pps->init_qs - 26 - 6 * (sps->bit_depth_luma - 8),
+         .chroma_qp_index_offset = pps->chroma_qp_index_offset[0],
+         .second_chroma_qp_index_offset = pps->chroma_qp_index_offset[1],
+         .flags = (StdVideoH264PpsFlags) {
 Index: FFmpeg/libavcodec/vulkan_video.c
 ===================================================================
 --- libavcodec/vulkan_video.c
@@ -682,7 +757,15 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  #if CONFIG_CUDA
      /* Importing external memory into cuda is really expensive so we keep the
       * memory imported all the time */
-@@ -2370,7 +2377,7 @@ static int alloc_mem(AVHWDeviceContext *
+@@ -576,6 +583,7 @@ static int vkfmt_from_pixfmt2(AVHWDevice
+                 basics_secondary = (feats_secondary & basic_flags) == basic_flags;
+                 storage_secondary = !!(feats_secondary & VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT);
+             } else {
++                feats_secondary = feats_primary;
+                 basics_secondary = basics_primary;
+                 storage_secondary = storage_primary;
+             }
+@@ -2370,7 +2378,7 @@ static int alloc_mem(AVHWDeviceContext *
      return 0;
  }
  
@@ -691,7 +774,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  {
      av_unused AVVkFrameInternal *internal = f->internal;
  
-@@ -2402,6 +2409,10 @@ static void vulkan_free_internal(AVVkFra
+@@ -2402,6 +2410,10 @@ static void vulkan_free_internal(AVVkFra
      }
  #endif
  
@@ -702,7 +785,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      pthread_mutex_destroy(&internal->update_mutex);
      av_freep(&f->internal);
  }
-@@ -2429,7 +2440,7 @@ static void vulkan_frame_free(AVHWFrames
+@@ -2429,7 +2441,7 @@ static void vulkan_frame_free(AVHWFrames
          vk->WaitSemaphores(hwctx->act_dev, &sem_wait, UINT64_MAX);
      }
  
@@ -711,7 +794,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  
      for (int i = 0; i < nb_images; i++) {
          vk->DestroyImage(hwctx->act_dev,     f->img[i], hwctx->alloc);
-@@ -2476,6 +2487,10 @@ static int alloc_bind_mem(AVHWFramesCont
+@@ -2476,6 +2488,10 @@ static int alloc_bind_mem(AVHWFramesCont
  
          vk->GetImageMemoryRequirements2(hwctx->act_dev, &req_desc, &req);
  
@@ -722,7 +805,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          if (f->tiling == VK_IMAGE_TILING_LINEAR)
              req.memoryRequirements.size = FFALIGN(req.memoryRequirements.size,
                                                    p->props.properties.limits.minMemoryMapAlignment);
-@@ -2483,6 +2498,8 @@ static int alloc_bind_mem(AVHWFramesCont
+@@ -2483,6 +2499,8 @@ static int alloc_bind_mem(AVHWFramesCont
          /* In case the implementation prefers/requires dedicated allocation */
          use_ded_mem = ded_req.prefersDedicatedAllocation |
                        ded_req.requiresDedicatedAllocation;
@@ -731,7 +814,19 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          if (use_ded_mem)
              ded_alloc.image = f->img[img_cnt];
  
-@@ -2674,11 +2691,11 @@ static int prepare_frame(AVHWFramesConte
+@@ -2595,8 +2613,10 @@ static int switch_layout(AVHWFramesConte
+     cmd_buf = exec->buf;
+     ff_vk_exec_start(&p->vkctx, exec);
+ 
++    /* NONE does not block any stage, so this queue's layout transition
++     * races a decode write submitted on the video queue. */
+     err = ff_vk_exec_add_dep_frame(&p->vkctx, exec, &tmp_frame,
+-                                   VK_PIPELINE_STAGE_2_NONE,
++                                   VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+                                    VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT);
+     if (err < 0)
+         return err;
+@@ -2674,11 +2694,11 @@ static int prepare_frame(AVHWFramesConte
      AVVulkanFramesContext *hwfc_vk = hwfc->hwctx;
      if (hwfc_vk->usage & VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT &&
          (pmode != PREP_MODE_EXTERNAL_EXPORT) &&
@@ -747,7 +842,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  
      return switch_layout(hwfc, ectx, frame, pmode);
  }
-@@ -2850,11 +2867,12 @@ static void try_export_flags(AVHWFramesC
+@@ -2850,11 +2870,12 @@ static void try_export_flags(AVHWFramesC
      VkPhysicalDeviceImageFormatInfo2 pinfo = {
          .sType  = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2,
          .pNext  = !exp ? NULL : &enext,
@@ -762,7 +857,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      };
  
      nb_mods = has_mods ? drm_mod_info->drmFormatModifierCount : 1;
-@@ -2865,9 +2883,18 @@ static void try_export_flags(AVHWFramesC
+@@ -2865,9 +2886,18 @@ static void try_export_flags(AVHWFramesC
          ret = vk->GetPhysicalDeviceImageFormatProperties2(dev_hwctx->phys_dev,
                                                          &pinfo, &props);
  
@@ -781,7 +876,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          }
      }
  }
-@@ -2895,7 +2922,8 @@ static AVBufferRef *vulkan_pool_alloc(vo
+@@ -2895,7 +2925,8 @@ static AVBufferRef *vulkan_pool_alloc(vo
                               ? VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT
                               : VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT);
  #else
@@ -791,7 +886,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          try_export_flags(hwfc, &eiinfo.handleTypes, &e,
                           VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT);
  
-@@ -2914,8 +2942,10 @@ static AVBufferRef *vulkan_pool_alloc(vo
+@@ -2914,8 +2945,10 @@ static AVBufferRef *vulkan_pool_alloc(vo
      err = create_frame(hwfc, &f, hwctx->tiling, hwctx->usage, hwctx->img_flags,
                         hwctx->nb_layers,
                         eiinfo.handleTypes ? &eiinfo : hwctx->create_pnext);
@@ -803,7 +898,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  
      err = alloc_bind_mem(hwfc, f, eminfo, sizeof(*eminfo));
      if (err)
-@@ -2943,6 +2973,7 @@ static AVBufferRef *vulkan_pool_alloc(vo
+@@ -2943,6 +2976,7 @@ static AVBufferRef *vulkan_pool_alloc(vo
      return avbuf;
  
  fail:
@@ -811,7 +906,28 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      vulkan_frame_free(hwfc, f);
      return NULL;
  }
-@@ -3044,16 +3075,29 @@ static int vulkan_frames_init(AVHWFrames
+@@ -2986,6 +3020,7 @@ static int vulkan_frames_init(AVHWFrames
+     VkImageUsageFlags supported_usage;
+     FFVulkanFunctions *vk = &p->vkctx.vkfn;
+     const struct FFVkFormatEntry *fmt;
++    const AVPixFmtDescriptor *desc;
+     int disable_multiplane = p->disable_multiplane ||
+                              (hwctx->flags & AV_VK_FRAME_FLAG_DISABLE_MULTIPLANE);
+     int is_lone_dpb = ((hwctx->usage & VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR) ||
+@@ -3009,6 +3044,12 @@ static int vulkan_frames_init(AVHWFrames
+         return AVERROR(EINVAL);
+     }
+ 
++    /* _420 and _422 formats need even dimensions, use one image per plane */
++    desc = av_pix_fmt_desc_get(hwfc->sw_format);
++    if ((hwfc->width  & ((1 << desc->log2_chroma_w) - 1)) ||
++        (hwfc->height & ((1 << desc->log2_chroma_h) - 1)))
++        disable_multiplane = 1;
++
+     if (hwctx->format[0] != VK_FORMAT_UNDEFINED) {
+         if (hwctx->format[0] != fmt->vkf) {
+             for (int i = 0; i < fmt->nb_images_fallback; i++) {
+@@ -3044,16 +3085,29 @@ static int vulkan_frames_init(AVHWFrames
      }
  
      /* Lone DPB images do not need additional flags. */
@@ -843,7 +959,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
              hwctx->usage |= supported_usage & VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT;
  
          /* Enables encoding of images, if supported by format and extensions */
-@@ -3163,8 +3207,8 @@ static int vulkan_frames_init(AVHWFrames
+@@ -3163,8 +3217,8 @@ static int vulkan_frames_init(AVHWFrames
              }
              vk->GetPhysicalDeviceFormatProperties2(dev_hwctx->phys_dev, fmt->fallback[i], &fmtp);
  
@@ -854,7 +970,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
                  if (m->drmFormatModifier == drm_mod.drmFormatModifier) {
                      mod_props = m;
                      break;
-@@ -3502,7 +3546,7 @@ static int vulkan_map_from_drm_frame_des
+@@ -3502,7 +3556,7 @@ static int vulkan_map_from_drm_frame_des
                          &f->flags, &f->mem[i]);
          if (err) {
              close(idesc.fd);
@@ -863,7 +979,22 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          }
  
          f->size[i] = req2.memoryRequirements.size;
-@@ -3969,7 +4013,7 @@ static int vulkan_export_to_cuda(AVHWFra
+@@ -3636,8 +3690,13 @@ static int vulkan_map_from_drm_frame_syn
+         if (err < 0)
+             return err;
+ 
++        /* The imported DRM sync file only orders the external data, not this
++         * frame's earlier use by FFmpeg. The frame may be recycled from the
++         * pool while it is still in flight (and last used on another queue),
++         * so the map waits on its last signal, at ALL_COMMANDS, to be ordered
++         * after that previous use. */
+         err = ff_vk_exec_add_dep_frame(&p->vkctx, exec, dst,
+-                                       VK_PIPELINE_STAGE_2_NONE,
++                                       VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+                                        VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT);
+         if (err < 0)
+             return err;
+@@ -3969,7 +4028,7 @@ static int vulkan_export_to_cuda(AVHWFra
      return 0;
  
  fail:
@@ -872,7 +1003,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      return err;
  }
  
-@@ -3980,6 +4024,7 @@ static int vulkan_transfer_data_from_cud
+@@ -3980,6 +4039,7 @@ static int vulkan_transfer_data_from_cud
      CUcontext dummy;
      AVVkFrame *dst_f;
      AVVkFrameInternal *dst_int;
@@ -880,7 +1011,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      VulkanFramesPriv *fp = hwfc->hwctx;
      const int planes = av_pix_fmt_count_planes(hwfc->sw_format);
      const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(hwfc->sw_format);
-@@ -4058,7 +4103,7 @@ static int vulkan_transfer_data_from_cud
+@@ -4058,7 +4118,7 @@ static int vulkan_transfer_data_from_cud
  
  fail:
      CHECK_CU(cu->cuCtxPopCurrent(&dummy));
@@ -889,7 +1020,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      av_buffer_unref(&dst->buf[0]);
      return err;
  }
-@@ -4128,6 +4173,72 @@ static VkImageAspectFlags plane_index_to
+@@ -4128,6 +4188,72 @@ static VkImageAspectFlags plane_index_to
      return VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT;
  }
  
@@ -962,7 +1093,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  static int vulkan_map_to_drm(AVHWFramesContext *hwfc, AVFrame *dst,
                               const AVFrame *src, int flags)
  {
-@@ -4138,15 +4249,14 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4138,15 +4264,14 @@ static int vulkan_map_to_drm(AVHWFramesC
      AVVulkanDeviceContext *hwctx = &p->p;
      FFVulkanFunctions *vk = &p->vkctx.vkfn;
      VulkanFramesPriv *fp = hwfc->hwctx;
@@ -982,7 +1113,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
  
      AVDRMFrameDescriptor *drm_desc = av_mallocz(sizeof(*drm_desc));
      if (!drm_desc)
-@@ -4156,16 +4266,36 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4156,16 +4281,36 @@ static int vulkan_map_to_drm(AVHWFramesC
      if (err < 0)
          goto end;
  
@@ -1023,7 +1154,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      ret = vk->GetImageDrmFormatModifierPropertiesEXT(hwctx->act_dev, f->img[0],
                                                       &drm_mod);
      if (ret != VK_SUCCESS) {
-@@ -4174,7 +4304,7 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4174,7 +4319,7 @@ static int vulkan_map_to_drm(AVHWFramesC
          goto end;
      }
  
@@ -1032,7 +1163,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          VkMemoryGetFdInfoKHR export_info = {
              .sType      = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
              .memory     = f->mem[i],
-@@ -4189,12 +4319,30 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4189,12 +4334,30 @@ static int vulkan_map_to_drm(AVHWFramesC
              goto end;
          }
  
@@ -1064,7 +1195,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      for (int i = 0; i < drm_desc->nb_layers; i++) {
          VkFormat plane_vkfmt = av_vkfmt_from_pixfmt(hwfc->sw_format)[i];
  
-@@ -4209,13 +4357,14 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4209,13 +4372,14 @@ static int vulkan_map_to_drm(AVHWFramesC
  
          for (int j = 0; j < drm_desc->layers[i].nb_planes; j++) {
              VkSubresourceLayout layout;
@@ -1081,7 +1212,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
              drm_desc->layers[i].planes[j].offset = layout.offset;
              drm_desc->layers[i].planes[j].pitch  = layout.rowPitch;
          }
-@@ -4235,13 +4384,22 @@ static int vulkan_map_to_drm(AVHWFramesC
+@@ -4235,13 +4399,22 @@ static int vulkan_map_to_drm(AVHWFramesC
      dst->width   = src->width;
      dst->height  = src->height;
      dst->data[0] = (uint8_t *)drm_desc;
@@ -1105,7 +1236,41 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      return err;
  }
  
-@@ -4469,10 +4627,12 @@ static int vulkan_transfer_host(AVHWFram
+@@ -4306,6 +4479,15 @@ static int copy_buffer_data(AVHWFramesCo
+     int err;
+     VulkanDevicePriv *p = hwfc->device_ctx->hwctx;
+     FFVkBuffer *vkbuf = (FFVkBuffer *)buf->data;
++    int bytewidth[AV_NUM_DATA_POINTERS];
++
++    /* Copy only the visible bytes of each row, the last row of a plane
++     * does not have to extend to the full linesize. */
++    for (int i = 0; i < planes; i++) {
++        bytewidth[i] = av_image_get_linesize(swf->format, swf->width, i);
++        if (bytewidth[i] < 0)
++            return bytewidth[i];
++    }
+ 
+     if (upload) {
+         for (int i = 0; i < planes; i++)
+@@ -4313,7 +4495,7 @@ static int copy_buffer_data(AVHWFramesCo
+                                 region[i].bufferRowLength,
+                                 swf->data[i],
+                                 swf->linesize[i],
+-                                swf->linesize[i],
++                                bytewidth[i],
+                                 region[i].imageExtent.height);
+ 
+         err = ff_vk_flush_buffer(&p->vkctx, vkbuf, 0, VK_WHOLE_SIZE, 1);
+@@ -4335,7 +4517,7 @@ static int copy_buffer_data(AVHWFramesCo
+                                 swf->linesize[i],
+                                 vkbuf->mapped_mem + region[i].bufferOffset,
+                                 region[i].bufferRowLength,
+-                                swf->linesize[i],
++                                bytewidth[i],
+                                 region[i].imageExtent.height);
+     }
+ 
+@@ -4469,10 +4651,12 @@ static int vulkan_transfer_host(AVHWFram
          if (compat)
              continue;
  
@@ -1119,7 +1284,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
              .newLayout = VK_IMAGE_LAYOUT_GENERAL,
              .subresourceRange = {
                  .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-@@ -4594,8 +4754,27 @@ static int vulkan_transfer_frame(AVHWFra
+@@ -4594,8 +4778,27 @@ static int vulkan_transfer_frame(AVHWFra
      if (swf->width > hwfc->width || swf->height > hwfc->height)
          return AVERROR(EINVAL);
  
@@ -1149,7 +1314,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          return vulkan_transfer_host(hwfc, hwf, swf, upload);
  
      for (int i = 0; i < av_pix_fmt_count_planes(swf->format); i++) {
-@@ -4751,6 +4930,7 @@ static int vulkan_transfer_data_to_cuda(
+@@ -4751,6 +4954,7 @@ static int vulkan_transfer_data_to_cuda(
      CUcontext dummy;
      AVVkFrame *dst_f;
      AVVkFrameInternal *dst_int;
@@ -1157,7 +1322,7 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      VulkanFramesPriv *fp = hwfc->hwctx;
      const int planes = av_pix_fmt_count_planes(hwfc->sw_format);
      const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(hwfc->sw_format);
-@@ -4831,7 +5011,7 @@ static int vulkan_transfer_data_to_cuda(
+@@ -4831,7 +5035,7 @@ static int vulkan_transfer_data_to_cuda(
  
  fail:
      CHECK_CU(cu->cuCtxPopCurrent(&dummy));
@@ -1166,3 +1331,25 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      av_buffer_unref(&dst->buf[0]);
      return err;
  }
+Index: FFmpeg/libavutil/vulkan.c
+===================================================================
+--- libavutil/vulkan.c
++++ libavutil/vulkan.c
+@@ -2054,13 +2054,16 @@ void ff_vk_frame_barrier(FFVulkanContext
+             break;
+         }
+ 
++    /* Earlier submissions are ordered by the frame's semaphore, which makes
++     * their writes available and visible, so only accesses recorded in this
++     * command buffer belong in the source scope. */
+     for (int i = 0; i < nb_images; i++) {
+         bar[*nb_bar] = (VkImageMemoryBarrier2) {
+             .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
+             .pNext = NULL,
+             .srcStageMask = src_stage,
+             .dstStageMask = dst_stage,
+-            .srcAccessMask = found >= 0 ? e->access_dst[found] : vkf->access[i],
++            .srcAccessMask = found >= 0 ? e->access_dst[found] : VK_ACCESS_2_NONE,
+             .dstAccessMask = new_access,
+             .oldLayout = found >= 0 ? e->layout_dst[found] : vkf->layout[0],
+             .newLayout = new_layout,

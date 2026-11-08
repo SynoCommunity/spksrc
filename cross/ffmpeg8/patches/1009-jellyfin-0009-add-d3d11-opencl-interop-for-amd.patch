@@ -221,7 +221,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    cl_mem_flags cl_flags;
      cl_int cle;
 -    int err, index, i;
-+    cl_mem plane_uint;
++    cl_mem plane_uint = NULL;
 +    const cl_mem *mem_objs;
 +    cl_uint num_objs;
 +    int err, i, p, nb_planes = 2;

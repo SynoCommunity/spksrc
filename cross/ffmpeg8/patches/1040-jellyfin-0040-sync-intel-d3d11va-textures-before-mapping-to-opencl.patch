@@ -2,7 +2,7 @@ Index: FFmpeg/libavcodec/dxva2.c
 ===================================================================
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
-@@ -715,8 +715,10 @@ int ff_dxva2_common_frame_params(AVCodec
+@@ -717,8 +717,10 @@ int ff_dxva2_common_frame_params(AVCodec
  #if CONFIG_D3D11VA
      if (frames_ctx->format == AV_PIX_FMT_D3D11) {
          AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
@@ -47,23 +47,19 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 ===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
-@@ -181,6 +181,10 @@ typedef struct OpenCLFramesContext {
-     int                   nb_mapped_frames;
-     AVOpenCLFrameDescriptor *mapped_frames;
- #endif
-+#if HAVE_OPENCL_D3D11
+@@ -184,6 +184,8 @@ typedef struct OpenCLFramesContext {
+ #if HAVE_OPENCL_D3D11
+ #define OPENCL_D3D11_MAX_MAPPED_FRAMES 256
+     ID3D11Texture2D        **mapped_textures;
 +    ID3D11Texture2D         *sync_tex_2x2;
 +    ID3D11Asynchronous      *sync_point;
-+#endif
+ #endif
  } OpenCLFramesContext;
  
- 
-@@ -1809,7 +1813,16 @@ static void opencl_frames_uninit(AVHWFra
-     }
-     av_freep(&priv->mapped_frames);
+@@ -1815,6 +1817,14 @@ static void opencl_frames_uninit(AVHWFra
  #endif
--
-+#if HAVE_OPENCL_D3D11
+ #if HAVE_OPENCL_D3D11
+     av_freep(&priv->mapped_textures);
 +    if (priv->sync_tex_2x2) {
 +        ID3D11Texture2D_Release(priv->sync_tex_2x2);
 +        priv->sync_tex_2x2 = NULL;
@@ -72,11 +68,10 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +        ID3D11Asynchronous_Release(priv->sync_point);
 +        priv->sync_point = NULL;
 +    }
-+#endif
+ #endif
      if (priv->command_queue) {
          cle = clReleaseCommandQueue(priv->command_queue);
-         if (cle != CL_SUCCESS) {
-@@ -2583,6 +2596,98 @@ fail:
+@@ -2589,6 +2599,98 @@ fail:
  
  #if HAVE_OPENCL_D3D11
  
@@ -175,22 +170,19 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
  #if CONFIG_LIBMFX
  
  static void opencl_unmap_from_d3d11_qsv(AVHWFramesContext *dst_fc,
-@@ -2623,6 +2728,14 @@ static void opencl_unmap_from_d3d11_qsv(
- static int opencl_map_from_d3d11_qsv(AVHWFramesContext *dst_fc, AVFrame *dst,
-                                      const AVFrame *src, int flags)
- {
-+    AVHWFramesContext *src_fc =
-+        (AVHWFramesContext*)src->hw_frames_ctx->data;
+@@ -2619,6 +2721,11 @@ static int opencl_map_from_d3d11_qsv(AVH
+     AVHWFramesContext *src_fc =
+         (AVHWFramesContext*)src->hw_frames_ctx->data;
+     AVQSVFramesContext     *src_hwctx = src_fc->hwctx;
 +    AVHWDeviceContext *src_dev = src_fc->device_ctx;
 +    FFHWDeviceContext *fsrc_dev = (FFHWDeviceContext*)src_dev;
 +    AVHWDeviceContext *src_subdev =
 +        (AVHWDeviceContext*)fsrc_dev->source_device->data;
 +    AVD3D11VADeviceContext *device_hwctx = src_subdev->hwctx;
-+    AVQSVFramesContext     *src_hwctx = src_fc->hwctx;
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
      OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
      AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
-@@ -2685,6 +2798,19 @@ static int opencl_map_from_d3d11_qsv(AVH
+@@ -2696,6 +2803,19 @@ static int opencl_map_from_d3d11_qsv(AVH
          }
      }
  
@@ -210,7 +202,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
      if (derived_frames)
          desc = &frames_priv->mapped_frames[index];
      else {
-@@ -2806,6 +2932,10 @@ static void opencl_unmap_from_d3d11(AVHW
+@@ -2822,6 +2942,10 @@ static void opencl_unmap_from_d3d11(AVHW
  static int opencl_map_from_d3d11(AVHWFramesContext *dst_fc, AVFrame *dst,
                                   const AVFrame *src, int flags)
  {
@@ -221,7 +213,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
      OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
      AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
-@@ -2877,6 +3007,19 @@ static int opencl_map_from_d3d11(AVHWFra
+@@ -2893,6 +3017,19 @@ static int opencl_map_from_d3d11(AVHWFra
          }
      }
  
@@ -245,7 +237,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -2064,6 +2064,7 @@ static int qsv_dynamic_frames_derive_to(
+@@ -2063,6 +2063,7 @@ static int qsv_dynamic_frames_derive_to(
          } else {
              dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
          }
@@ -253,7 +245,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
      }
      break;
  #endif
-@@ -2139,6 +2140,7 @@ static int qsv_fixed_frames_derive_to(AV
+@@ -2138,6 +2139,7 @@ static int qsv_fixed_frames_derive_to(AV
              } else {
                  dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
              }
