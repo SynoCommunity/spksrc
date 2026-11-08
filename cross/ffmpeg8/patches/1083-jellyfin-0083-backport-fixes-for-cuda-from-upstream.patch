@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -7870,7 +7870,7 @@ if enabled x86; then
+@@ -7879,7 +7879,7 @@ if enabled x86; then
      esac
  elif enabled_any aarch64 ppc64 && ! enabled bigendian; then
      case $target_os in
@@ -36,7 +36,17 @@ Index: FFmpeg/libavcodec/cuviddec.c
  
      // aspect ratio conversion, 1:1, depends on scaled resolution
      cuinfo.target_rect.left = 0;
-@@ -916,7 +924,7 @@ static av_cold int cuvid_decode_init(AVC
+@@ -573,7 +581,8 @@ static int cuvid_output_frame(AVCodecCon
+             return ret;
+     }
+ 
+-    if (!cuvid_is_buffer_full(avctx)) {
++    // Consume queued output before parsing can reuse its decode surfaces.
++    if (!av_fifo_can_read(ctx->frame_queue) && !cuvid_is_buffer_full(avctx)) {
+         AVPacket *const pkt = ctx->pkt;
+         ret = ff_decode_get_packet(avctx, pkt);
+         if (ret < 0 && ret != AVERROR_EOF)
+@@ -916,7 +925,7 @@ static av_cold int cuvid_decode_init(AVC
      if (probe_desc && probe_desc->nb_components)
          probed_bit_depth = probe_desc->comp[0].depth;
  
@@ -45,7 +55,7 @@ Index: FFmpeg/libavcodec/cuviddec.c
          is_yuv444 = 1;
  
  #ifdef NVDEC_HAVE_422_SUPPORT
-@@ -1103,7 +1111,7 @@ static av_cold int cuvid_decode_init(AVC
+@@ -1103,7 +1112,7 @@ static av_cold int cuvid_decode_init(AVC
      // Skip first 4 bytes of AV1CodecConfigurationRecord to keep configOBUs
      // only, otherwise cuvidParseVideoData report unknown error.
      if (avctx->codec->id == AV_CODEC_ID_AV1 &&
@@ -58,7 +68,53 @@ Index: FFmpeg/libavcodec/nvdec.c
 ===================================================================
 --- libavcodec/nvdec.c
 +++ libavcodec/nvdec.c
-@@ -732,8 +732,18 @@ int ff_nvdec_frame_params(AVCodecContext
+@@ -498,7 +498,7 @@ static int nvdec_retrieve_data(void *log
+     NVDECFrame        *cf = (NVDECFrame*)fdd->hwaccel_priv;
+     NVDECDecoder *decoder = cf->decoder;
+ 
+-    AVHWFramesContext *hwctx = (AVHWFramesContext *)frame->hw_frames_ctx->data;
++    AVHWFramesContext *hwctx = (AVHWFramesContext *)decoder->real_hw_frames_ref->data;
+ 
+     CUVIDPROCPARAMS vpp = { 0 };
+     NVDECFrame *unmap_data = NULL;
+@@ -524,6 +524,10 @@ static int nvdec_retrieve_data(void *log
+     if (ret < 0)
+         goto finish;
+ 
++    ret = av_buffer_replace(&frame->hw_frames_ctx, decoder->real_hw_frames_ref);
++    if (ret < 0)
++        goto copy_fail;
++
+     unmap_data = av_mallocz(sizeof(*unmap_data));
+     if (!unmap_data) {
+         ret = AVERROR(ENOMEM);
+@@ -538,10 +542,6 @@ static int nvdec_retrieve_data(void *log
+         goto copy_fail;
+     }
+ 
+-    ret = av_buffer_replace(&frame->hw_frames_ctx, decoder->real_hw_frames_ref);
+-    if (ret < 0)
+-        goto copy_fail;
+-
+     unmap_data->idx = cf->idx;
+     unmap_data->decoder = av_refstruct_ref(cf->decoder);
+ 
+@@ -555,12 +555,8 @@ static int nvdec_retrieve_data(void *log
+     goto finish;
+ 
+ copy_fail:
+-    if (!frame->buf[1]) {
+-        CHECK_CU(decoder->cvdl->cuvidUnmapVideoFrame(decoder->decoder, devptr));
+-        av_freep(&unmap_data);
+-    } else {
+-        av_buffer_unref(&frame->buf[1]);
+-    }
++    CHECK_CU(decoder->cvdl->cuvidUnmapVideoFrame(decoder->decoder, devptr));
++    av_freep(&unmap_data);
+ 
+ finish:
+     CHECK_CU(decoder->cudl->cuCtxPopCurrent(&dummy));
+@@ -728,8 +724,18 @@ int ff_nvdec_frame_params(AVCodecContext
      chroma_444 = supports_444 && cuvid_chroma_format == cudaVideoChromaFormat_444;
  
      frames_ctx->format            = AV_PIX_FMT_CUDA;
@@ -151,6 +207,137 @@ Index: FFmpeg/libavcodec/nvenc.c
              break;
          case NV_ENC_H264_PROFILE_MAIN:
              cc->profileGUID = NV_ENC_H264_PROFILE_MAIN_GUID;
+@@ -2081,8 +2107,10 @@ static av_cold int nvenc_alloc_surface(A
+     nv_status = p_nvenc->nvEncCreateBitstreamBuffer(ctx->nvencoder, &allocOut);
+     if (nv_status != NV_ENC_SUCCESS) {
+         int err = nvenc_print_error(avctx, nv_status, "CreateBitstreamBuffer failed");
+-        if (avctx->pix_fmt != AV_PIX_FMT_CUDA && avctx->pix_fmt != AV_PIX_FMT_D3D11)
++        if (avctx->pix_fmt != AV_PIX_FMT_CUDA && avctx->pix_fmt != AV_PIX_FMT_D3D11) {
+             p_nvenc->nvEncDestroyInputBuffer(ctx->nvencoder, ctx->surfaces[idx].input_surface);
++            ctx->surfaces[idx].input_surface = NULL;
++        }
+         av_frame_free(&ctx->surfaces[idx].in_ref);
+         return err;
+     }
+@@ -2216,10 +2244,11 @@ av_cold int ff_nvenc_encode_close(AVCode
+ 
+     if (ctx->surfaces) {
+         for (i = 0; i < ctx->nb_surfaces; ++i) {
+-            if (avctx->pix_fmt != AV_PIX_FMT_CUDA && avctx->pix_fmt != AV_PIX_FMT_D3D11)
++            if (avctx->pix_fmt != AV_PIX_FMT_CUDA && avctx->pix_fmt != AV_PIX_FMT_D3D11 && ctx->surfaces[i].input_surface)
+                 p_nvenc->nvEncDestroyInputBuffer(ctx->nvencoder, ctx->surfaces[i].input_surface);
+             av_frame_free(&ctx->surfaces[i].in_ref);
+-            p_nvenc->nvEncDestroyBitstreamBuffer(ctx->nvencoder, ctx->surfaces[i].output_surface);
++            if (ctx->surfaces[i].output_surface)
++                p_nvenc->nvEncDestroyBitstreamBuffer(ctx->nvencoder, ctx->surfaces[i].output_surface);
+         }
+     }
+     av_freep(&ctx->surfaces);
+@@ -2840,6 +2869,41 @@ static int output_ready(AVCodecContext *
+     return (nb_ready > 0) && (nb_ready + nb_pending >= ctx->async_depth);
+ }
+ 
++/* hevc_nvenc fails nvEncLockBitstream() with NV_ENC_ERR_OUT_OF_MEMORY when
++ * the SEI of a picture are too large. With driver 615.78.08 at 1080p a single
++ * payload of up to 898 bytes passes on an IDR picture, 672 when it is all
++ * zero bytes; stay well below that. */
++#define NVENC_HEVC_SEI_MAX_PAYLOAD 512
++
++/* Drop the SEI that would take the total payload size of the picture above
++ * NVENC_HEVC_SEI_MAX_PAYLOAD and return the new count. */
++static int nvenc_hevc_sei_size_check(AVCodecContext *avctx, int count)
++{
++    NvencContext *ctx = avctx->priv_data;
++    size_t total = 0;
++    int kept = 0;
++
++    if (avctx->codec->id != AV_CODEC_ID_HEVC)
++        return count;
++
++    for (int i = 0; i < count; i++) {
++        NV_ENC_SEI_PAYLOAD *sei = &ctx->sei_data[i];
++
++        if (total + sei->payloadSize <= NVENC_HEVC_SEI_MAX_PAYLOAD) {
++            total += sei->payloadSize;
++            ctx->sei_data[kept++] = *sei;
++            continue;
++        }
++        av_log(avctx, ctx->sei_size_warned ? AV_LOG_VERBOSE : AV_LOG_WARNING,
++               "Not writing a %"PRIu32"-byte SEI of type %"PRIu32": hevc_nvenc "
++               "fails on more than about %d bytes of SEI per picture.\n",
++               sei->payloadSize, sei->payloadType, NVENC_HEVC_SEI_MAX_PAYLOAD);
++        ctx->sei_size_warned = 1;
++        av_freep(&sei->payload);
++    }
++    return kept;
++}
++
+ static int prepare_sei_data_array(AVCodecContext *avctx, const AVFrame *frame)
+ {
+     NvencContext *ctx = avctx->priv_data;
+@@ -2991,7 +3055,7 @@ static int prepare_sei_data_array(AVCode
+ #endif
+ 
+     if (!ctx->udu_sei)
+-        return sei_count;
++        return nvenc_hevc_sei_size_check(avctx, sei_count);
+ 
+     for (i = 0; i < frame->nb_side_data; i++) {
+         AVFrameSideData *side_data = frame->side_data[i];
+@@ -3021,7 +3085,7 @@ static int prepare_sei_data_array(AVCode
+         }
+     }
+ 
+-    return sei_count;
++    return nvenc_hevc_sei_size_check(avctx, sei_count);
+ 
+ error:
+     for (i = 0; i < sei_count; i++)
+Index: FFmpeg/libavcodec/nvenc.h
+===================================================================
+--- libavcodec/nvenc.h
++++ libavcodec/nvenc.h
+@@ -246,6 +246,7 @@ typedef struct NvencContext
+ 
+     NV_ENC_SEI_PAYLOAD *sei_data;
+     int sei_data_size;
++    int sei_size_warned; ///< a SEI was dropped by nvenc_hevc_sei_size_check()
+ 
+     struct {
+         void *ptr;
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -208,7 +208,8 @@ OBJS-$(CONFIG_BACKGROUNDKEY_FILTER)
+ OBJS-$(CONFIG_BBOX_FILTER)                   += bbox.o vf_bbox.o
+ OBJS-$(CONFIG_BENCH_FILTER)                  += f_bench.o
+ OBJS-$(CONFIG_BILATERAL_FILTER)              += vf_bilateral.o
+-OBJS-$(CONFIG_BILATERAL_CUDA_FILTER)         += vf_bilateral_cuda.o vf_bilateral_cuda.ptx.o
++OBJS-$(CONFIG_BILATERAL_CUDA_FILTER)         += vf_bilateral_cuda.o vf_bilateral_cuda.ptx.o \
++                                                cuda/load_helper.o
+ OBJS-$(CONFIG_BITPLANENOISE_FILTER)          += vf_bitplanenoise.o
+ OBJS-$(CONFIG_BLACKDETECT_FILTER)            += vf_blackdetect.o
+ OBJS-$(CONFIG_BLACKDETECT_VULKAN_FILTER)     += vf_blackdetect_vulkan.o
+@@ -223,7 +224,7 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
+                                                 opencl/avgblur.o boxblur.o
+ OBJS-$(CONFIG_BWDIF_FILTER)                  += vf_bwdif.o bwdifdsp.o yadif_common.o
+ OBJS-$(CONFIG_BWDIF_CUDA_FILTER)             += vf_bwdif_cuda.o vf_bwdif_cuda.ptx.o \
+-                                                yadif_common.o
++                                                yadif_common.o cuda/load_helper.o
+ OBJS-$(CONFIG_BWDIF_OPENCL_FILTER)           += vf_bwdif_opencl.o opencl.o opencl/bwdif.o \
+                                                 yadif_common.o
+ OBJS-$(CONFIG_BWDIF_VIDEOTOOLBOX_FILTER)     += vf_bwdif_videotoolbox.o \
+@@ -236,7 +237,8 @@ OBJS-$(CONFIG_CCREPACK_FILTER)
+ OBJS-$(CONFIG_CHROMABER_VULKAN_FILTER)       += vf_chromaber_vulkan.o vulkan.o vulkan_filter.o
+ OBJS-$(CONFIG_CHROMAHOLD_FILTER)             += vf_chromakey.o
+ OBJS-$(CONFIG_CHROMAKEY_FILTER)              += vf_chromakey.o
+-OBJS-$(CONFIG_CHROMAKEY_CUDA_FILTER)         += vf_chromakey_cuda.o vf_chromakey_cuda.ptx.o
++OBJS-$(CONFIG_CHROMAKEY_CUDA_FILTER)         += vf_chromakey_cuda.o vf_chromakey_cuda.ptx.o \
++                                                cuda/load_helper.o
+ 
+ OBJS-$(CONFIG_CHROMANR_FILTER)               += vf_chromanr.o
+ OBJS-$(CONFIG_CHROMASHIFT_FILTER)            += vf_chromashift.o
 Index: FFmpeg/libavfilter/vf_bwdif_cuda.cu
 ===================================================================
 --- libavfilter/vf_bwdif_cuda.cu
@@ -209,6 +396,19 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.h
  #else
  #include <ffnvcodec/dynlink_cuda.h>
  #endif
+Index: FFmpeg/libavfilter/vf_yadif_cuda.c
+===================================================================
+--- libavfilter/vf_yadif_cuda.c
++++ libavfilter/vf_yadif_cuda.c
+@@ -69,7 +69,7 @@ static CUresult call_kernel(AVFilterCont
+     CudaFunctions *cu = s->hwctx->internal->cuda_dl;
+     CUtexObject tex_prev = 0, tex_cur = 0, tex_next = 0;
+     int ret;
+-    int skip_spatial_check = s->yadif.mode&2;
++    int skip_spatial_check = !!(s->yadif.mode&2);
+ 
+     void *args[] = { &dst, &tex_prev, &tex_cur, &tex_next,
+                      &dst_width, &dst_height, &dst_pitch,
 Index: FFmpeg/libavfilter/vf_yadif_cuda.cu
 ===================================================================
 --- libavfilter/vf_yadif_cuda.cu
@@ -275,11 +475,22 @@ Index: FFmpeg/libavutil/hwcontext_cuda.c
 ===================================================================
 --- libavutil/hwcontext_cuda.c
 +++ libavutil/hwcontext_cuda.c
-@@ -259,7 +259,7 @@ static int cuda_transfer_data(AVHWFrames
+@@ -255,11 +255,17 @@ static int cuda_transfer_data(AVHWFrames
+         return ret;
+ 
+     for (i = 0; i < FF_ARRAY_ELEMS(src->data) && src->data[i]; i++) {
++        int bytewidth = av_image_get_linesize(ctx->sw_format, src->width, i);
++        if (bytewidth < 0) {
++            ret = bytewidth;
++            goto exit;
++        }
++
+         CUDA_MEMCPY2D cpy = {
              .srcPitch      = src->linesize[i],
              .dstPitch      = dst->linesize[i],
-             .WidthInBytes  = FFMIN(src->linesize[i], dst->linesize[i]),
+-            .WidthInBytes  = FFMIN(src->linesize[i], dst->linesize[i]),
 -            .Height        = src->height >> ((i == 0 || i == 3) ? 0 : priv->shift_height),
++            .WidthInBytes  = bytewidth,
 +            .Height        = AV_CEIL_RSHIFT(src->height, ((i == 0 || i == 3) ? 0 : priv->shift_height)),
          };
  

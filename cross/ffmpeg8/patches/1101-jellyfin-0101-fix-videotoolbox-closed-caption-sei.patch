@@ -1,0 +1,113 @@
+Index: FFmpeg/libavcodec/videotoolboxenc.c
+===================================================================
+--- libavcodec/videotoolboxenc.c
++++ libavcodec/videotoolboxenc.c
+@@ -1838,64 +1838,6 @@ static int is_post_sei_nal_type(int nal_
+            nal_type != H264_NAL_AUD;
+ }
+ 
+-/*
+- * Finds the sei message start/size of type find_sei_type.
+- * If more than one of that type exists, the last one is returned.
+- */
+-static int find_sei_end(AVCodecContext *avctx,
+-                        uint8_t        *nal_data,
+-                        size_t          nal_size,
+-                        uint8_t       **sei_end)
+-{
+-    int nal_type;
+-    size_t sei_payload_size = 0;
+-    uint8_t *nal_start = nal_data;
+-    *sei_end = NULL;
+-
+-    if (!nal_size)
+-        return 0;
+-
+-    nal_type = *nal_data & 0x1F;
+-    if (nal_type != H264_NAL_SEI)
+-        return 0;
+-
+-    nal_data++;
+-    nal_size--;
+-
+-    if (nal_data[nal_size - 1] == 0x80)
+-        nal_size--;
+-
+-    while (nal_size > 0 && *nal_data > 0) {
+-        do{
+-            nal_data++;
+-            nal_size--;
+-        } while (nal_size > 0 && *nal_data == 0xFF);
+-
+-        if (!nal_size) {
+-            av_log(avctx, AV_LOG_ERROR, "Unexpected end of SEI NAL Unit parsing type.\n");
+-            return AVERROR_INVALIDDATA;
+-        }
+-
+-        do{
+-            sei_payload_size += *nal_data;
+-            nal_data++;
+-            nal_size--;
+-        } while (nal_size > 0 && *nal_data == 0xFF);
+-
+-        if (nal_size < sei_payload_size) {
+-            av_log(avctx, AV_LOG_ERROR, "Unexpected end of SEI NAL Unit parsing size.\n");
+-            return AVERROR_INVALIDDATA;
+-        }
+-
+-        nal_data += sei_payload_size;
+-        nal_size -= sei_payload_size;
+-    }
+-
+-    *sei_end = nal_data;
+-
+-    return nal_data - nal_start + 1;
+-}
+-
+ /**
+  * Copies the data inserting emulation prevention bytes as needed.
+  * Existing data in the destination can be taken into account by providing
+@@ -2085,7 +2027,6 @@ static int copy_replace_length_codes(
+         }
+ 
+         if (sei && !wrote_sei && is_post_sei_nal_type(nal_type)) {
+-            //No SEI NAL unit - insert.
+             int wrote_bytes;
+ 
+             memcpy(dst_data, start_code, sizeof(start_code));
+@@ -2142,35 +2083,6 @@ static int copy_replace_length_codes(
+             return AVERROR_EXTERNAL;
+         }
+ 
+-        if (sei && !wrote_sei && nal_type == H264_NAL_SEI) {
+-            //Found SEI NAL unit - append.
+-            int wrote_bytes;
+-            int old_sei_length;
+-            int extra_bytes;
+-            uint8_t *new_sei;
+-            old_sei_length = find_sei_end(avctx, dst_box, box_len, &new_sei);
+-            if (old_sei_length < 0)
+-                return old_sei_length;
+-
+-            wrote_bytes = write_sei(sei,
+-                                    SEI_TYPE_USER_DATA_REGISTERED_ITU_T_T35,
+-                                    new_sei,
+-                                    remaining_dst_size - old_sei_length);
+-            if (wrote_bytes < 0)
+-                return wrote_bytes;
+-
+-            if (new_sei + wrote_bytes >= dst_data + remaining_dst_size)
+-                return AVERROR_BUFFER_TOO_SMALL;
+-
+-            new_sei[wrote_bytes++] = 0x80;
+-            extra_bytes = wrote_bytes - (dst_box + box_len - new_sei);
+-
+-            dst_data += extra_bytes;
+-            remaining_dst_size -= extra_bytes;
+-
+-            wrote_sei = 1;
+-        }
+-
+         src_offset += curr_src_len;
+         dst_data += curr_dst_len;
+ 

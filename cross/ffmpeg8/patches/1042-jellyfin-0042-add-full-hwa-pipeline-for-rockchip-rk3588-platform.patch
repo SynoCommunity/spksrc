@@ -26,7 +26,7 @@ Index: FFmpeg/configure
  "
  
  DOCUMENT_LIST="
-@@ -3565,10 +3568,12 @@ av1_nvenc_encoder_select="atsc_a53"
+@@ -3566,10 +3569,12 @@ av1_nvenc_encoder_select="atsc_a53"
  av1_qsv_decoder_select="qsvdec"
  av1_qsv_encoder_deps="libvpl"
  av1_qsv_encoder_select="qsvenc"
@@ -39,7 +39,7 @@ Index: FFmpeg/configure
  h263_v4l2m2m_decoder_deps="v4l2_m2m h263_v4l2_m2m"
  h263_v4l2m2m_encoder_deps="v4l2_m2m h263_v4l2_m2m"
  h264_amf_encoder_deps="amf"
-@@ -3591,7 +3596,7 @@ h264_omx_encoder_deps="omx"
+@@ -3592,7 +3597,7 @@ h264_omx_encoder_deps="omx"
  h264_qsv_decoder_select="h264_mp4toannexb_bsf qsvdec"
  h264_qsv_encoder_select="atsc_a53 qsvenc"
  h264_rkmpp_decoder_deps="rkmpp"
@@ -48,7 +48,7 @@ Index: FFmpeg/configure
  h264_rkmpp_encoder_deps="rkmpp"
  h264_vaapi_encoder_select="atsc_a53 cbs_h264 vaapi_encode"
  h264_vulkan_encoder_select="atsc_a53 cbs_h264 vulkan_encode"
-@@ -3616,7 +3621,7 @@ hevc_oh_encoder_deps="ohcodec"
+@@ -3617,7 +3622,7 @@ hevc_oh_encoder_deps="ohcodec"
  hevc_qsv_decoder_select="hevc_mp4toannexb_bsf qsvdec"
  hevc_qsv_encoder_select="hevcparse qsvenc"
  hevc_rkmpp_decoder_deps="rkmpp"
@@ -57,7 +57,7 @@ Index: FFmpeg/configure
  hevc_rkmpp_encoder_deps="rkmpp"
  hevc_vaapi_encoder_deps="VAEncPictureParameterBufferHEVC"
  hevc_vaapi_encoder_select="atsc_a53 cbs_h265 vaapi_encode"
-@@ -3628,18 +3633,22 @@ mjpeg_cuvid_decoder_deps="cuvid"
+@@ -3629,18 +3634,22 @@ mjpeg_cuvid_decoder_deps="cuvid"
  mjpeg_qsv_decoder_select="qsvdec"
  mjpeg_qsv_encoder_deps="libmfx"
  mjpeg_qsv_encoder_select="qsvenc"
@@ -80,7 +80,7 @@ Index: FFmpeg/configure
  mpeg2_vaapi_encoder_select="cbs_mpeg2 vaapi_encode"
  mpeg2_v4l2m2m_decoder_deps="v4l2_m2m mpeg2_v4l2_m2m"
  mpeg4_cuvid_decoder_deps="cuvid"
-@@ -3648,6 +3657,8 @@ mpeg4_mediacodec_encoder_deps="mediacode
+@@ -3649,6 +3658,8 @@ mpeg4_mediacodec_encoder_deps="mediacode
  mpeg4_mediacodec_encoder_select="extract_extradata_bsf"
  mpeg4_mmal_decoder_deps="mmal"
  mpeg4_omx_encoder_deps="omx"
@@ -89,7 +89,7 @@ Index: FFmpeg/configure
  mpeg4_v4l2m2m_decoder_deps="v4l2_m2m mpeg4_v4l2_m2m"
  mpeg4_v4l2m2m_encoder_deps="v4l2_m2m mpeg4_v4l2_m2m"
  vc1_cuvid_decoder_deps="cuvid"
-@@ -4178,6 +4189,7 @@ libopencolorio_filter_deps="libopencolor
+@@ -4179,6 +4190,7 @@ libopencolorio_filter_deps="libopencolor
  overlay_opencl_filter_deps="opencl"
  overlay_qsv_filter_deps="libmfx"
  overlay_qsv_filter_select="qsvvpp"
@@ -97,7 +97,7 @@ Index: FFmpeg/configure
  overlay_vaapi_filter_deps="vaapi VAProcPipelineCaps_blend_flags"
  overlay_vulkan_filter_deps="vulkan spirv_library"
  owdenoise_filter_deps="gpl"
-@@ -4203,6 +4215,7 @@ vpp_amf_filter_deps="amf"
+@@ -4204,6 +4216,7 @@ vpp_amf_filter_deps="amf"
  scale_opencl_filter_deps="opencl const_nan"
  scale_qsv_filter_deps="libmfx"
  scale_qsv_filter_select="qsvvpp"
@@ -105,7 +105,7 @@ Index: FFmpeg/configure
  scdet_filter_select="scene_sad"
  scdet_vulkan_filter_deps="vulkan spirv_library"
  select_filter_select="scene_sad"
-@@ -4247,6 +4260,7 @@ scale_vt_filter_deps="videotoolbox VTPix
+@@ -4248,6 +4261,7 @@ scale_vt_filter_deps="videotoolbox VTPix
  scale_vulkan_filter_deps="vulkan spirv_compiler spirv_library"
  vpp_qsv_filter_deps="libmfx"
  vpp_qsv_filter_select="qsvvpp"
@@ -113,7 +113,7 @@ Index: FFmpeg/configure
  xfade_opencl_filter_deps="opencl"
  xfade_vulkan_filter_deps="vulkan spirv_library"
  yadif_cuda_filter_deps="ffnvcodec"
-@@ -4297,14 +4311,14 @@ cws2fws_extralibs="zlib_extralibs"
+@@ -4298,14 +4312,14 @@ cws2fws_extralibs="zlib_extralibs"
  
  # libraries, in any order
  avcodec_deps="avutil"
@@ -130,7 +130,7 @@ Index: FFmpeg/configure
  swresample_deps="avutil"
  swresample_suggest="libm libsoxr stdatomic"
  swscale_deps="avutil"
-@@ -7510,10 +7524,15 @@ enabled openssl           && { { check_p
+@@ -7519,10 +7533,15 @@ enabled openssl           && { { check_p
                                 check_lib openssl openssl/ssl.h DTLS_get_data_mtu -lssl -lcrypto -lws2_32 -lgdi32 ||
                                 die "ERROR: openssl (>= 1.1.1) not found"; }
  enabled pocketsphinx      && require_pkg_config pocketsphinx pocketsphinx pocketsphinx/pocketsphinx.h ps_init
@@ -147,7 +147,7 @@ Index: FFmpeg/configure
  enabled vapoursynth       && require_headers "vapoursynth/VSScript4.h vapoursynth/VapourSynth4.h"
  
  if enabled gcrypt; then
-@@ -7713,7 +7732,7 @@ fi
+@@ -7722,7 +7741,7 @@ fi
  if enabled_all opencl libdrm ; then
      check_type "CL/cl_intel.h" "clCreateImageFromFdINTEL_fn" &&
          enable opencl_drm_beignet
@@ -7308,7 +7308,7 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 ===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.c
-@@ -0,0 +1,604 @@
+@@ -0,0 +1,607 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -7722,7 +7722,8 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 +
 +    if (desc->drm_desc.objects[0].format_modifier != DRM_FORMAT_MOD_LINEAR) {
 +        av_log(hwfc, AV_LOG_ERROR, "Transfer non-linear DRM_PRIME frame is not supported!\n");
-+        return AVERROR(ENOSYS);
++        err = AVERROR(ENOSYS);
++        goto fail;
 +    }
 +
 +    av_assert0(desc->drm_desc.nb_objects <= AV_DRM_MAX_PLANES);
@@ -7875,7 +7876,9 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 +{
 +    int err;
 +
-+    if (hwfc->sw_format != dst->format)
++    if (dst->format == AV_PIX_FMT_NONE)
++        dst->format = hwfc->sw_format;
++    else if (hwfc->sw_format != dst->format)
 +        return AVERROR(ENOSYS);
 +
 +    err = rkmpp_map_frame(hwfc, dst, src, flags);
@@ -8297,7 +8300,7 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
  static int planarToP01xWrapper(SwsInternal *c, const uint8_t *const src8[],
                                 const int srcStride[], int srcSliceY,
                                 int srcSliceH, uint8_t *const dstParam8[],
-@@ -2411,6 +2479,19 @@ void ff_get_unscaled_swscale(SwsInternal
+@@ -2410,6 +2478,19 @@ void ff_get_unscaled_swscale(SwsInternal
          (srcFormat == AV_PIX_FMT_NV24 || srcFormat == AV_PIX_FMT_NV42)) {
          c->convert_unscaled = nv24ToPlanarWrapper;
      }
