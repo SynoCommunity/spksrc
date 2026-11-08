@@ -1,6 +1,6 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.1.2
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/imagemagick.png
 
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
