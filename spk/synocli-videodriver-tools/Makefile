@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver-tools
 SPK_VERS = 1.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
@@ -22,7 +22,8 @@ VIDEODRIVER = on
 VIDEODRV_PACKAGE = synocli-videodriver
 
 CHANGELOG  = "1. Initial release: diagnostic and monitoring tools split out of synocli-videodriver.<br/>"
-CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+."
+CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+.<br/>"
+CHANGELOG += "3. DSM 7.0 provides vainfo and vpl-inspect; clinfo, vulkaninfo and the igt tools (lsgpu, intel_gpu_top) require DSM 7.1+."
 
 include ../../mk/spksrc.common.mk
 
