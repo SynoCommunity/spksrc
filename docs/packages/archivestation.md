@@ -62,7 +62,9 @@ make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```
 
-The current 1.1.1 recipe was built for both targets in the official spksrc container. The upstream artifact checks passed on each SPK, and all 124 staged application, UI and license files match upstream staging of the published source. The packaged application starts under Python 3.12 with Waitress as its only third-party dependency. This community 1.1.1 package has not itself been installed on a NAS, and the upgrade from an earlier community package was not rerun for this version.
+The current 1.1.1 recipe was built for both targets in the official spksrc container. The upstream artifact checks passed on each SPK, and all 124 staged application, UI and license files match upstream staging of the published source. The packaged application starts under Python 3.12 with Waitress as its only third-party dependency.
+
+The 1.1.1-1 package was freshly installed on a DS918+ with DSM 7.1.1 and SynoCommunity Python 3.12.13-7. The post-install step created the virtualenv and installed Waitress from PyPI, and the service ran as `sc-archivestation`. The window opened from the DSM main menu in an administrator session, and unauthenticated gateway requests were rejected. A public PDF downloaded into the `ArchiveStation` shared folder with its expected SHA-1 and a readable report. GitHub update checks stayed disabled, and the service stopped and restarted cleanly. The upgrade from an earlier community package was not rerun for this version.
 
 Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
 
@@ -73,6 +75,6 @@ Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Updat
 - Manual migration from the standalone package and restoration of the original installation.
 - Rejection of concurrent installation with the standalone package.
 
-The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. DSM 7.4.1 session recovery has not been hardware-verified. Browser tests use a simulated DSM session; an authenticated interactive browser session was not rechecked during this hardware run. Other NAS architectures still need hardware testing.
+The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. DSM 7.4.1 session recovery has not been hardware-verified; missing or stale DSM token recovery is covered by simulated browser sessions. Other NAS architectures still need hardware testing.
 
 See the [upstream usage guide](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/USAGE.md) for the full feature reference.
