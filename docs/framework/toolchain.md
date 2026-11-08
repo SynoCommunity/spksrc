@@ -165,10 +165,6 @@ ABI (`TC_EXTRA_BUILD_FLAGS`, folded in as described under
 [Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare)), so
 the ABI reaches every compiler *and* the link driver.
 
-The `TC_EXTRA_*FLAGS` themselves are written here too, ahead of the flags, as the
-toolchain declares them: the CMake toolchain file and the Meson cross file read them
-again, per language. `tc_vars.mk` keeps the toolchain's identity and paths.
-
 ### tc_vars.cmake
 
 CMake toolchain file for cross-compilation:
