@@ -38,8 +38,9 @@ VIDEODRV_DEPENDS += cross/intel-level-zero
 endif
 
 # OpenCL and Vulkan: the OpenCL headers, IGC, compute-runtime, shaderc and mesa need
-# C++17 (gcc 7.5). The Vulkan loader has no floor of its own but is of no use without them.
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# C++17 (gcc 7.5), and SPIRV-Tools, under IGC and shaderc, <charconv> (gcc 8). The Vulkan
+# loader has no floor of its own but is of no use without them.
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
 
 # OpenCL
 VIDEODRV_DEPENDS += cross/ocl-icd

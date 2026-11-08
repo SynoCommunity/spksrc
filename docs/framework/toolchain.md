@@ -131,7 +131,7 @@ Core toolchain identity:
 TC_NAME     = x86_64-pc-linux-gnu
 TC_PREFIX   = /path/to/toolchain/work/x86_64-pc-linux-gnu/bin/
 TC_PATH     = $(TC_PREFIX)/bin
-TC_SYSROOT  = $(TC_PREFIX)/x86_64-pc-linux-gnu/sysroot
+TC_SYSROOT  = x86_64-pc-linux-gnu/sys-root
 TC_CC       = $(TC_PREFIX)x86_64-pc-linux-gnu-gcc
 TC_CXX      = $(TC_PREFIX)x86_64-pc-linux-gnu-g++
 TC_AR       = $(TC_PREFIX)x86_64-pc-linux-gnu-ar
@@ -174,11 +174,20 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 set(CMAKE_C_COMPILER /path/to/x86_64-pc-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /path/to/x86_64-pc-linux-gnu-g++)
-set(CMAKE_SYSROOT /path/to/sysroot)
+set(CMAKE_FIND_ROOT_PATH /path/to/work/install/usr/local)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 ```
+
+No `CMAKE_SYSROOT`: the compiler already knows its own. A package's generated toolchain
+file then appends the meta staging roots and, last, the toolchain's sysroot to
+`CMAKE_FIND_ROOT_PATH`, so `find_library`/`find_path` take what is built in the staging
+first and still find what glibc itself provides (`m`, `c`, `sys/epoll.h`).
+
+Some sysroots hold more than glibc -- `libbfd` on most, `expat`, `uuid` and `bz2` on
+ppc853x-5.2 -- so a package still declares every library it uses: an undeclared probe
+can find the toolchain's copy instead of failing.
 
 ### tc_vars.meson-cross and tc_vars.meson-native
 

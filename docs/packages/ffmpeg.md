@@ -162,7 +162,7 @@ QSV mapping must be enabled on context creation to use QSV to OpenCL mapping.
 
 ### OpenCL Acceleration
 
-Validate OpenCL hardware acceleration (only available on DSM 7+ with recent Intel processors):
+Validate OpenCL hardware acceleration (only available on DSM 7.1+ with recent Intel processors):
 ```bash
 /var/packages/synocli-videodriver/target/bin/clinfo
 # Output:

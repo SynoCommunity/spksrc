@@ -7,8 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
-MIN_GCC_VERSION = 7.5
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer. AArch64 needs gcc 8: its NEON
+# target turns SVE off by name (+nosve), a modifier gcc only knows from 8.
+MIN_GCC_VERSION = $(if $(filter $(ARCH),$(ARMv8_ARCHS)),8,7.5)
 # hwy/contrib/thread_pool calls pthread_setname_np, which glibc grew in 2.12; DSM 5.2's
 # 2.8 has no such symbol and the assert around it fails to compile.
 MIN_GLIBC_VERSION = 2.12
