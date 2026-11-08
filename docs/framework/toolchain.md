@@ -136,15 +136,15 @@ checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e5
 |------|-------|---------|
 | `tc_vars.mk` | the toolchain's identity and versions: no compiler, no flags | every build |
 | `tc_vars.autotools.mk` | `TC_CONFIGURE_ARGS` and the environment of a cross build: `CC`, `CXX`, `AR`, `LD`, … and the `*FLAGS`, as `TC_ENV += …` | autotools builds |
-| `tc_vars.flags.mk` | `CFLAGS`, `CPPFLAGS`, `CXXFLAGS`, `LDFLAGS` as make variables | autotools builds, and the CMake and Meson file generators |
+| `tc_vars.flags.mk` | the toolchain's `TC_EXTRA_*FLAGS`, and `CFLAGS`, `CPPFLAGS`, `CXXFLAGS`, `LDFLAGS` as make variables | autotools builds, and the CMake and Meson file generators |
 | `tc_vars.rust.mk` | the cargo and rustup environment, per Rust target triple | every package |
 | `tc_vars.cmake` | the toolchain half of a CMake toolchain file | the per-dependency CMake toolchain file |
 | `tc_vars.meson-cross`, `tc_vars.meson-native` | the toolchain half of a Meson cross file, and the build machine's native file | the per-dependency Meson cross file |
 
 ### tc_vars.mk
 
-What the toolchain is, as plain values: where it lives, its target and prefix, the ABI flags it
-declares, and the versions the capability floors compare against (`MIN_GCC_VERSION`,
+What the toolchain is, as plain values: where it lives, its target and prefix, and the versions
+the capability floors compare against (`MIN_GCC_VERSION`,
 `MIN_KERNEL_VERSION`, …). The overlay pointers carry **active** semantics -- the path when that
 overlay drives the build, empty otherwise (see [Toolchain Overlays](#toolchain-overlays)).
 
@@ -157,9 +157,6 @@ TC_PREFIX := powerpc-e500v2-linux-gnuspe-
 TC_PATH := <tc>/bin/
 TC_INCLUDE := powerpc-e500v2-linux-gnuspe/sysroot/usr/include
 TC_LIBRARY := powerpc-e500v2-linux-gnuspe/sysroot/lib
-TC_EXTRA_BUILD_FLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_EXTRA_CFLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
-...                                  # TC_EXTRA_CPPFLAGS, CXXFLAGS, FFLAGS, LDFLAGS, RUSTFLAGS
 TC_VERS := 6.2.4
 TC_BUILD := 25556
 TC_OS_MIN_VER := 6.2-25556
@@ -194,9 +191,15 @@ TC_ENV += CC_FOR_BUILD="/usr/bin/gcc"
 
 ### tc_vars.flags.mk
 
-The same flags as make variables, for the makefiles that compose with them:
+The toolchain's own flags, as it declares them, then the flags of the autotools file as make
+variables, for the makefiles that compose with them:
 
 ```makefile
+TC_EXTRA_BUILD_FLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_EXTRA_CFLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double
+...                                  # TC_EXTRA_CPPFLAGS, CXXFLAGS, FFLAGS
+TC_EXTRA_LDFLAGS := -mcpu=8548 -mhard-float -mfloat-gprs=double -latomic
+TC_EXTRA_RUSTFLAGS :=
 CFLAGS := -I<tc>/…/sysroot/usr/include -I<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/include -mcpu=8548 …
 CPPFLAGS := …
 CXXFLAGS := …
@@ -208,7 +211,9 @@ Each language's flags end with its own `TC_EXTRA_<LANG>FLAGS` — `CFLAGS` ends 
 ends with `TC_EXTRA_LDFLAGS`. Each of those already carries the toolchain-declared
 ABI (`TC_EXTRA_BUILD_FLAGS`, folded in as described under
 [Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare)), so
-the ABI reaches every compiler *and* the link driver.
+the ABI reaches every compiler *and* the link driver. The `TC_EXTRA_*FLAGS` themselves are
+read again by the CMake toolchain file and the Meson cross file, which list them per language;
+both are generated with this file loaded.
 
 ### tc_vars.rust.mk
 

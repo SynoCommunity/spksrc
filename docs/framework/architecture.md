@@ -39,7 +39,7 @@ Stage 1 ensures the cross-compilation toolchain is ready:
 3. **tc_vars Generation** - Creates environment files that configure the build:
    - `tc_vars.mk` - Core toolchain identity and paths
    - `tc_vars.autotools.mk` - Autotools adapter variables
-   - `tc_vars.flags.mk` - C/C++ compiler flags
+   - `tc_vars.flags.mk` - C/C++ compiler flags, and the toolchain's `TC_EXTRA_*FLAGS`
    - `tc_vars.rust.mk` - Rust environment (if applicable)
    - `tc_vars.cmake` - CMake toolchain file
    - `tc_vars.meson-*` - Meson cross/native configuration files
@@ -256,7 +256,7 @@ The toolchain bootstrap (stage 1; the toolchain-dir `tc_vars.mk` also at stage 0
 | File | Contents | Loaded into the make env |
 |------|----------|--------------------------|
 | `tc_vars.mk` | Toolchain identity and paths (`TC_PATH`, `TC_TARGET`, `TC_SYSROOT`, `TC_GCC`, ...) | **always** |
-| `tc_vars.flags.mk` | C / C++ / CPP / LD compiler & linker flags | autotools |
+| `tc_vars.flags.mk` | C / C++ / CPP / LD compiler & linker flags, and the toolchain's `TC_EXTRA_*FLAGS` | autotools |
 | `tc_vars.autotools.mk` | Autotools (`configure`) environment | autotools |
 | `tc_vars.rust.mk` | Rust / Cargo environment | **every cross package** |
 | `tc_vars.cmake` | CMake toolchain file — read by `cmake`, not a `.mk` | — |

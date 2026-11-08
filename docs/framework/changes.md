@@ -97,7 +97,9 @@ If you only read one thing, read this. The details are in the dated log below.
   **`TC_EXTRA_LDFLAGS`** and are passed plainly, with `-latomic` auto-dropped
   where the gcc lacks it. They are *not* wrapped in `--as-needed`: `LDFLAGS`
   precedes the objects, so a front-placed library there resolves nothing yet and
-  the wrap discarded it outright.
+  the wrap discarded it outright. The `TC_EXTRA_*FLAGS` are written to
+  `tc_vars.flags.mk`, beside the flags they are folded into; `tc_vars.mk` holds the
+  toolchain's identity and paths (#7738).
   See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
 
 - **Build a host tool once, host it, reuse it.** A native package hosts its build
@@ -123,6 +125,17 @@ If you only read one thing, read this. The details are in the dated log below.
   shows which are active for your arch.
 
 ---
+
+??? note "November 8th 2026 — The toolchain's extra flags in tc_vars.flags.mk (#7738)"
+
+    - **What:** `TC_EXTRA_BUILD_FLAGS` and the `TC_EXTRA_<LANG>FLAGS` / `TC_EXTRA_LDFLAGS` /
+      `TC_EXTRA_RUSTFLAGS` move from `tc_vars.mk` to `tc_vars.flags.mk`, with the flags they
+      are already folded into: `tc_vars.mk` holds the toolchain's identity and paths. Their
+      readers, the CMake toolchain file and the Meson cross file, are generated with
+      `TC_VARS_ENV="flags rust"` and load that file; autotools builds load it anyway.
+    - **For a package:** a `TC_EXTRA_*` read in its own Makefile is defined only where the
+      flags are loaded -- not in a CMake or Meson build's own environment. None does in the
+      tree.
 
 ??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
 
