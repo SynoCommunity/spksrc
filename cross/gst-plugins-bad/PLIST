@@ -59,6 +59,7 @@ lib:lib/gstreamer-1.0/libgstmpegpsdemux.so
 lib:lib/gstreamer-1.0/libgstmpegpsmux.so
 lib:lib/gstreamer-1.0/libgstmpegtsdemux.so
 lib:lib/gstreamer-1.0/libgstmpegtsmux.so
+lib:lib/gstreamer-1.0/libgstmsdk.so
 lib:lib/gstreamer-1.0/libgstmse.so
 lib:lib/gstreamer-1.0/libgstmxf.so
 lib:lib/gstreamer-1.0/libgstnetsim.so
@@ -68,6 +69,7 @@ lib:lib/gstreamer-1.0/libgstopusparse.so
 lib:lib/gstreamer-1.0/libgstpcapparse.so
 lib:lib/gstreamer-1.0/libgstpnm.so
 lib:lib/gstreamer-1.0/libgstproxy.so
+lib:lib/gstreamer-1.0/libgstqsv.so
 lib:lib/gstreamer-1.0/libgstremovesilence.so
 lib:lib/gstreamer-1.0/libgstrfbsrc.so
 lib:lib/gstreamer-1.0/libgstrist.so
