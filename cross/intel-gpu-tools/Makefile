@@ -9,6 +9,10 @@ DEPENDS  = cross/libdrm cross/libkmod cross/libproc2 cross/elfutils
 DEPENDS += cross/pixman cross/cairo
 DEPENDS += cross/libudev_219
 
+# gcc 8: igt builds with -Werror=array-bounds, after any CFLAGS, and gcc 7's
+# -Warray-bounds misfires on intel_gpu_top.c.
+MIN_GCC_VERSION = 8
+
 HOMEPAGE = https://gitlab.freedesktop.org/drm/igt-gpu-tools
 COMMENT  = IGT GPU Tools is a collection of tools for development and testing of the DRM drivers.
 LICENSE  = MIT License
