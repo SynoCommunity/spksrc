@@ -1,0 +1,16 @@
+--- sys/msdk/meson.build.orig
++++ sys/msdk/meson.build
+@@ -252,8 +252,11 @@
+ else
+   libdl_dep = cc.find_library('dl', required: get_option('msdk'))
+   libgudev_dep = dependency('gudev-1.0', required: get_option('msdk'), allow_fallback: true)
+-  msdk_deps = declare_dependency(dependencies: [gstva_dep, libdl_dep, libgudev_dep, libdrm_dep])
+-  msdk_deps_found = gstva_dep.found() and libdl_dep.found() and libgudev_dep.found() and libdrm_dep.found()
++  # Its own lookup: sys/kms and gst-libs/gst/wayland reassign libdrm_dep, not found when
++  # those features are disabled, which silently dropped msdk.
++  msdk_libdrm_dep = dependency('libdrm', version : '>=2.4.50', required: get_option('msdk'))
++  msdk_deps = declare_dependency(dependencies: [gstva_dep, libdl_dep, libgudev_dep, msdk_libdrm_dep])
++  msdk_deps_found = gstva_dep.found() and libdl_dep.found() and libgudev_dep.found() and msdk_libdrm_dep.found()
+ endif
+ 
+ if msdk_deps_found

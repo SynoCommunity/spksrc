@@ -120,6 +120,11 @@ On Intel-based models, VA-API accelerated elements are provided by the `va`
 plugin, using the drivers from the [SynoCli Video Driver](synocli-videodriver.md)
 package, installed as a dependency.
 
+The `qsv` and `msdk` plugins add Intel Quick Sync Video elements on the same
+drivers -- `qsvh264dec`, `qsvh264enc`, `qsvh265enc`, ... and `msdkh264dec`,
+`msdkh264enc`, `msdkvpp`, ... -- through the Media SDK runtime that FFmpeg's
+`h264_qsv` also uses. Like `va`, they need the `videodriver` group.
+
 ### Validate the VA-API elements
 
 ```bash
