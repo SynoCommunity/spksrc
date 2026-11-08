@@ -1,16 +1,15 @@
-diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoothstreamingenc.c
---- ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c	2020-06-15 14:54:24.000000000 -0400
-+++ ./libavformat/smoothstreamingenc.c	2020-06-16 20:08:21.691804931 -0400
-@@ -39,6 +39,8 @@
+--- libavformat/smoothstreamingenc.c.orig
++++ libavformat/smoothstreamingenc.c
+@@ -38,6 +38,8 @@
  #include "libavutil/mathematics.h"
- #include "libavutil/intreadwrite.h"
+ #include "libavutil/uuid.h"
  
 +#include "synoconfig.h"
 +
  typedef struct Fragment {
-     char file[1024];
-     char infofile[1024];
-@@ -77,6 +79,11 @@ typedef struct SmoothStreamingContext {
+     int64_t start_time, duration;
+     int n;
+@@ -75,6 +77,11 @@ typedef struct SmoothStreamingContext {
      OutputStream *streams;
      int has_video, has_audio;
      int nb_fragments;
@@ -21,8 +20,8 @@ diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoo
 +#endif
  } SmoothStreamingContext;
  
- static int ism_write(void *opaque, uint8_t *buf, int buf_size)
-@@ -250,8 +257,13 @@ static int write_manifest(AVFormatContex
+ static int ism_write(void *opaque, const uint8_t *buf, int buf_size)
+@@ -246,8 +253,13 @@ static int write_manifest(AVFormatContex
      avio_printf(out, ">\n");
      if (c->has_video) {
          int last = -1, index = 0;
@@ -38,7 +37,7 @@ diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoo
              OutputStream *os = &c->streams[i];
              if (s->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
                  continue;
-@@ -264,8 +276,13 @@ static int write_manifest(AVFormatContex
+@@ -260,8 +272,13 @@ static int write_manifest(AVFormatContex
      }
      if (c->has_audio) {
          int last = -1, index = 0;
@@ -54,7 +53,7 @@ diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoo
              OutputStream *os = &c->streams[i];
              if (s->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)
                  continue;
-@@ -555,6 +572,14 @@ static int ism_flush(AVFormatContext *s,
+@@ -541,6 +558,14 @@ static int ism_flush(AVFormatContext *s,
                  return ret;
          }
  
@@ -69,7 +68,7 @@ diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoo
          snprintf(header_filename, sizeof(header_filename), "%s/FragmentInfo(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
          snprintf(target_filename, sizeof(target_filename), "%s/Fragments(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
          copy_moof(s, filename, header_filename, moof_size);
-@@ -640,7 +665,12 @@ static const AVOption options[] = {
+@@ -626,7 +651,12 @@ static const AVOption options[] = {
      { "lookahead_count", "number of lookahead fragments", OFFSET(lookahead_count), AV_OPT_TYPE_INT, { .i64 = 2 }, 0, INT_MAX, E },
      { "min_frag_duration", "minimum fragment duration (in microseconds)", OFFSET(min_frag_duration), AV_OPT_TYPE_INT64, { .i64 = 5000000 }, 0, INT_MAX, E },
      { "remove_at_exit", "remove all fragments when finished", OFFSET(remove_at_exit), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, E },
@@ -83,9 +82,8 @@ diff -uprN ../ffmpeg-4.3-023/libavformat/smoothstreamingenc.c ./libavformat/smoo
  };
  
  static const AVClass ism_class = {
-diff -uprN ../ffmpeg-4.3-023/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.3-023/synoconfig.h	2020-06-16 20:01:36.286633640 -0400
-+++ ./synoconfig.h	2020-06-16 20:08:21.691804931 -0400
+--- synoconfig.h.orig
++++ synoconfig.h
 @@ -31,3 +31,17 @@
  #if defined(SYNO_VIDEOSTATION)
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
