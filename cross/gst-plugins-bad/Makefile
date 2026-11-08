@@ -130,6 +130,8 @@ ifneq ($(and $(VIDEODRV_ON),$(filter $(ARCH),$(x64_ARCHS)),$(filter 1,$(call ver
 DEPENDS += cross/libgudev
 CONFIGURE_ARGS += -Dva=enabled
 CONFIGURE_ARGS += -Dqsv=enabled
+# where qsv's dispatcher finds the Media SDK runtime: the meta's lib (patch 003)
+CONFIGURE_ARGS += -Dmfx-modules-dir=$(VIDEODRV_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += -Dmsdk=enabled
 else
 CONFIGURE_ARGS += -Dva=disabled
