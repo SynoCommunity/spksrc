@@ -1,8 +1,8 @@
 SPK_NAME = gstreamer
-SPK_VERS = 1.28.8
-SPK_REV = 1
+SPK_VERS = 1.28.9
+SPK_REV = 2
 SPK_ICON = src/gstreamer.png
-CHANGELOG = "1. Initial package release."
+CHANGELOG = "Update GStreamer to v1.28.9 (bug and security fixes)."
 
 DEPENDS  = cross/gstreamer
 DEPENDS += cross/gst-plugins-base
