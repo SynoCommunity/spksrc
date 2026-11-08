@@ -124,6 +124,26 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
+
+    - **What:** the generated CMake toolchain file appends the toolchain's sysroot to
+      `CMAKE_FIND_ROOT_PATH`, after the staging and the meta roots. With
+      `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY/INCLUDE = ONLY` and the staging as the only root,
+      a `find_library`/`find_path` aimed at glibc itself -- `m`, `c`, `sys/epoll.h` --
+      returned `NOTFOUND` while the build went on: jasper linked `pow`/`sqrt` without
+      `libm` in `DT_NEEDED`, mosquitto fell back from epoll to a busy-looping poll, LLVM
+      dropped libxml2. Found by mreid-tt's audit of the CMake packages. What is built in
+      the staging still wins. Some sysroots carry more than glibc -- `libbfd` on most,
+      bz2, expat and uuid on ppc853x-5.2 -- now found where a package probes them
+      undeclared: declare what a package uses.
+    - **TC_SYSROOT:** still declared in the toolchain Makefile -- stage0 writes `tc_vars.mk`
+      before the toolchain is extracted -- and now checked against what its gcc reports
+      (`-print-sysroot`) when a package's `tcvars` runs: a toolchain whose declaration
+      differs stops there. ppc853x-5.2 declared `$(TC_TARGET)`, the tooldir above its
+      sysroot, so its `SYSROOT`, crossenv's `--sysroot` and binutils' `--with-sysroot`
+      pointed there; it now declares `$(TC_TARGET)/libc`, and names its
+      `TC_INCLUDE`/`TC_LIBRARY` tooldir directly, so its `-I`/`-L` are unchanged.
+
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 
     - **What:** overlay consumers move from `toolchain/syno-<arch>-<dsm>_<component>-…` to
