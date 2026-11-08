@@ -1,6 +1,6 @@
 PKG_NAME = archivestation
-PKG_VERS = 1.0.2
-UPSTREAM_REV = 2
+PKG_VERS = 1.1.1
+UPSTREAM_REV = 1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = ArchiveStation-$(PKG_VERS)-$(UPSTREAM_REV)-source.tar.gz
 PKG_DIST_SITE = https://github.com/jbdemonte/synology-archive-downloader/releases/download/v$(PKG_VERS)-$(UPSTREAM_REV)

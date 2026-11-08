@@ -1,5 +1,5 @@
 SPK_NAME = archivestation
-SPK_VERS = 1.0.2
+SPK_VERS = 1.1.1
 SPK_REV = 1
 SPK_ICON = src/archivestation.png
 
@@ -14,9 +14,9 @@ override ARCH = noarch
 REQUIRED_MIN_DSM = 7.0
 
 MAINTAINER = jbdemonte
-DESCRIPTION = Download public Internet Archive items into separate folders with file selection, progress tracking, resumable transfers, integrity verification and scheduling. Opens inside the DSM desktop and uses your administrator session.
+DESCRIPTION = Download Internet Archive items into separate folders with file selection, progress tracking, resumable transfers, integrity verification and scheduling. Public items need no account; an optional Internet Archive account adds the restricted files it is authorized to download. Opens inside the DSM desktop and uses your administrator session.
 DISPLAY_NAME = Archive Station
-CHANGELOG = "Initial SynoCommunity package of Archive Station 1.0.2, including automatic DSM session recovery."
+CHANGELOG = "Initial SynoCommunity package of Archive Station 1.1.1, with optional Internet Archive accounts for restricted files and recorded integrity checks."
 HOMEPAGE = https://github.com/jbdemonte/synology-archive-downloader
 LICENSE = MIT
 STARTABLE = yes

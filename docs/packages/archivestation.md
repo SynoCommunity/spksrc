@@ -1,6 +1,6 @@
 # Archive Station
 
-[Archive Station](https://github.com/jbdemonte/synology-archive-downloader) downloads public Internet Archive item files directly to your NAS. Each item has its own directory, with the original subdirectories preserved.
+[Archive Station](https://github.com/jbdemonte/synology-archive-downloader) downloads Internet Archive item files directly to your NAS. Each item has its own directory, with the original subdirectories preserved. Public items need no account; an optional Internet Archive account adds the restricted files it is authorized to download.
 
 ## Requirements
 
@@ -30,7 +30,11 @@ The package creates an `ArchiveStation` shared folder by default. To use another
 
 The application reuses your existing DSM administrator session without a separate login or password. It automatically attempts to recover a missing or outdated session token. The DSM gateway validates the current administrator session before forwarding requests. Trusted local NAS processes can reach the loopback service; this is not an isolation boundary against other software running on the NAS.
 
-Closing the window does not stop downloads. Pause/resume, individual file selection, scheduling, retries, SHA-1/MD5 verification, transfer history and readable text reports are available in the application. Partial files are retained separately and published under their final names after verification.
+Closing the window does not stop downloads. Pause/resume, individual file selection, scheduling, retries, SHA-1/MD5 verification, transfer history and readable text reports are available in the application. Reports record the integrity check performed on each completed file. Partial files are retained separately and published under their final names after verification.
+
+## Internet Archive account
+
+Connect an account from **Settings → Internet Archive account** to include restricted files. Internet Archive checks the account's authorization for each download; signing in does not unlock content the account cannot access. The password is sent only to Internet Archive and is never stored. Only the account email and session cookies are kept, in plain text, in `/var/packages/archivestation/var/archive-account.json` with owner-only permissions; protect this file and its backups as account credentials. When the session expires, public files keep downloading anonymously and the account must be reconnected for restricted files. The account is shared by the DSM administrators of the NAS.
 
 ## Updates
 
@@ -50,7 +54,7 @@ There is no automatic migration in this initial recipe. A manual migration was t
 
 The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md). Final distribution metadata is rendered through the standard `POST_STRIP_TARGET` hook. Run `make clean` before rebuilding after a source version or package revision change; spksrc caches the intermediate build steps and `INFO`.
 
-The recipe uses the checksum-verified upstream 1.0.2-2 source release and a pinned pure-Python dependency. `UPSTREAM_REV` identifies the upstream source archive independently of the SynoCommunity `SPK_REV`, which remains 1 for this first package submission. From the spksrc build environment:
+The recipe uses the checksum-verified upstream 1.1.1-1 source release and a pinned pure-Python dependency. `UPSTREAM_REV` identifies the upstream source archive independently of the SynoCommunity `SPK_REV`, which remains 1 for this first package submission. From the spksrc build environment:
 
 ```bash
 make -C spk/archivestation clean
@@ -58,7 +62,7 @@ make -C spk/archivestation arch-x64-7.2
 make -C spk/archivestation arch-noarch-7.1
 ```
 
-The current 1.0.2 recipe was built for both targets and checked against the published source. An isolated Linux upgrade from community 1.0.1-1 to 1.0.2-1 retained settings and an active partial download, resumed automatically and completed with the expected SHA-1. This is not a DSM hardware test.
+The current 1.1.1 recipe was built for both targets in the official spksrc container. The upstream artifact checks passed on each SPK, and all 124 staged application, UI and license files match upstream staging of the published source. The packaged application starts under Python 3.12 with Waitress as its only third-party dependency. This community 1.1.1 package has not itself been installed on a NAS, and the upgrade from an earlier community package was not rerun for this version.
 
 Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Update 9 and SynoCommunity Python 3.12.13-7 covered:
 
