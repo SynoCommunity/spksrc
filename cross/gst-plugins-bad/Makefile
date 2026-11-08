@@ -125,8 +125,9 @@ endif
 
 # libdrm, libva and the Intel Media SDK come from the synocli-videodriver meta: va, and the
 # two Quick Sync plugins -- qsv (over gstva, with its own oneVPL dispatcher) and msdk (Media
-# SDK), the runtimes ffmpeg's QSV uses
+# SDK, which finds the GPU through libgudev), the runtimes ffmpeg's QSV uses
 ifneq ($(and $(VIDEODRV_ON),$(filter $(ARCH),$(x64_ARCHS)),$(filter 1,$(call version_ge, $(TCVERSION), 6))),)
+DEPENDS += cross/libgudev
 CONFIGURE_ARGS += -Dva=enabled
 CONFIGURE_ARGS += -Dqsv=enabled
 CONFIGURE_ARGS += -Dmsdk=enabled
