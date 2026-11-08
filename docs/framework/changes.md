@@ -124,6 +124,21 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 8th 2026 — The toolchain's extra flags in tc_vars.flags.mk"
+
+    - **What:** `TC_EXTRA_BUILD_FLAGS` and the `TC_EXTRA_<LANG>FLAGS` / `TC_EXTRA_LDFLAGS` /
+      `TC_EXTRA_RUSTFLAGS` move from `tc_vars.mk` to `tc_vars.flags.mk`, with the flags
+      they are already folded into: `tc_vars.mk` holds the toolchain's identity and paths.
+      Their readers, the CMake toolchain file and the Meson cross file, are generated with
+      `TC_VARS_ENV="flags rust"` and load that file; autotools builds load it anyway. A
+      package reading a `TC_EXTRA_*` in its own Makefile now has it only where the flags
+      are loaded -- none does in the tree.
+    - **Unchanged:** on seven toolchains (qoriq-6.2.4, 88f6281-6.2.4 and 5.2, ppc853x-5.2,
+      x86-5.2, x64-7.1, aarch64-7.0) the other `tc_vars*` files are byte-identical and the
+      variables of the two files together are the same; on qoriq-6.2.4 the CMake toolchain
+      file (zlib), the Meson cross file (lz4) and the autotools flags (libogg) are
+      identical, `-mcpu=8548` included.
+
 ??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
 
     - **What:** the generated CMake toolchain file appends the toolchain's sysroot to

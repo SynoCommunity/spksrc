@@ -21,7 +21,7 @@
 #  $(WORK_DIR)/tc_vars.autotools.mk
 #      Autotools cross-compilation variables (CC, CFLAGS, SYSROOT, …)
 #  $(WORK_DIR)/tc_vars.flags.mk
-#      Raw compiler and linker flags
+#      Raw compiler and linker flags, and the toolchain's own TC_EXTRA_*FLAGS
 #  $(WORK_DIR)/tc_vars.rust.mk
 #      Rust / Cargo environment variables
 #  $(WORK_DIR)/tc_vars.cmake
@@ -390,8 +390,17 @@ tc_autotools_vars:
 	echo TC_ENV += LDFLAGS_FOR_BUILD=\"\"
 
 .PHONY: tc_flags
+# The toolchain's own flags first, as declared -- already folded into the ones below, and read
+# again where the CMake toolchain file and the meson cross file list them per language.
 tc_flags:
-	@echo CFLAGS := $(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	@echo TC_EXTRA_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS) ; \
+	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_EXTRA_CPPFLAGS := $(TC_EXTRA_CPPFLAGS) ; \
+	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
+	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
+	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
+	echo CFLAGS := $(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
@@ -430,13 +439,6 @@ tc_vars:
 	echo TC_PATH := $(TC_PATH) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
-	echo TC_EXTRA_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS) ; \
-	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
-	echo TC_EXTRA_CPPFLAGS := $(TC_EXTRA_CPPFLAGS) ; \
-	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
-	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
-	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
-	echo TC_EXTRA_RUSTFLAGS := $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
