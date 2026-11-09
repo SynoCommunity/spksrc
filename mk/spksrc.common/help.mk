@@ -90,9 +90,9 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "  \033[33m%s\033[0m\n" "  command line > environment > local.mk > built-in defaults -- so 'make setup' puts"
 	@printf "  \033[33m%s\033[0m\n" "  them in local.mk with ?=, and OVERLAY_BINUTILS=1 make ... still overrides for one build"
 	@if [ -n "$(strip $(ARCH))" ]; then \
-	  printf "  \033[33m%s\033[0m\n" "  here ($(ARCH)-$(TCVERSION)): rustc=$(if $(OVERLAY_RUSTC_ON),active,$(if $(strip $(_OVERLAY_RUSTC_DIR)),off,none)) binutils=$(if $(OVERLAY_BINUTILS_ON),active,$(if $(strip $(_OVERLAY_BINUTILS_DIR)),off,none))" ; \
+	  printf "  \033[33m%s\033[0m\n" "  what they resolve to for $(ARCH)-$(TCVERSION): below (also: make overlay-$(ARCH)-$(TCVERSION))" ; \
 	else \
-	  printf "  \033[33m%s\033[0m\n" "  add ARCH=... TCVERSION=... to see which are active here" ; \
+	  printf "  \033[33m%s\033[0m\n" "  help-<arch>-<tcvers> (or ARCH=... TCVERSION=...) adds that arch's check and overlays" ; \
 	fi
 	@printf "  \033[33m%s\033[0m\n" "  details: docs/framework/toolchain.md (Overlay switches)"
 endif
@@ -112,7 +112,20 @@ ifneq ($(SPKSRC_TREE),python)
 	@printf "  \033[36m%-24s\033[0m %s\n" "digests" "regenerate the digests file (auto-runs download)"
 	@printf "  \033[33m%s\033[0m\n" "  to refresh digests: make clean, delete the file in distrib/, then make digests"
 endif
+ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
+	@# With an arch: its check and overlays, the same whether asked as help-<arch>-<tcvers>.
+	@if [ -n "$(strip $(ARCH))" ]; then \
+	  printf "\n\033[1m%s\033[0m\n" "$(ARCH)-$(TCVERSION)" ; \
+	  $(MAKE) --no-print-directory check ; \
+	  $(MAKE) --no-print-directory overlay ; \
+	fi
+endif
 	@printf "\nRun \033[36mmake help\033[0m at the spksrc root for repo-wide targets (setup, ...)\n\n"
+
+# The goal-shaped form of 'make help ARCH=<arch> TCVERSION=<tcvers>', which it runs as is.
+help-%:
+	@$(MAKE) --no-print-directory help \
+	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
 
 endif
 

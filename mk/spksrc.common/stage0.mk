@@ -83,23 +83,33 @@ TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 # Unconditional and ahead of pre-check, so a refused arch still leaves one behind. The
 # overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
-ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
-  $(shell mkdir -p $(WORK_DIR))
-  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+_tc_vars_identity = $(shell mkdir -p $(WORK_DIR))$(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+_TC_VARS_MK_EXISTED := $(wildcard $(WORK_DIR)/tc_vars.mk)
+ifeq ($(_TC_VARS_MK_EXISTED),)
+  $(_tc_vars_identity)
 endif
 
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(WORK_DIR)/tc_vars.mk
 
-# The overlays a work dir's tc_vars were generated with are fixed in its flags (-B<shim>, the
-# overlay gcc): a run deciding otherwise -- a switch flipped since -- would mix the two. Stop,
-# except for the goals that clean the work dir or only walk the dependencies. A tc_vars.mk older
-# than ON/OFF holds paths there, which nothing reads any more: not compared.
-ifeq ($(filter clean clean% %clean dependency-%,$(MAKECMDGOALS)),)
+# The overlays it records (ON/OFF) against what this run resolves. A tc_vars.mk older than
+# ON/OFF holds paths there, which nothing reads any more: not compared.
 _TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter ON OFF,$(TC_OVERLAY_$(c))),\
                               $(if $(filter $(TC_OVERLAY_$(c)),$(if $(OVERLAY_$(c)_ON),ON,OFF)),,$(c)))))
+_TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
+
 ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
+ifeq ($(filter $(_TC_VARS_GOALS_INSPECT),$(MAKECMDGOALS)),)
+ifeq ($(wildcard $(WORK_DIR)/tc_vars.flags.mk),)
+# Only the identity file, from a parse: nothing was built with it, so it is written again.
+  $(shell rm -f $(WORK_DIR)/tc_vars.mk)$(_tc_vars_identity)
+  -include $(WORK_DIR)/tc_vars.mk
+_TC_VARS_OVERLAY_CHANGED :=
+else
+# The flags are made: -B<shim> and the overlay gcc are fixed in them with the overlays this file
+# records, so a run deciding otherwise -- a switch flipped since -- would mix the two.
 $(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(TC_OVERLAY_$(c))) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+endif
 endif
 endif
 

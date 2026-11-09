@@ -109,6 +109,32 @@ check-%:
 	@$(MAKE) --no-print-directory check \
 	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
 
+# What each overlay resolves to for ARCH/TCVERSION with this run's switches -- ON/OFF, the
+# consumer taken, those the arch ships -- what degrades, and whether the work dir's tc_vars.mk
+# agrees (stage0.mk: rewritten if only its identity exists, a stop once the flags are made).
+# Pure diagnostic, like check: parses, builds nothing.
+_overlay_name = $(if $(1),$(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(1))),-)
+
+.PHONY: overlay
+overlay:
+	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays"
+	@$(foreach c,BINUTILS GCC RUSTC,printf "       %-9s %-3s  %-22s %-24s available: %s\n" \
+	    "$(call lower,$(c))" "$(if $(OVERLAY_$(c)_ON),ON,OFF)" "OVERLAY_$(c)=$(strip $(OVERLAY_$(c)))" \
+	    "$(call _overlay_name,$(firstword $(_OVERLAY_$(c)_DIR)))" "$(or $(foreach d,$(_OVERLAY_$(c)_ANY),$(call _overlay_name,$(d))),none)" ;)
+	@printf "       %s\n" "rust link through the binutils shim: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF)"
+	@$(if $(OVERLAY_BINUTILS_MISSING),printf "       %s\n" "note: binutils requested but the arch ships none" ;)
+	@$(if $(OVERLAY_BINUTILS_VERSION_MISSING),printf "       %s\n" "note: binutils $(OVERLAY_BINUTILS_VERSION) is not shipped for this arch" ;)
+	@$(if $(OVERLAY_BINUTILS_UNMATCHED),printf "       %s\n" "note: binutils ON beside the vendor gcc it is not matched to" ;)
+	@$(if $(OVERLAY_GCC_VERSION_MISSING),printf "       %s\n" "note: gcc $(OVERLAY_GCC_VERSION) is not shipped for this arch" ;)
+	@$(if $(OVERLAY_GCC_NO_BINUTILS),printf "       %s\n" "note: gcc requested without a binutils overlay to drive: vendor gcc kept" ;)
+	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),printf "       %s\n" "note: rust $(OVERLAY_RUSTC_VERSION) is not shipped for this arch" ;)
+	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),printf "       %s\n" "note: no rust built with the gcc overlay: the vendor-gcc one is taken" ;)
+	@printf "       %s\n" "work dir: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),tc_vars.mk records $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(TC_OVERLAY_$(c))) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build would stop: make clean first,rewritten at the next build),tc_vars.mk agrees),none yet)"
+
+overlay-%:
+	@$(MAKE) --no-print-directory overlay \
+	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
+
 # Teed here rather than in build-arch-%: one level up also catches make's own
 # "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
 # _runlog's LOGGING_ENABLED guard makes this the only teeing level.

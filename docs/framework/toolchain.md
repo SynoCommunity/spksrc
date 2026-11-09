@@ -480,7 +480,9 @@ TC_RUST_LINK_VIA_BINUTILS := ON # the narrow use: the Rust link only, through th
 TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
-`TC_OVERLAY_<c>` is `ON` or `OFF`, `TC_OVERLAY_<c>_DIR` the consumer dir and `TC_OVERLAY_<c>_PATH` its bin dir when `ON`. The tree computes none of these names -- it keeps its own in `_OVERLAY_<c>_DIR` and `OVERLAY_<c>_ON` -- so the file, included at parse, never shadows a decision. Its flags are fixed with the overlays it records, though: a run whose switches resolve otherwise -- `OVERLAY_BINUTILS=1` on a work dir generated without it -- stops with *tc_vars.mk was generated with the BINUTILS overlay OFF and this run has it ON: run make clean first*. The `OVERLAY_<c>` switches themselves are not written there.
+`TC_OVERLAY_<c>` is `ON` or `OFF`, `TC_OVERLAY_<c>_DIR` the consumer dir and `TC_OVERLAY_<c>_PATH` its bin dir when `ON`. The tree computes none of these names -- it keeps its own in `_OVERLAY_<c>_DIR` and `OVERLAY_<c>_ON` -- so the file, included at parse, never shadows a decision. Its flags are fixed with the overlays it records, though: a run whose switches resolve otherwise -- `OVERLAY_BINUTILS=1` on a work dir generated without it -- stops with *tc_vars.mk was generated with the BINUTILS overlay OFF and this run has it ON: run make clean first*. The `OVERLAY_<c>` switches themselves are not written there. A work dir that holds only that file, from a parse, is written again instead: nothing was built with it.
+
+`make overlay-<arch>-<tcvers>` shows, with this run's switches, what each overlay resolves to -- `ON`/`OFF`, the consumer taken, those the arch ships, what degrades -- and whether the work dir agrees. `make help-<arch>-<tcvers>`, the same as `make help ARCH=<arch> TCVERSION=<tcvers>`, adds it and `check` to the package's help.
 
 ### Building and publishing an overlay
 
