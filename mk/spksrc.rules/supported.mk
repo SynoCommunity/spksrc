@@ -133,8 +133,12 @@ define _overlay_report_component
 @$(if $(call _ovl_versions,$(1),$(2)),$(_ovl_vers) "OVERLAY_$(1)_VERSION=$(call _ovl_asked,$(1))" "available:" "$(call _ovl_versions,$(1),$(2))" "$(call _overlay_newest,$(call _ovl_versions,$(1),$(2)))" "",$(_ovl_none) "OVERLAY_$(1)_VERSION=$(call _ovl_asked,$(1))" "available:" "none")
 endef
 
+# An arch that ships none -- most of them -- gets one line.
 .PHONY: overlay
 overlay:
+ifeq ($(strip $(_OVERLAY_BINUTILS_ANY)$(_OVERLAY_GCC_ANY)$(_OVERLAY_RUSTC_ANY)),)
+	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays: none shipped for this arch"
+else
 	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays"
 	$(call _overlay_report_component,BINUTILS,binutils)
 	@$(if $(OVERLAY_BINUTILS_ON),$(if $(call is_true,$(OVERLAY_BINUTILS)),,$(_ovl_line) "note: ON for the gcc overlay (it drives as/ld)" ;))
@@ -151,6 +155,7 @@ overlay:
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),$(_ovl_line) "note: no rust $(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_pool) (the gcc this build uses)" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),$(_ovl_line) "note: none built with the gcc overlay: the vendor-gcc one is taken" ;)
 	@printf "       %s\n" "work dir: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),tc_vars.mk records $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build would stop: make clean first,rewritten at the next build),tc_vars.mk agrees),none yet)"
+endif
 
 overlay-%:
 	@$(MAKE) --no-print-directory overlay \
@@ -186,6 +191,10 @@ build-arch-%:
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" \
 	        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	        | tee --append $(STATUS_LOG)
+	@# What the build starts with, at the head of its log: its overlays, with its switches.
+	@# Informational: a report that fails does not fail the build.
+	@MAKEFLAGS= $(MAKE) --no-print-directory $(FWRD_ARGS) \
+	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) overlay || :
 	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
 	@# failed build would be reported as a success.
 	@set -o pipefail ; \
