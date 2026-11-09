@@ -1724,25 +1724,30 @@ If you only read one thing, read this. The details are in the dated log below.
     the root. This was not one big-bang move but a sequence of PRs, each carving
     out one concern at a time.
 
-    Final layout:
+    The layout today, with the directories added since (see
+    [Makefile System](makefile-system.md#include-hierarchy) for every file):
 
     ```text
     mk/
-    ├── spksrc.cross-cc.mk        ┐  entry points a Makefile includes
-    ├── spksrc.cross-cmake.mk     │  stay at the root (unchanged include paths)
-    ├── spksrc.spk.mk             ┘
-    ├── spksrc.common/     archs, directories, macros, logs, stage0
-    ├── spksrc.build/      per-step recipes: configure, compile, install, patch, …
-    ├── spksrc.cross/      cross-build env per build system: cmake, meson, rust, go
-    ├── spksrc.native/     native-build env per build system
-    ├── spksrc.rules/      depend, dependency-tree, pre-check, digests, tests
-    ├── spksrc.spk/        spk assembly: copy, icon, strip, publish
-    ├── spksrc.spk-meta/   meta initiators: ffmpeg, python, videodriver
-    ├── spksrc.service/    DSM service scripts and installers
-    ├── spksrc.wheel/      python wheel build/install
-    ├── spksrc.toolchain/  toolchain fetch + tc_vars generation
-    ├── spksrc.toolkit/    build-host toolkit (mirrors toolchain)
-    └── spksrc.kernel/     kernel-module build support
+    ├── spksrc.cross-cc.mk          ┐  entry points a Makefile includes
+    ├── spksrc.cross-cmake.mk       │  stay at the root (unchanged include paths)
+    ├── spksrc.spk.mk               ┘
+    ├── spksrc.common/           archs, directories, help, logs, stage0, dotnet,
+    │                            tc-capability; macros/ and overlay/ (decisions) by theme
+    ├── spksrc.build/            per-step recipes: configure, compile, install, patch, …
+    ├── spksrc.cross/            cross-build env per build system: cmake, meson, rust, go, dotnet
+    ├── spksrc.native/           native-build env per build system
+    ├── spksrc.native-toolchain/ overlay producers: binutils, gcc, rustc (#7707)
+    ├── spksrc.overlay/          overlay consumers: binutils, gcc, rust (#7701)
+    ├── spksrc.rules/            depend, dependency, dependency-tree, pre-check, digests,
+    │                            status, supported, check, overlay, tests
+    ├── spksrc.spk/              spk assembly: copy, icon, strip, publish
+    ├── spksrc.spk-meta/         meta initiators: ffmpeg, python, videodriver
+    ├── spksrc.service/          DSM service scripts and installers
+    ├── spksrc.wheel/            python wheel build/install
+    ├── spksrc.toolchain/        toolchain fetch, tc_vars generation, overlay/ use
+    ├── spksrc.toolkit/          build-host toolkit (mirrors toolchain)
+    └── spksrc.kernel/           kernel-module build support, for kernel/ and driver/
     ```
 
     ??? note "`spksrc.common/` — split `common.mk` (#6906)"

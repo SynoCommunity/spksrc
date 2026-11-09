@@ -59,6 +59,14 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
 
+### Kernel Modules and Drivers
+
+| File | Purpose |
+|------|--------|
+| `spksrc.kernel.mk` | A `kernel/` package: modules built in the Synology kernel source, one kernel per arch/DSM |
+| `spksrc.driver.mk` | A `driver/` package: an out-of-tree driver, built once per kernel against that kernel's source |
+| `spksrc.kernel/` | Kernel environment, configuration, headers, module build, requirements, download and version mapping |
+
 ### Build System Adapters
 
 | File | Purpose |
@@ -98,6 +106,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.wheel/install.mk` | Wheel installation |
 | `spksrc.wheel/env.mk` | Wheel environment setup |
 | `spksrc.python-crossenv.mk` | Cross-compilation virtual environment |
+| `spksrc.python-module.mk` | A python extension module, compiled under crossenv |
 
 ### SPK Package Creation
 
@@ -107,6 +116,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.spk-meta.mk` | Meta-consumer entry point: sets up the ffmpeg/python/videodriver meta(s), then includes `spksrc.spk.mk` |
 | `spksrc.spk-meta/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
 | `spksrc.spk-meta/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
+| `spksrc.spk-meta/videodriver-depends.mk` | The videodriver library `DEPENDS`, shared by `spk/synocli-videodriver` and the videodriver meta |
 | `spksrc.spk/copy.mk` | Dependency copying to staging |
 | `spksrc.spk/strip.mk` | Binary stripping |
 | `spksrc.spk/icon.mk` | Icon processing |
@@ -192,6 +202,8 @@ spksrc.cross-dotnet.mk        # .NET
 spksrc.cross-go.mk            # Go
 spksrc.cross-meson.mk         # Meson
 spksrc.cross-rust.mk          # Rust
+spksrc.cross-install.mk       # install-only: no configure/compile
+spksrc.cross-virtual.mk       # source-less: only aggregates DEPENDS
 spksrc.cross/                 # environment setup loaded by the entry points above
 ├── cmake-toolchainfile.mk    # generated CMake toolchain file
 ├── env-cmake.mk
@@ -233,6 +245,7 @@ spksrc.spk-meta/
 ├── ffmpeg.mk                 # when FFMPEG_PACKAGE is set
 ├── meta.mk                   # generates tc_vars.meta.mk
 ├── python.mk                 # when PYTHON_PACKAGE is set
+├── videodriver-depends.mk    # the videodriver DEPENDS, shared with spk/synocli-videodriver
 └── videodriver.mk            # when VIDEODRV_PACKAGE is set
 
 # Service configuration entry point
@@ -250,8 +263,12 @@ spksrc.service/
 ├── use_alternate_tmpdir
 └── use_alternate_tmpdir.dsm7
 
-# Python wheel entry point
-spksrc.wheel.mk
+# Python entry points
+spksrc.python-wheel.mk        # an exception wheel under python/ (pip/crossenv)
+spksrc.python-wheel-meson.mk  # same, meson-built
+spksrc.python-crossenv.mk     # the cross-compilation virtual environment
+spksrc.python-module.mk       # a python extension module, under crossenv
+spksrc.wheel.mk               # wheel orchestration (via spksrc.spk.mk)
 spksrc.wheel/
 ├── compile.mk
 ├── download.mk
@@ -289,6 +306,19 @@ spksrc.toolkit/
 ├── tk-url.mk
 ├── tk-versions.mk
 └── tk_vars.mk                # generates the tk_vars* files
+
+# Kernel entry points (a kernel/ or driver/ package includes one)
+spksrc.kernel.mk              # a kernel's modules, built in the Synology kernel source
+spksrc.driver.mk              # an out-of-tree driver, built once per kernel against its source
+spksrc.kernel/
+├── base.mk                   # default kernel environment
+├── configure.mk              # kernel configuration
+├── dependency.mk             # kernel module dependencies
+├── headers.mk                # kernel headers for external modules
+├── module.mk                 # module compilation
+├── required.mk               # kernel requirement checks
+├── url.mk                    # kernel download locations
+└── versions.mk               # DSM version -> kernel metadata
 ```
 
 ## Key Implementation Details
