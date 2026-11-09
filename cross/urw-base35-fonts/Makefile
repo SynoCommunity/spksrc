@@ -1,10 +1,12 @@
 PKG_NAME = urw-base35-fonts
-PKG_VERS = 20151005
-PKG_EXT = zip
-PKG_DIST_NAME = urw-base35-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
+PKG_VERS = 20200910
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = urw-base35-fonts-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/ArtifexSoftware/urw-base35-fonts/archive/refs/tags
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # download and extract only
-EXTRACT_PATH = $(WORK_DIR)/share/fonts
+EXTRACT_PATH = $(WORK_DIR)
 
 DEPENDS =
 
@@ -22,4 +24,4 @@ include ../../mk/spksrc.cross-install.mk
 .PHONY: urw-base35-fonts_install
 urw-base35-fonts_install:
 	$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/fonts
-	$(RUN) cp share/fonts/* $(STAGING_INSTALL_PREFIX)/share/fonts
+	$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/fonts/* $(STAGING_INSTALL_PREFIX)/share/fonts
