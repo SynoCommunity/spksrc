@@ -52,7 +52,7 @@ collect_min_dsm_packages() {
     local result=
     for package in ${packages}; do
         if [ -f "./spk/${package}/Makefile" ]; then
-            if [ "$(sed -n 's/^[[:space:]]*REQUIRED_MIN_DSM[[:space:]]*=[[:space:]]*//p' "./spk/${package}/Makefile" | xargs)" = "${version}" ]; then
+            if [ "$(sed -n 's/^[[:space:]]*REQUIRED_MIN_DSM[[:space:]]*[?:]\{0,1\}=[[:space:]]*//p' "./spk/${package}/Makefile" | xargs)" = "${version}" ]; then
                 result+="${package} "
             fi
         fi
