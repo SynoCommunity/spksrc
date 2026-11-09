@@ -130,6 +130,12 @@ ifneq ($(and $(VIDEODRV_ON),$(filter $(ARCH),$(x64_ARCHS)),$(filter 1,$(call ver
 DEPENDS += cross/libgudev
 CONFIGURE_ARGS += -Dva=enabled
 CONFIGURE_ARGS += -Dqsv=enabled
+# the oneVPL and Media SDK headers put attributes on enumerators, which gcc takes from 6 on;
+# MFX_DEPRECATED_OFF is their own switch to leave them out
+ifeq ($(call version_lt, $(TC_GCC), 6),1)
+ADDITIONAL_CFLAGS += -DMFX_DEPRECATED_OFF
+ADDITIONAL_CPPFLAGS += -DMFX_DEPRECATED_OFF
+endif
 # where qsv's dispatcher finds the Media SDK runtime: the meta's lib (patch 003)
 CONFIGURE_ARGS += -Dmfx-modules-dir=$(VIDEODRV_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += -Dmsdk=enabled
