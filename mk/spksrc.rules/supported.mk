@@ -107,6 +107,7 @@ build-arch-%:
 	@$(MSG) "$(_ovl_rule)"
 	@MAKEFLAGS= $(MAKE) --no-print-directory $(FWRD_ARGS) \
 	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) overlay || :
+	@$(MSG) "$(_ovl_rule)"
 	@MAKEFLAGS= $(MAKE) --no-print-directory $(FWRD_ARGS) \
 	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) check || :
 	@$(MSG) "$(_ovl_rule)"
