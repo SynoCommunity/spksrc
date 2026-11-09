@@ -124,7 +124,7 @@ Two builds may therefore run side by side against the same toolchain — two SPK
 package built directly to test it — each with its own answer and no file to contend for.
 
 Each file has its own role, and a build reads only those it needs (`TC_VARS_ENV`, set in
-`mk/spksrc.cross/env-default.mk`): `tc_vars.mk` always, `tc_vars.autotools.mk` and
+`mk/spksrc.cross/env-default.mk`): `tc_vars.mk` and `tc_vars.overlay.mk` always, `tc_vars.autotools.mk` and
 `tc_vars.flags.mk` for an autotools build, `tc_vars.rust.mk` for every package, since any of
 them may build crates. CMake and Meson builds do not read the generic files directly: they get
 a file of their own, generated per dependency (below).
@@ -135,6 +135,7 @@ checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e5
 | File | Holds | Read by |
 |------|-------|---------|
 | `tc_vars.mk` | the toolchain's identity and versions: no compiler, no flags | every build |
+| `tc_vars.overlay.mk` | the overlays the arch ships: whether this build uses each, its version, consumer dir and bin dir | every build |
 | `tc_vars.autotools.mk` | `TC_CONFIGURE_ARGS` and the environment of a cross build: `CC`, `CXX`, `AR`, `LD`, … and the `*FLAGS`, as `TC_ENV += …` | autotools builds |
 | `tc_vars.flags.mk` | the toolchain's `TC_EXTRA_*FLAGS`, and `CFLAGS`, `CPPFLAGS`, `CXXFLAGS`, `LDFLAGS` as make variables | autotools builds, and the CMake and Meson file generators |
 | `tc_vars.rust.mk` | the cargo and rustup environment, per Rust target triple | every package |
@@ -145,9 +146,7 @@ checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e5
 
 What the toolchain is, as plain values: where it lives, its target and prefix, and the versions
 the capability floors compare against (`MIN_GCC_VERSION`,
-`MIN_KERNEL_VERSION`, …), then the overlays the arch ships: whether this build uses each
-(`TC_OVERLAY_<c>_ON`), and its version, consumer dir and bin dir (see
-[Toolchain Overlays](#toolchain-overlays)).
+`MIN_KERNEL_VERSION`, …). The overlays are in `tc_vars.overlay.mk`, below.
 
 ```makefile
 TC_TYPE := DSM
@@ -166,6 +165,15 @@ TC_GCC := 4.9.3
 TC_GLIBC := 2.20
 TC_BINUTILS := 2.25
 TC_KERNEL := 2.6.32
+```
+
+### tc_vars.overlay.mk
+
+The overlays the arch ships, one block each, written with `tc_vars.mk` so that file keeps the
+toolchain alone: `TC_OVERLAY_<c>_ON` says whether this build uses it, then its version, consumer
+dir and bin dir, filled used or not (see [Toolchain Overlays](#toolchain-overlays)).
+
+```makefile
 TC_OVERLAY_BINUTILS_ON := FALSE
 TC_OVERLAY_BINUTILS := 2.30
 TC_OVERLAY_BINUTILS_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30
@@ -474,7 +482,7 @@ OVERLAY_BINUTILS=1 make -C cross/bat-0.25 arch-qoriq-6.2.4   # just this build
 
 A request that cannot be honored never fails the build: it degrades to the stock tools and says so, in a banner on the `tcvars` path (the switches are a per-package choice, and the toolchain's own `_all` is skipped once its cookie exists). You get one for a component the arch does not ship, one for a version it does not have, and one for the global overlay driving a vendor gcc it is not matched to.
 
-Each generated `tc_vars.mk` records what the build actually resolved to, one block per overlay the arch ships:
+Each generated `tc_vars.overlay.mk` records what the build actually resolved to, one block per overlay the arch ships:
 
 ```makefile
 TC_OVERLAY_BINUTILS_ON := FALSE   # the global overlay: the C build keeps the vendor as/ld
@@ -532,7 +540,7 @@ The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>
 
 A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
 
-An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC := ON` in its `tc_vars.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
+An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC_ON := TRUE` in its `tc_vars.overlay.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
 
 ### Building Rust
 
@@ -563,7 +571,7 @@ They belong to the build tree, so remove them there and rebuild the package:
 rm -f cross/<package>/work-x64-7.2/tc_vars* cross/<package>/work-x64-7.2/.stage1-tcvars_done
 make -C cross/<package> arch-x64-7.2
 ```
-`stage0` rewrites `tc_vars.mk` alone at parse time; `stage1` rewrites the whole set.
+`stage0` writes `tc_vars.mk` and `tc_vars.overlay.mk` at parse time; `stage1` writes the rest of the set.
 
 ### Cross-Compiler Not Found
 

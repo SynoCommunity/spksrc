@@ -84,19 +84,20 @@ TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 # overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 _tc_vars_identity = $(shell mkdir -p $(WORK_DIR))$(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
-# Whether the work dir had one before this parse wrote it (stage0.mk is read more than once).
-ifeq ($(origin _TC_VARS_MK_EXISTED),undefined)
-_TC_VARS_MK_EXISTED := $(wildcard $(WORK_DIR)/tc_vars.mk)
+# Whether the work dir recorded its overlays before this parse (stage0.mk is read more than
+# once). Both files are written together; a work dir older than tc_vars.overlay.mk gets it.
+ifeq ($(origin _TC_VARS_OVERLAY_EXISTED),undefined)
+_TC_VARS_OVERLAY_EXISTED := $(wildcard $(WORK_DIR)/tc_vars.overlay.mk)
 endif
-ifeq ($(_TC_VARS_MK_EXISTED),)
+ifneq ($(wildcard $(WORK_DIR)/tc_vars.mk $(WORK_DIR)/tc_vars.overlay.mk),$(WORK_DIR)/tc_vars.mk $(WORK_DIR)/tc_vars.overlay.mk)
   $(_tc_vars_identity)
 endif
 
-# Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
+# Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...), and the overlays
 -include $(WORK_DIR)/tc_vars.mk
+-include $(WORK_DIR)/tc_vars.overlay.mk
 
-# The overlays it records (TC_OVERLAY_<c>_ON) against what this run resolves. A tc_vars.mk
-# older than that has none: not compared.
+# The overlays the work dir records (TC_OVERLAY_<c>_ON) against what this run resolves.
 _TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter TRUE FALSE,$(TC_OVERLAY_$(c)_ON)),\
                               $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(_OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
 _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
@@ -106,7 +107,7 @@ _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay
 # depends on. A run whose switches resolve otherwise stops; inspecting goals only report.
 ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
 ifeq ($(filter $(_TC_VARS_GOALS_INSPECT),$(MAKECMDGOALS)),)
-$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(_OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+$(error $(WORK_DIR)/tc_vars.overlay.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(_OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
 endif
 endif
 

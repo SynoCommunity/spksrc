@@ -141,7 +141,7 @@ ifeq ($(strip $(_OVERLAY_BINUTILS_ANY)$(_OVERLAY_GCC_ANY)$(_OVERLAY_RUSTC_ANY)),
 	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays: none shipped for this arch"
 else
 	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays"
-	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),ERROR -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(_OVERLAY_$(c)_ON),ON,OFF)): make clean first,OK),n/a))"
+	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.overlay.mk: $(if $(_TC_VARS_OVERLAY_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),ERROR -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(_OVERLAY_$(c)_ON),ON,OFF)): make clean first,OK),n/a))"
 	$(call _overlay_report_component,BINUTILS,binutils)
 	@$(if $(_OVERLAY_BINUTILS_ON),$(if $(call is_true,$(OVERLAY_BINUTILS)),,$(_ovl_line) "note: ON for the gcc overlay (it drives as/ld)" ;))
 	@$(if $(OVERLAY_BINUTILS_MISSING),$(_ovl_line) "note: requested but the arch ships none" ;)

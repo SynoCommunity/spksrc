@@ -54,6 +54,7 @@ endif
 # This file is framework-agnostic and is ALWAYS loaded once tcvars
 # generation is complete, independently of TC_VARS_ENV.
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
+TC_VARS_OVERLAY_MK = $(WORK_DIR)/tc_vars.overlay.mk
 TC_WORK_DIR=$(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 ENV += TC_WORK_DIR=$(TC_WORK_DIR)
 
@@ -152,6 +153,7 @@ TC_VARS_FILES := $(wildcard $(foreach b,$(sort $(TC_VARS_ENV)),$(WORK_DIR)/tc_va
 ifeq ($(wildcard $(TCVARS_DONE)),$(TCVARS_DONE))
   ENV += TC=$(TC)
   $(eval -include $(TC_VARS_MK))
+  $(eval -include $(TC_VARS_OVERLAY_MK))
   $(eval -include $(TC_VARS_FILES))
   ENV += $(TC_ENV)
 endif

@@ -111,6 +111,7 @@ endif
 # Mappings (target_name:output_file)
 TC_VAR_MAPPING_MK = \
 	tc_vars:tc_vars.mk \
+	tc_overlay_vars:tc_vars.overlay.mk \
 	tc_flags:tc_vars.flags.mk \
 	tc_autotools_vars:tc_vars.autotools.mk \
 	tc_rust_vars:tc_vars.rust.mk
@@ -123,6 +124,7 @@ TC_VAR_MAPPING_OTHER = \
 # Common variables to simply calls
 # (e.g. direct call such as 'make work/tc_vars.mk')
 TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_VARS_OVERLAY_MK   = $(WORK_DIR)/tc_vars.overlay.mk
 TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
 TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
 TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
@@ -159,7 +161,7 @@ generate_tc_vars_other: $(foreach m,$(TC_VAR_MAPPING_OTHER),$(WORK_DIR)/$(word 2
 # Toolchain identity alone (TC_GCC, TC_TARGET, ...), the one file free of INSTALL_PREFIX and
 # thus generatable from stage0's parse; the rest needs the recipe environment.
 .PHONY: tcvars-identity
-tcvars-identity: $(TC_VARS_MK)
+tcvars-identity: $(TC_VARS_MK) $(TC_VARS_OVERLAY_MK)
 
 #####
 
@@ -411,18 +413,7 @@ tc_flags:
 	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
-# The overlays, after the versions, one block each: TC_OVERLAY_<c>_ON TRUE or FALSE says
-# whether this build uses it; TC_OVERLAY_<c> is its version, TC_OVERLAY_<c>_DIR its consumer dir and
-# TC_OVERLAY_<c>_PATH its bin dir (binutils and gcc; trailing slash, like TC_PATH) wherever
-# the arch ships it, used or not -- beside TC_BINUTILS / TC_GCC, the versions the build takes.
-# The tc macro (spksrc.common/macros/tools.mk) takes a _PATH only when ON. The tree computes
-# none of these names -- its own are _OVERLAY_<c>_DIR and _OVERLAY_<c>_ON -- so this file,
-# included at parse, records without changing a decision. stage0.mk compares
-# TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that differs.
-# Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on wherever a rust
-# overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim TC_OVERLAY_RUSTC_LINKER (the
-# -Clink-arg=-B of the Rust link flags). TC_KERNEL takes a "+" from 4.4 on, the
-# EXTRAVERSION those kernels carry.
+# TC_KERNEL takes a "+" from 4.4 on, the EXTRAVERSION those kernels carry.
 #
 # TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
 # it was the one missing here, so a package reading the generated file saw an empty value
@@ -445,8 +436,23 @@ tc_vars:
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
-	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+) ; \
-	echo TC_OVERLAY_BINUTILS_ON := $(if $(_OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
+	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+)
+
+
+.PHONY: tc_overlay_vars
+# tc_vars.overlay.mk: the overlays the arch ships, one block each, so tc_vars.mk keeps the
+# toolchain alone. TC_OVERLAY_<c>_ON TRUE or FALSE says whether this build uses it;
+# TC_OVERLAY_<c> is its version (beside TC_BINUTILS / TC_GCC, the ones the build takes),
+# TC_OVERLAY_<c>_DIR its consumer dir and TC_OVERLAY_<c>_PATH its bin dir (binutils and gcc;
+# trailing slash, like TC_PATH), filled used or not. The tc macro (macros/tools.mk) takes a
+# _PATH only when ON. The tree computes none of these names -- its own are _OVERLAY_<c>_DIR
+# and _OVERLAY_<c>_ON -- so the file, included at parse, records without changing a
+# decision; stage0.mk compares TC_OVERLAY_<c>_ON with what a run resolves, and stops a run
+# that differs. Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on
+# wherever a rust overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim
+# TC_OVERLAY_RUSTC_LINKER (the -Clink-arg=-B of the Rust link flags).
+tc_overlay_vars:
+	@echo TC_OVERLAY_BINUTILS_ON := $(if $(_OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_BINUTILS := $(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_BINUTILS_DIR := $(firstword $(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
