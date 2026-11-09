@@ -153,7 +153,7 @@ else
 	@printf "       %s: %s\n" "rustc" "$(if $(OVERLAY_RUSTC_ON),ON ($(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_gcc)),OFF)"
 	@$(_ovl_line) "OVERLAY_RUSTC=$(strip $(OVERLAY_RUSTC))"
 	@$(if $(_ovl_rust_gccs),$(foreach g,$(_ovl_rust_gccs),$(_ovl_vers) "$(if $(filter $(g),$(firstword $(_ovl_rust_gccs))),OVERLAY_RUSTC_VERSION=$(call _ovl_asked,RUSTC))" "with gcc $(g):" "$(call _ovl_rust_vers,$(g))" "$(call _overlay_newest,$(call _ovl_rust_vers,$(g)))" "$(if $(OVERLAY_RUSTC_ON),$(if $(filter $(g),$(_ovl_rust_gcc)),   <- this build))" ;),$(_ovl_none) "OVERLAY_RUSTC_VERSION=$(call _ovl_asked,RUSTC)" "available:" "none" ;)
-	@$(_ovl_line) "rust link through the binutils shim: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF)"
+	@$(_ovl_line) "RUST_LINK_VIA_BINUTILS=$(or $(strip $(RUST_LINK_VIA_BINUTILS)),0)"
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),$(_ovl_line) "note: no rust $(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_pool) (the gcc this build uses)" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),$(_ovl_line) "note: none built with the gcc overlay: the vendor-gcc one is taken" ;)
 endif
