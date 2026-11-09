@@ -34,9 +34,9 @@ _tc_binutils_tools = ld as ar nm ranlib strip objdump objcopy readelf
 define tc
 $(strip \
   $(if $(filter $(1),$(_tc_gcc_tools)),\
-    $(or $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC_PATH)),$(TC_PATH))$(TC_PREFIX)$(1)$(TC_GCC_SUFFIX),\
+    $(or $(if $(_OVERLAY_GCC_ON),$(TC_OVERLAY_GCC_PATH)),$(TC_PATH))$(TC_PREFIX)$(1)$(TC_GCC_SUFFIX),\
   $(if $(filter $(1),$(_tc_binutils_tools)),\
-    $(or $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS_PATH)),$(TC_PATH))$(TC_PREFIX)$(1),\
+    $(or $(if $(_OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS_PATH)),$(TC_PATH))$(TC_PREFIX)$(1),\
     $(TC_PATH)$(TC_PREFIX)$(1))))
 endef
 

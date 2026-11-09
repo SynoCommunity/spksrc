@@ -448,9 +448,9 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 
 | | Variable | Meaning |
 |---|---|---|
-| Available | `TC_OVERLAY_<c>` | the consumer dir, empty when the arch ships none |
+| Available | `_OVERLAY_<c>_DIR` | the consumer dir, empty when the arch ships none |
 | Requested | `OVERLAY_<c>` | the switch |
-| Active | `OVERLAY_<c>_ON` | both of the above |
+| Active | `_OVERLAY_<c>_ON` | both of the above |
 
 | Switch | Default | Effect |
 |--------|---------|--------|

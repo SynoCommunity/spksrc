@@ -82,7 +82,7 @@ endif
 # package never names a toolchain itself and cannot drift from the one the overlay installed.
 # https://rust-lang.github.io/rustup/environment-variables.html
 rust_install_target:
-ifneq ($(strip $(if $(OVERLAY_RUSTC_ON),$(filter RUSTFLAGS=%,$(ENV)))),)
+ifneq ($(strip $(if $(_OVERLAY_RUSTC_ON),$(filter RUSTFLAGS=%,$(ENV)))),)
 	@$(MSG) "*********************************************************************"
 	@$(MSG) "*** $(PKG_NAME) sets a global RUSTFLAGS, which overrides the toolchain's"
 	@$(MSG) "*** CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS -- the overlay link flags"

@@ -176,7 +176,7 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
       the macros. See [Boolean values](../reference/macros.md#boolean-values).
     - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
-      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `OVERLAY_GCC_ON`), off for the
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `_OVERLAY_GCC_ON`), off for the
       tree: the producer turns it on for itself.
       Packages keep the vendor gcc, and the same rust.
     - **What `tc_vars.mk` says about the overlays:** one block per overlay the arch ships,

@@ -271,7 +271,7 @@ endif
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER} \$${RUST_LINKER})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)))"
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(_OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)))"
 
 .PHONY: tc_meson_cross_vars
 tc_meson_cross_vars:
@@ -332,7 +332,7 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(call tc,ar)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(call tc,gcc)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(_OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo TC_ENV += CC_$(RUST_TARGET_LENV)=\"$(call tc,gcc)\" ; \
 	echo TC_ENV += CXX_$(RUST_TARGET_LENV)=\"$(call tc,g++)\" ; \
 	echo TC_ENV += AR_$(RUST_TARGET_LENV)=\"$(call tc,ar)\" ; \
@@ -401,7 +401,7 @@ tc_flags:
 	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
 	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
 	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
-	echo TC_EXTRA_RUSTFLAGS := $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(if $(_OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
 	echo CFLAGS := $(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
@@ -416,7 +416,7 @@ tc_flags:
 # TC_OVERLAY_<c>_PATH its bin dir (binutils and gcc; trailing slash, like TC_PATH) wherever
 # the arch ships it, used or not -- beside TC_BINUTILS / TC_GCC, the versions the build takes.
 # The tc macro (spksrc.common/macros/tools.mk) takes a _PATH only when ON. The tree computes
-# none of these names -- its own are _OVERLAY_<c>_DIR and OVERLAY_<c>_ON -- so this file,
+# none of these names -- its own are _OVERLAY_<c>_DIR and _OVERLAY_<c>_ON -- so this file,
 # included at parse, records without changing a decision. stage0.mk compares
 # TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that differs.
 # Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on wherever a rust
@@ -446,15 +446,15 @@ tc_vars:
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
 	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+) ; \
-	echo TC_OVERLAY_BINUTILS_ON := $(if $(OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_BINUTILS_ON := $(if $(_OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_BINUTILS := $(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_BINUTILS_DIR := $(firstword $(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
-	echo TC_OVERLAY_GCC_ON := $(if $(OVERLAY_GCC_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_GCC_ON := $(if $(_OVERLAY_GCC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_GCC := $(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_GCC_DIR := $(firstword $(_OVERLAY_GCC_DIR)) ; \
 	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH) ; \
-	echo TC_OVERLAY_RUSTC_ON := $(if $(OVERLAY_RUSTC_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_RUSTC_ON := $(if $(_OVERLAY_RUSTC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_RUSTC := $(call read_makefile_var,$(firstword $(_OVERLAY_RUSTC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_RUSTC_DIR := $(firstword $(_OVERLAY_RUSTC_DIR)) ; \
 	echo TC_RUST_LINK_VIA_BINUTILS := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),TRUE,FALSE) ; \

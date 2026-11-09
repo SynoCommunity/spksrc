@@ -8,16 +8,16 @@
 # Three questions, kept apart on purpose -- conflating them is what produced
 # both of the bugs this file exists to prevent:
 #
-#   AVAILABLE  does this (arch, DSM) ship a consumer dir?   TC_OVERLAY_<c>
+#   AVAILABLE  does this (arch, DSM) ship a consumer dir?   _OVERLAY_<c>_DIR
 #   REQUESTED  did the caller ask for it?                   OVERLAY_<c>
-#   ACTIVE     both of the above                            OVERLAY_<c>_ON
+#   ACTIVE     both of the above                            _OVERLAY_<c>_ON
 #
 # Variables by role -- <c> is RUSTC, BINUTILS or GCC:
 #
-#   contract  TC_OVERLAY_<c>          consumer dir, empty when the arch ships none
+#   contract  _OVERLAY_<c>_DIR        consumer dir, empty when the arch ships none
 #             OVERLAY_<c>             the switch (local.mk / environment / command line)
 #             OVERLAY_<c>_VERSION     which build of it to select, the newest by default
-#             OVERLAY_<c>_ON          requested AND available
+#             _OVERLAY_<c>_ON         requested AND available
 #             OVERLAY_BINUTILS_ASKED  OVERLAY_BINUTILS as the first make was given it,
 #                                     carried to every sub-make: 0 is refused beside gcc
 #
@@ -49,7 +49,7 @@
 # One file per component under spksrc.common/overlay/, read in a fixed order: the
 # switches and versions first, which every component reads; then binutils, gcc and rustc;
 # then what spans them. An immediate (:=) value only needs what comes before it, and a lazy
-# (=) one is read once all are in -- so OVERLAY_BINUTILS_ON may test OVERLAY_GCC_ON, and
+# (=) one is read once all are in -- so _OVERLAY_BINUTILS_ON may test _OVERLAY_GCC_ON, and
 # the rust pool OVERLAY_GCC.
 #
 #   binutils.mk  gcc.mk  rustc.mk   AVAILABLE, ACTIVE and the degraded states of each
@@ -77,7 +77,7 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 #                        these archs ship an overlay because the stock std does not fit.
 # OVERLAY_BINUTILS       GLOBAL: overlay as/ld for EVERY compile. Needs a matched modern
 #                        gcc, hence off by default -- OVERLAY_GCC is what matches it, and
-#                        turns it on (OVERLAY_BINUTILS_ON); asking 0 alongside an active
+#                        turns it on (_OVERLAY_BINUTILS_ON); asking 0 alongside an active
 #                        gcc overlay stops the build (OVERLAY_BINUTILS_REFUSED).
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix;
 #                        inert where the arch ships none.
@@ -91,7 +91,7 @@ OVERLAY_BINUTILS ?= 0
 # built with the gcc overlay turns it on for itself (native/rustc-1.98). Tree-wide because a
 # package that selects a meta on TC_GCC must agree with the meta spk-meta-source builds,
 # and FWRD_ARGS_SPK does not carry the switch. OVERLAY_BINUTILS follows through
-# OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
+# _OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
 OVERLAY_GCC      ?= 0
 # A typo must not read as "off": anything neither true nor false (macros.mk) stops here.
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
@@ -141,7 +141,7 @@ TC_OVERLAY_ALL := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_
 # Here, once the gcc overlay is known.
 #
 # Immediate: settled here, before stage0.mk includes the work dir's tc_vars.mk.
-_OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(OVERLAY_GCC_ON)),$(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS))
+_OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(_OVERLAY_GCC_ON)),$(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS))
 
 # The effective as/ld version, given the vendor one to fall back to. Two callers, because
 # TC_BINUTILS reaches them from different places: tc-capability.mk reads it out of the
@@ -183,7 +183,7 @@ export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 # prints the first of a component's list, so their order there is their priority.
 include $(_OVERLAY_MK_DIR)/warnings.mk
 
-# Once every component is in: the refusal reads OVERLAY_GCC_ON.
+# Once every component is in: the refusal reads _OVERLAY_GCC_ON.
 ifneq ($(OVERLAY_BINUTILS_REFUSED),)
 $(info ===>  *********************************************************************)
 $(info ===>  *** OVERLAY_BINUTILS=$(OVERLAY_BINUTILS_ASKED) cannot be honoured for [$(_OVERLAY_TC)]:)

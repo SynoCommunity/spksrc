@@ -98,7 +98,7 @@ endif
 # The overlays it records (TC_OVERLAY_<c>_ON) against what this run resolves. A tc_vars.mk
 # older than that has none: not compared.
 _TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter TRUE FALSE,$(TC_OVERLAY_$(c)_ON)),\
-                              $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
+                              $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(_OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
 _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
 
 # A work dir is made with its overlays: its flags (-B<shim>, the overlay gcc), and the
@@ -106,7 +106,7 @@ _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay
 # depends on. A run whose switches resolve otherwise stops; inspecting goals only report.
 ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
 ifeq ($(filter $(_TC_VARS_GOALS_INSPECT),$(MAKECMDGOALS)),)
-$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(_OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
 endif
 endif
 

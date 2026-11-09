@@ -60,7 +60,7 @@ _OVERLAY_RUSTC_DIR := $(if $(call is_true,$(OVERLAY_GCC)),\
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(_OVERLAY_RUSTC_DIR)),1)
 
 # Lazy (=), like the other components' ACTIVE.
-OVERLAY_RUSTC_ON = $(if $(strip $(_OVERLAY_RUSTC_DIR)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))
+_OVERLAY_RUSTC_ON = $(if $(strip $(_OVERLAY_RUSTC_DIR)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))
 
 # Degraded state (spksrc.common/overlay.mk), not a failure: the gcc overlay is on, this
 # arch ships no rustc built against it, and the vendor-gcc one was taken instead. Worth

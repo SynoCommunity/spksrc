@@ -29,7 +29,7 @@ OVERLAY_BINUTILS_SHIM = $(_OVERLAY_BINUTILS_DIR)/work/shim
 # GLOBAL redirect, folded into CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS by tc_vars. Empty unless the
 # global overlay is active -- a -B into a shim that never gets built would silently leave
 # every compile on the vendor as/ld.
-OVERLAY_BINUTILS_FLAG = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHIM))
+OVERLAY_BINUTILS_FLAG = $(if $(_OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHIM))
 
 # `make clean` on the base toolchain also cleans whichever overlay consumers it has, so a
 # rebuild re-extracts them instead of reusing a stale install. Only ADDS a prerequisite to the

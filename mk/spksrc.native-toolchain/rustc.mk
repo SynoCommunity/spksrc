@@ -100,8 +100,8 @@ RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 #
 # gcc and g++ only: the overlay archive ships no binutils, so ar and ranlib keep coming
 # from the toolchain that has them.
-TC_GCC_SUFFIX ?= $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERSION))
-_RUST_GCC_BIN  = $(if $(OVERLAY_GCC_ON),$(_OVERLAY_GCC_DIR)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
+TC_GCC_SUFFIX ?= $(if $(_OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERSION))
+_RUST_GCC_BIN  = $(if $(_OVERLAY_GCC_ON),$(_OVERLAY_GCC_DIR)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
 RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
 RUST_CC       ?= $(_RUST_GCC_BIN)$(TC_TARGET)-gcc$(TC_GCC_SUFFIX)
 RUST_CXX      ?= $(_RUST_GCC_BIN)$(TC_TARGET)-g++$(TC_GCC_SUFFIX)
@@ -133,7 +133,7 @@ _RUST_PGO_ENV        = $(if $(filter gen,$(PGO_PHASE)),RUSTFLAGS_NOT_BOOTSTRAP="
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID on the package-build side.
-_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
+_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(_OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
 # are trackable in status-build.log: NAME: native-rust-<step>.
@@ -241,10 +241,10 @@ endef
 # DEPENDS, for the same reason binutils is co-built below.
 .PHONY: rustc_gcc_overlay
 # Unconditional prerequisite, tested in the recipe: prerequisites expand when the rule is
-# READ, and OVERLAY_GCC_ON comes from overlay.mk, which native-cc.mk includes after this
+# READ, and _OVERLAY_GCC_ON comes from overlay.mk, which native-cc.mk includes after this
 # file. Testing it above would read empty and silently skip the extraction.
 rustc_gcc_overlay:
-	@if [ -n "$(OVERLAY_GCC_ON)" ]; then \
+	@if [ -n "$(_OVERLAY_GCC_ON)" ]; then \
 	  $(call rustc_status,gcc-overlay) ; \
 	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERSION) for $(TC_ARCH)-$(TC_VERS)" ; \
 	  $(MSG) "*** PATH: $(_OVERLAY_GCC_DIR)" ; \

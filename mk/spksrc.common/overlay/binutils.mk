@@ -2,7 +2,7 @@
 # spksrc.common/overlay/binutils.mk
 #
 # The binutils overlay: available, requested, active. Read by spksrc.common/overlay.mk,
-# after the switches and before gcc.mk, whose OVERLAY_GCC_ON this reads lazily.
+# after the switches and before gcc.mk, whose _OVERLAY_GCC_ON this reads lazily.
 ###############################################################################
 
 # _OVERLAY_BINUTILS_ANY, OVERLAY_BINUTILS_VERSION, _OVERLAY_BINUTILS_DIR,
@@ -23,13 +23,13 @@ endif
 # OVERLAY_BINUTILS_FLAG, so the pair is ONE decision -- gcc 8.5 on the vendor as/ld cannot
 # assemble what it emits. A package therefore activates OVERLAY_GCC alone; an explicit
 # OVERLAY_BINUTILS=0 beside it is refused (spksrc.common/overlay.mk). No cycle:
-# OVERLAY_GCC_ON tests availability, not this.
-OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(call is_true,$(OVERLAY_BINUTILS))$(OVERLAY_GCC_ON),1))
+# _OVERLAY_GCC_ON tests availability, not this.
+_OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(call is_true,$(OVERLAY_BINUTILS))$(_OVERLAY_GCC_ON),1))
 
 # OVERLAY_BINUTILS asked off while the gcc overlay is active: the request cannot be obeyed,
 # and building anyway would let the caller believe it was. Stops at parse time, in the
 # first make that knows the arch -- before stage0 touches the toolchain.
-OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED),$(call is_false,$(OVERLAY_BINUTILS_ASKED))))
+OVERLAY_BINUTILS_REFUSED = $(if $(_OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED),$(call is_false,$(OVERLAY_BINUTILS_ASKED))))
 
 # All three uses pull the same archive; they differ only in scope. The gcc overlay ships
 # no as/ld of its own, so without this it would silently drive the vendor ones. The gcc one
@@ -40,4 +40,4 @@ _OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_tru
 # Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or active
 # beside the vendor gcc, which it is not matched to.
 OVERLAY_BINUTILS_MISSING   = $(if $(_OVERLAY_BINUTILS_ANY),,$(_OVERLAY_BINUTILS_WANTED))
-OVERLAY_BINUTILS_UNMATCHED = $(if $(OVERLAY_BINUTILS_ON),$(if $(OVERLAY_GCC_ON),,1))
+OVERLAY_BINUTILS_UNMATCHED = $(if $(_OVERLAY_BINUTILS_ON),$(if $(_OVERLAY_GCC_ON),,1))

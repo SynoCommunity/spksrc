@@ -42,7 +42,7 @@ _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC
 # ON = custom from-source build + synology triple; OFF = stock rustup rustc + `unknown`
 # triple, usable only where rustup ships a std (tc-rust.mk reports it). The switch and its
 # default live in spksrc.common/overlay.mk.
-ifeq ($(OVERLAY_RUSTC_ON),1)
+ifeq ($(_OVERLAY_RUSTC_ON),1)
 # Overlay ON (default): our custom toolchain, synology triple.
 RUST_TARGET        := $(_RUST_SYNO_TARGET)
 TC_RUSTUP_TOOLCHAIN = $(_RUST_TC_ID)
