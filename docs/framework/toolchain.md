@@ -412,6 +412,63 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 | binutils | 2.30 | 65 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
 | gcc | 8.5 | the same 65 | not yet: installed only |
 
+### Where the overlay code lives
+
+Overlay code sits at four levels, by role, each read by a different Makefile, in the order an overlay goes through them:
+
+| Level | Files | Read by | See |
+|-------|-------|---------|-----|
+| **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
+| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
+| **Decide** | `mk/spksrc.common/overlay.mk`, `mk/spksrc.common/overlay/<component>.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`_OVERLAY_*_DIR`), which are requested (`OVERLAY_*`) and active (`_OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
+| **Use** | `mk/spksrc.toolchain/overlay/<component>.mk` | the base toolchain, and the `tc_vars` files it writes into a package's work dir: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
+
+The base toolchain ties the last three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the ones the *decide* level made active. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
+
+What the components have in common is written once, so a state carries the same name in each:
+
+- **Install:** `mk/spksrc.overlay.mk` sets the archive name, release, extract path and `<component>-post_install` step; a component file sets only what differs (rust has its own release and archive name).
+- **Decide:** each component file starts with `$(eval $(call OVERLAY_COMPONENT_TEMPLATE,<C>,<dir>))`, which creates `_OVERLAY_<C>_ANY`, `_OVERLAY_<C>_DIR`, `OVERLAY_<C>_VERSION_MISSING` and its banner `OVERLAY_WARN_<C>_VERSION_MISSING`. Only what differs, such as when the component is active, is written in the file. The header of `mk/spksrc.common/overlay.mk` lists the names the template creates, for a search that finds no assignment.
+- **Use:** a component's `overlay-<c>-warn` target prints `$(call overlay_warn,<C>,<STATE> ...)`, the banner `OVERLAY_WARN_<C>_<STATE>` of the first state of the list whose `OVERLAY_<C>_<STATE>` is 1.
+
+### Building and publishing an overlay
+
+```bash
+make -C native/gcc-8.5 arch-qoriq-6.2.4                    # one (arch, DSM): build, then archive
+make -C native/gcc-8.5 TOOLCHAIN_JOBS=4 all-6.2.4          # every arch with an overlay, four at a time
+make -C native/binutils-2.30 TOOLCHAIN_PGO=0 arch-x86-5.2  # one plain pass instead of two
+make -C native/rustc-1.82 all-5.2
+```
+
+A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native-toolchain/$(PKG_NAME).mk` (`gcc`, `binutils`, `rustc`).
+
+A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2.4` builds `x86-6.2.4`, `arch-x64-7.1` builds `apollolake-7.1`. `all-<dsm>` builds every arch that has an overlay of the component, each real arch once. An arch whose archive already exists is skipped -- nothing to do -- so a batch stopped by a failure resumes where it stopped; remove the `.txz` to rebuild one. An archive is written under a temporary name and renamed once complete, so an interrupted build never leaves a truncated file under the final name.
+
+| Knob | Default | Effect |
+|------|---------|--------|
+| `TOOLCHAIN_PGO` | `1` | Two passes: build instrumented, run the instrumented tools over training input, rebuild reading the counts. gcc and binutils train on generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`); rust on the crates the official Rust dist trains on, rustc-perf's compile benchmarks, shipped with their dependencies in the rust source tarball, built check, debug and release for the arch's target. For rust both halves are profiled: rustc by x.py, LLVM by gcc. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
+| `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
+
+The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc first makes `native/binutils-2.30` for the same `(arch, DSM)` with its own `arch-<arch>-<dsm>` target -- both PGO passes and the archive, the very file the binutils overlay publishes -- unless that archive already exists, then reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain. rust does the same. The binutils archive keeps binutils' own `PKG_REV`, whatever revision the gcc or rust build is given.
+
+A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of the usual native build variables (`CONFIGURE_ARGS`, `COMPILE_TARGET`, ...):
+
+| A component sets | For |
+|------------------|-----|
+| `TOOLCHAIN_CONSUMER` | The suffix of its consumer directories (`gcc-8.5`, `binutils-2.30`, `rust-1.98_gcc-*`): `all-<dsm>` builds for every arch that has one. |
+| `ARCHIVE_NAME`, `ARCHIVE_EXT`, `ARCHIVE_DIR`, `ARCHIVE_KEEP` | The archive (`mk/spksrc.build/archive.mk`), named after `TOOLCHAIN_DIST_ARCH` for gcc and binutils. |
+| `TOOLCHAIN_DIST_SHARED = 1` | A generic arch is built as the real arch whose archive it shares. |
+| `TOOLCHAIN_PGO ?= 1`, `TOOLCHAIN_PGO_TRAIN` | The two passes, and the target that runs the instrumented tools over `TOOLCHAIN_PGO_SOURCES`. |
+
+In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
+
+The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
+
+1. Bump `PKG_REV` in the producer (`native/<component>/Makefile`) and build.
+2. Upload the `.txz` to its release.
+3. Bump `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`).
+
 ### The overlay/ directories
 
 Each overlay is a directory of `overlay/`, named `syno-<arch>-<dsm>_<component>-<version>` -- a rust one adds the gcc it was built with, `_rust-1.82_gcc-4.9.3`. Its Makefile is four lines; the directory name says the rest:
@@ -430,25 +487,6 @@ An arch has an overlay exactly when such a directory exists for it: adding one i
 ### Installed and cleaned with the toolchain
 
 A base toolchain (`toolchain/syno-<arch>-<dsm>/`) `DEPENDS` on every overlay of its arch (`TC_OVERLAY_ALL`), binutils first since the gcc overlay links its `as`/`ld` at install time, whether a build uses them or not. `make clean` on the base toolchain cleans them too, so a rebuild re-extracts them; `make dist-clean` at the top level runs `overlay-clean` over every one.
-
-### Where the overlay code lives
-
-Overlay code sits at four levels, by role, each read by a different Makefile:
-
-| Level | Files | Read by | See |
-|-------|-------|---------|-----|
-| **Decide** | `mk/spksrc.common/overlay.mk`, `mk/spksrc.common/overlay/<component>.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`TC_OVERLAY_*`), which are requested (`OVERLAY_*`) and active (`OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
-| **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
-| **Use** | `mk/spksrc.toolchain/overlay/<component>.mk` | the base toolchain, and the `tc_vars` it generates for packages: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
-| **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
-
-The base toolchain ties the first three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the active ones. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
-
-What the components have in common is written once, so a state carries the same name in each:
-
-- **Decide:** each component file starts with `$(eval $(call OVERLAY_COMPONENT_TEMPLATE,<C>,<dir>))`, which creates `_OVERLAY_<C>_ANY`, `TC_OVERLAY_<C>`, `OVERLAY_<C>_VERSION_MISSING` and its banner `OVERLAY_WARN_<C>_VERSION_MISSING`. Only what differs, such as when the component is active, is written in the file. The header of `mk/spksrc.common/overlay.mk` lists the names the template creates, for a search that finds no assignment.
-- **Install:** `mk/spksrc.overlay.mk` sets the archive name, release, extract path and `<component>-post_install` step; a component file sets only what differs (rust has its own release and archive name).
-- **Use:** a component's `overlay-<c>-warn` target prints `$(call overlay_warn,<C>,<STATE> ...)`, the banner `OVERLAY_WARN_<C>_<STATE>` of the first state of the list whose `OVERLAY_<C>_<STATE>` is 1.
 
 ### Overlay switches
 
@@ -497,44 +535,6 @@ TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 `TC_OVERLAY_<c>_ON` says whether the build uses an overlay; `TC_OVERLAY_<c>`, `_DIR` and `_PATH` (its version, consumer dir and bin dir) are filled wherever the arch ships it, used or not, and `$(call tc,…)` takes a `_PATH` only when `_ON` is `TRUE`. The tree computes none of these names -- it keeps its own in `_OVERLAY_<c>_DIR` and `OVERLAY_<c>_ON` -- so the file, included at parse, never shadows a decision. Its flags are fixed with the overlays it records, though: a run whose switches resolve otherwise -- `OVERLAY_BINUTILS=1` on a work dir built without it -- stops with *tc_vars.mk was generated with the BINUTILS overlay OFF and this run has it ON: run make clean first*. The rule is the same for a work dir a `check` or an `overlay` report created: the optional dependencies resolved there depend on the overlays too.
 
 `make overlay-<arch>-<tcvers>` shows, with this run's switches, what each overlay resolves to -- `ON`/`OFF`, the consumer taken, those the arch ships, what degrades -- and whether the work dir agrees. `make help-<arch>-<tcvers>`, the same as `make help ARCH=<arch> TCVERSION=<tcvers>`, adds it and `check` to the package's help. Every `arch-<arch>-<tcvers>` build prints the same report, then `check`, right after its `[BEGIN]` line, so a log always says what the build started with.
-
-### Building and publishing an overlay
-
-```bash
-make -C native/gcc-8.5 arch-qoriq-6.2.4                    # one (arch, DSM): build, then archive
-make -C native/gcc-8.5 TOOLCHAIN_JOBS=4 all-6.2.4          # every arch with an overlay, four at a time
-make -C native/binutils-2.30 TOOLCHAIN_PGO=0 arch-x86-5.2  # one plain pass instead of two
-make -C native/rustc-1.82 all-5.2
-```
-
-A producer is a version, a revision and a component name: `native/gcc-8.5`, `native/binutils-2.30` and `native/rustc-<version>` include `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`, the host optimisation flags and the profile-guided passes, and dispatches to `mk/spksrc.native-toolchain/$(PKG_NAME).mk` (`gcc`, `binutils`, `rustc`).
-
-A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2.4` builds `x86-6.2.4`, `arch-x64-7.1` builds `apollolake-7.1`. `all-<dsm>` builds every arch that has an overlay of the component, each real arch once. An arch whose archive already exists is skipped -- nothing to do -- so a batch stopped by a failure resumes where it stopped; remove the `.txz` to rebuild one. An archive is written under a temporary name and renamed once complete, so an interrupted build never leaves a truncated file under the final name.
-
-| Knob | Default | Effect |
-|------|---------|--------|
-| `TOOLCHAIN_PGO` | `1` | Two passes: build instrumented, run the instrumented tools over training input, rebuild reading the counts. gcc and binutils train on generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`); rust on the crates the official Rust dist trains on, rustc-perf's compile benchmarks, shipped with their dependencies in the rust source tarball, built check, debug and release for the arch's target. For rust both halves are profiled: rustc by x.py, LLVM by gcc. The instrumented pass is never archived, so an archive that exists is always a finished build. |
-| `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
-| `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
-
-The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc first makes `native/binutils-2.30` for the same `(arch, DSM)` with its own `arch-<arch>-<dsm>` target -- both PGO passes and the archive, the very file the binutils overlay publishes -- unless that archive already exists, then reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain. rust does the same. The binutils archive keeps binutils' own `PKG_REV`, whatever revision the gcc or rust build is given.
-
-A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of the usual native build variables (`CONFIGURE_ARGS`, `COMPILE_TARGET`, ...):
-
-| A component sets | For |
-|------------------|-----|
-| `TOOLCHAIN_CONSUMER` | The suffix of its consumer directories (`gcc-8.5`, `binutils-2.30`, `rust-1.98_gcc-*`): `all-<dsm>` builds for every arch that has one. |
-| `ARCHIVE_NAME`, `ARCHIVE_EXT`, `ARCHIVE_DIR`, `ARCHIVE_KEEP` | The archive (`mk/spksrc.build/archive.mk`), named after `TOOLCHAIN_DIST_ARCH` for gcc and binutils. |
-| `TOOLCHAIN_DIST_SHARED = 1` | A generic arch is built as the real arch whose archive it shares. |
-| `TOOLCHAIN_PGO ?= 1`, `TOOLCHAIN_PGO_TRAIN` | The two passes, and the target that runs the instrumented tools over `TOOLCHAIN_PGO_SOURCES`. |
-
-In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
-
-The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
-
-1. Bump `PKG_REV` in the producer (`native/<component>/Makefile`) and build.
-2. Upload the `.txz` to its release.
-3. Bump `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`).
 
 ## Custom From-Source Rust Toolchains
 

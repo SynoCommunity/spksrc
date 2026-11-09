@@ -37,7 +37,7 @@
 #
 #   created by OVERLAY_COMPONENT_TEMPLATE, for every <c> -- no assignment to search for:
 #             _OVERLAY_<c>_ANY, OVERLAY_<c>_VERSION_MISSING and its OVERLAY_WARN_<c>_...;
-#             OVERLAY_<c>_VERSION and TC_OVERLAY_<c> too, but for RUSTC (rustc.mk)
+#             OVERLAY_<c>_VERSION and _OVERLAY_<c>_DIR too, but for RUSTC (rustc.mk)
 #
 #   internal  _OVERLAY_TC                the toolchain dir name
 #             _OVERLAY_<c>_ANY           any version, ignoring OVERLAY_<c>_VERSION
@@ -104,12 +104,12 @@ _OVERLAY_MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))overlay
 #
 #   _OVERLAY_<C>_ANY                  every <dir> dir the arch ships, any version
 #   OVERLAY_<C>_VERSION               the newest of them, unless already set
-#   TC_OVERLAY_<C>                    the one of OVERLAY_<C>_VERSION
+#   _OVERLAY_<C>_DIR                  the one of OVERLAY_<C>_VERSION
 #   OVERLAY_<C>_VERSION_MISSING       ships one, but not that version
 #   OVERLAY_WARN_<C>_VERSION_MISSING  the banner for it (warnings.mk)
 #
 # select: the component picks its version and directory itself (rustc: by gcc variant), so
-# OVERLAY_<C>_VERSION and TC_OVERLAY_<C> are left to it. The same state carries the same
+# OVERLAY_<C>_VERSION and _OVERLAY_<C>_DIR are left to it. The same state carries the same
 # name in every component. What differs -- ACTIVE, and
 # the states only one of them has -- stays in its own file.
 define OVERLAY_COMPONENT_TEMPLATE
