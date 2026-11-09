@@ -202,9 +202,11 @@ DEP_FLAT_TARGETS_MK = $(strip \
 # -------------------------------------------------------------------
 AT_ROOT_LEVEL := $(if $(filter $(abspath $(BASEDIR)),$(CURDIR)),1,)
 
-SPK_DIRS    := $(sort $(dir $(wildcard spk/*/Makefile)))
-SPK_NAMES   := $(notdir $(patsubst %/,%,$(SPK_DIRS)))
-SPK_TARGETS := $(addprefix dependency-list-spk-,$(SPK_NAMES))
+SPK_DIRS     := $(sort $(dir $(wildcard spk/*/Makefile)))
+SPK_BROKEN   := $(notdir $(patsubst %/BROKEN,%,$(wildcard spk/*/BROKEN)))
+SPK_DISABLED := $(notdir $(patsubst %/DISABLED,%,$(wildcard spk/*/DISABLED)))
+SPK_NAMES    := $(filter-out $(SPK_BROKEN) $(SPK_DISABLED),$(notdir $(patsubst %/,%,$(SPK_DIRS))))
+SPK_TARGETS  := $(addprefix dependency-list-spk-,$(SPK_NAMES))
 
 # -------------------------------------------------------------------
 # Per-run temporary directories
@@ -238,13 +240,18 @@ ifeq ($(AT_ROOT_LEVEL),1)
 # ARCH and TCVERSION are forwarded when provided so each package is
 # evaluated in the correct toolchain context.
 .PHONY: dependency-list-spk
-dependency-list-spk: | $(SPK_LIST_STAMP_DIR)  ## Resolved deps for every spk; honors DEPENDS_TYPE, EXCLUDE_DEPENDS, ARCH, TCVERSION
-	@$(MAKE) -j $(nproc) --silent --no-print-directory \
-		$(if $(ARCH),ARCH=$(ARCH)) \
-		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
-		$(SPK_TARGETS)
-	@cat $(SPK_LIST_STAMP_DIR)/*.out | sort
-	@rm -rf $(SPK_LIST_STAMP_DIR)
+dependency-list-spk: | $(SPK_LIST_STAMP_DIR)  ## Resolved deps for buildable spk; skips BROKEN/DISABLED, honors DEPENDS_TYPE, EXCLUDE_DEPENDS, ARCH, TCVERSION
+	@tmp="$(SPK_LIST_STAMP_DIR)"; \
+	trap 'rm -rf "$$tmp"' EXIT HUP INT TERM; \
+	failed=0; \
+	if [ -n "$(strip $(SPK_TARGETS))" ]; then \
+		$(MAKE) -k -j $(nproc) --silent --no-print-directory \
+			$(if $(ARCH),ARCH=$(ARCH)) \
+			$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
+			$(SPK_TARGETS) || failed=1; \
+	fi; \
+	if [ $$failed -eq 0 ] && ls "$$tmp"/*.out >/dev/null 2>&1; then cat "$$tmp"/*.out | sort; fi; \
+	exit $$failed
 
 # -------------------------------------------------------------------
 # dependency-list-spk-%
@@ -260,7 +267,7 @@ dependency-list-spk-%: | $(SPK_LIST_STAMP_DIR)
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 		dependency-list \
-		> $(SPK_LIST_STAMP_DIR)/$*.out 2>/dev/null || true
+		> $(SPK_LIST_STAMP_DIR)/$*.out
 
 else
 # -------------------------------------------------------------------
