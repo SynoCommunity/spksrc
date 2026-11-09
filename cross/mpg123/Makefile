@@ -1,5 +1,5 @@
 PKG_NAME = mpg123
-PKG_VERS = 1.33.0
+PKG_VERS = 1.33.7
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/mpg123/files/mpg123/$(PKG_VERS)

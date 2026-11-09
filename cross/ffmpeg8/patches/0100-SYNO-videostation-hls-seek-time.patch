@@ -1,7 +1,6 @@
-diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
---- ../ffmpeg-4.3-005/libavformat/segment.c	2020-06-15 14:54:24.000000000 -0400
-+++ ./libavformat/segment.c	2020-06-16 19:54:41.332482718 -0400
-@@ -43,6 +43,8 @@
+--- libavformat/segment.c.orig
++++ libavformat/segment.c
+@@ -46,6 +46,8 @@
  #include "libavutil/time_internal.h"
  #include "libavutil/timestamp.h"
  
@@ -10,7 +9,7 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
  typedef struct SegmentListEntry {
      int index;
      double start_time, end_time;
-@@ -123,6 +125,12 @@ typedef struct SegmentContext {
+@@ -128,6 +130,12 @@ typedef struct SegmentContext {
      SegmentListEntry cur_entry;
      SegmentListEntry *segment_list_entries;
      SegmentListEntry *segment_list_entries_end;
@@ -23,7 +22,7 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
  } SegmentContext;
  
  static void print_csv_escaped_str(AVIOContext *ctx, const char *str)
-@@ -854,6 +862,10 @@ static int seg_write_header(AVFormatCont
+@@ -852,6 +860,10 @@ static int seg_write_header(AVFormatCont
          if (!seg->individual_header_trailer)
              oc->pb->seekable = 0;
      }
@@ -34,7 +33,7 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
  
      return 0;
  }
-@@ -885,6 +897,40 @@ static int seg_write_packet(AVFormatCont
+@@ -883,6 +895,40 @@ static int seg_write_packet(AVFormatCont
          }
      }
  
@@ -75,7 +74,7 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
  calc_times:
      if (seg->times) {
          end_pts = seg->segment_count < seg->nb_times ?
-@@ -971,6 +1017,15 @@ calc_times:
+@@ -985,6 +1031,15 @@ calc_times:
             av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, &st->time_base),
             av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, &st->time_base));
  
@@ -89,8 +88,8 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
 +#endif
 +
      ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s,
-                            seg->initial_offset || seg->reset_timestamps || seg->avf->oformat->interleave_packet);
- 
+                            seg->initial_offset || seg->reset_timestamps ||
+                            ffofmt(seg->avf->oformat)->interleave_packet);
 @@ -1085,6 +1140,9 @@ static const AVOption options[] = {
      { "reset_timestamps", "reset timestamps at the beginning of each segment", OFFSET(reset_timestamps), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, E },
      { "initial_offset", "set initial timestamp offset", OFFSET(initial_offset), AV_OPT_TYPE_DURATION, {.i64 = 0}, -INT64_MAX, INT64_MAX, E },
@@ -101,10 +100,8 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
      { NULL },
  };
  
-Binary files ../ffmpeg-4.3-005/libavformat/.segment.c.rej.swp and ./libavformat/.segment.c.rej.swp differ
-diff -uprN ../ffmpeg-4.3-005/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.3-005/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./synoconfig.h	2020-06-16 19:53:14.125668365 -0400
+--- /dev/null
++++ synoconfig.h
 @@ -0,0 +1,12 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE

@@ -20,7 +20,18 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
      int d3d11_map_amd;
      int d3d11_map_intel;
      clCreateFromD3D11Texture2DKHR_fn
-@@ -906,6 +910,11 @@ static int opencl_device_init(AVHWDevice
+@@ -177,6 +181,10 @@ typedef struct OpenCLFramesContext {
+     int                   nb_mapped_frames;
+     AVOpenCLFrameDescriptor *mapped_frames;
+ #endif
++#if HAVE_OPENCL_D3D11
++#define OPENCL_D3D11_MAX_MAPPED_FRAMES 256
++    ID3D11Texture2D        **mapped_textures;
++#endif
+ } OpenCLFramesContext;
+ 
+ 
+@@ -906,6 +914,11 @@ static int opencl_device_init(AVHWDevice
              priv->d3d11_mapping_usable = 0;
          } else {
              priv->d3d11_mapping_usable = 1;
@@ -32,7 +43,18 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
          }
      }
  #endif
-@@ -2574,6 +2583,196 @@ fail:
+@@ -1800,7 +1813,9 @@ static void opencl_frames_uninit(AVHWFra
+     }
+     av_freep(&priv->mapped_frames);
+ #endif
+-
++#if HAVE_OPENCL_D3D11
++    av_freep(&priv->mapped_textures);
++#endif
+     if (priv->command_queue) {
+         cle = clReleaseCommandQueue(priv->command_queue);
+         if (cle != CL_SUCCESS) {
+@@ -2574,6 +2589,206 @@ fail:
  
  #if HAVE_OPENCL_D3D11
  
@@ -46,7 +68,6 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    OpenCLFramesContext *frames_priv = dst_fc->hwctx;
 +    cl_event event;
 +    cl_int cle;
-+    int p;
 +
 +    av_log(dst_fc, AV_LOG_DEBUG, "Unmap QSV surface from OpenCL.\n");
 +
@@ -59,23 +80,14 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    }
 +
 +    opencl_wait_events(dst_fc, &event, 1);
-+
-+    if (!frames_priv->nb_mapped_frames && !frames_priv->mapped_frames) {
-+        for (p = 0; p < desc->nb_planes; p++) {
-+            cle = clReleaseMemObject(desc->planes[p]);
-+            if (cle != CL_SUCCESS) {
-+                av_log(dst_fc, AV_LOG_ERROR, "Failed to release CL "
-+                       "image of plane %d of D3D11 texture: %d\n",
-+                       p, cle);
-+            }
-+        }
-+        av_freep(&desc);
-+    }
 +}
 +
 +static int opencl_map_from_d3d11_qsv(AVHWFramesContext *dst_fc, AVFrame *dst,
 +                                     const AVFrame *src, int flags)
 +{
++    AVHWFramesContext *src_fc =
++        (AVHWFramesContext*)src->hw_frames_ctx->data;
++    AVQSVFramesContext     *src_hwctx = src_fc->hwctx;
 +    OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
 +    OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
 +    AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
@@ -123,31 +135,58 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    }
 +    av_log(dst_fc, AV_LOG_DEBUG, "Map QSV surface %#llx to OpenCL.\n", (uintptr_t)pair);
 +
-+    if (derived_frames && !frames_priv->mapped_frames) {
-+        frames_priv->nb_mapped_frames = src_fc->initial_pool_size;
++    if (!frames_priv->mapped_frames) {
++        if (derived_frames) {
++            frames_priv->nb_mapped_frames = src_fc->initial_pool_size;
++            frames_priv->mapped_frames =
++                av_calloc(frames_priv->nb_mapped_frames,
++                          sizeof(*frames_priv->mapped_frames));
++            if (!frames_priv->mapped_frames)
++                return AVERROR(ENOMEM);
 +
-+        frames_priv->mapped_frames =
-+            av_calloc(frames_priv->nb_mapped_frames,
-+                      sizeof(*frames_priv->mapped_frames));
-+        if (!frames_priv->mapped_frames)
-+            return AVERROR(ENOMEM);
-+
-+        for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
-+            desc = &frames_priv->mapped_frames[i];
-+            desc->nb_planes = nb_planes;
++            for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
++                desc = &frames_priv->mapped_frames[i];
++                desc->nb_planes = nb_planes;
++            }
++        } else {
++            frames_priv->nb_mapped_frames = 0;
++            frames_priv->mapped_frames =
++                av_calloc(OPENCL_D3D11_MAX_MAPPED_FRAMES,
++                          sizeof(*frames_priv->mapped_frames));
++            frames_priv->mapped_textures =
++                av_calloc(OPENCL_D3D11_MAX_MAPPED_FRAMES,
++                          sizeof(*frames_priv->mapped_textures));
++            if (!frames_priv->mapped_frames ||
++                !frames_priv->mapped_textures) {
++                av_freep(&frames_priv->mapped_frames);
++                av_freep(&frames_priv->mapped_textures);
++                return AVERROR(ENOMEM);
++            }
 +        }
 +    }
 +
 +    if (derived_frames)
 +        desc = &frames_priv->mapped_frames[index];
 +    else {
-+        desc = av_mallocz(sizeof(*desc));
-+        if (!desc) {
-+            err = AVERROR(ENOMEM);
-+            goto fail2;
++        for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
++            if (frames_priv->mapped_textures[i] == tex)
++                break;
 +        }
-+        desc->nb_planes = nb_planes;
++        if (i < frames_priv->nb_mapped_frames)
++            desc = &frames_priv->mapped_frames[i];
++        else {
++            if (frames_priv->nb_mapped_frames >= OPENCL_D3D11_MAX_MAPPED_FRAMES) {
++                av_log(dst_fc, AV_LOG_ERROR, "QSV D3D11 texture mapping slot "
++                       "is full (%d entries).\n", OPENCL_D3D11_MAX_MAPPED_FRAMES);
++                err = AVERROR(ENOSPC);
++                goto fail2;
++            }
++            desc = &frames_priv->mapped_frames[frames_priv->nb_mapped_frames];
++            desc->nb_planes = nb_planes;
++            frames_priv->mapped_textures[frames_priv->nb_mapped_frames++] = tex;
++        }
 +    }
++
 +    // deferred clCreateFromD3D11Texture2DKHR() for low startup latency.
 +    for (p = 0; p < desc->nb_planes; p++) {
 +        UINT subresource = derived_frames ? (2 * index + p) : p;
@@ -203,23 +242,16 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
 +    if (cle == CL_SUCCESS)
 +        opencl_wait_events(dst_fc, &event, 1);
 +fail2:
-+    if (derived_frames) {
-+        for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
-+            desc = &frames_priv->mapped_frames[i];
-+            for (p = 0; p < desc->nb_planes; p++) {
-+                if (desc->planes[p])
-+                    clReleaseMemObject(desc->planes[p]);
-+            }
-+        }
-+        av_freep(&frames_priv->mapped_frames);
-+        frames_priv->nb_mapped_frames = 0;
-+    } else {
++    for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
++        desc = &frames_priv->mapped_frames[i];
 +        for (p = 0; p < desc->nb_planes; p++) {
 +            if (desc->planes[p])
 +                clReleaseMemObject(desc->planes[p]);
 +        }
-+        av_freep(&desc);
 +    }
++    av_freep(&frames_priv->mapped_frames);
++    av_freep(&frames_priv->mapped_textures);
++    frames_priv->nb_mapped_frames = 0;
 +    memset(dst->data, 0, sizeof(dst->data));
 +    return err;
 +}
@@ -229,7 +261,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
  static void opencl_unmap_from_d3d11(AVHWFramesContext *dst_fc,
                                      HWMapDescriptor *hwmap)
  {
-@@ -3089,6 +3288,11 @@ static int opencl_map_to(AVHWFramesConte
+@@ -3101,6 +3316,11 @@ static int opencl_map_to(AVHWFramesConte
              return opencl_map_from_dxva2(hwfc, dst, src, flags);
  #endif
  #if HAVE_OPENCL_D3D11
@@ -241,7 +273,7 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
      case AV_PIX_FMT_D3D11:
          if (priv->d3d11_mapping_usable)
              return opencl_map_from_d3d11(hwfc, dst, src, flags);
-@@ -3143,6 +3347,12 @@ static int opencl_frames_derive_to(AVHWF
+@@ -3155,6 +3375,12 @@ static int opencl_frames_derive_to(AVHWF
          break;
  #endif
  #if HAVE_OPENCL_D3D11

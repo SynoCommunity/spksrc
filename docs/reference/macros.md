@@ -85,10 +85,10 @@ $(call depend,cross/flac cross/libtheora,--enable-libtheora)
 $(call depend,cross/libdvbcsa cross/dvb-apps,--enable-dvbcsa,--disable-dvbcsa)
 
 # OR: the first supported version
-$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
+$(call depend,cross/libvmaf-2.3|cross/libvmaf-1.5,--enable-libvmaf)
 
 # OR with an else
-$(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf,--disable-libvmaf)
+$(call depend,cross/libvmaf-2.3|cross/libvmaf-1.5,--enable-libvmaf,--disable-libvmaf)
 
 include ../../mk/spksrc.cross-cc.mk
 ```

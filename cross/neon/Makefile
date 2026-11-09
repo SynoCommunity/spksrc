@@ -1,5 +1,5 @@
 PKG_NAME = neon
-PKG_VERS = 0.35.0
+PKG_VERS = 0.37.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/notroj/neon/archive

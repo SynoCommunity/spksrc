@@ -28,7 +28,7 @@ Signed-off-by: Vincent Fortier <th0ma7@gmail.com>
 
 --- libavcodec/hw_base_encode.c.orig
 +++ libavcodec/hw_base_encode.c
-@@ -325,6 +325,16 @@
+@@ -326,6 +326,16 @@ static int hw_base_encode_pick_next(AVCo
      pic->is_reference = 1;
      *pic_out = pic;
  
