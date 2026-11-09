@@ -414,8 +414,8 @@ If you only read one thing, read this. The details are in the dated log below.
       of the build with its switch, instead of refusing the whole package. The gates go:
       libjxl (highway's glibc floor comes with its tree), vvenc (its `UNSUPPORTED_ARCHS`),
       libplacebo, liblc3, openh264, libaom, svt-av1, svt-hevc, x265... Where a condition
-      lived only in ffmpeg, it moved into the library: `MIN_GCC_VERSION` 7.5 in libvmaf_2.3,
-      4.8 in libvmaf_1.5 and librabbitmq. Still plain `DEPENDS`: what has no switch (cairo,
+      lived only in ffmpeg, it moved into the library: `MIN_GCC_VERSION` 7.5 in libvmaf-2.3,
+      4.8 in libvmaf-1.5 and librabbitmq. Still plain `DEPENDS`: what has no switch (cairo,
       flac, pngquant -- whose place first in the list matters). Still `ifeq`: tvheadend's
       ffmpeg choice (paired with `spk/tvheadend`) and the videodriver blocks.
 

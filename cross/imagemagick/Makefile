@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/librsvg
-OPTIONAL_DEPENDS += cross/jemalloc cross/jemalloc_5.2
+OPTIONAL_DEPENDS += cross/jemalloc cross/jemalloc-5.2
 OPTIONAL_DEPENDS += cross/libjxl cross/libultrahdr cross/sjpeg
 
 DEPENDS  = cross/bzip2
@@ -27,7 +27,6 @@ DEPENDS += cross/libwmf
 DEPENDS += cross/libwebp
 DEPENDS += cross/djvulibre
 DEPENDS += cross/libtool
-DEPENDS += cross/libfpx
 DEPENDS += cross/fftw
 DEPENDS += cross/liblqr
 
@@ -35,7 +34,7 @@ CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
 CONFIGURE_ARGS += --without-perl --without-x
 # magick *++* files fail to add to package by PLIST
 CONFIGURE_ARGS += --without-magick-plus-plus
-CONFIGURE_ARGS += --with-fpx
+CONFIGURE_ARGS += --without-fpx
 CONFIGURE_ARGS += --with-fftw
 
 include ../../mk/spksrc.common.mk
@@ -72,7 +71,7 @@ LICENSE  = Apache 2.0
 GNU_CONFIGURE = 1
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/jemalloc_5.2
+DEPENDS += cross/jemalloc-5.2
 else
 DEPENDS += cross/jemalloc
 endif
