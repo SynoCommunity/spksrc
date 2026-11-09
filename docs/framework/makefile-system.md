@@ -133,7 +133,8 @@ spksrc.common.mk
 spksrc.common/
 ├── archs.mk                  # architecture classification / groups
 ├── directories.mk            # work/staging/distrib directory layout
-├── help.mk                   # context-aware `make help` inside a package
+├── dotnet.mk                 # the archs a dotnet package refuses, and why
+├── help.mk                   # context-aware `make help`; help-<arch>-<tcvers> adds overlay and check
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros, one file per theme:
 ├── macros/
@@ -151,7 +152,8 @@ spksrc.common/
 │   ├── gcc.mk                #   binutils, gcc, rustc
 │   ├── rustc.mk
 │   └── warnings.mk           #   banner text for the degraded states
-└── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
+├── stage0.mk                 # parse-time toolchain pre-bootstrap (tc_vars.mk, tc_vars.overlay.mk)
+└── tc-capability.mk          # capability floors: MIN_GCC_VERSION, MIN_KERNEL_VERSION, ...
 
 # Build pipeline — the per-package steps
 spksrc.build.mk               # standard pipeline aggregator (download -> install),
@@ -172,12 +174,15 @@ spksrc.build/
 spksrc.rules.mk               # rules entry point: clean/changelog targets,
                               # aggregates dependency-tree.mk + generate-digests.mk
 spksrc.rules/
+├── check.mk                  # make check / check-<arch>-<tcvers>: the capability gates an arch fails
 ├── depend.mk                 # dependency resolution/build
+├── dependency.mk             # builds the DEPENDS, in order
 ├── dependency-tree.mk        # dependency graph
 ├── generate-digests.mk       # digests generation
+├── overlay.mk                # make overlay / overlay-<arch>-<tcvers>: the overlay report
 ├── pre-check.mk              # pre-build validation
 ├── status.mk                 # build status tracking
-├── supported.mk              # arch/version support (build-arch-* targets)
+├── supported.mk              # arch/version support (build-arch-* targets); includes check.mk, overlay.mk
 └── tests.mk                  # test harness rules
 
 # Cross-compilation entry points (a cross/ package includes one)

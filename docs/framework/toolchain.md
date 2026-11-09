@@ -392,7 +392,7 @@ distrib/
     ├── 6.2.4/
     │   ├── binutils-2.30-powerpc-e500v2-linux-gnuspe-qoriq-6.2.4-v4.txz
     │   ├── gcc-8.5.0-powerpc-e500v2-linux-gnuspe-qoriq-6.2.4-v5.txz
-    │   ├── rust-1.98.1-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc8.5-v1.txz
+    │   ├── rust-1.98.1-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc8.5-v2.txz
     │   └── ...
     └── 7.1/
         └── ...

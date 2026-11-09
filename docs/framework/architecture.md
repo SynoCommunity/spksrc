@@ -125,6 +125,7 @@ work-<arch>-<tcversion>/
 │   ├── scripts/
 │   └── conf/
 ├── tc_vars.mk                # Toolchain variables
+├── tc_vars.overlay.mk        # The overlays, and whether the build uses each
 ├── tc_vars.*.mk              # Build system adapters
 └── .<stage>_done             # Cookie files
 ```
