@@ -116,6 +116,7 @@ define OVERLAY_COMPONENT_TEMPLATE
 _OVERLAY_$(1)_ANY := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-*)
 ifeq ($(3)$$(origin OVERLAY_$(1)_VERSION),undefined)
 OVERLAY_$(1)_VERSION := $$(call _overlay_newest,$$(patsubst $$(_OVERLAY_TC)_$(2)-%,%,$$(notdir $$(_OVERLAY_$(1)_ANY))))
+_OVERLAY_$(1)_VERSION_DEFAULTED := 1
 endif
 $(if $(3),,_OVERLAY_$(1)_DIR := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-$$(OVERLAY_$(1)_VERSION)))
 OVERLAY_$(1)_VERSION_MISSING = $$(if $$(_OVERLAY_$(1)_ANY),$$(if $$(strip $$(_OVERLAY_$(1)_DIR)),,1))

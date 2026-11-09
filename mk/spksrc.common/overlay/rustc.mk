@@ -40,6 +40,7 @@ _OVERLAY_RUSTC_POOL_VERSIONS := $(sort $(foreach v,$(_OVERLAY_RUSTC_POOL_NAMES),
 # picking the newest of two forks a shell, once.
 ifeq ($(origin OVERLAY_RUSTC_VERSION),undefined)
 OVERLAY_RUSTC_VERSION := $(call _overlay_newest,$(_OVERLAY_RUSTC_POOL_VERSIONS))
+_OVERLAY_RUSTC_VERSION_DEFAULTED := 1
 endif
 
 _OVERLAY_RUSTC_ALL     := $(wildcard $(BASEDIR)/overlay/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERSION)_gcc-*)
