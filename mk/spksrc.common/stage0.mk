@@ -84,7 +84,10 @@ TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 # overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
 _tc_vars_identity = $(shell mkdir -p $(WORK_DIR))$(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+# Whether the work dir had one before this parse wrote it (stage0.mk is read more than once).
+ifeq ($(origin _TC_VARS_MK_EXISTED),undefined)
 _TC_VARS_MK_EXISTED := $(wildcard $(WORK_DIR)/tc_vars.mk)
+endif
 ifeq ($(_TC_VARS_MK_EXISTED),)
   $(_tc_vars_identity)
 endif

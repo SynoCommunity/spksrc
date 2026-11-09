@@ -154,7 +154,7 @@ else
 	@$(_ovl_line) "rust link through the binutils shim: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF)"
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),$(_ovl_line) "note: no rust $(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_pool) (the gcc this build uses)" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),$(_ovl_line) "note: none built with the gcc overlay: the vendor-gcc one is taken" ;)
-	@printf "       %s\n" "work dir: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),tc_vars.mk records $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build would stop: make clean first,rewritten at the next build),tc_vars.mk agrees),none yet)"
+	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),$(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build stops: make clean first,rewritten by the build),OK),not yet))"
 endif
 
 overlay-%:
