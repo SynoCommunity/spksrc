@@ -190,7 +190,8 @@ If you only read one thing, read this. The details are in the dated log below.
       a run whose switches resolve otherwise than the file records stops, asking for `make
       clean`. `make overlay-<arch>-<tcvers>` shows what each overlay resolves to and whether
       the work dir agrees; `make help-<arch>-<tcvers>` (= `make help ARCH=… TCVERSION=…`) adds
-      it and `check` to the package help. `TC_KERNEL` sits with the versions.
+      it and `check` to the package help, and every arch build prints both after its
+      `[BEGIN]`. `TC_KERNEL` sits with the versions.
     - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
       vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
       depend on the caller's shell.
