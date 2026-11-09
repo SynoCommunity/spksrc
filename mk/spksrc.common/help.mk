@@ -59,6 +59,8 @@ endif
 	@printf "  \033[36m%-24s\033[0m %s\n" "rustup <args>" "run rustup for the rust toolchain (e.g. make rustup show)"
 ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "  \033[36m%-24s\033[0m %s\n" "check-<arch>-<tcvers>" "list the capability gates an arch fails (also: ARCH=.. TCVERSION=.. check)"
+	@printf "  \033[36m%-24s\033[0m %s\n" "overlay-<arch>-<tcvers>" "what each overlay resolves to for an arch, and its work dir (also: ARCH=.. TCVERSION=.. overlay)"
+	@printf "  \033[36m%-24s\033[0m %s\n" "help-<arch>-<tcvers>" "this help, then that arch's check and overlays (also: ARCH=.. TCVERSION=.. help)"
 endif
 ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "\n\033[1mMulti-arch\033[0m  (needs 'make setup' once at the spksrc root first)\n"
