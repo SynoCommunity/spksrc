@@ -92,10 +92,10 @@ endif
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(WORK_DIR)/tc_vars.mk
 
-# The overlays it records (ON/OFF) against what this run resolves. A tc_vars.mk older than
-# ON/OFF holds paths there, which nothing reads any more: not compared.
-_TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter ON OFF,$(TC_OVERLAY_$(c))),\
-                              $(if $(filter $(TC_OVERLAY_$(c)),$(if $(OVERLAY_$(c)_ON),ON,OFF)),,$(c)))))
+# The overlays it records (TC_OVERLAY_<c>_ON) against what this run resolves. A tc_vars.mk
+# older than that has none: not compared.
+_TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter TRUE FALSE,$(TC_OVERLAY_$(c)_ON)),\
+                              $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
 _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
 
 ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
@@ -108,7 +108,7 @@ _TC_VARS_OVERLAY_CHANGED :=
 else
 # The flags are made: -B<shim> and the overlay gcc are fixed in them with the overlays this file
 # records, so a run deciding otherwise -- a switch flipped since -- would mix the two.
-$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(TC_OVERLAY_$(c))) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
 endif
 endif
 endif

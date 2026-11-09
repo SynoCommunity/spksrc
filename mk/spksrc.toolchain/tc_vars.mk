@@ -54,9 +54,11 @@ COOKIE_PREFIX =
 
 # Where a tool lives, emitted verbatim into tc_vars.mk below so the files written here
 # and the packages reading them resolve one the same way. Recursive: the overlays follow.
+# An overlay's bin dir is set wherever the arch ships it; the tc macro takes it only when
+# that overlay is ON.
 TC_PATH                   = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
-TC_OVERLAY_BINUTILS_PATH  = $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/)
-TC_OVERLAY_GCC_PATH       = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/)
+TC_OVERLAY_BINUTILS_PATH  = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_BIN)/)
+TC_OVERLAY_GCC_PATH       = $(if $(strip $(_OVERLAY_GCC_DIR)),$(firstword $(_OVERLAY_GCC_DIR))/work/install/usr/local/bin/)
 
 # The cmake variable a tool fills, given its TOOLS name; the build-host twin is the
 # same with _FOR_BUILD appended. Anything not named here is CMAKE_<name>.
@@ -409,20 +411,19 @@ tc_flags:
 	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
-# What this build's overlays are, for the package and for whoever reads the file: TC_OVERLAY_<c>
-# ON or OFF, TC_OVERLAY_<c>_DIR the consumer dir when ON, TC_OVERLAY_<c>_PATH its bin dir when
-# ON (binutils and gcc; trailing slash, like TC_PATH) -- see the tc macro in
-# spksrc.common/macros/tools.mk, which packages should call rather than assembling a path.
-# None of these names is computed by the tree, which keeps its own in _OVERLAY_<c>_DIR and
-# OVERLAY_<c>_ON: this file, included at parse, cannot shadow them. stage0.mk stops the build
-# when a switch has changed since the file was written (its flags were made with it).
+# The overlays, after the versions, one block each: TC_OVERLAY_<c>_ON TRUE or FALSE says
+# whether this build uses it; TC_OVERLAY_<c> is its version, TC_OVERLAY_<c>_DIR its consumer dir and
+# TC_OVERLAY_<c>_PATH its bin dir (binutils and gcc; trailing slash, like TC_PATH) wherever
+# the arch ships it, used or not -- beside TC_BINUTILS / TC_GCC, the versions the build takes.
+# The tc macro (spksrc.common/macros/tools.mk) takes a _PATH only when ON. The tree computes
+# none of these names -- its own are _OVERLAY_<c>_DIR and OVERLAY_<c>_ON -- so this file,
+# included at parse, records without changing a decision. stage0.mk compares
+# TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that differs once the flags are
+# made.
 # Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on wherever a rust
 # overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim TC_OVERLAY_RUSTC_LINKER (the
 # -Clink-arg=-B of the Rust link flags). TC_KERNEL takes a "+" from 4.4 on, the
 # EXTRAVERSION those kernels carry.
-#
-# The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
-# would inherit the previous run's choice and the switch would go sticky.
 #
 # TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
 # it was the one missing here, so a package reading the generated file saw an empty value
@@ -446,16 +447,19 @@ tc_vars:
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
 	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+) ; \
-	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),ON,OFF) ; \
-	echo TC_OVERLAY_BINUTILS_DIR := $(if $(OVERLAY_BINUTILS_ON),$(_OVERLAY_BINUTILS_DIR)) ; \
+	echo TC_OVERLAY_BINUTILS_ON := $(if $(OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_BINUTILS := $(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS) ; \
+	echo TC_OVERLAY_BINUTILS_DIR := $(firstword $(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
-	echo TC_OVERLAY_GCC := $(if $(OVERLAY_GCC_ON),ON,OFF) ; \
-	echo TC_OVERLAY_GCC_DIR := $(if $(OVERLAY_GCC_ON),$(_OVERLAY_GCC_DIR)) ; \
+	echo TC_OVERLAY_GCC_ON := $(if $(OVERLAY_GCC_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_GCC := $(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS) ; \
+	echo TC_OVERLAY_GCC_DIR := $(firstword $(_OVERLAY_GCC_DIR)) ; \
 	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH) ; \
-	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),ON,OFF) ; \
-	echo TC_OVERLAY_RUSTC_DIR := $(if $(OVERLAY_RUSTC_ON),$(_OVERLAY_RUSTC_DIR)) ; \
-	echo TC_RUST_LINK_VIA_BINUTILS := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF) ; \
-	echo TC_OVERLAY_RUSTC_LINKER := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(OVERLAY_BINUTILS_SHIM))
+	echo TC_OVERLAY_RUSTC_ON := $(if $(OVERLAY_RUSTC_ON),TRUE,FALSE) ; \
+	echo TC_OVERLAY_RUSTC := $(call read_makefile_var,$(firstword $(_OVERLAY_RUSTC_DIR))/Makefile,PKG_VERS) ; \
+	echo TC_OVERLAY_RUSTC_DIR := $(firstword $(_OVERLAY_RUSTC_DIR)) ; \
+	echo TC_RUST_LINK_VIA_BINUTILS := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),TRUE,FALSE) ; \
+	echo TC_OVERLAY_RUSTC_LINKER := $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_SHIM))
 
 #####
 

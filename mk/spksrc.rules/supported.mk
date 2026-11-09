@@ -129,7 +129,7 @@ overlay:
 	@$(if $(OVERLAY_GCC_NO_BINUTILS),printf "       %s\n" "note: gcc requested without a binutils overlay to drive: vendor gcc kept" ;)
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),printf "       %s\n" "note: rust $(OVERLAY_RUSTC_VERSION) is not shipped for this arch" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),printf "       %s\n" "note: no rust built with the gcc overlay: the vendor-gcc one is taken" ;)
-	@printf "       %s\n" "work dir: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),tc_vars.mk records $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(TC_OVERLAY_$(c))) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build would stop: make clean first,rewritten at the next build),tc_vars.mk agrees),none yet)"
+	@printf "       %s\n" "work dir: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),tc_vars.mk records $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) -- $(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),a build would stop: make clean first,rewritten at the next build),tc_vars.mk agrees),none yet)"
 
 overlay-%:
 	@$(MAKE) --no-print-directory overlay \

@@ -23,8 +23,8 @@ read_makefile_var = $(shell sed -n 's/^$(2)[[:space:]]*[:?]*=[[:space:]]*//p' $(
 # resolves to the vendor compiler whenever an overlay is active.
 #
 # Falls back to TC_PATH, so the call is correct with no overlay and stays correct when one
-# is grafted on -- nothing to revisit in the packages. TC_OVERLAY_<c>_PATH is empty unless
-# that overlay is ACTIVE (spksrc.toolchain/tc_vars.mk).
+# is grafted on -- nothing to revisit in the packages. TC_OVERLAY_<c>_PATH is set wherever the
+# arch ships that overlay (spksrc.toolchain/tc_vars.mk), and taken only when it is ON.
 #
 # Needed by any build system that ignores CC/AR from the environment: ffmpeg takes its
 # compilers from --cross-prefix, and a handful of packages pass CC=/AR= on a make line.
@@ -34,9 +34,9 @@ _tc_binutils_tools = ld as ar nm ranlib strip objdump objcopy readelf
 define tc
 $(strip \
   $(if $(filter $(1),$(_tc_gcc_tools)),\
-    $(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)$(1)$(TC_GCC_SUFFIX),\
+    $(or $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC_PATH)),$(TC_PATH))$(TC_PREFIX)$(1)$(TC_GCC_SUFFIX),\
   $(if $(filter $(1),$(_tc_binutils_tools)),\
-    $(or $(TC_OVERLAY_BINUTILS_PATH),$(TC_PATH))$(TC_PREFIX)$(1),\
+    $(or $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS_PATH)),$(TC_PATH))$(TC_PREFIX)$(1),\
     $(TC_PATH)$(TC_PREFIX)$(1))))
 endef
 

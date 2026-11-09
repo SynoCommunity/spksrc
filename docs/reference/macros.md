@@ -263,8 +263,8 @@ hand-built path silently resolves to the **vendor** tool the moment an overlay i
 
 | Tool family | Resolved through | Tools |
 |-------------|------------------|-------|
-| gcc | `TC_OVERLAY_GCC_PATH`, else `TC_PATH` (plus `TC_GCC_SUFFIX`) | `gcc` `g++` `c++` `cpp` `gfortran` |
-| binutils | `TC_OVERLAY_BINUTILS_PATH`, else `TC_PATH` | `ld` `as` `ar` `nm` `ranlib` `strip` `objdump` `objcopy` `readelf` |
+| gcc | `TC_OVERLAY_GCC_PATH` when `TC_OVERLAY_GCC_ON`, else `TC_PATH` (plus `TC_GCC_SUFFIX`) | `gcc` `g++` `c++` `cpp` `gfortran` |
+| binutils | `TC_OVERLAY_BINUTILS_PATH` when `TC_OVERLAY_BINUTILS_ON`, else `TC_PATH` | `ld` `as` `ar` `nm` `ranlib` `strip` `objdump` `objcopy` `readelf` |
 | anything else | `TC_PATH` | — |
 
 `TC_OVERLAY_<c>_PATH` is empty unless that overlay is *active* for the build (see
