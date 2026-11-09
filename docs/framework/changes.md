@@ -176,9 +176,16 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
       the macros. See [Boolean values](../reference/macros.md#boolean-values).
     - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
-      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `TC_OVERLAY_GCC`,
-      `OVERLAY_GCC_ON`), off for the tree: the producer turns it on for itself.
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `OVERLAY_GCC_ON`), off for the
+      tree: the producer turns it on for itself.
       Packages keep the vendor gcc, and the same rust.
+    - **What `tc_vars.mk` says about the overlays:** `TC_OVERLAY_<c>` is `ON` or `OFF`,
+      `TC_OVERLAY_<c>_DIR` and `_PATH` the consumer and bin dirs when `ON`, for binutils, gcc
+      and rust; `TC_RUST_LINK_VIA_BINUTILS` and `TC_OVERLAY_RUSTC_LINKER` show the Rust link
+      through the binutils shim. The tree's own names move to `_OVERLAY_<c>_DIR`, so the file
+      no longer shadows them at parse -- a work dir generated with an overlay off used to
+      keep it off whatever the switch -- and a run whose switches resolve otherwise than the
+      file records stops, asking for `make clean`. `TC_KERNEL` sits with the versions.
     - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
       vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
       depend on the caller's shell.

@@ -8,7 +8,7 @@
 
 # ---- AVAILABLE ---------------------------------------------------------------------
 # _OVERLAY_RUSTC_ANY, OVERLAY_RUSTC_VERSION_MISSING and its banner; OVERLAY_RUSTC_VERSION and
-# TC_OVERLAY_RUSTC are picked below. _ANY ignores the requested version, which is what tells
+# _OVERLAY_RUSTC_DIR are picked below. _ANY ignores the requested version, which is what tells
 # "this arch has no overlay" (standard arch) from "not that version" (mis-set knob).
 $(eval $(call OVERLAY_COMPONENT_TEMPLATE,RUSTC,rust,select))
 
@@ -51,15 +51,15 @@ _OVERLAY_RUSTC_VENDOR  := $(filter-out %_gcc-$(OVERLAY_GCC_VERSION),$(_OVERLAY_R
 # against the same glibc, so it stays usable -- having no rustc overlay at all would not.
 # With the gcc overlay OFF, only the vendor one is a candidate; taking the gcc-8.5 build
 # there would pair it with a compiler it was not built against.
-TC_OVERLAY_RUSTC := $(if $(call is_true,$(OVERLAY_GCC)),\
-                         $(or $(_OVERLAY_RUSTC_MATCHED),$(_OVERLAY_RUSTC_VENDOR)),\
-                         $(_OVERLAY_RUSTC_VENDOR))
+_OVERLAY_RUSTC_DIR := $(if $(call is_true,$(OVERLAY_GCC)),\
+                           $(or $(_OVERLAY_RUSTC_MATCHED),$(_OVERLAY_RUSTC_VENDOR)),\
+                           $(_OVERLAY_RUSTC_VENDOR))
 
 # NARROW: only the Rust link takes the overlay ld; C keeps the vendor's.
-RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
+RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(_OVERLAY_RUSTC_DIR)),1)
 
 # Lazy (=), like the other components' ACTIVE.
-OVERLAY_RUSTC_ON = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))
+OVERLAY_RUSTC_ON = $(if $(strip $(_OVERLAY_RUSTC_DIR)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))
 
 # Degraded state (spksrc.common/overlay.mk), not a failure: the gcc overlay is on, this
 # arch ships no rustc built against it, and the vendor-gcc one was taken instead. Worth

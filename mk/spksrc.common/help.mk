@@ -90,7 +90,7 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "  \033[33m%s\033[0m\n" "  command line > environment > local.mk > built-in defaults -- so 'make setup' puts"
 	@printf "  \033[33m%s\033[0m\n" "  them in local.mk with ?=, and OVERLAY_BINUTILS=1 make ... still overrides for one build"
 	@if [ -n "$(strip $(ARCH))" ]; then \
-	  printf "  \033[33m%s\033[0m\n" "  here ($(ARCH)-$(TCVERSION)): rustc=$(if $(OVERLAY_RUSTC_ON),active,$(if $(strip $(TC_OVERLAY_RUSTC)),off,none)) binutils=$(if $(OVERLAY_BINUTILS_ON),active,$(if $(strip $(TC_OVERLAY_BINUTILS)),off,none))" ; \
+	  printf "  \033[33m%s\033[0m\n" "  here ($(ARCH)-$(TCVERSION)): rustc=$(if $(OVERLAY_RUSTC_ON),active,$(if $(strip $(_OVERLAY_RUSTC_DIR)),off,none)) binutils=$(if $(OVERLAY_BINUTILS_ON),active,$(if $(strip $(_OVERLAY_BINUTILS_DIR)),off,none))" ; \
 	else \
 	  printf "  \033[33m%s\033[0m\n" "  add ARCH=... TCVERSION=... to see which are active here" ; \
 	fi

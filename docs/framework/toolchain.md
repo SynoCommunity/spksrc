@@ -145,8 +145,8 @@ checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e5
 
 What the toolchain is, as plain values: where it lives, its target and prefix, and the versions
 the capability floors compare against (`MIN_GCC_VERSION`,
-`MIN_KERNEL_VERSION`, …). The overlay pointers carry **active** semantics -- the path when that
-overlay drives the build, empty otherwise (see [Toolchain Overlays](#toolchain-overlays)).
+`MIN_KERNEL_VERSION`, …), then what this build's overlays are: each `ON` or `OFF`, with its
+consumer dir and bin dir when `ON` (see [Toolchain Overlays](#toolchain-overlays)).
 
 ```makefile
 TC_TYPE := DSM
@@ -164,10 +164,17 @@ TC_ARCH := qoriq
 TC_GCC := 4.9.3
 TC_GLIBC := 2.20
 TC_BINUTILS := 2.25
-TC_OVERLAY_RUSTC := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_OVERLAY_BINUTILS :=
-TC_OVERLAY_BINUTILS_PATH :=
 TC_KERNEL := 2.6.32
+TC_OVERLAY_BINUTILS := OFF
+TC_OVERLAY_BINUTILS_DIR :=
+TC_OVERLAY_BINUTILS_PATH :=
+TC_OVERLAY_GCC := OFF
+TC_OVERLAY_GCC_DIR :=
+TC_OVERLAY_GCC_PATH :=
+TC_OVERLAY_RUSTC := ON
+TC_OVERLAY_RUSTC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
+TC_RUST_LINK_VIA_BINUTILS := ON
+TC_OVERLAY_RUSTC_LINKER := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
 ### tc_vars.autotools.mk
@@ -466,11 +473,14 @@ A request that cannot be honored never fails the build: it degrades to the stock
 Each generated `tc_vars.mk` records what the build actually resolved to:
 
 ```makefile
-TC_OVERLAY_RUSTC := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_OVERLAY_BINUTILS :=          # empty: the narrow rust link only, not the global overlay
+TC_OVERLAY_BINUTILS := OFF      # the global overlay: off, the C build keeps the vendor as/ld
+TC_OVERLAY_RUSTC := ON
+TC_OVERLAY_RUSTC_DIR := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
+TC_RUST_LINK_VIA_BINUTILS := ON # the narrow use: the Rust link only, through the shim below
+TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
-Both carry **active** semantics — the path when that overlay drives the build, empty otherwise. The narrow rust-link use shows up instead as a `-Clink-arg=-B<shim>` in the Rust link flags. The `OVERLAY_<c>` switches are deliberately not exported: a package includes `tc_vars.mk`, so it would inherit the previous run's choice and the switch would go sticky.
+`TC_OVERLAY_<c>` is `ON` or `OFF`, `TC_OVERLAY_<c>_DIR` the consumer dir and `TC_OVERLAY_<c>_PATH` its bin dir when `ON`. The tree computes none of these names -- it keeps its own in `_OVERLAY_<c>_DIR` and `OVERLAY_<c>_ON` -- so the file, included at parse, never shadows a decision. Its flags are fixed with the overlays it records, though: a run whose switches resolve otherwise -- `OVERLAY_BINUTILS=1` on a work dir generated without it -- stops with *tc_vars.mk was generated with the BINUTILS overlay OFF and this run has it ON: run make clean first*. The `OVERLAY_<c>` switches themselves are not written there.
 
 ### Building and publishing an overlay
 
@@ -514,7 +524,7 @@ The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>
 
 A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
 
-An arch opts in simply by having a rust overlay (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
+An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC := ON` in its `tc_vars.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
 
 ### Building Rust
 

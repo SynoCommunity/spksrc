@@ -101,7 +101,7 @@ RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 # gcc and g++ only: the overlay archive ships no binutils, so ar and ranlib keep coming
 # from the toolchain that has them.
 TC_GCC_SUFFIX ?= $(if $(OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERSION))
-_RUST_GCC_BIN  = $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
+_RUST_GCC_BIN  = $(if $(OVERLAY_GCC_ON),$(_OVERLAY_GCC_DIR)/work/install/usr/local/bin/,$(TC_EXTRACT_DIR)/bin/)
 RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
 RUST_CC       ?= $(_RUST_GCC_BIN)$(TC_TARGET)-gcc$(TC_GCC_SUFFIX)
 RUST_CXX      ?= $(_RUST_GCC_BIN)$(TC_TARGET)-g++$(TC_GCC_SUFFIX)
@@ -247,8 +247,8 @@ rustc_gcc_overlay:
 	@if [ -n "$(OVERLAY_GCC_ON)" ]; then \
 	  $(call rustc_status,gcc-overlay) ; \
 	  $(MSG) "*** Extracting gcc overlay $(OVERLAY_GCC_VERSION) for $(TC_ARCH)-$(TC_VERS)" ; \
-	  $(MSG) "*** PATH: $(TC_OVERLAY_GCC)" ; \
-	  MAKEFLAGS= $(MAKE) --no-print-directory -C $(TC_OVERLAY_GCC) ; \
+	  $(MSG) "*** PATH: $(_OVERLAY_GCC_DIR)" ; \
+	  MAKEFLAGS= $(MAKE) --no-print-directory -C $(_OVERLAY_GCC_DIR) ; \
 	fi
 
 .PHONY: rustc_binutils_cobuild

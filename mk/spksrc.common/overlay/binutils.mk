@@ -5,7 +5,7 @@
 # after the switches and before gcc.mk, whose OVERLAY_GCC_ON this reads lazily.
 ###############################################################################
 
-# _OVERLAY_BINUTILS_ANY, OVERLAY_BINUTILS_VERSION, TC_OVERLAY_BINUTILS,
+# _OVERLAY_BINUTILS_ANY, OVERLAY_BINUTILS_VERSION, _OVERLAY_BINUTILS_DIR,
 # OVERLAY_BINUTILS_VERSION_MISSING and its banner.
 $(eval $(call OVERLAY_COMPONENT_TEMPLATE,BINUTILS,binutils))
 
@@ -24,7 +24,7 @@ endif
 # assemble what it emits. A package therefore activates OVERLAY_GCC alone; an explicit
 # OVERLAY_BINUTILS=0 beside it is refused (spksrc.common/overlay.mk). No cycle:
 # OVERLAY_GCC_ON tests availability, not this.
-OVERLAY_BINUTILS_ON = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(call is_true,$(OVERLAY_BINUTILS))$(OVERLAY_GCC_ON),1))
+OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(call is_true,$(OVERLAY_BINUTILS))$(OVERLAY_GCC_ON),1))
 
 # OVERLAY_BINUTILS asked off while the gcc overlay is active: the request cannot be obeyed,
 # and building anyway would let the caller believe it was. Stops at parse time, in the
@@ -35,7 +35,7 @@ OVERLAY_BINUTILS_REFUSED = $(if $(OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED)
 # no as/ld of its own, so without this it would silently drive the vendor ones. The gcc one
 # counts only where the arch ships a gcc overlay: elsewhere OVERLAY_GCC=1 asks for nothing,
 # and must not announce a missing binutils on every build of a 7.2 arch.
-_OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(if $(strip $(TC_OVERLAY_GCC)),$(call is_true,$(OVERLAY_GCC))),1)
+_OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUST_LINK_VIA_BINUTILS))$(if $(strip $(_OVERLAY_GCC_DIR)),$(call is_true,$(OVERLAY_GCC))),1)
 
 # Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or active
 # beside the vendor gcc, which it is not matched to.

@@ -91,6 +91,18 @@ endif
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(WORK_DIR)/tc_vars.mk
 
+# The overlays a work dir's tc_vars were generated with are fixed in its flags (-B<shim>, the
+# overlay gcc): a run deciding otherwise -- a switch flipped since -- would mix the two. Stop,
+# except for the goals that clean the work dir or only walk the dependencies. A tc_vars.mk older
+# than ON/OFF holds paths there, which nothing reads any more: not compared.
+ifeq ($(filter clean clean% %clean dependency-%,$(MAKECMDGOALS)),)
+_TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter ON OFF,$(TC_OVERLAY_$(c))),\
+                              $(if $(filter $(TC_OVERLAY_$(c)),$(if $(OVERLAY_$(c)_ON),ON,OFF)),,$(c)))))
+ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
+$(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(TC_OVERLAY_$(c))) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+endif
+endif
+
 # Keyed on the extracted $(TC_TARGET); the cookie traces who paid for it. Locked: the
 # parallel walks of depend.mk bootstrap the same toolchain at once, the later ones then
 # finding its cookies.

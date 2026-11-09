@@ -409,18 +409,17 @@ tc_flags:
 	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
-# TC_OVERLAY_<c> is emitted with ACTIVE semantics -- the consumer dir when the overlay drives
-# THIS build, empty otherwise -- so a generated tc_vars.mk shows what was resolved. (In-tree the
-# same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
-# active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
-# touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
-# TC_OVERLAY_<c>_PATH is the bin dir of an ACTIVE overlay, empty otherwise, so a package
-# can write its own fallback -- see the tc macro in spksrc.common/macros.mk, which is what
-# packages should call rather than assembling a path. Trailing slash, like TC_PATH.
-#
-# The GCC arm is inert today: no gcc overlay exists yet, so OVERLAY_GCC_ON is undefined and
-# the value comes out empty. It is emitted anyway so the contract is whole and a gcc
-# overlay needs no change here to switch it on.
+# What this build's overlays are, for the package and for whoever reads the file: TC_OVERLAY_<c>
+# ON or OFF, TC_OVERLAY_<c>_DIR the consumer dir when ON, TC_OVERLAY_<c>_PATH its bin dir when
+# ON (binutils and gcc; trailing slash, like TC_PATH) -- see the tc macro in
+# spksrc.common/macros/tools.mk, which packages should call rather than assembling a path.
+# None of these names is computed by the tree, which keeps its own in _OVERLAY_<c>_DIR and
+# OVERLAY_<c>_ON: this file, included at parse, cannot shadow them. stage0.mk stops the build
+# when a switch has changed since the file was written (its flags were made with it).
+# Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on wherever a rust
+# overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim TC_OVERLAY_RUSTC_LINKER (the
+# -Clink-arg=-B of the Rust link flags). TC_KERNEL takes a "+" from 4.4 on, the
+# EXTRAVERSION those kernels carry.
 #
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
@@ -446,17 +445,17 @@ tc_vars:
 	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
-	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
-	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
+	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+) ; \
+	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),ON,OFF) ; \
+	echo TC_OVERLAY_BINUTILS_DIR := $(if $(OVERLAY_BINUTILS_ON),$(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
-	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH)
-# TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
-# Add "+" to EXTRAVERSION for kernels version >= 4.4
-ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
-	@echo TC_KERNEL := $(TC_KERNEL)+
-else
-	@echo TC_KERNEL := $(TC_KERNEL)
-endif
+	echo TC_OVERLAY_GCC := $(if $(OVERLAY_GCC_ON),ON,OFF) ; \
+	echo TC_OVERLAY_GCC_DIR := $(if $(OVERLAY_GCC_ON),$(_OVERLAY_GCC_DIR)) ; \
+	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH) ; \
+	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),ON,OFF) ; \
+	echo TC_OVERLAY_RUSTC_DIR := $(if $(OVERLAY_RUSTC_ON),$(_OVERLAY_RUSTC_DIR)) ; \
+	echo TC_RUST_LINK_VIA_BINUTILS := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF) ; \
+	echo TC_OVERLAY_RUSTC_LINKER := $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(OVERLAY_BINUTILS_SHIM))
 
 #####
 

@@ -19,13 +19,13 @@
 ###############################################################################
 
 # The extracted cross tools (<target>-ld, <target>-as, ...), inside the CONSUMER's own work
-# dir -- TC_OVERLAY_BINUTILS is that directory. Keeping each overlay self-contained is what
+# dir -- _OVERLAY_BINUTILS_DIR is that directory. Keeping each overlay self-contained is what
 # lets two versions of one component coexist; only these pointers then decide which is used.
-OVERLAY_BINUTILS_BIN  = $(TC_OVERLAY_BINUTILS)/work/install/usr/local/bin
+OVERLAY_BINUTILS_BIN  = $(_OVERLAY_BINUTILS_DIR)/work/install/usr/local/bin
 # gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a shim dir
 # carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim).
 # Absolute, so the -B path baked into tc_vars is stable across checkouts.
-OVERLAY_BINUTILS_SHIM = $(TC_OVERLAY_BINUTILS)/work/shim
+OVERLAY_BINUTILS_SHIM = $(_OVERLAY_BINUTILS_DIR)/work/shim
 # GLOBAL redirect, folded into CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS by tc_vars. Empty unless the
 # global overlay is active -- a -B into a shim that never gets built would silently leave
 # every compile on the vendor as/ld.

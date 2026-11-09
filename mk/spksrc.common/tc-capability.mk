@@ -117,9 +117,10 @@ endif
 endif
 
 # ---- rustc: the rust version the toolchain pins -----------------------------
-# PKG_VERS of the rust consumer overlay.mk settled on: it narrows the arch's consumers to
-# one version and one gcc variant, so firstword just unwraps. Else a toolchain's own pin.
-_TC_CAP_RUST_MK := $(wildcard $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+# PKG_VERS of the rust consumer overlay.mk settled on, when it is active: it narrows the arch's
+# consumers to one version and one gcc variant, so firstword just unwraps. Else a toolchain's
+# own pin.
+_TC_CAP_RUST_MK := $(if $(OVERLAY_RUSTC_ON),$(wildcard $(firstword $(_OVERLAY_RUSTC_DIR))/Makefile))
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
 _TC_CAP_RUSTC := $(call read_makefile_var,$(_TC_CAP_RUST_MK),PKG_VERS)
 else

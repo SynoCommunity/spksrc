@@ -9,7 +9,7 @@
 # build selects OUR toolchain rather than rustup's glibc-newer std, for the targets rustup
 # ships no usable one for: Tier-3 PowerPC e500 (qoriq, ppc853x), or a Tier-2 whose prebuilt
 # std targets a newer glibc than the DSM toolchain (ARMv5 88f6281). An arch enters here when
-# it has a rust consumer dir (TC_OVERLAY_RUSTC); standard archs never do.
+# it has a rust consumer dir (_OVERLAY_RUSTC_DIR); standard archs never do.
 #
 # The toolchain itself is BUILT by native/rustc-<vers> and downloaded by the consumer:
 #   make -C native/rustc-<vers> arch-<arch>-<vers>
@@ -22,10 +22,10 @@ overlay-rustc-warn:
 	@$(call overlay_warn,RUSTC,VERSION_MISSING GCC_FALLBACK)
 
 # ============================================================================
-# Custom-rust archs only (TC_OVERLAY_RUSTC: a rust consumer dir exists);
+# Custom-rust archs only (_OVERLAY_RUSTC_DIR: a rust consumer dir exists);
 # standard archs never enter here.
 # ============================================================================
-ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
+ifneq ($(strip $(_OVERLAY_RUSTC_DIR)),)
 
 # RUST_TARGET (the in-tree base triple) comes from env-rust.mk's arch map -- the single
 # source of truth. Sourced here (guarded; tc_vars.mk includes it again) so it is set
@@ -73,4 +73,4 @@ ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 RUSTFLAGS += -Clink-arg=-B$(OVERLAY_BINUTILS_SHIM)
 endif
 
-endif # custom-rust arch (TC_OVERLAY_RUSTC)
+endif # custom-rust arch (_OVERLAY_RUSTC_DIR)

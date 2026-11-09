@@ -82,7 +82,7 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix;
 #                        inert where the arch ships none.
 #
-# Defaulted here, before the components: the rust pool and TC_OVERLAY_RUSTC (rustc.mk) are
+# Defaulted here, before the components: the rust pool and _OVERLAY_RUSTC_DIR (rustc.mk) are
 # immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
 # unset switch while everything later sees the default.
 OVERLAY_RUSTC    ?= 1
@@ -117,8 +117,8 @@ _OVERLAY_$(1)_ANY := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-*)
 ifeq ($(3)$$(origin OVERLAY_$(1)_VERSION),undefined)
 OVERLAY_$(1)_VERSION := $$(call _overlay_newest,$$(patsubst $$(_OVERLAY_TC)_$(2)-%,%,$$(notdir $$(_OVERLAY_$(1)_ANY))))
 endif
-$(if $(3),,TC_OVERLAY_$(1) := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-$$(OVERLAY_$(1)_VERSION)))
-OVERLAY_$(1)_VERSION_MISSING = $$(if $$(_OVERLAY_$(1)_ANY),$$(if $$(strip $$(TC_OVERLAY_$(1))),,1))
+$(if $(3),,_OVERLAY_$(1)_DIR := $$(wildcard $$(BASEDIR)/overlay/$$(_OVERLAY_TC)_$(2)-$$(OVERLAY_$(1)_VERSION)))
+OVERLAY_$(1)_VERSION_MISSING = $$(if $$(_OVERLAY_$(1)_ANY),$$(if $$(strip $$(_OVERLAY_$(1)_DIR)),,1))
 OVERLAY_WARN_$(1)_VERSION_MISSING = $$(call overlay_warn_version_missing,$(2),OVERLAY_$(1)_VERSION,$$(OVERLAY_$(1)_VERSION),$$(_OVERLAY_$(1)_ANY))
 endef
 
@@ -139,11 +139,8 @@ TC_OVERLAY_ALL := $(_OVERLAY_BINUTILS_ANY) $(_OVERLAY_GCC_ANY) $(_OVERLAY_RUSTC_
 # use rather than the vendor one it replaces. Empty when neither, or the arch has none.
 # Here, once the gcc overlay is known.
 #
-# Immediate, and deliberately not read back later: the generated tc_vars.mk emits
-# TC_OVERLAY_BINUTILS with ACTIVE semantics and stage0.mk includes that file ahead of
-# tc-capability.mk, so a work dir generated with the overlay off would hand back an empty
-# one and the floor would see the vendor version.
-_OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(OVERLAY_GCC_ON)),$(call read_makefile_var,$(firstword $(TC_OVERLAY_BINUTILS))/Makefile,PKG_VERS))
+# Immediate: settled here, before stage0.mk includes the work dir's tc_vars.mk.
+_OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(OVERLAY_GCC_ON)),$(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS))
 
 # The effective as/ld version, given the vendor one to fall back to. Two callers, because
 # TC_BINUTILS reaches them from different places: tc-capability.mk reads it out of the
@@ -156,7 +153,7 @@ overlay_binutils_version = $(or $(strip $(_OVERLAY_BINUTILS_PKG_VERS)),$(strip $
 # FWRD_ARGS, which spksrc.common.mk builds from FWRD_VARS. Deliberately absent from
 # FWRD_ARGS_SPK: which compiler a package builds with belongs to that package and its own
 # work dir, so an spk built as another's meta decides for itself rather than inheriting its
-# caller's choice. Not RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the
+# caller's choice. Not RUST_LINK_VIA_BINUTILS: it derives from _OVERLAY_RUSTC_DIR, which the
 # child reads itself.
 FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 

@@ -184,7 +184,7 @@ rustup-rustc: patch
 # (single source of truth, never hardcoded per base toolchain); otherwise left to env-rust.mk's
 # 'stable'. Availability/request/active are resolved in spksrc.common/overlay.mk.
 ifeq ($(OVERLAY_RUSTC_ON),1)
-TC_RUSTC := $(call read_makefile_var,$(firstword $(TC_OVERLAY_RUSTC))/Makefile,PKG_VERS)
+TC_RUSTC := $(call read_makefile_var,$(firstword $(_OVERLAY_RUSTC_DIR))/Makefile,PKG_VERS)
 endif
 
 # Every overlay the arch ships, as a consumer-dir DEPENDS, whether a build uses it or not:
