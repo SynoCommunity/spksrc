@@ -121,6 +121,7 @@ _ovl_rust_gccs = $(sort $(foreach d,$(notdir $(_OVERLAY_RUSTC_ANY)),$(lastword $
 _ovl_rust_vers = $(sort $(foreach d,$(filter %_gcc-$(1),$(notdir $(_OVERLAY_RUSTC_ANY))),$(firstword $(subst _gcc-, ,$(patsubst $(_OVERLAY_TC)_rust-%,%,$(d))))))
 _ovl_rust_gcc  = $(lastword $(subst _gcc-, ,$(notdir $(firstword $(_OVERLAY_RUSTC_DIR)))))
 _ovl_rust_pool = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(TC_GCC))
+_ovl_rule      = ======================================================================
 _ovl_line      = printf "         %s\n"
 # One versions row: switch (or blank), what the versions are, them, the default, a marker.
 _ovl_vers      = printf "         %-34s %-15s %-12s default: %s%s\n"
@@ -193,8 +194,10 @@ build-arch-%:
 	        | tee --append $(STATUS_LOG)
 	@# What the build starts with, at the head of its log: its overlays, with its switches.
 	@# Informational: a report that fails does not fail the build.
+	@$(MSG) "$(_ovl_rule)"
 	@MAKEFLAGS= $(MAKE) --no-print-directory $(FWRD_ARGS) \
 	    ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) overlay || :
+	@$(MSG) "$(_ovl_rule)"
 	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
 	@# failed build would be reported as a success.
 	@set -o pipefail ; \
