@@ -1,5 +1,5 @@
 PKG_NAME = json-c
-PKG_VERS = 0.17-20230812
+PKG_VERS = 0.19-20260627
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/json-c/json-c/archive

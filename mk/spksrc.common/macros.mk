@@ -58,7 +58,7 @@ dep_seen = { [ -d "$(1)" ] && ! mkdir "$(1)/$$(echo $(2) | sed 's|/|__|g')" 2>/d
 #   $(call depend,cross/vvenc,--enable-libvvenc)
 #   $(call depend,cross/x265,--enable-libx265,--disable-libx265)
 #   $(call depend,cross/intel-mediasdk,nop)
-#   $(call depend,cross/libvmaf_2.3|cross/libvmaf_1.5,--enable-libvmaf)
+#   $(call depend,cross/libvmaf-2.3|cross/libvmaf-1.5,--enable-libvmaf)
 #   $(call depend,cross/flac)
 #   $(call depend,cross/libaom-latest|cross/libaom-3.8)
 #

@@ -19,9 +19,9 @@ h264_vaapi transcoding of IPTV streams after encoder context reset.
 Suggested-by: Claude Sonnet 4.6 (Anthropic AI <https://anthropic.com>)
 Signed-off-by: Vincent Fortier <th0ma7@gmail.com>
 
---- libavformat/movenc.c.orig	2026-05-30 20:10:26.399269531 +0000
-+++ libavformat/movenc.c	2026-05-30 20:11:37.129673506 +0000
-@@ -6304,9 +6304,12 @@ static int mov_flush_fragment(AVFormatCo
+--- libavformat/movenc.c.orig
++++ libavformat/movenc.c
+@@ -6534,9 +6534,12 @@ static int mov_flush_fragment(AVFormatCo
                  ff_get_muxer_ts_offset(s, i, &offset);
                  pts = pkt->pts + offset;
                  dts = pkt->dts + offset;

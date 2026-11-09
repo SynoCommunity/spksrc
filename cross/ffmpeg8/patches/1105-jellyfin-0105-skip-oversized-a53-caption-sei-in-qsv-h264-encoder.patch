@@ -1,0 +1,27 @@
+Index: FFmpeg/libavcodec/qsvenc_h264.c
+===================================================================
+--- libavcodec/qsvenc_h264.c
++++ libavcodec/qsvenc_h264.c
+@@ -27,6 +27,7 @@
+ #include <mfxvideo.h>
+ 
+ #include "libavutil/common.h"
++#include "libavutil/mem.h"
+ #include "libavutil/opt.h"
+ 
+ #include "avcodec.h"
+@@ -56,6 +57,14 @@ static int qsv_h264_set_encode_ctrl(AVCo
+         if (res < 0 || !payload)
+             return res;
+ 
++        if (sei_size >= UINT8_MAX) {
++            av_log(avctx, AV_LOG_VERBOSE,
++                   "A53 caption SEI payload is too large "
++                   "(%zu bytes), skipping\n", sei_size);
++            av_free(payload);
++            return 0;
++        }
++
+         sei_data = (mfxU8*)(payload + 1);
+         // SEI header
+         sei_data[0] = 4;

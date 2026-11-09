@@ -1,0 +1,14 @@
+--- sys/qsv/libmfx/dispatcher/vpl/mfx_dispatcher_vpl_loader.cpp.orig
++++ sys/qsv/libmfx/dispatcher/vpl/mfx_dispatcher_vpl_loader.cpp
+@@ -414,6 +414,11 @@
+     searchDirs.clear();
+ 
+ #ifdef __linux__
++#ifdef MFX_MODULES_DIR
++    // The runtime directory set at build time (-Dmfx-modules-dir), which the legacy
++    // MFXInit loader already searches: a runtime outside the distro paths.
++    searchDirs.push_back(MFX_MODULES_DIR);
++#endif
+     // Add the standard path for libmfx1 install in Ubuntu
+     searchDirs.push_back("/usr/lib/x86_64-linux-gnu");
+ 
