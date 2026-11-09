@@ -111,7 +111,7 @@ check-%:
 
 # What each overlay resolves to for ARCH/TCVERSION with this run's switches -- ON/OFF, the
 # consumer taken, those the arch ships -- what degrades, and whether the work dir's tc_vars.mk
-# agrees (stage0.mk: rewritten if only its identity exists, a stop once the flags are made).
+# agrees (stage0.mk stops a build that does not).
 # Pure diagnostic, like check: parses, builds nothing.
 # A component's shipped versions ($(1) BINUTILS/GCC, $(2) its dir name); what was asked of
 # it -- "default" unless OVERLAY_<C>_VERSION was set; rust's, per gcc it was built with.
@@ -154,7 +154,7 @@ else
 	@$(_ovl_line) "rust link through the binutils shim: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF)"
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),$(_ovl_line) "note: no rust $(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_pool) (the gcc this build uses)" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),$(_ovl_line) "note: none built with the gcc overlay: the vendor-gcc one is taken" ;)
-	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),$(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),ERROR,REWRITE) -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(OVERLAY_$(c)_ON),ON,OFF))$(if $(wildcard $(WORK_DIR)/tc_vars.flags.mk),: make clean first),OK),n/a))"
+	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),ERROR -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(OVERLAY_$(c)_ON),ON,OFF)): make clean first,OK),n/a))"
 endif
 
 overlay-%:

@@ -418,8 +418,7 @@ tc_flags:
 # The tc macro (spksrc.common/macros/tools.mk) takes a _PATH only when ON. The tree computes
 # none of these names -- its own are _OVERLAY_<c>_DIR and OVERLAY_<c>_ON -- so this file,
 # included at parse, records without changing a decision. stage0.mk compares
-# TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that differs once the flags are
-# made.
+# TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that differs.
 # Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on wherever a rust
 # overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim TC_OVERLAY_RUSTC_LINKER (the
 # -Clink-arg=-B of the Rust link flags). TC_KERNEL takes a "+" from 4.4 on, the

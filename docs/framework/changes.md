@@ -186,8 +186,7 @@ If you only read one thing, read this. The details are in the dated log below.
       binutils shim; `$(call tc,…)` takes a `_PATH` only when ON. The tree's own names move to
       `_OVERLAY_<c>_DIR`, so the file no longer shadows them at parse -- a work dir generated
       with an overlay off used to keep it off whatever the switch -- and a run whose switches
-      resolve otherwise than the file records stops, asking for `make clean`, once its flags
-      exist. `make overlay-<arch>-<tcvers>` shows what each overlay resolves to and whether the
+      resolve otherwise than the file records stops, asking for `make clean`. `make overlay-<arch>-<tcvers>` shows what each overlay resolves to and whether the
       work dir agrees; `make help-<arch>-<tcvers>` (= `make help ARCH=… TCVERSION=…`) adds it
       and `check` to the package help. `TC_KERNEL` sits with the versions.
     - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the

@@ -101,18 +101,12 @@ _TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter
                               $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
 _TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
 
+# A work dir is made with its overlays: its flags (-B<shim>, the overlay gcc), and the
+# optional-dependency verdicts cached beside them, which the rust version a floor sees
+# depends on. A run whose switches resolve otherwise stops; inspecting goals only report.
 ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
 ifeq ($(filter $(_TC_VARS_GOALS_INSPECT),$(MAKECMDGOALS)),)
-ifeq ($(wildcard $(WORK_DIR)/tc_vars.flags.mk),)
-# Only the identity file, from a parse: nothing was built with it, so it is written again.
-  $(shell rm -f $(WORK_DIR)/tc_vars.mk)$(_tc_vars_identity)
-  -include $(WORK_DIR)/tc_vars.mk
-_TC_VARS_OVERLAY_CHANGED :=
-else
-# The flags are made: -B<shim> and the overlay gcc are fixed in them with the overlays this file
-# records, so a run deciding otherwise -- a switch flipped since -- would mix the two.
 $(error $(WORK_DIR)/tc_vars.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
-endif
 endif
 endif
 
