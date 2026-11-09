@@ -141,6 +141,7 @@ ifeq ($(strip $(_OVERLAY_BINUTILS_ANY)$(_OVERLAY_GCC_ANY)$(_OVERLAY_RUSTC_ANY)),
 	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays: none shipped for this arch"
 else
 	@$(MSG) "$(NAME): $(ARCH)-$(TCVERSION) overlays"
+	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),ERROR -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(OVERLAY_$(c)_ON),ON,OFF)): make clean first,OK),n/a))"
 	$(call _overlay_report_component,BINUTILS,binutils)
 	@$(if $(OVERLAY_BINUTILS_ON),$(if $(call is_true,$(OVERLAY_BINUTILS)),,$(_ovl_line) "note: ON for the gcc overlay (it drives as/ld)" ;))
 	@$(if $(OVERLAY_BINUTILS_MISSING),$(_ovl_line) "note: requested but the arch ships none" ;)
@@ -155,7 +156,6 @@ else
 	@$(_ovl_line) "rust link through the binutils shim: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),ON,OFF)"
 	@$(if $(OVERLAY_RUSTC_VERSION_MISSING),$(_ovl_line) "note: no rust $(OVERLAY_RUSTC_VERSION) built with gcc $(_ovl_rust_pool) (the gcc this build uses)" ;)
 	@$(if $(OVERLAY_RUSTC_GCC_FALLBACK),$(_ovl_line) "note: none built with the gcc overlay: the vendor-gcc one is taken" ;)
-	@printf "       %s\n" "WORK_DIR: $(notdir $(WORK_DIR)) (tc_vars.mk: $(if $(_TC_VARS_MK_EXISTED),$(if $(_TC_VARS_OVERLAY_CHANGED),ERROR -> $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(call lower,$(c)) $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)$(,) this run $(if $(OVERLAY_$(c)_ON),ON,OFF)): make clean first,OK),n/a))"
 endif
 
 overlay-%:
