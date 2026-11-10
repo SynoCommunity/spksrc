@@ -1,6 +1,6 @@
 SPK_NAME = mympd
-SPK_VERS = 26.1.1
-SPK_REV = 4
+SPK_VERS = 26.1.3
+SPK_REV = 5
 SPK_ICON = src/mympd.png
 DSM_UI_DIR = app
 
@@ -8,7 +8,7 @@ DEPENDS = cross/mympd
 
 MAINTAINER = hgy59
 DESCRIPTION = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.
-CHANGELOG = "1. Update myMPD to v26.1.1."
+CHANGELOG = "1. Update myMPD to v26.1.3."
 
 DISPLAY_NAME = myMPD
 
