@@ -457,13 +457,16 @@ A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of t
 | A component sets | For |
 |------------------|-----|
 | `TOOLCHAIN_CONSUMER` | The suffix of its consumer directories (`gcc-8.5`, `binutils-2.30`, `rust-1.98_gcc-*`): `all-<dsm>` builds for every arch that has one. |
+| `TOOLCHAIN_CONSUMER_EXACT` | The suffix of this build's own consumer, where `TOOLCHAIN_CONSUMER` is a pattern (rust: `rust-1.98_gcc-8.5`, by gcc variant); its `PKG_REV` sets the revision. Defaults to `TOOLCHAIN_CONSUMER`. |
 | `ARCHIVE_NAME`, `ARCHIVE_EXT`, `ARCHIVE_DIR`, `ARCHIVE_KEEP` | The archive (`mk/spksrc.build/archive.mk`), named after `TOOLCHAIN_DIST_ARCH` for gcc and binutils. |
 | `TOOLCHAIN_DIST_SHARED = 1` | A generic arch is built as the real arch whose archive it shares. |
 | `TOOLCHAIN_PGO ?= 1`, `TOOLCHAIN_PGO_TRAIN` | The two passes, and the target that runs the instrumented tools over `TOOLCHAIN_PGO_SOURCES`. |
 
+Before its archive, gcc rewrites to `$ORIGIN` the `RUNPATH` a target library was linked with (`gcc-runpath-origin`): libgfortran carries one to the build prefix wherever libquadmath exists to need, on the x86_64 targets. A `RUNPATH` keeps the loader from using the package's `RPATH` for that library's own dependencies, so on DSM a package carrying both libraries would not find libquadmath. The build host needs `patchelf`, which the spksrc image ships.
+
 In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
 
-The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision, so a rebuild lands under a new name and caches never serve the stale file. A producer builds one past its consumer's `PKG_REV` -- the arch's own overlay, or the generic arch built as it (`x64-7.1` for `apollolake-7.1`) -- or `v1` for a toolchain that has none yet; `PKG_REV=vN` on the command line sets another. The revision holds until the consumer moves to it, so a batch resumes on the same name.
+The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision, so a rebuild lands under a new name and caches never serve the stale file. A producer builds one past its consumer's `PKG_REV` (`$(call toolchain_published_rev,...)`, [Macros](../reference/macros.md#reading-a-makefile)) -- the arch's own overlay, or the generic arch built as it (`x64-7.1` for `apollolake-7.1`) -- or `v1` for a toolchain that has none yet; `PKG_REV=vN` on the command line sets another. The revision holds until the consumer moves to it, so a batch resumes on the same name.
 
 1. Build: `make -C native/<component> arch-<arch>-<dsm>`.
 2. Upload the `.txz` to its release.

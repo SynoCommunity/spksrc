@@ -44,6 +44,7 @@
 #   overlay_dist_arch : the arch an overlay archive is named after
 #   toolchain_real    : the toolchain a producer builds an <arch>-<dsm> as
 #   toolchain_archs   : the archs a producer builds for a DSM version
+#   toolchain_published_rev : the PKG_REV of the overlay that installs an archive
 #
 #  runlog.mk
 #   _runlog           : shell fragment running a command teed into a log

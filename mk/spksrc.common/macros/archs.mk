@@ -10,6 +10,9 @@
 #   producer  native/<component>   names the archive it publishes
 #   consumer  overlay/<dir>        names the archive it downloads
 #
+# The revision in that name is the consumer's PKG_REV; a producer builds the next one
+# (toolchain_published_rev).
+#
 # These read the toolchain Makefiles, so only producers and consumers ever expand them --
 # never a package build.
 ###############################################################################

@@ -148,7 +148,7 @@ spksrc.common/
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros, one file per theme:
 ├── macros/
-│   ├── archs.mk              #   which toolchain an overlay or its producer stands for
+│   ├── archs.mk              #   which toolchain an overlay or its producer stands for, at which revision
 │   ├── bool.mk               #   TRUE, FALSE, is_true, is_false, assert_bool, bool
 │   ├── depend.mk             #   depend, dep_seen
 │   ├── list.mk               #   uniq, dedup, dedup_files, merge, comma_append

@@ -47,6 +47,8 @@ ARCHIVE_KEEP = usr/local
 ARCHIVE_STRIP = 1
 ARCHIVE_STRIP_TARGET = $(TOOLCHAIN_BINUTILS_BIN)/$(TC_TARGET)-strip
 ARCHIVE_STRIP_TARGET_DIRS = $(TC_TARGET) lib/gcc/$(TC_TARGET)
+# Before the archive: the target libraries' RUNPATH (gcc-runpath-origin).
+PRE_ARCHIVE_TARGET = gcc-runpath-origin
 # Host docs and the NATIVE_DEPENDS math libs share this prefix; neither belongs in
 # a compiler archive. An exclusion list rather than a dir allow-list, because the
 # C++ headers and runtime libs sit under <triple>/ for a cross arch but under the
@@ -203,6 +205,21 @@ INSTALL_ARGS  = install
 INSTALL_ARGS += DESTDIR=$(INSTALL_DIR)
 INSTALL_ARGS += prefix=$(INSTALL_PREFIX)
 INSTALL_ARGS += MAKEINFO=missing
+
+.PHONY: gcc-runpath-origin
+# A target library a package carries can be linked with a RUNPATH to the build prefix --
+# libgfortran, wherever libquadmath exists to need. A RUNPATH stops the loader from using
+# the package's RPATH for that library's own dependencies, so libquadmath, carried beside
+# it, is not found on DSM. $ORIGIN looks beside it. patchelf is a build-host requirement.
+gcc-runpath-origin:
+	@command -v patchelf >/dev/null || { $(MSG) "gcc: patchelf is required (target libraries' RUNPATH)" ; exit 1 ; }
+	@find $(ARCHIVE_DIR)/$(ARCHIVE_KEEP) -name 'lib*.so*' -type f | while read -r lib ; do \
+	  readelf -d "$$lib" 2>/dev/null | grep -q '(RUNPATH)' || continue ; \
+	  rp=$$(patchelf --print-rpath "$$lib") ; \
+	  [ "$$rp" = '$$ORIGIN' ] && continue ; \
+	  $(MSG) "gcc: $${lib#$(ARCHIVE_DIR)/}: RUNPATH $$rp -> \$$ORIGIN" ; \
+	  chmod u+w "$$lib" && patchelf --set-rpath '$$ORIGIN' "$$lib" || exit 1 ; \
+	done
 
 .PHONY: gcc-prepare
 gcc-prepare: tc-install
