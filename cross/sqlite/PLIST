@@ -1,4 +1,4 @@
 bin:bin/sqlite3
 lnk:lib/libsqlite3.so
 lnk:lib/libsqlite3.so.0
-lib:lib/libsqlite3.so.3.53.4
+lib:lib/libsqlite3.so.3.54.1
