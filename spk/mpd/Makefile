@@ -1,6 +1,6 @@
 SPK_NAME = mpd
 SPK_VERS = 0.24.18
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 
