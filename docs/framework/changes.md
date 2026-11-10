@@ -192,9 +192,10 @@ If you only read one thing, read this. The details are in the dated log below.
       the work dir agrees; `make help-<arch>-<tcvers>` (= `make help ARCH=… TCVERSION=…`) adds
       it and `check` to the package help, and every arch build prints both after its
       `[BEGIN]`. `TC_KERNEL` sits with the versions.
-    - **The C locale for every build** (`export LC_ALL := C`, `spksrc.common.mk`): the
-      vendor gcc of DSM 5.2 aborts under any other locale, which made those builds
-      depend on the caller's shell.
+    - **The C locale for the producers** (`export LC_ALL := C`,
+      `spksrc.native-toolchain.mk`): the vendor gcc of DSM 5.2 aborts under any other
+      locale. Packages keep the caller's locale; the gcc overlay takes the vendor gcc out
+      of their builds.
     - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
       (`gcc.mk`, `binutils.mk`, `rustc.mk`).
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`

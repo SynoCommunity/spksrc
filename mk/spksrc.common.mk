@@ -56,12 +56,6 @@ space := $(empty) $(empty)
 # For literal ',' in $(eval ...) contexts interpreted as individual arguments -> $(eval -Wl$(,)--rpath-link$(,)/some/path)
 , := ,
 
-# The C locale for everything a build runs: the vendor gcc of DSM 5.2 aborts under any other
-# (a loadlocale.c assertion on the host's locale data), and tools then sort and report alike
-# on every host. C, not C.UTF-8: the only locale glibc does not load from files. An export
-# reaches $(shell) only from make 4.4, so a $(shell) running a vendor tool sets it inline too.
-export LC_ALL := C
-
 # Ahead of every include below, not further down the file: an included makefile that uses
 # these in a `:=` assignment expands them at its own parse, and would otherwise get empty.
 # Load macros early

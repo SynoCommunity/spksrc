@@ -61,6 +61,11 @@
 TOOLCHAIN_JOBS      ?= 1
 TOOLCHAIN_KEEP_WORK ?= 1
 
+# The C locale for everything a producer runs: the vendor gcc it builds with aborts under any
+# other on DSM 5.2 (a loadlocale.c assertion on the host's locale data). C, not C.UTF-8: the
+# only locale glibc does not load from files. $(shell) gets it from TC_VENDOR_ENV.
+export LC_ALL := C
+
 ifeq ($(strip $(TC_ARCH)),)
 $(error spksrc.native-toolchain.mk: TC_ARCH is required (e.g. TC_ARCH=ppc853x))
 endif
@@ -93,8 +98,8 @@ TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
 # Prefix for running a binary of that toolchain from $(shell): the C locale. The gcc 4.7.3
 # of x86-5.2 (and x64-5.2) aborts on a current host's locale data -- "loadlocale.c:129:
-# _nl_intern_locale_data: Assertion ... failed". spksrc.common.mk exports LC_ALL=C, which
-# reaches recipes, but $(shell) only from make 4.4.
+# _nl_intern_locale_data: Assertion ... failed". The export above reaches recipes, but
+# $(shell) only from make 4.4.
 TC_VENDOR_ENV = LC_ALL=C
 
 # The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
