@@ -1,8 +1,9 @@
 PKG_NAME = opus
-PKG_VERS = 1.5.2
+PKG_VERS = 1.6.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = opus-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/xiph/opus/releases/download/v$(PKG_VERS)
+# 1.6.1 has no source asset on GitHub; use the official Xiph mirror.
+PKG_DIST_SITE = https://ftp.osuosl.org/pub/xiph/releases/opus
 PKG_DIR = opus-$(PKG_VERS)
 
 DEPENDS =
