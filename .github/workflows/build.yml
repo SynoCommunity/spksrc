@@ -233,31 +233,72 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed spk_packages and dependency_folders for pull request
-        if: github.event_name == 'pull_request'
-        id: getchanges_pr
+      - name: Get changed spk_packages and dependency_folders
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        id: getchanges
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DELETED: ${{ github.event.deleted }}
         run: |
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
-          echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          BASE_REF="origin/${DEFAULT_BRANCH}"
+          if [ "${DELETED}" = "true" ]; then
+            DETECTION_MODE="deleted-branch"
+            CHANGED_FILES=""
+          elif [ "${EVENT_NAME}" = "pull_request" ]; then
+            DETECTION_MODE="pr-vs-default-branch"
+            CHANGED_FILES=$(git diff --no-commit-id --name-only -r "${BASE_REF}...${PR_HEAD_SHA}")
+          elif [ -n "${BEFORE_SHA}" ] && \
+               [ "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ] && \
+               git merge-base --is-ancestor "${BEFORE_SHA}" "${PUSH_SHA}" 2>/dev/null; then
+            # Fast-forward push (default-branch merges included): exactly the pushed
+            # range, so multi-commit and merge pushes are not reduced to the final commit.
+            DETECTION_MODE="fast-forward"
+            CHANGED_FILES=$(git diff --name-only "${BEFORE_SHA}" "${PUSH_SHA}")
+          elif [ "${REF_NAME}" != "${DEFAULT_BRANCH}" ] && \
+               git rev-parse --quiet --verify "${BASE_REF}" >/dev/null; then
+            # New branch, or history rewritten by a force-push (rebase): everything the
+            # branch changes against the default branch, as for a pull request.
+            # before..after would also carry what the default branch gained between the
+            # two bases.
+            DETECTION_MODE="branch-vs-default-branch"
+            CHANGED_FILES=$(git diff --name-only "${BASE_REF}...${PUSH_SHA}")
+          elif [ "${REF_NAME}" = "${DEFAULT_BRANCH}" ] && \
+               [ -n "${BEFORE_SHA}" ] && \
+               [ "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ] && \
+               git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            # Rewritten default branch (force-push): compare the old and new trees so
+            # earlier commits in the rewritten history are not missed.
+            DETECTION_MODE="default-branch-rewrite"
+            CHANGED_FILES=$(git diff --name-only "${BEFORE_SHA}" "${PUSH_SHA}")
+          else
+            # No usable base to compare against: inspect the final commit.
+            DETECTION_MODE="final-commit-fallback"
+            echo "::warning::Using final-commit fallback; earlier commits in this push may not be inspected."
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${PUSH_SHA}")
+          fi
 
-      - name: Get changed spk_packages and dependency_folders of last commit for push
-        if: github.event_name == 'push'
-        id: getchanges_push
-        run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
-          echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|driver|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          echo "detection: ${DETECTION_MODE}"
+          echo "detection=${DETECTION_MODE}" >> "${GITHUB_OUTPUT}"
+          SPK_PACKAGES=$(printf '%s\n' "${CHANGED_FILES}" | grep -oP '^spk/\K[^/]*' | sort -u | xargs || true)
+          echo "spk_packages: ${SPK_PACKAGES}"
+          echo "spk_packages=${SPK_PACKAGES}" >> "${GITHUB_OUTPUT}"
+
+          DEPENDENCY_FOLDERS=$(printf '%s\n' "${CHANGED_FILES}" | grep -oP '^(cross|driver|python|native)/[^/]*' | sort -u | xargs || true)
+          echo "dependency_folders: ${DEPENDENCY_FOLDERS}"
+          echo "dependency_folders=${DEPENDENCY_FOLDERS}" >> "${GITHUB_OUTPUT}"
 
       - name: Evaluate dependencies
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
-          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
+          GH_SPK_PACKAGES: ${{ steps.getchanges.outputs.spk_packages }}
+          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges.outputs.dependency_folders }}
           USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Restore distrib cache

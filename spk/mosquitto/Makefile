@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
 SPK_VERS = 2.1.2
-SPK_REV = 18
+SPK_REV = 20
 SPK_ICON = src/mosquitto.png
 
 DEPENDS = cross/mosquitto
@@ -30,6 +30,8 @@ SPK_COMMANDS += bin/mosquitto_passwd
 SPK_COMMANDS += bin/mosquitto_rr
 SPK_COMMANDS += bin/mosquitto_pub
 SPK_COMMANDS += bin/mosquitto_sub
+
+PLIST_TRANSFORM = sed -e '/^bin:bin\/sqlite3$$/d'
 
 include ../../mk/spksrc.spk.mk
 

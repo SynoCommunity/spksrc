@@ -113,6 +113,14 @@ access_rules:
     allow: loopback
 
 api_permissions:
+  "webadmin commands":
+    from: ejabberd_web_admin
+    who: admin
+    what: "*"
+  "adhoc commands":
+    from: mod_adhoc_api
+    who: admin
+    what: "*"
   "console commands":
     from:
       - ejabberd_ctl
