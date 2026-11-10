@@ -1,5 +1,5 @@
 PKG_NAME = libultrahdr
-PKG_VERS = 1.5.1
+PKG_VERS = 2.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/google/libultrahdr/archive

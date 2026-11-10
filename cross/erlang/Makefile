@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 26.2.5.19
+PKG_VERS = 27.3.4.19
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -28,6 +28,18 @@ CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
 CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.common.mk
+
+# OTP 27 JIT (asmjit) requires GCC 9+; GCC 8.5 and older crash while
+# compiling asmjit/core/virtmem.cpp
+ifeq ($(call version_lt, $(TC_GCC), 9),1)
+CONFIGURE_ARGS += --disable-jit
+endif
+
+# OTP 27 requires 64-bit time_t by default. 32-bit DSM toolchains only
+# provide 32-bit time_t, so allow the upstream-supported opt-out.
+ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),)
+CONFIGURE_ARGS += --disable-year2038
+endif
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 

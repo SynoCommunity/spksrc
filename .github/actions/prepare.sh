@@ -52,7 +52,7 @@ collect_min_dsm_packages() {
     local result=
     for package in ${packages}; do
         if [ -f "./spk/${package}/Makefile" ]; then
-            if [ "$(grep REQUIRED_MIN_DSM "./spk/${package}/Makefile" | cut -d= -f2 | xargs)" = "${version}" ]; then
+            if [ "$(sed -n 's/^[[:space:]]*REQUIRED_MIN_DSM[[:space:]]*[?:]\{0,1\}=[[:space:]]*//p' "./spk/${package}/Makefile" | xargs)" = "${version}" ]; then
                 result+="${package} "
             fi
         fi
@@ -75,13 +75,34 @@ SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 # Get dependency list
 # Dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
-DEPENDENCY_LIST=./dependency-list.txt
-make dependency-list-spk 2>/dev/null > "${DEPENDENCY_LIST}"
+DEPENDENCY_LIST=$(mktemp)
+DEPENDENCY_LOG=$(mktemp)
+trap 'rm -f "${DEPENDENCY_LIST}" "${DEPENDENCY_LOG}"' EXIT
+if ! make dependency-list-spk > "${DEPENDENCY_LIST}" 2> "${DEPENDENCY_LOG}"; then
+    echo "===> ERROR: failed to generate dependency list" >&2
+    cat "${DEPENDENCY_LOG}" >&2
+    exit 1
+fi
 
 # Search for dependent spk packages
+# Parse the dependency list once, keeping exact package/dependency token
+# matches. Prefix matches are wrong here: native/nodejs must not select
+# consumers of native/nodejs-22, and cross/glib must not select cross/glib-2.58.
+declare -A package_deps
+declare -A dep_packages
+while IFS= read -r line; do
+    package_name="${line%%:*}"
+    [ "${package_name}" = "${line}" ] && continue
+    deps="${line#*:}"
+    package_deps["${package_name}"]="${deps}"
+    for dep in ${deps}; do
+        dep_packages["${dep}"]+=" ${package_name}"
+    done
+done < "${DEPENDENCY_LIST}"
+
 for package in ${GH_DEPENDENCY_FOLDERS}; do
     echo "===> Searching for dependent package: ${package}"
-    found=$(grep -w "${package}" "${DEPENDENCY_LIST}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
+    found=$(printf '%s\n' "${dep_packages[${package}]:-}" | tr ' ' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ')
     if [ -n "${found}" ]; then
         echo "===> Found: ${found}"
     else
@@ -101,7 +122,7 @@ for package in ${packages}; do
     if [ -f "./spk/${package}/BROKEN" ] || [ -f "./spk/${package}/DISABLED" ]; then
         broken_reason=$(cat "./spk/${package}/BROKEN" "./spk/${package}/DISABLED" 2>/dev/null)
         echo "===> Skipping disabled package: ${package} (${broken_reason})"
-    elif ! grep -q "^${package}:" "${DEPENDENCY_LIST}" && [ ! -f "./spk/${package}/Makefile" ]; then
+    elif [ -z "${package_deps[${package}]:-}" ] && [ ! -f "./spk/${package}/Makefile" ]; then
         echo "===> Skipping invalid package (no Makefile, not in dependency list): ${package}"
     else
         filtered_packages+="${package} "
@@ -133,8 +154,12 @@ fi
 
 # Find all noarch packages (needed for classification)
 all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
-    -exec grep -Ho "override ARCH" {} \; \
+    -exec grep -Ho '^override ARCH' {} \; \
     | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+declare -A noarch_set
+for package in ${all_noarch}; do
+    noarch_set["${package}"]=1
+done
 
 # Collect DSM-restricted packages, split into arch and noarch lists.
 for version in "${min_dsm_versions[@]}"; do
@@ -149,7 +174,7 @@ for version in "${min_dsm_versions[@]}"; do
     arch_list=""
     noarch_list=""
     for pkg in ${result}; do
-        if echo "${all_noarch}" | tr ' ' '\n' | grep -qx "${pkg}"; then
+        if [ -n "${noarch_set[${pkg}]:-}" ]; then
             noarch_list="${noarch_list}${noarch_list:+ }${pkg}"
         else
             arch_list="${arch_list}${arch_list:+ }${pkg}"
@@ -170,15 +195,13 @@ done
 # Build the combined list of all DSM-restricted packages for exclusion from the
 # standard builds. Each list holds what declares that REQUIRED_MIN_DSM itself, and
 # nothing may be exempt: a package that refuses DSM 7.1 cannot build there.
-all_min_dsm_packages=
+declare -A min_dsm_set
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
     eval "arch_pkgs=\$arch_min_dsm${v}_packages"
     eval "noarch_pkgs=\$noarch_min_dsm${v}_packages"
     for pkg in ${arch_pkgs} ${noarch_pkgs}; do
-        if ! echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${pkg}"; then
-            all_min_dsm_packages+="${pkg} "
-        fi
+        min_dsm_set["${pkg}"]=1
     done
 done
 
@@ -191,10 +214,10 @@ has_arch_packages='false'
 has_noarch_packages='false'
 for package in ${packages}; do
     if [ -f "./spk/${package}/Makefile" ]; then
-        if echo "${all_min_dsm_packages}" | tr ' ' '\n' | grep -qx "${package}"; then
+        if [ -n "${min_dsm_set[${package}]:-}" ]; then
             continue
         fi
-        if [ "$(echo "${all_noarch}" | grep -ow "${package}")" = "" ]; then
+        if [ -z "${noarch_set[${package}]:-}" ]; then
             arch_packages+="${package} "
             has_arch_packages='true'
         else
@@ -279,7 +302,7 @@ else
     echo "===> PACKAGES to download references for: ${packages}"
     DOWNLOAD_LIST=
     for package in ${packages}; do
-        DOWNLOAD_LIST+=$(grep "^${package}:" "${DEPENDENCY_LIST}" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        DOWNLOAD_LIST+="${package_deps[${package}]:-} "
     done
     # Remove duplicate downloads
     downloads=$(printf '%s' "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')

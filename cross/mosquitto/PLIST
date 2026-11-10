@@ -10,4 +10,8 @@ lib:lib/libmosquitto.so.2.1.2
 lnk:lib/libmosquittopp.so
 lnk:lib/libmosquittopp.so.1
 lib:lib/libmosquittopp.so.2.1.2
+lib:lib/mosquitto_acl_file.so
 lib:lib/mosquitto_dynamic_security.so
+lib:lib/mosquitto_password_file.so
+lib:lib/mosquitto_persist_sqlite.so
+lib:lib/mosquitto_sparkplug_aware.so
