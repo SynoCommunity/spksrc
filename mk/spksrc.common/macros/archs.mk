@@ -46,6 +46,20 @@ $(if $(call is_true,$(TOOLCHAIN_DIST_SHARED)),$(call overlay_dist_arch,$(firstwo
   $(subst -, ,$(1))),$(lastword $(subst -, ,$(1))))-$(lastword $(subst -, ,$(1))),$(1))
 endef
 
+# Macro: the revision a toolchain archive is published at
+#
+#   $(call toolchain_published_rev,apollolake,7.1,gcc-8.5)   -> v5
+#
+# The PKG_REV of the overlay that installs it: the arch's own, or else that of a generic
+# arch built as it (overlay_dist_arch) -- x64-7.1 fetches apollolake-7.1's archive, which
+# has no overlay of its own. Empty where neither exists.
+define toolchain_published_rev
+$(strip $(foreach f,$(firstword $(or $(wildcard $(BASEDIR)/overlay/syno-$(1)-$(2)_$(3)/Makefile),\
+  $(foreach d,$(wildcard $(BASEDIR)/overlay/syno-*-$(2)_$(3)),$(if $(filter $(1),\
+    $(call overlay_dist_arch,$(patsubst syno-%-$(2)_$(3),%,$(notdir $(d))),$(2))),$(d)/Makefile)))),\
+  $(call read_makefile_var,$(f),PKG_REV)))
+endef
+
 # Macro: the archs a producer builds for a DSM version
 #
 #   $(call toolchain_archs,7.1)

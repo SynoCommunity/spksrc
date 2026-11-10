@@ -21,11 +21,6 @@ HOMEPAGE = https://gcc.gnu.org/
 COMMENT  = GNU Compiler Collection
 LICENSE  = GPLv3
 
-# Bump when a rebuild changes what is inside without changing a version already encoded
-# in the archive name, so it lands under a new name instead of replacing a file consumers
-# cached. v5: profile-guided. Every consumer pins the same rev (overlay/*_gcc-8.5).
-PKG_REV ?= v5
-
 # Builds the archive the gcc overlay installs: mk/spksrc.native-toolchain/gcc.mk.
 #   make arch-qoriq-6.2.4        make all-6.2.4        make TOOLCHAIN_PGO=0 arch-x86-5.2
 include ../../mk/spksrc.native-toolchain.mk

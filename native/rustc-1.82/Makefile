@@ -37,13 +37,7 @@ LICENSE  = Apache-2.0, MIT
 # resolve later. ARCHIVE_KEEP = . of the stage dir so the tree unpacks straight
 # into $(RUSTUP_HOME)/toolchains/<id>.
 #
-# PKG_REV tags the .txz name only; bump it -- or pass PKG_REV=vN on
-# the command line, then rename -- when re-publishing a rebuilt archive under the same
-# id so mirrors/CDN caches don't serve the stale artifact. Each consumer toolchain
-# (syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) pins its own current rev the same way (mirrors
-# native/binutils-2.30's PKG_REV; no shared/cross-included rev file).
-##############################################################################
-PKG_REV ?= v1
+# PKG_REV: one past the consumer's (spksrc.native-toolchain.mk).
 ARCHIVE_NAME = rust-$(_RUST_TC_ID)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(RUST_STAGE_DIR)

@@ -113,7 +113,8 @@ RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils
 
 # The overlay directories this component's consumers carry: all-<vers> builds for them
 # (spksrc.native-toolchain.mk).
-TOOLCHAIN_CONSUMER = rust-$(basename $(PKG_VERS))_gcc-*
+TOOLCHAIN_CONSUMER       = rust-$(basename $(PKG_VERS))_gcc-*
+TOOLCHAIN_CONSUMER_EXACT = rust-$(basename $(PKG_VERS))_gcc-$(_RUST_GCC)
 
 # Profile-guided, both halves of the compiler a cargo build runs: rustc through x.py's own
 # PGO, LLVM -- which does most of a release build's work -- through gcc's, like the gcc
@@ -133,7 +134,8 @@ _RUST_PGO_ENV        = $(if $(filter gen,$(PGO_PHASE)),RUSTFLAGS_NOT_BOOTSTRAP="
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (overlay/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # spksrc.toolchain/overlay/rustc.mk's _RUST_TC_ID on the package-build side.
-_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(if $(_OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
+_RUST_GCC   = $(if $(_OVERLAY_GCC_ON),$(OVERLAY_GCC_VERSION),$(or $(TC_GCC_VENDOR),$(TC_GCC)))
+_RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(_RUST_GCC)
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps
 # are trackable in status-build.log: NAME: native-rust-<step>.

@@ -463,11 +463,11 @@ A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of t
 
 In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
 
-The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision: when a rebuild changes what is inside without changing a version already in the name, bump it, so caches never serve the stale file.
+The archives are published in releases: gcc and binutils in `toolchains/dsm<dsm>`, beside the toolchains they extend, and rust in `rust/qoriq`. The archive name carries a revision, so a rebuild lands under a new name and caches never serve the stale file. A producer builds one past its consumer's `PKG_REV` -- the arch's own overlay, or the generic arch built as it (`x64-7.1` for `apollolake-7.1`) -- or `v1` for a toolchain that has none yet; `PKG_REV=vN` on the command line sets another. The revision holds until the consumer moves to it, so a batch resumes on the same name.
 
-1. Bump `PKG_REV` in the producer (`native/<component>/Makefile`) and build.
+1. Build: `make -C native/<component> arch-<arch>-<dsm>`.
 2. Upload the `.txz` to its release.
-3. Bump `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`).
+3. Set `PKG_REV = vN` in the overlay's Makefile and refresh its `digests` (`make -C overlay/syno-<arch>-<dsm>_<component>-<version> digests`); the next build of it is vN+1.
 
 ### The overlay/ directories
 

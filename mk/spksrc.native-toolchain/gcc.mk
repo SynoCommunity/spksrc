@@ -6,11 +6,10 @@
 # the gcc overlay installs (spksrc.overlay/gcc.mk). One component, one archive: it ships
 # NO as/ld -- those stay binutils', and the consumer wires the two together.
 #
-# The package states the version, its archive revision and the host math libraries:
+# The package states the version and the host math libraries:
 #
 #   PKG_NAME = gcc
 #   PKG_VERS = 8.5.0
-#   PKG_REV ?= v5
 #   include ../../mk/spksrc.native-toolchain.mk
 ###############################################################################
 

@@ -198,6 +198,9 @@ If you only read one thing, read this. The details are in the dated log below.
       of their builds.
     - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
       (`gcc.mk`, `binutils.mk`, `rustc.mk`).
+    - **A producer's revision follows its consumer:** one past the overlay's `PKG_REV`
+      (`toolchain_published_rev`), `v1` for a new toolchain; `PKG_REV=vN` sets another. The
+      binutils gcc and rust build against stays at the published one.
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
       (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
       macro documented the same way; `upper` and `lower` change case without a fork,

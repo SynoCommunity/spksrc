@@ -37,6 +37,7 @@
 #
 # What a component sets:
 #   TOOLCHAIN_CONSUMER      the overlay directory suffix its consumers carry
+#   TOOLCHAIN_CONSUMER_EXACT  that of this build's own consumer, where the first is a pattern
 #   ARCHIVE_NAME & co       its archive, named after TOOLCHAIN_DIST_ARCH where
 #   TOOLCHAIN_DIST_SHARED   = 1 says a generic arch shares the real arch's archive
 #   TOOLCHAIN_PGO           ?= 1 to build twice, profile-guided
@@ -46,6 +47,7 @@
 #   TOOLCHAIN_JOBS          archs all-<vers> builds at once (default 1)
 #   TOOLCHAIN_KEEP_WORK     0 drops a work dir once its archive exists (default 1, gcc 0)
 #   TOOLCHAIN_PGO           0 for one plain pass
+#   PKG_REV                 vN instead of one past the consumer's revision
 #
 # And the targets that build it:
 #   make arch-<arch>-<vers>             one toolchain: build, then archive
@@ -121,14 +123,21 @@ TC_WORK_DIR ?= $(TC_DIR)/work
 
 TOOLCHAIN_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 
+# The revision a build produces: one past its consumer's PKG_REV (toolchain_published_rev),
+# v1 where it has none yet. It holds until the consumer moves to it, so a batch resumes on
+# the same name.
+TOOLCHAIN_CONSUMER_EXACT ?= $(TOOLCHAIN_CONSUMER)
+_toolchain_rev           = $(call toolchain_published_rev,$(TC_ARCH),$(TC_VERS),$(TOOLCHAIN_CONSUMER_EXACT))
+PKG_REV ?= v$(if $(_toolchain_rev),$(shell echo $$(($(patsubst v%,%,$(_toolchain_rev)) + 1))),1)
+
 # The binutils gcc and rust are built against: native/binutils-<v> for this (arch, DSM),
 # made by its own arch- target -- both PGO passes and the archive, the very file the
-# binutils overlay publishes -- or left as it is when that archive exists. The version the
+# binutils overlay publishes, at its revision -- or left as it is when that archive exists. The version the
 # binutils overlay ships, 2.30 where the arch has none yet; named after the real arch
 # (TOOLCHAIN_DIST_ARCH), which binutils builds a generic one as.
 TOOLCHAIN_BINUTILS_VERSION := $(or $(OVERLAY_BINUTILS_VERSION),2.30)
 TOOLCHAIN_BINUTILS_DIR      = $(BASEDIR)/native/binutils-$(TOOLCHAIN_BINUTILS_VERSION)
-TOOLCHAIN_BINUTILS_REV      = $(call read_makefile_var,$(TOOLCHAIN_BINUTILS_DIR)/Makefile,PKG_REV)
+TOOLCHAIN_BINUTILS_REV      = $(or $(call toolchain_published_rev,$(TOOLCHAIN_DIST_ARCH),$(TC_VERS),binutils-$(TOOLCHAIN_BINUTILS_VERSION)),v1)
 TOOLCHAIN_BINUTILS_WORK     = $(TOOLCHAIN_BINUTILS_DIR)/work-$(TOOLCHAIN_DIST_ARCH)-$(TC_VERS)
 TOOLCHAIN_BINUTILS_BIN      = $(TOOLCHAIN_BINUTILS_WORK)/install/usr/local/bin
 TOOLCHAIN_BINUTILS_ARCHIVE  = $(TOOLCHAIN_BINUTILS_DIR)/binutils-$(TOOLCHAIN_BINUTILS_VERSION)-$(TC_TARGET)-$(TOOLCHAIN_DIST_ARCH)-$(TC_VERS)-$(TOOLCHAIN_BINUTILS_REV).txz
