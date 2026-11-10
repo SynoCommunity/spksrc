@@ -1,6 +1,6 @@
 --- src/mympd_worker/smartpls.c
 +++ src/mympd_worker/smartpls.c
-@@ -468,7 +468,7 @@
+@@ -476,7 +476,7 @@
      if ((time_t)timerange > value_max) {
          return false;
      }

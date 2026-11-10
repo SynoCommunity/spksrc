@@ -1,4 +1,5 @@
 bin:bin/mympd
+bin:bin/mympd-script
 lib:lib/libmongoose.so
 lib:lib/libmpack.so
 lib:lib/librax.so

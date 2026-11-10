@@ -1,0 +1,31 @@
+--- src/lib/cache/cache_disk.c
++++ src/lib/cache/cache_disk.c
+@@ -74,7 +74,7 @@
+     int num_deleted = 0;
+     bool rc = true;
+     const time_t now = time(NULL);
+-    const time_t expire_time = now - ((time_t)keepdays * 24LL * 60LL * 60LL);
++    const time_t expire_time = now - (time_t)keepdays * 24 * 60 * 60;
+ 
+     sds cache_path = sdscatfmt(sdsempty(), "%S/%s", cache_basedir, type);
+     char fmt_time[32];
+--- src/mympd_client/random_select.c
++++ src/mympd_client/random_select.c
+@@ -85,7 +85,7 @@
+     unsigned skipno = 0;
+     unsigned lineno = 1;
+     time_t now = time(NULL);
+-    time_t since = now - ((time_t)constraints->last_played * 3600LL);
++    time_t since = now - (time_t)constraints->last_played * 3600;
+     sds albumid = sdsempty();
+     rax *stickers_last_played = NULL;
+     if (partition_state->config->albums.mode == ALBUM_MODE_ADV &&
+@@ -186,7 +186,7 @@
+     unsigned skipno = 0;
+     unsigned lineno = 1;
+     time_t now = time(NULL);
+-    time_t since = now - ((time_t)constraints->last_played * 3600LL);
++    time_t since = now - (time_t)constraints->last_played * 3600;
+ 
+     bool from_database = strcmp(playlist, "Database") == 0
+         ? true
