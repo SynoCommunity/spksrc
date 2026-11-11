@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Needs gcc >= 4.8: C++11 required (proven: 4.7.3 fails).
-MIN_GCC_VERSION = 4.8
-# other compiler problem (declaration of libthreadar::exception_base ...)
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+# C++11 as gcc 4.9 has it: 4.8.3 rejects exception_base's defaulted move assignment
+# ("defaulted on its first declaration"), 4.7.3 C++11 altogether.
+MIN_GCC_VERSION = 4.9
 
 HOMEPAGE = http://libthreadar.sourceforge.net/
 COMMENT  = Libthreadar is a C++ library providing a small set of C++ classes to manipulate threads in a very simple and efficient way from your C++ code.

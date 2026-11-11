@@ -4,8 +4,6 @@ SPK_REV = 1
 
 DEPENDS = cross/mergerfs
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = mergerfs - a featureful union filesystem.
 STARTABLE = no
