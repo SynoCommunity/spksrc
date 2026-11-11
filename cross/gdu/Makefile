@@ -1,5 +1,5 @@
 PKG_NAME = gdu
-PKG_VERS = 5.31.0
+PKG_VERS = 5.32.0
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dundee/gdu/releases/download/v$(PKG_VERS)

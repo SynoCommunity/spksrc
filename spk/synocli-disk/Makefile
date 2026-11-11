@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
 SPK_VERS = 4.1
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/synocli-disk.png
 
 # ATTENTION: build order of dependent packages matters
@@ -39,11 +39,14 @@ DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Disk Tools\</a\>
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescue$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Update dar from v2.7.19 to v2.8.1 and add SFTP repository support. <br/>"
-CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
-CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5, qoriq and x86). <br/>"
-CHANGELOG += "4. Update duf from v0.8.1 to v0.9.1. <br/>"
-CHANGELOG += "5. Update s3backer from v2.1.5 to v2.1.6. <br/>"
+CHANGELOG  = "1. Update ntfs-3g_ntfsprogs to v2026.9.28. <br/>"
+CHANGELOG += "2. Update dar to v2.8.6. <br/>"
+CHANGELOG += "3. Update davfs2 to v1.7.3. <br/>"
+CHANGELOG += "4. Update e2fsprogs to v1.47.4. <br/>"
+CHANGELOG += "5. Update lsscsi to v0.33. <br/>"
+CHANGELOG += "6. Update ddrescue to v1.30. <br/>"
+CHANGELOG += "7. Update gdu to v5.32.0. <br/>"
+CHANGELOG += "8. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
