@@ -56,6 +56,8 @@ OVERLAY_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 override WORK_DIR = $(CURDIR)/work
 # Its archive beside the toolchains', per DSM version: distrib/overlay/<dsm>/.
 override DISTRIB_DIR = $(OVERLAY_DIR)/$(TC_VERS)
+# A compiler, not package payload: nothing ever reads its plist.
+INSTALL_PLIST_SKIP = 1
 # Not a cross build: no stage0 bootstrap, no toolchain identity, nothing keyed on ARCH.
 override ARCH =
 override TCVERSION =
