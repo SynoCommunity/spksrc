@@ -49,8 +49,20 @@
 # Notes:
 #  - The toolchain target is idempotent: if the cookie exists, it is skipped.
 #  - Logging is centralized via RUNLOG and applied to the full build.
-#  - This makefile orchestrates modular logic implemented under
-#    mk/spksrc.toolchain/.
+#  - This makefile orchestrates modular logic implemented under mk/spksrc.toolchain/,
+#    in include order:
+#
+#      mk/spksrc.toolchain/
+#      ├── tc-base.mk       : core toolchain identity and versioning variables
+#      ├── tc-flags.mk      : compiler, linker and language tool defaults
+#      ├── tc-url.mk        : download locations and filenames
+#      ├── tc-versions.mk   : Synology OS versions to toolchain metadata
+#      ├── tc-normalize.mk  : post-extraction normalization of the sysroot
+#      ├── overlay/
+#      │   ├── binutils.mk  : uses the binutils overlay (shim, -B), cleans every overlay
+#      │   └── rustc.mk     : uses the rust overlay (synology triple, rustup toolchain)
+#      ├── tc-rust.mk       : rustup base install and target support
+#      └── tc_vars.mk       : generates the tc_vars* files
 #
 ###############################################################################
 # Cross-compilation orchestration overview

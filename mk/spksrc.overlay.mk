@@ -15,6 +15,13 @@
 #
 # A rust toolchain also names the gcc it was built with: syno-qoriq-6.2.4_rust-1.98_gcc-8.5.
 #
+# The component files, one of which is included (OVERLAY_COMPONENT):
+#
+#   mk/spksrc.overlay/
+#   ├── binutils.mk      : download, extract, as/ld shim
+#   ├── gcc.mk           : download, extract, link sysroot and as/ld
+#   └── rust.mk          : download, extract, rustup toolchain link
+#
 # Provides to the component file, spksrc.overlay/<component>.mk:
 #   OVERLAY_TC          syno-<arch>-<dsm>, the base toolchain this one sits beside
 #   TC_ARCH, TC_VERS    <arch> and <dsm>

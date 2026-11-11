@@ -17,6 +17,12 @@
 # included once the toolchain is known; spksrc.native-cc.mk comes last, so that file can
 # set the CONFIGURE/COMPILE/INSTALL targets before native-cc.mk wires them.
 #
+#   mk/spksrc.native-toolchain/
+#   ├── binutils.mk      : PKG_NAME = binutils
+#   ├── gcc.mk           : PKG_NAME = gcc
+#   ├── rustc.mk         : PKG_NAME = rustc
+#   └── pgo-sources.sh   : writes the PGO training sources (toolchain-pgo-sources)
+#
 # Provides to the component mk and the package:
 #   TC_DIR       toolchain/syno-<arch>-<vers>
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile

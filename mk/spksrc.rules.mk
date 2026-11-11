@@ -3,6 +3,14 @@
 #
 # Common rules, shared by all makefiles
 #
+#   mk/spksrc.rules/
+#   ├── dependency-tree.mk   : dependency graph (dependency-list, dependency-tree, ...)
+#   └── generate-digests.mk  : digests generation
+#   mk/spksrc.kernel/
+#   └── required.mk          : kernel requirement checks
+#
+# The other spksrc.rules/ files are included by the entry points that need them.
+#
 ###############################################################################
 
 ###
