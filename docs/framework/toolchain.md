@@ -409,8 +409,8 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 | Component | Versions | Toolchains | Used by builds |
 |-----------|----------|------------|----------------|
 | rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
-| binutils | 2.30 | 65 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
-| gcc | 8.5 | the same 65 | not yet: installed only |
+| binutils | 2.30 | 67 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
+| gcc | 8.5 | the same 67 | not yet: installed only |
 
 ### Where the overlay code lives
 
@@ -446,11 +446,13 @@ A generic arch is built as the real arch whose archive it fetches: `arch-x64-6.2
 
 | Knob | Default | Effect |
 |------|---------|--------|
-| `TOOLCHAIN_PGO` | `1` | Two passes: build instrumented, run the instrumented tools over training input, rebuild reading the counts. gcc and binutils train on generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`); rust on the crates the official Rust dist trains on, rustc-perf's compile benchmarks, shipped with their dependencies in the rust source tarball, built check, debug and release for the arch's target. For rust both halves are profiled: rustc by x.py, LLVM by gcc. gcc's own prerequisites (gmp, mpfr, mpc, isl, native packages linked in statically) are built plainly: profiling them would add passes for a gain that is marginal in these builds. The instrumented pass is never archived, so an archive that exists is always a finished build. |
+| `TOOLCHAIN_PGO` | `1` | Two passes: build instrumented, run the instrumented tools over training input, rebuild reading the counts. gcc and binutils train on generated sources -- C, C++ and, for gcc, Fortran (`mk/spksrc.native-toolchain/pgo-sources.sh`); rust on the crates the official Rust dist trains on, rustc-perf's compile benchmarks, shipped with their dependencies in the rust source tarball, built check, debug and release for the arch's target. For rust both halves are profiled: rustc by x.py, LLVM by gcc. gcc's own prerequisites (gmp, mpfr, mpc, isl, native packages linked in statically) are built plainly: profiling them would add passes for a gain that is marginal in these builds. Training gcc on real code as well -- 289 files of zstd, libwebp, bzip2, openh264 and highway -- was measured and gained nothing over the generated sources. The instrumented pass is never archived, so an archive that exists is always a finished build. |
 | `TOOLCHAIN_JOBS` | `1` | Archs built in parallel by `all-<dsm>`, each still at full parallelism. |
 | `TOOLCHAIN_KEEP_WORK` | `0` for gcc, else `1` | Keep each arch's work dir once its archive exists. A gcc tree is ~2 GB; a failed arch is always kept. |
 
-The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc first makes `native/binutils-2.30` for the same `(arch, DSM)` with its own `arch-<arch>-<dsm>` target -- both PGO passes and the archive, the very file the binutils overlay publishes -- unless that archive already exists, then reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain. rust does the same. The binutils archive keeps binutils' own `PKG_REV`, whatever revision the gcc or rust build is given.
+The producer builds the component for the build host with `HOST_OPTFLAGS`: `-O2`, LTO, and `-march=x86-64-v3` when the host compiler accepts it -- an archive built that way runs only on an x86-64-v3 (AVX2) build host. gcc first makes `native/binutils-2.30` for the same `(arch, DSM)` with its own `arch-<arch>-<dsm>` target -- both PGO passes and the archive, the very file the binutils overlay publishes -- unless that archive already exists, then reads its target ABI (`--with-cpu`, float ABI, fpu) off the vendor gcc of that toolchain. rust does the same. That binutils is the one its overlay publishes, at its consumer's revision, whatever revision the gcc or rust build is given.
+
+Built that way, the overlays compile faster than the vendor toolchain they extend: on x64-7.1, whose vendor gcc is 8.5 as well, gcc and binutils use about 12% less CPU time over ffmpeg, x265, sqlite, OpenSSL and `as` alone (10.6 to 14.3% per build). Where the vendor gcc is older, the newer compiler's extra work absorbs it: comcerto2k-7.1's gcc 8.5 overlay runs level with its vendor gcc 4.9.3.
 
 A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of the usual native build variables (`CONFIGURE_ARGS`, `COMPILE_TARGET`, ...):
 
