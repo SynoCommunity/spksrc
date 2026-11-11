@@ -10,9 +10,8 @@ HOMEPAGE = https://github.com/cminyard/gensio
 COMMENT  = A library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc.
 LICENSE  = GPLv2
 
-# qoriq is the only PPC arch that is supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+# stdatomic.h, which gcc ships from 4.9 on.
+MIN_GCC_VERSION = 4.9
 
 DEPENDS = cross/openssl3
 DEPENDS += cross/glib
