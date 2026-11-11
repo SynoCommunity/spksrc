@@ -32,12 +32,12 @@ $(call depend,cross/s3backer,nop)
 $(call depend,cross/dar,nop)
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
-LICENSE  = Each tool is licensed under it\'s respective license.
+LICENSE  = Each tool is licensed under its respective license.
 
 DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Disk Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
-DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescue$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG  = "1. Update dar from v2.7.19 to v2.8.1 and add SFTP repository support. <br/>"
 CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
