@@ -121,10 +121,48 @@ If you only read one thing, read this. The details are in the dated log below.
   archive and pulled in like any other dependency. That fixes long-standing failures on
   those archs (SPE float, the ppc853x TLS relocations, `AtomicU64`). It also
   generalises: a component shipped **beside** a base toolchain is an *overlay*, switched
-  with **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`** from `local.mk`, and `make help`
+  with **`OVERLAY_GCC`** / **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`**, and `make help`
   shows which are active for your arch.
 
+- **gcc 8.5 on DSM 5.2 to 7.1, on by default.** 68 toolchains get gcc 8.5 and binutils
+  2.30 beside their vendor compiler, so a package whose `MIN_GCC_VERSION` the vendor gcc
+  misses builds there all the same, and `TC_GCC` reports the compiler actually used.
+  **`OVERLAY_GCC=0`** builds on the vendor gcc. See
+  [Building with the gcc overlay](../framework/toolchain.md#building-with-the-gcc-overlay).
+
 ---
+
+??? note "November 11th 2026 — The gcc 8.5 overlay on by default, DSM 5.2 to 7.1 (#7391)"
+
+    - **What:** the gcc 8.5 overlay, installed beside the vendor gcc of 68 toolchains since
+      #7701 and produced by #7707, is now used by packages, together with binutils 2.30,
+      whose `as`/`ld` it needs. A package then builds with `<target>-gcc-8.5`, and `TC_GCC`
+      reports `8.5.0`, so `MIN_GCC_VERSION` floors and `version_ge` selections follow the
+      compiler actually used; `TC_GCC_VENDOR` keeps the toolchain's own.
+    - **On by default** (`OVERLAY_GCC ?= 1`), tree-wide, so a package and the meta packages
+      it builds agree without the switch crossing the spk boundary. Inert where an arch
+      ships no overlay; kernel modules and drivers keep the vendor gcc. `OVERLAY_GCC=0`
+      returns to the vendor compiler; an explicit `OVERLAY_BINUTILS=0` beside an active
+      gcc overlay stops the build, since gcc 8.5 cannot drive the vendor `as`.
+    - **The effective compiler, wherever the toolchain is asked.** The overlay's runtimes
+      are searched first, with `-L` and `--rpath-link`, which `ld` uses for a shared
+      library's own `DT_NEEDED`; the toolchain's include directory moves to `-idirafter`,
+      so it no longer shadows gcc 8.5's headers; `TC_HAS_LIBATOMIC` probes the compiler
+      that will run. `tc_vars.overlay.mk` records the drivers' suffix, `TC_GCC_SUFFIX`.
+    - **What a package carries:** the overlay's `libstdc++.so` and `libgcc_s.so`, newer
+      than DSM's, wherever a shipped binary needs them (`TC_LIBS_OVERLAY`).
+    - **Rust follows the gcc:** the rust built with gcc 8.5 is taken by default, and the
+      rustup toolchain is named after the gcc the selected rust was built with. On an arch
+      with no rust overlay and a vendor gcc older than 5 (`hi3535`, the ARMv8 archs of DSM
+      6.2.4), the toolchain provisions stable rust for the overlay side and 1.97.1 for the
+      vendor side.
+    - **Overlay consumers** build no plist (`INSTALL_PLIST_SKIP`), and log and answer
+      `make help` in `overlay/` as in `toolchain/`.
+    - **Packages:** ffmpeg 6 builds without LTO on PowerPC, where gcc 8.5 crashes in it;
+      ffmpeg 7 and 8 define `static_assert` below glibc 2.16 and build for armv5te on
+      ARMv5; the dvb plugin of gst-plugins-bad needs the headers of a 3.10 kernel.
+    - See [Building with the gcc overlay](toolchain.md#building-with-the-gcc-overlay).
+    - Pull request: [#7391](https://github.com/SynoCommunity/spksrc/pull/7391)
 
 ??? note "November 11th 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
 

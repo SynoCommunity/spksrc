@@ -129,13 +129,13 @@ Each file has its own role, and a build reads only those it needs (`TC_VARS_ENV`
 them may build crates. CMake and Meson builds do not read the generic files directly: they get
 a file of their own, generated per dependency (below).
 
-The examples are those of `cross/zlib` for `qoriq-6.2.4`, shortened: `<spksrc>` is the
-checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e500v2-linux-gnuspe`.
+The examples are those of `cross/zlib` for `qoriq-6.2.4`, with the gcc overlay on, the default, shortened: `<spksrc>` is the
+checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e500v2-linux-gnuspe`, `<gcc>` and `<binutils>` for the bin dirs of its gcc and binutils overlays, `<shim>` for the binutils overlay's shim.
 
 | File | Holds | Read by |
 |------|-------|---------|
 | `tc_vars.mk` | the toolchain's identity and versions: no compiler, no flags | every build |
-| `tc_vars.overlay.mk` | the overlays the arch ships: whether this build uses each, its version, consumer dir and bin dir | every build |
+| `tc_vars.overlay.mk` | the overlays the arch ships: whether this build uses each, its version, consumer dir and bin dir; the suffix of the gcc drivers this build calls | every build |
 | `tc_vars.autotools.mk` | `TC_CONFIGURE_ARGS` and the environment of a cross build: `CC`, `CXX`, `AR`, `LD`, … and the `*FLAGS`, as `TC_ENV += …` | autotools builds |
 | `tc_vars.flags.mk` | the toolchain's `TC_EXTRA_*FLAGS`, and `CFLAGS`, `CPPFLAGS`, `CXXFLAGS`, `LDFLAGS` as make variables | autotools builds, and the CMake and Meson file generators |
 | `tc_vars.rust.mk` | the cargo and rustup environment, per Rust target triple | every package |
@@ -146,7 +146,7 @@ checkout, `<tc>` stands for `<spksrc>/toolchain/syno-qoriq-6.2.4/work/powerpc-e5
 
 What the toolchain is, as plain values: where it lives, its target and prefix, and the versions
 the capability floors compare against (`MIN_GCC_VERSION`,
-`MIN_KERNEL_VERSION`, …). The overlays are in `tc_vars.overlay.mk`, below.
+`MIN_KERNEL_VERSION`, …). `TC_GCC` and `TC_BINUTILS` are those the build uses: the gcc overlay's 8.5.0 and its binutils 2.30 here, where the toolchain's own are 4.9.3 and 2.25. The overlays are in `tc_vars.overlay.mk`, below.
 
 ```makefile
 TC_TYPE := DSM
@@ -161,9 +161,9 @@ TC_VERS := 6.2.4
 TC_BUILD := 25556
 TC_OS_MIN_VER := 6.2-25556
 TC_ARCH := qoriq
-TC_GCC := 4.9.3
+TC_GCC := 8.5.0
 TC_GLIBC := 2.20
-TC_BINUTILS := 2.25
+TC_BINUTILS := 2.30
 TC_KERNEL := 2.6.32
 ```
 
@@ -171,20 +171,22 @@ TC_KERNEL := 2.6.32
 
 The overlays the arch ships, one block each, written with `tc_vars.mk` so that file keeps the
 toolchain alone: `TC_OVERLAY_<c>_ON` says whether this build uses it, then its version, consumer
-dir and bin dir, filled used or not (see [Toolchain Overlays](#toolchain-overlays)).
+dir and bin dir, filled used or not (see [Toolchain Overlays](#toolchain-overlays)); and
+`TC_GCC_SUFFIX`, the suffix of the gcc drivers this build calls, empty unless the gcc overlay is on.
 
 ```makefile
-TC_OVERLAY_BINUTILS_ON := FALSE
+TC_OVERLAY_BINUTILS_ON := TRUE
 TC_OVERLAY_BINUTILS := 2.30
 TC_OVERLAY_BINUTILS_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30
 TC_OVERLAY_BINUTILS_PATH := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/install/usr/local/bin/
-TC_OVERLAY_GCC_ON := FALSE
+TC_OVERLAY_GCC_ON := TRUE
 TC_OVERLAY_GCC := 8.5.0
 TC_OVERLAY_GCC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_gcc-8.5
 TC_OVERLAY_GCC_PATH := <spksrc>/overlay/syno-qoriq-6.2.4_gcc-8.5/work/install/usr/local/bin/
+TC_GCC_SUFFIX := -8.5
 TC_OVERLAY_RUSTC_ON := TRUE
-TC_OVERLAY_RUSTC := 1.82.0
-TC_OVERLAY_RUSTC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
+TC_OVERLAY_RUSTC := 1.98.1
+TC_OVERLAY_RUSTC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.98_gcc-8.5
 TC_RUST_LINK_VIA_BINUTILS := TRUE
 TC_OVERLAY_RUSTC_LINKER := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
@@ -197,12 +199,12 @@ with its absolute path, the flags, and the `*_FOR_BUILD` set for what runs on th
 ```makefile
 TC_CONFIGURE_ARGS := --host=powerpc-e500v2-linux-gnuspe --build=i686-pc-linux
 TC_ENV += SYSROOT="<tc>/powerpc-e500v2-linux-gnuspe/sysroot"
-TC_ENV += CC="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
-TC_ENV += CXX="<tc>/bin/powerpc-e500v2-linux-gnuspe-g++"
-TC_ENV += LD="<tc>/bin/powerpc-e500v2-linux-gnuspe-ld"
-TC_ENV += LDSHARED="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc -shared"
+TC_ENV += CC="<gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5"
+TC_ENV += CXX="<gcc>/powerpc-e500v2-linux-gnuspe-g++-8.5"
+TC_ENV += LD="<binutils>/powerpc-e500v2-linux-gnuspe-ld"
+TC_ENV += LDSHARED="<gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5 -shared -B<shim>"
 ...                                  # CPP, AS, AR, NM, RANLIB, STRIP, OBJDUMP, OBJCOPY, READELF
-TC_ENV += CFLAGS="-I<tc>/…/sysroot/usr/include -I<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/include …"
+TC_ENV += CFLAGS="-idirafter <tc>/…/sysroot/usr/include -I<spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib/include … -B<shim>"
 ...                                  # CPPFLAGS, CXXFLAGS, LDFLAGS
 TC_ENV += CC_FOR_BUILD="/usr/bin/gcc"
 ...                                  # CXX/CPP_FOR_BUILD and their flags
@@ -245,19 +247,19 @@ rust overlay, the toolchain is the overlay's and the target the Synology triple:
 ```makefile
 TC_ENV += CARGO_HOME="<spksrc>/distrib/cargo"
 TC_ENV += RUSTUP_HOME="<spksrc>/distrib/rustup"
-TC_ENV += RUSTUP_TOOLCHAIN="1.82.0-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc4.9.3"
-TC_ENV += RUST_TARGET_PATH="<spksrc>/distrib/rustup/toolchains/1.82.0-…-gcc4.9.3/target-spec"
+TC_ENV += RUSTUP_TOOLCHAIN="1.98.1-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc8.5"
+TC_ENV += RUST_TARGET_PATH="<spksrc>/distrib/rustup/toolchains/1.98.1-…-gcc8.5/target-spec"
 TC_ENV += CARGO_BUILD_TARGET="powerpc-synology-linux-gnuspe"
-TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_LINKER="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
-TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_AR="<tc>/bin/powerpc-e500v2-linux-gnuspe-ar"
+TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_LINKER="<gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5"
+TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_AR="<binutils>/powerpc-e500v2-linux-gnuspe-ar"
 TC_ENV += CARGO_TARGET_POWERPC_SYNOLOGY_LINUX_GNUSPE_RUSTFLAGS="-Clink-arg=-L… -Clink-arg=-B<spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim …"
-TC_ENV += CC_powerpc_synology_linux_gnuspe="<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc"
+TC_ENV += CC_powerpc_synology_linux_gnuspe="<gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5"
 ...                                  # CXX_, AR_, RANLIB_, CFLAGS_, CXXFLAGS_<triple>
 TC_ENV += HOST_CC="/usr/bin/gcc"
 ...                                  # HOST_CXX, HOST_AR, HOST_RANLIB and their flags
 RUST_TARGET := powerpc-synology-linux-gnuspe
-TC_RUSTC := 1.82.0
-TC_RUSTUP_TOOLCHAIN := 1.82.0-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc4.9.3
+TC_RUSTC := 1.98.1
+TC_RUSTUP_TOOLCHAIN := 1.98.1-powerpc-synology-linux-gnuspe-qoriq-6.2.4-gcc8.5
 ```
 
 ### tc_vars.cmake, and the CMake toolchain file of a dependency
@@ -269,9 +271,9 @@ Rust settings for CMake projects that build crates (Corrosion).
 ```cmake
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR ppc)
-set(CMAKE_C_COMPILER          <tc>/bin/powerpc-e500v2-linux-gnuspe-gcc)
-set(CMAKE_CXX_COMPILER        <tc>/bin/powerpc-e500v2-linux-gnuspe-g++)
-set(CMAKE_AR                  <tc>/bin/powerpc-e500v2-linux-gnuspe-ar)
+set(CMAKE_C_COMPILER          <gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5)
+set(CMAKE_CXX_COMPILER        <gcc>/powerpc-e500v2-linux-gnuspe-g++-8.5)
+set(CMAKE_AR                  <binutils>/powerpc-e500v2-linux-gnuspe-ar)
 ...                           # LINKER, AS, NM, RANLIB, STRIP, OBJDUMP, … and *_FOR_BUILD
 set(CMAKE_FIND_ROOT_PATH <spksrc>/cross/zlib/work-qoriq-6.2.4/install/usr/local/zlib)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -311,9 +313,9 @@ cpu = 'ppc'
 endian = 'big'
 
 [binaries]
-c = '<tc>/bin/powerpc-e500v2-linux-gnuspe-gcc'
-cpp = '<tc>/bin/powerpc-e500v2-linux-gnuspe-g++'
-ar = '<tc>/bin/powerpc-e500v2-linux-gnuspe-ar'
+c = '<gcc>/powerpc-e500v2-linux-gnuspe-gcc-8.5'
+cpp = '<gcc>/powerpc-e500v2-linux-gnuspe-g++-8.5'
+ar = '<binutils>/powerpc-e500v2-linux-gnuspe-ar'
 ...                                  # ld, as, nm, ranlib, strip, objdump, …, cargo, rust
 ```
 
@@ -408,9 +410,9 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 
 | Component | Versions | Toolchains | Used by builds |
 |-----------|----------|------------|----------------|
-| rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
-| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
-| gcc | 8.5 | the same 68 | not yet: installed only |
+| rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the build made with the gcc a package uses: the gcc 8.5 one by default, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
+| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | with the gcc overlay, whose output the vendor `as` cannot assemble; and for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
+| gcc | 8.5 | the same 68 | by default (`OVERLAY_GCC`), see [Building with the gcc overlay](#building-with-the-gcc-overlay) |
 
 ### Where the overlay code lives
 
@@ -421,7 +423,7 @@ Overlay code sits at four levels, by role, each read by a different Makefile, in
 | **Produce** | `native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-<version>`, through `mk/spksrc.native-toolchain.mk` | a maintainer, by hand: build an archive to publish | [Building and publishing an overlay](#building-and-publishing-an-overlay) |
 | **Install** | `mk/spksrc.overlay.mk`, `mk/spksrc.overlay/<component>.mk` | the Makefile of an `overlay/` directory: download, extract into its own `work/`, then the component's own step (binutils shim, gcc links, `rustup toolchain link`) | [The overlay/ directories](#the-overlay-directories) |
 | **Decide** | `mk/spksrc.common/overlay.mk`, `mk/spksrc.common/overlay/<component>.mk` | every package and toolchain, through `spksrc.common.mk`: which overlays the arch has (`_OVERLAY_*_DIR`), which are requested (`OVERLAY_*`) and active (`_OVERLAY_*_ON`), versions, warnings | [Overlay switches](#overlay-switches) |
-| **Use** | `mk/spksrc.toolchain/overlay/<component>.mk` | the base toolchain, and the `tc_vars` files it writes into a package's work dir: shim path and `-B`, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files) |
+| **Use** | `mk/spksrc.toolchain/overlay/<component>.mk`, with `tc-flags.mk` and `tc_vars.mk` | the base toolchain, and the `tc_vars` files it writes into a package's work dir: shim path and `-B`, the gcc overlay's drivers, headers and runtimes, Synology triple, rustup toolchain, Rust link flags; cleaning the overlays | [tc_vars Files](#tc_vars-files), [Building with the gcc overlay](#building-with-the-gcc-overlay) |
 
 The base toolchain ties the last three together: it installs every overlay of its arch, and includes the *use* files, which point its builds at the ones the *decide* level made active. The Makefiles themselves are listed in [Makefile System](makefile-system.md).
 
@@ -505,15 +507,15 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 
 | Switch | Default | Effect |
 |--------|---------|--------|
-| `OVERLAY_GCC` | `0` | gcc 8.5 beside the vendor gcc, with the binutils overlay it drives. Off for the tree; `native/rustc-1.98`, a rust built with gcc 8.5, turns it on for itself. |
+| `OVERLAY_GCC` | `1` | gcc 8.5 beside the vendor gcc, selected by its version suffix (`<target>-gcc-8.5`), with the binutils overlay it drives. `TC_GCC` then reports `8.5.0`, so `MIN_GCC_VERSION` floors and `version_ge` selections follow the compiler actually used. Inert where the arch ships no gcc overlay; `0` builds on the vendor gcc. |
 | `OVERLAY_RUSTC` | `1` | Custom from-source rustc + Synology triple. `0` falls back to stock `rustup` — diagnostic only: the archs that ship an overlay do so precisely because the stock std does not fit them. |
-| `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off. |
+| `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off -- the gcc overlay turns it on wherever it is active, and an explicit `OVERLAY_BINUTILS=0` there stops the build: for the vendor `as`/`ld`, set `OVERLAY_GCC=0` as well. |
 | `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. |
 | `OVERLAY_GCC_VERSION` | newest the arch ships | Which gcc build to select, matching the consumer dir name; empty where the arch ships none. |
 | `OVERLAY_RUSTC_VERSION` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
 | `OVERLAY_BINUTILS_VERSION` | newest the arch ships | Idem. |
 
-`make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read *before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
+`make setup` writes `OVERLAY_RUSTC` and `OVERLAY_BINUTILS` into `local.mk`, the tree-wide source of truth. It is read *before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
 
     command line  >  environment  >  local.mk  >  the defaults above
 
@@ -528,11 +530,14 @@ A request that cannot be honored never fails the build: it degrades to the stock
 Each generated `tc_vars.overlay.mk` records what the build actually resolved to, one block per overlay the arch ships:
 
 ```makefile
-TC_OVERLAY_BINUTILS_ON := FALSE   # the global overlay: the C build keeps the vendor as/ld
+TC_OVERLAY_BINUTILS_ON := TRUE    # the global overlay: every compile takes its as/ld, for gcc 8.5
 TC_OVERLAY_BINUTILS := 2.30       # its version, beside TC_BINUTILS, the one the build takes
+TC_OVERLAY_GCC_ON := TRUE
+TC_OVERLAY_GCC := 8.5.0
+TC_GCC_SUFFIX := -8.5             # the drivers this build calls: <target>-gcc-8.5
 TC_OVERLAY_RUSTC_ON := TRUE
-TC_OVERLAY_RUSTC := 1.82.0
-TC_OVERLAY_RUSTC_DIR := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
+TC_OVERLAY_RUSTC := 1.98.1
+TC_OVERLAY_RUSTC_DIR := …/syno-qoriq-6.2.4_rust-1.98_gcc-8.5
 TC_RUST_LINK_VIA_BINUTILS := TRUE # the narrow use: the Rust link only, through the shim below
 TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
@@ -541,11 +546,31 @@ TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 
 `make overlay-<arch>-<tcvers>` shows, with this run's switches, what each overlay resolves to -- `ON`/`OFF`, the consumer taken, those the arch ships, what degrades -- and whether the work dir agrees. `make help-<arch>-<tcvers>`, the same as `make help ARCH=<arch> TCVERSION=<tcvers>`, adds it and `check` to the package's help. Every `arch-<arch>-<tcvers>` build prints the same report, then `check`, right after its `[BEGIN]` line, so a log always says what the build started with.
 
+### Building with the gcc overlay
+
+The gcc overlay is on by default, tree-wide (`OVERLAY_GCC ?= 1`): on the 68 toolchains of DSM 5.2 to 7.1 that ship one, a package builds with gcc 8.5 and binutils 2.30, whatever its vendor gcc. It is inert where an arch ships none, which is every toolchain whose vendor gcc is already recent. `x64-7.1`, whose vendor gcc is 8.5 too, keeps one: built profile-guided, it takes about 12% less CPU time (see [Building and publishing an overlay](#building-and-publishing-an-overlay)). Kernel modules and drivers keep the vendor gcc, the one their kernel was built with: `spksrc.kernel.mk` and `spksrc.driver.mk` force `OVERLAY_GCC` off.
+
+What changes for a build:
+
+- **The drivers.** `$(call tc,gcc)` -- and `g++`, `cpp`, `gfortran` -- name the overlay's, `<target>-gcc-8.5`, through `TC_OVERLAY_GCC_PATH` and `TC_GCC_SUFFIX`, and so do `CC`, `CXX` and the rest of the generated environment. Their `as`/`ld` are binutils 2.30's.
+- **The versions.** `TC_GCC` reports `8.5.0` and `TC_BINUTILS` `2.30`, so a `MIN_GCC_VERSION` floor the vendor gcc misses is met, and a package's `version_ge` selection follows the compiler that compiles; `TC_GCC_VENDOR` keeps the toolchain's own. `TC_HAS_LIBATOMIC` asks gcc 8.5, which ships libatomic where an old vendor gcc does not, and emits the `__atomic_*` calls that need it.
+- **The headers.** The toolchain's include dir moves from `-I` to `-idirafter`: still searched, for the headers only it has, it no longer shadows gcc 8.5's own -- on `ppc853x-5.2` it holds the gcc 4.3.7 headers.
+- **The runtimes.** The overlay's own libraries (libstdc++, libgcc_s, libatomic, ...) are searched first, with `-L` and `--rpath-link`, which `ld` uses for a shared library's own `DT_NEEDED`, ahead of the vendor ones in the sysroot. A package whose binaries need its libstdc++ or libgcc_s carries them (`TC_LIBS_OVERLAY`, `mk/spksrc.spk/strip.mk`): they are newer than those DSM ships.
+- **Rust.** A rust overlay built with gcc 8.5 is preferred, the vendor-gcc one taken where an arch has none. On an arch with no rust overlay whose vendor gcc is older than 5 (`hi3535`, the ARMv8 archs of DSM 6.2.4), a package takes stable rust under the gcc overlay and 1.97.1 without it: the toolchain provisions both.
+
+A compiler choice holds for a package *and its whole dependency tree*: C++ built by a vendor gcc older than 5 does not link with C++ built by gcc 8.5, whose library ABI differs. The switch crosses every sub-make on its command line (`FWRD_VARS`), which outranks a dependency's own; it does not cross an spk boundary (`FWRD_ARGS_SPK`): a meta package decides for itself, from the same default.
+
+```bash
+OVERLAY_GCC=0 make -C cross/zlib arch-x64-6.2.4   # just this build, on the vendor gcc
+```
+
+A work dir is made with its compiler: switching `OVERLAY_GCC` on an existing one stops with *run make clean first*, as for every overlay switch.
+
 ## Custom From-Source Rust Toolchains
 
-A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
+A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc or the gcc 8.5 overlay, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
 
-An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC_ON := TRUE` in its `tc_vars.overlay.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
+An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC_ON := TRUE` in its `tc_vars.overlay.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. With the gcc overlay on, the default, a package builds its C with gcc 8.5 and its Rust with the rust made with it, both linking through binutils 2.30. With `OVERLAY_GCC=0` the C keeps the vendor `gcc`+`ld`, the vendor-gcc rust is selected, and only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`).
 
 ### Building Rust
 
