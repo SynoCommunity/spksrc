@@ -462,7 +462,7 @@ A component is one file, `mk/spksrc.native-toolchain/<PKG_NAME>.mk`, on top of t
 | `TOOLCHAIN_DIST_SHARED = 1` | A generic arch is built as the real arch whose archive it shares. |
 | `TOOLCHAIN_PGO ?= 1`, `TOOLCHAIN_PGO_TRAIN` | The two passes, and the target that runs the instrumented tools over `TOOLCHAIN_PGO_SOURCES`. |
 
-Before its archive, gcc rewrites to `$ORIGIN` the `RUNPATH` a target library was linked with (`gcc-runpath-origin`): libgfortran carries one to the build prefix wherever libquadmath exists to need, on the x86_64 targets. A `RUNPATH` keeps the loader from using the package's `RPATH` for that library's own dependencies, so on DSM a package carrying both libraries would not find libquadmath. The build host needs `patchelf`, which the spksrc image ships.
+gcc is configured with a build triple of its own, `--build=--host=<machine>-build_pc-linux-gnu`, as crosstool-NG does. Sharing the target's -- an x86_64 target on an x86_64 build host -- gcc configures as a native compiler and links its target libraries with the host's binutils instead of `--with-build-time-tools`: a `RUNPATH` on libgfortran that hid a package's libquadmath from the loader on DSM, `-z separate-code` layouts, tools installed twice under a doubled prefix. The gcc v5 archives of the x86_64 targets were built that way.
 
 In return the front-end provides the toolchain's identity (`TC_TARGET`, `TC_GCC`, `TC_GLIBC`, `TC_SYSROOT_DIR`, `$(call _tc_get,VAR)`), the `tc-install` target, `HOST_OPTFLAGS`, `TC_VENDOR_ENV` for a `$(shell)` that runs a vendor tool, and `TOOLCHAIN_BINUTILS_DIR` / `_BIN` / `_VERSION`: the `native/binutils-<version>` gcc and rust are built against, co-built for the same `(arch, DSM)`.
 

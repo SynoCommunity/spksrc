@@ -201,10 +201,11 @@ If you only read one thing, read this. The details are in the dated log below.
     - **A producer's revision follows its consumer:** one past the overlay's `PKG_REV`
       (`toolchain_published_rev`), `v1` for a new toolchain; `PKG_REV=vN` sets another. The
       binutils gcc and rust build against stays at the published one.
-    - **gcc's target libraries get `$ORIGIN` for a `RUNPATH`** (`gcc-runpath-origin`, before
-      the archive): libgfortran's pointed at the build prefix on the x86_64 targets, which
-      kept a package's libquadmath out of the loader's reach. Takes effect with the next
-      gcc revision.
+    - **gcc builds with a build triple of its own** (`--build=--host=<machine>-build_pc-linux-gnu`):
+      for an x86_64 target it configured as a native compiler and linked its target
+      libraries with the host's binutils -- libgfortran got a `RUNPATH` that kept a
+      package's libquadmath out of the loader's reach on DSM. The x86_64 gcc archives are
+      rebuilt as v6.
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
       (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
       macro documented the same way; `upper` and `lower` change case without a fork,
