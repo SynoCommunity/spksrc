@@ -15,13 +15,20 @@
 #
 # A rust toolchain also names the gcc it was built with: syno-qoriq-6.2.4_rust-1.98_gcc-8.5.
 #
+# The component files, one of which is included (OVERLAY_COMPONENT):
+#
+#   mk/spksrc.overlay/
+#   ├── binutils.mk      : download, extract, as/ld shim
+#   ├── gcc.mk           : download, extract, link sysroot and as/ld
+#   └── rust.mk          : download, extract, rustup toolchain link
+#
 # Provides to the component file, spksrc.overlay/<component>.mk:
 #   OVERLAY_TC          syno-<arch>-<dsm>, the base toolchain this one sits beside
 #   TC_ARCH, TC_VERS    <arch> and <dsm>
 #   OVERLAY_COMPONENT   gcc, binutils or rust
 #   OVERLAY_RUST_GCC    the _gcc-<version> suffix, when there is one
 #   TC_TARGET           the base toolchain's target triple
-#   OVERLAY_DIST_ARCH   the arch the archive is named after (spksrc.overlay/dist-arch.mk)
+#   OVERLAY_DIST_ARCH   the arch the archive is named after (overlay_dist_arch)
 ###############################################################################
 
 _OVERLAY_DIR_WORDS := $(subst _, ,$(notdir $(CURDIR)))
@@ -39,9 +46,8 @@ ifeq ($(wildcard $(CURDIR)/../../mk/spksrc.overlay/$(OVERLAY_COMPONENT).mk),)
 $(error $(notdir $(CURDIR)): no overlay component '$(OVERLAY_COMPONENT)' (mk/spksrc.overlay/))
 endif
 
-TC_TARGET := $(shell sed -n 's/^TC_TARGET *= *//p' $(_OVERLAY_TC_MK))
-
-include ../../mk/spksrc.overlay/dist-arch.mk
+include ../../mk/spksrc.common/macros.mk
+TC_TARGET := $(call read_makefile_var,$(_OVERLAY_TC_MK),TC_TARGET)
 OVERLAY_DIST_ARCH := $(call overlay_dist_arch,$(TC_ARCH),$(TC_VERS))
 
 # Installed into its own work/, never the base toolchain's: the toolchain pulling this in as
@@ -53,6 +59,18 @@ override DISTRIB_DIR = $(OVERLAY_DIR)/$(TC_VERS)
 # Not a cross build: no stage0 bootstrap, no toolchain identity, nothing keyed on ARCH.
 override ARCH =
 override TCVERSION =
+
+# What every component shares, before its own file: an archive named after its producer's
+# toolchain, published in the toolchains/dsm<dsm> release, extracted as is, nothing to
+# install but its own <component>-post_install step. A component sets only what differs
+# (rust: its own release and name, under INSTALL_PREFIX).
+PKG_NAME            = $(OVERLAY_COMPONENT)
+PKG_EXT             = txz
+PKG_DIST_NAME       = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(OVERLAY_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
+PKG_DIST_SITE       = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm$(TC_VERS)
+EXTRACT_PATH        = $(INSTALL_DIR)
+INSTALL_TARGET      = nop
+POST_INSTALL_TARGET = $(PKG_NAME)-post_install
 
 include ../../mk/spksrc.overlay/$(OVERLAY_COMPONENT).mk
 include ../../mk/spksrc.native-install.mk

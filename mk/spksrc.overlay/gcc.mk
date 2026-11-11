@@ -7,18 +7,9 @@
 # either can be rebuilt without the other.
 ###############################################################################
 
-PKG_NAME = gcc
-PKG_EXT  = txz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(OVERLAY_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm$(TC_VERS)
-EXTRACT_PATH  = $(INSTALL_DIR)
-
 HOMEPAGE = https://gcc.gnu.org/
 COMMENT  = GNU Compiler Collection
 LICENSE  = GPLv3
-
-INSTALL_TARGET      = nop
-POST_INSTALL_TARGET = gcc-post_install
 
 # The base toolchain's sysroot, under whichever name its layout uses, and the binutils
 # overlay beside this one.

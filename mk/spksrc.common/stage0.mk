@@ -83,13 +83,33 @@ TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
 # Unconditional and ahead of pre-check, so a refused arch still leaves one behind. The
 # overlay switches go on the command line -- overlay.mk's export does not reach a $(shell).
 # MAKEFLAGS cleared: a $(shell) sub-make inherits -n/-p and would print, not write.
-ifeq ($(wildcard $(WORK_DIR)/tc_vars.mk),)
-  $(shell mkdir -p $(WORK_DIR))
-  $(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+_tc_vars_identity = $(shell mkdir -p $(WORK_DIR))$(shell MAKEFLAGS= $(MAKE) WORK_DIR=$(WORK_DIR) $(FWRD_ARGS) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars-identity >/dev/null 2>&1)
+# Whether the work dir recorded its overlays before this parse (stage0.mk is read more than
+# once). Both files are written together; a work dir older than tc_vars.overlay.mk gets it.
+ifeq ($(origin _TC_VARS_OVERLAY_EXISTED),undefined)
+_TC_VARS_OVERLAY_EXISTED := $(wildcard $(WORK_DIR)/tc_vars.overlay.mk)
+endif
+ifneq ($(wildcard $(WORK_DIR)/tc_vars.mk $(WORK_DIR)/tc_vars.overlay.mk),$(WORK_DIR)/tc_vars.mk $(WORK_DIR)/tc_vars.overlay.mk)
+  $(_tc_vars_identity)
 endif
 
-# Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
+# Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...), and the overlays
 -include $(WORK_DIR)/tc_vars.mk
+-include $(WORK_DIR)/tc_vars.overlay.mk
+
+# The overlays the work dir records (TC_OVERLAY_<c>_ON) against what this run resolves.
+_TC_VARS_OVERLAY_CHANGED := $(strip $(foreach c,BINUTILS GCC RUSTC,$(if $(filter TRUE FALSE,$(TC_OVERLAY_$(c)_ON)),\
+                              $(if $(filter $(TC_OVERLAY_$(c)_ON),$(if $(_OVERLAY_$(c)_ON),TRUE,FALSE)),,$(c)))))
+_TC_VARS_GOALS_INSPECT := clean clean% %clean dependency-% check check-% overlay overlay-% help help-%
+
+# A work dir is made with its overlays: its flags (-B<shim>, the overlay gcc), and the
+# optional-dependency verdicts cached beside them, which the rust version a floor sees
+# depends on. A run whose switches resolve otherwise stops; inspecting goals only report.
+ifneq ($(_TC_VARS_OVERLAY_CHANGED),)
+ifeq ($(filter $(_TC_VARS_GOALS_INSPECT),$(MAKECMDGOALS)),)
+$(error $(WORK_DIR)/tc_vars.overlay.mk was generated with $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),the $(c) overlay $(if $(filter TRUE,$(TC_OVERLAY_$(c)_ON)),ON,OFF)) and this run has it $(foreach c,$(_TC_VARS_OVERLAY_CHANGED),$(if $(_OVERLAY_$(c)_ON),ON,OFF)): run make clean first)
+endif
+endif
 
 # Keyed on the extracted $(TC_TARGET); the cookie traces who paid for it. Locked: the
 # parallel walks of depend.mk bootstrap the same toolchain at once, the later ones then

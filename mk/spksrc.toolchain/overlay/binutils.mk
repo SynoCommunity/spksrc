@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.toolchain/overlay-binutils.mk
+# spksrc.toolchain/overlay/binutils.mk
 #
 # OVERLAY_BINUTILS, consumer side: a modern GNU binutils for this (arch, DSM). Member of the
 # OVERLAY_<component> family; the switches and their defaults are in spksrc.common/overlay.mk,
@@ -19,17 +19,17 @@
 ###############################################################################
 
 # The extracted cross tools (<target>-ld, <target>-as, ...), inside the CONSUMER's own work
-# dir -- TC_OVERLAY_BINUTILS is that directory. Keeping each overlay self-contained is what
+# dir -- _OVERLAY_BINUTILS_DIR is that directory. Keeping each overlay self-contained is what
 # lets two versions of one component coexist; only these pointers then decide which is used.
-OVERLAY_BINUTILS_BIN      = $(TC_OVERLAY_BINUTILS)/work/install/usr/local/bin
+OVERLAY_BINUTILS_BIN  = $(_OVERLAY_BINUTILS_DIR)/work/install/usr/local/bin
 # gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a shim dir
 # carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim).
 # Absolute, so the -B path baked into tc_vars is stable across checkouts.
-OVERLAY_BINUTILS_SHIM     = $(TC_OVERLAY_BINUTILS)/work/shim
+OVERLAY_BINUTILS_SHIM = $(_OVERLAY_BINUTILS_DIR)/work/shim
 # GLOBAL redirect, folded into CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS by tc_vars. Empty unless the
 # global overlay is active -- a -B into a shim that never gets built would silently leave
 # every compile on the vendor as/ld.
-OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHIM))
+OVERLAY_BINUTILS_FLAG = $(if $(_OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHIM))
 
 # `make clean` on the base toolchain also cleans whichever overlay consumers it has, so a
 # rebuild re-extracts them instead of reusing a stale install. Only ADDS a prerequisite to the
@@ -51,15 +51,5 @@ endif
 # spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):
 # the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-binutils-warn
-ifeq ($(OVERLAY_BINUTILS_VERSION_MISSING),1)
 overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_VERSION_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_MISSING),1)
-overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_MISSING)
-else ifeq ($(OVERLAY_BINUTILS_ON),1)
-overlay-binutils-warn:
-	@$(OVERLAY_WARN_BINUTILS_UNMATCHED)
-else
-overlay-binutils-warn: ;
-endif
+	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING UNMATCHED)

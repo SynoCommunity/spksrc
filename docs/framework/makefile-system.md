@@ -55,8 +55,17 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.toolchain.mk` | Toolchain download, extraction and patching |
+| `spksrc.native-toolchain.mk` | Toolchain overlay producer (`native/gcc-8.5`, `native/binutils-2.30`, `native/rustc-*`): `arch-<arch>-<dsm>`, `all-<dsm>`, profile-guided builds |
 | `spksrc.overlay.mk` | Overlay consumer: installs one `overlay/` component beside its base toolchain (see [Toolchain Overlays](toolchain.md#where-the-overlay-code-lives)) |
 | `spksrc.toolkit.mk` | Toolkit management |
+
+### Kernel Modules and Drivers
+
+| File | Purpose |
+|------|--------|
+| `spksrc.kernel.mk` | A `kernel/` package: modules built in the Synology kernel source, one kernel per arch/DSM |
+| `spksrc.driver.mk` | A `driver/` package: an out-of-tree driver, built once per kernel against that kernel's source |
+| `spksrc.kernel/` | Kernel environment, configuration, headers, module build, requirements, download and version mapping |
 
 ### Build System Adapters
 
@@ -97,6 +106,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.wheel/install.mk` | Wheel installation |
 | `spksrc.wheel/env.mk` | Wheel environment setup |
 | `spksrc.python-crossenv.mk` | Cross-compilation virtual environment |
+| `spksrc.python-module.mk` | A python extension module, compiled under crossenv |
 
 ### SPK Package Creation
 
@@ -106,6 +116,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.spk-meta.mk` | Meta-consumer entry point: sets up the ffmpeg/python/videodriver meta(s), then includes `spksrc.spk.mk` |
 | `spksrc.spk-meta/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
 | `spksrc.spk-meta/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
+| `spksrc.spk-meta/videodriver-depends.mk` | The videodriver library `DEPENDS`, shared by `spk/synocli-videodriver` and the videodriver meta |
 | `spksrc.spk/copy.mk` | Dependency copying to staging |
 | `spksrc.spk/strip.mk` | Binary stripping |
 | `spksrc.spk/icon.mk` | Icon processing |
@@ -132,11 +143,27 @@ spksrc.common.mk
 spksrc.common/
 ├── archs.mk                  # architecture classification / groups
 ├── directories.mk            # work/staging/distrib directory layout
-├── help.mk                   # context-aware `make help` inside a package
+├── dotnet.mk                 # the archs a dotnet package refuses, and why
+├── help.mk                   # context-aware `make help`; help-<arch>-<tcvers> adds overlay and check
 ├── logs.mk                   # logging helpers
-├── macros.mk                 # GNU Make helper macros
+├── macros.mk                 # GNU Make helper macros, one file per theme:
+├── macros/
+│   ├── archs.mk              #   which toolchain an overlay or its producer stands for, at which revision
+│   ├── bool.mk               #   TRUE, FALSE, is_true, is_false, assert_bool, bool
+│   ├── depend.mk             #   depend, dep_seen
+│   ├── list.mk               #   uniq, dedup, dedup_files, merge, comma_append
+│   ├── runlog.mk             #   _runlog, RUNLOG
+│   ├── string.mk             #   upper, lower
+│   ├── tools.mk              #   tc, native, read_makefile_var
+│   └── version.mk            #   version_le/ge/lt/gt
 ├── overlay.mk                # overlay decisions: available, requested, active
-└── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
+├── overlay/
+│   ├── binutils.mk           #   per component, read by overlay.mk in this order:
+│   ├── gcc.mk                #   binutils, gcc, rustc
+│   ├── rustc.mk
+│   └── warnings.mk           #   banner text for the degraded states
+├── stage0.mk                 # parse-time toolchain pre-bootstrap (tc_vars.mk, tc_vars.overlay.mk)
+└── tc-capability.mk          # capability floors: MIN_GCC_VERSION, MIN_KERNEL_VERSION, ...
 
 # Build pipeline — the per-package steps
 spksrc.build.mk               # standard pipeline aggregator (download -> install),
@@ -157,12 +184,15 @@ spksrc.build/
 spksrc.rules.mk               # rules entry point: clean/changelog targets,
                               # aggregates dependency-tree.mk + generate-digests.mk
 spksrc.rules/
+├── check.mk                  # make check / check-<arch>-<tcvers>: the capability gates an arch fails
 ├── depend.mk                 # dependency resolution/build
+├── dependency.mk             # builds the DEPENDS, in order
 ├── dependency-tree.mk        # dependency graph
 ├── generate-digests.mk       # digests generation
+├── overlay.mk                # make overlay / overlay-<arch>-<tcvers>: the overlay report
 ├── pre-check.mk              # pre-build validation
 ├── status.mk                 # build status tracking
-├── supported.mk              # arch/version support (build-arch-* targets)
+├── supported.mk              # arch/version support (build-arch-* targets); includes check.mk, overlay.mk
 └── tests.mk                  # test harness rules
 
 # Cross-compilation entry points (a cross/ package includes one)
@@ -172,6 +202,8 @@ spksrc.cross-dotnet.mk        # .NET
 spksrc.cross-go.mk            # Go
 spksrc.cross-meson.mk         # Meson
 spksrc.cross-rust.mk          # Rust
+spksrc.cross-install.mk       # install-only: no configure/compile
+spksrc.cross-virtual.mk       # source-less: only aggregates DEPENDS
 spksrc.cross/                 # environment setup loaded by the entry points above
 ├── cmake-toolchainfile.mk    # generated CMake toolchain file
 ├── env-cmake.mk
@@ -187,10 +219,16 @@ spksrc.native-cc.mk
 spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
+spksrc.native-toolchain.mk    # toolchain overlay producer front-end
 spksrc.native/
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 └── env-meson.mk
+spksrc.native-toolchain/      # one file per producer component, picked by PKG_NAME
+├── binutils.mk               # PKG_NAME = binutils
+├── gcc.mk                    # PKG_NAME = gcc
+├── pgo-sources.sh            # generates the PGO training sources
+└── rustc.mk                  # PKG_NAME = rustc
 
 # SPK assembly entry point
 spksrc.spk.mk
@@ -207,6 +245,7 @@ spksrc.spk-meta/
 ├── ffmpeg.mk                 # when FFMPEG_PACKAGE is set
 ├── meta.mk                   # generates tc_vars.meta.mk
 ├── python.mk                 # when PYTHON_PACKAGE is set
+├── videodriver-depends.mk    # the videodriver DEPENDS, shared with spk/synocli-videodriver
 └── videodriver.mk            # when VIDEODRV_PACKAGE is set
 
 # Service configuration entry point
@@ -224,8 +263,12 @@ spksrc.service/
 ├── use_alternate_tmpdir
 └── use_alternate_tmpdir.dsm7
 
-# Python wheel entry point
-spksrc.wheel.mk
+# Python entry points
+spksrc.python-wheel.mk        # an exception wheel under python/ (pip/crossenv)
+spksrc.python-wheel-meson.mk  # same, meson-built
+spksrc.python-crossenv.mk     # the cross-compilation virtual environment
+spksrc.python-module.mk       # a python extension module, under crossenv
+spksrc.wheel.mk               # wheel orchestration (via spksrc.spk.mk)
 spksrc.wheel/
 ├── compile.mk
 ├── download.mk
@@ -236,8 +279,9 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
-├── overlay-binutils.mk       # uses the binutils overlay (shim, -B), cleans every overlay
-├── overlay-rustc.mk          # uses the rust overlay (synology triple, rustup toolchain)
+├── overlay/
+│   ├── binutils.mk           # uses the binutils overlay (shim, -B), cleans every overlay
+│   └── rustc.mk              # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk
@@ -250,7 +294,6 @@ spksrc.toolchain/
 spksrc.overlay.mk             # reads arch, DSM and component off the directory name
 spksrc.overlay/
 ├── binutils.mk               # download, extract, as/ld shim
-├── dist-arch.mk              # the arch whose archive a generic arch downloads
 ├── gcc.mk                    # download, extract, link sysroot and as/ld
 └── rust.mk                   # download, extract, rustup toolchain link
 
@@ -263,6 +306,19 @@ spksrc.toolkit/
 ├── tk-url.mk
 ├── tk-versions.mk
 └── tk_vars.mk                # generates the tk_vars* files
+
+# Kernel entry points (a kernel/ or driver/ package includes one)
+spksrc.kernel.mk              # a kernel's modules, built in the Synology kernel source
+spksrc.driver.mk              # an out-of-tree driver, built once per kernel against its source
+spksrc.kernel/
+├── base.mk                   # default kernel environment
+├── configure.mk              # kernel configuration
+├── dependency.mk             # kernel module dependencies
+├── headers.mk                # kernel headers for external modules
+├── module.mk                 # module compilation
+├── required.mk               # kernel requirement checks
+├── url.mk                    # kernel download locations
+└── versions.mk               # DSM version -> kernel metadata
 ```
 
 ## Key Implementation Details

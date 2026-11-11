@@ -55,7 +55,7 @@ kernel-type = \
   $(word 3,$(subst :, ,$(call kernel-map,$(1))))
 
 kernel-type-lc = \
-  $(shell printf '%s' "$(call kernel-type,$(1))" | tr A-Z a-z)
+  $(call lower,$(call kernel-type,$(1)))
 
 kernel-url = \
   $(word 4,$(subst :, ,$(call kernel-map,$(1))))
