@@ -15,15 +15,13 @@ LICENSE  = GPLv2
 # - removed Boost dependency
 MIN_GCC_VERSION = 12
 
-DEPENDS  = cross/glib
-DEPENDS += cross/alsa-lib
+DEPENDS  = cross/alsa-lib
 DEPENDS += cross/libmad
 DEPENDS += cross/libogg
 DEPENDS += cross/flac
 DEPENDS += cross/audiofile
 DEPENDS += cross/libid3tag
 DEPENDS += cross/libvorbis
-DEPENDS += cross/libtheora
 DEPENDS += cross/lame
 DEPENDS += cross/libshout
 DEPENDS += cross/soxr
@@ -31,7 +29,7 @@ DEPENDS += cross/curl
 DEPENDS += cross/sqlite
 DEPENDS += cross/libexpat
 DEPENDS += cross/opus
-DEPENDS += cross/pcre
+DEPENDS += cross/pcre2
 DEPENDS += cross/libmpdclient
 
 include ../../mk/spksrc.cross-meson.mk
