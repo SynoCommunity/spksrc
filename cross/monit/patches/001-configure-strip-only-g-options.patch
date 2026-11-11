@@ -1,0 +1,58 @@
+--- configure.orig
++++ configure
+@@ -21684,7 +21684,7 @@
+ elif test "$architecture" = "AIX"
+ then
+    ARCH="AIX"
+-   CFLAGS=`echo $CFLAGS|sed 's/-g//g'`
++   CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+    CFLAGS="$CFLAGS -D_THREAD_SAFE -D_REENTRANT"
+    LIBS="$LIBS -lodm -lperfstat -lm"
+ else
+@@ -23297,7 +23297,7 @@
+   enableval=$enable_optimized;
+         CFLAGS=`echo $CFLAGS|sed 's/-O.//g'`
+         if test "x$enableval" = "xyes" ; then
+-                CFLAGS=`echo $CFLAGS|sed 's/-g[^ ]*//g'`
++                CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+                 CFLAGS=`echo $CFLAGS|sed 's/-O.//g'`
+                 CFLAGS="$CFLAGS -O3 -DNDEBUG"
+                 enable_optimized=1
+@@ -23331,7 +23331,7 @@
+ then :
+   enableval=$enable_profiling;
+         if test "x$enableval" = "xyes" ; then
+-                CFLAGS=`echo $CFLAGS|sed 's/-g.//g'`
++                CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+                 CFLAGS=`echo $CFLAGS|sed 's/-O.//g'`
+                 CFLAGS="$CFLAGS -g -pg -fprofile-arcs -ftest-coverage"
+                 enable_profile=1
+--- libmonit/configure.orig
++++ libmonit/configure
+@@ -13687,7 +13687,7 @@
+ then :
+   enableval=$enable_optimized;
+         if test "x$enableval" = "xyes" ; then
+-   	    	CFLAGS=`echo $CFLAGS|sed 's/-g[^ ]*//g'`
++   	    	CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+                 CFLAGS=`echo $CFLAGS|sed 's/-O.//g'`
+ 		CFLAGS="$CFLAGS -O3 -DNDEBUG"
+ 		OPTIMIZED=1
+@@ -13711,7 +13711,7 @@
+ then :
+   enableval=$enable_profiling;
+         if test "x$enableval" = "xyes" ; then
+-   	    	CFLAGS=`echo $CFLAGS|sed 's/-g.//g'`
++   	    	CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+                 CFLAGS=`echo $CFLAGS|sed 's/-O.//g'`
+                 CFLAGS="$CFLAGS -g -pg -fprofile-arcs -ftest-coverage"
+                 profile="true"
+@@ -14461,7 +14461,7 @@
+ 
+ elif test "$architecture" = "AIX"
+ then
+-   CFLAGS=`echo $CFLAGS|sed 's/-g//'`
++   CFLAGS=`echo $CFLAGS|sed 's/\(^\| \)-g[^ ]*/\1/g'`
+    CFLAGS="$CFLAGS -D_THREAD_SAFE -D_REENTRANT"
+ 
+ printf "%s\n" "#define AIX 1" >>confdefs.h
