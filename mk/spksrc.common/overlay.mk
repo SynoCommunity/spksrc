@@ -81,20 +81,19 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 #                        gcc, hence off by default -- OVERLAY_GCC is what matches it, and
 #                        turns it on (_OVERLAY_BINUTILS_ON); asking 0 alongside an active
 #                        gcc overlay stops the build (OVERLAY_BINUTILS_REFUSED).
-# OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix;
-#                        inert where the arch ships none.
+# OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix. On
+#                        by default; inert where the arch ships none.
 #
 # Defaulted here, before the components: the rust pool and _OVERLAY_RUSTC_DIR (rustc.mk) are
 # immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
 # unset switch while everything later sees the default.
 OVERLAY_RUSTC    ?= 1
 OVERLAY_BINUTILS ?= 0
-# Off by default, tree-wide: packages keep the vendor gcc, and the producer of a rust
-# built with the gcc overlay turns it on for itself (native/rustc-1.98). Tree-wide because a
-# package that selects a meta on TC_GCC must agree with the meta spk-meta-source builds,
-# and FWRD_ARGS_SPK does not carry the switch. OVERLAY_BINUTILS follows through
-# _OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
-OVERLAY_GCC      ?= 0
+# On by default, tree-wide. A package that selects a meta on TC_GCC must agree with the meta
+# spk-meta-source builds, and FWRD_ARGS_SPK does not carry the switch: only a shared
+# default makes both decide the same way. Inert wherever the arch ships no gcc overlay.
+# OVERLAY_BINUTILS follows through _OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
+OVERLAY_GCC      ?= 1
 # A typo must not read as "off": anything neither true nor false (macros.mk) stops here.
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
 
