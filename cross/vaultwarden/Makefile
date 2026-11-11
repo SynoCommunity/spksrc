@@ -12,9 +12,8 @@ DEPENDS = cross/openssl3 cross/mariadb-connector-c cross/libpq
 MIN_RUSTC_VERSION = 1.97
 
 # issue with dependent component "libmimalloc-sys"
-# error: failed to run custom build command for `libmimalloc-sys v0.1.30`
-# c_src/mimalloc/include/mimalloc-atomic.h:39:23: fatal error: stdatomic.h: No such file or directory
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+# libmimalloc-sys includes stdatomic.h, which gcc ships from 4.9 on.
+MIN_GCC_VERSION = 4.9
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden/wiki
 COMMENT = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.

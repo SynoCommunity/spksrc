@@ -3,9 +3,8 @@ SPK_VERS = 3.2.1
 SPK_REV = 14
 SPK_ICON = src/duplicity.png
 
-# protobuf: missing atomics support 
-# /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# The protobuf wheel includes stdatomic.h (upb/port/atomic.h), which gcc ships from 4.9 on.
+MIN_GCC_VERSION = 4.9
 
 PYTHON_PACKAGE = python314
 SPK_DEPENDS = "gnupg>=2.1.6"

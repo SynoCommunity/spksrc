@@ -26,14 +26,22 @@
 #  - Parallel build mode is auto-detected unless explicitly set
 #  - This file is intended to be the single entry point for common build definitions
 #
-# Common include structure:
+# Common include structure, in include order (a file with a directory of its own lists
+# that directory in its header):
 #
 #   mk/spksrc.common.mk
-#   └── mk/spksrc.common/
-#       ├── stage0.mk  : bootstrap toolchain & load its tc_vars (TC_GCC, ...)
-#       ├── archs.mk   : architecture and toolchain classification
-#       ├── logs.mk    : build log paths and logging helpers
-#       └── macros.mk  : generic GNU Make helper macros
+#   ├── mk/spksrc.common/
+#   │   ├── macros.mk        : generic GNU Make helper macros, one file per theme in macros/
+#   │   ├── directories.mk   : work, staging and distrib directory layout
+#   │   ├── overlay.mk       : overlay decisions, one file per component in overlay/
+#   │   ├── stage0.mk        : bootstrap toolchain & load its tc_vars (TC_GCC, ...)
+#   │   ├── archs.mk         : architecture and toolchain classification
+#   │   ├── dotnet.mk        : the archs a dotnet package refuses, and why
+#   │   ├── logs.mk          : build log paths and logging helpers
+#   │   ├── tc-capability.mk : capability floors (MIN_GCC_VERSION, MIN_KERNEL_VERSION, ...)
+#   │   └── help.mk          : context-aware make help
+#   └── local.mk             : local configuration overrides, when present (after macros.mk
+#                              and directories.mk, before overlay.mk)
 #
 ###############################################################################
 

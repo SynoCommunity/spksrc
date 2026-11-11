@@ -16,38 +16,16 @@ DEPENDS += cross/netcat
 DEPENDS += cross/imapfilter
 DEPENDS += cross/sshfs
 DEPENDS += cross/nmap
-
-OPTIONAL_DEPENDS  = cross/screen
-OPTIONAL_DEPENDS += cross/ser2net
-OPTIONAL_DEPENDS += cross/bind
-OPTIONAL_DEPENDS += cross/aria2
+DEPENDS += cross/screen
 
 include ../../mk/spksrc.common.mk
 
+# Each taken where its own floors admit the arch; descriptions follow spksrc.spk.mk.
+$(call depend,cross/bind,nop)
+$(call depend,cross/ser2net,nop)
+$(call depend,cross/aria2,nop)
+
 OPTIONAL_DESC =
-
-DEPENDS += cross/screen
-
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# tools of cross/bind (v9.16, v9.18, v9.20)
-OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
-DEPENDS += cross/bind
-endif
-
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/ser2net
-OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
-ifneq ($(call version_lt,${TCVERSION},6.0)$(call version_ge,${TCVERSION},3.0),11)
-DEPENDS += cross/aria2
-OPTIONAL_DESC := $(OPTIONAL_DESC)", aria2c"
-endif
-endif
-
 
 MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs, IMAPFilter$(OPTIONAL_DESC)."
@@ -88,3 +66,17 @@ SPK_COMMANDS += bin/nc bin/netcat
 SPK_COMMANDS += bin/imapfilter
 
 include ../../mk/spksrc.spk.mk
+
+# The optional tools taken above, in the description.
+ifneq ($(filter cross/bind,$(DEPENDS)),)
+# tools of cross/bind (v9.16, v9.18, v9.20)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
+endif
+
+ifneq ($(filter cross/ser2net,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
+endif
+
+ifneq ($(filter cross/aria2,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", aria2c"
+endif

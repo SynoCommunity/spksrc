@@ -54,16 +54,16 @@ endif
 # the binary is there to find. Cross packages read the baked tc_vars result and
 # never re-probe. (At the first, pre-extract parse it is empty; that value is not
 # consumed -- the sub-make's is.)
-TC_HAS_FORTRAN = $(if $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gfortran),1)
+# Through tc, so the gcc overlay's gfortran counts: tc's paths are only set later, by
+# overlay-gcc.mk and tc_vars.mk, so nothing below may test this at parse time.
+TC_HAS_FORTRAN = $(if $(wildcard $(call tc,gfortran)),1)
 
 # "<meson name>:<autotools and cmake name>:<binary>", no whitespace inside an entry so
 # a $(foreach) walks it. ldshared is a driver, not a tool: gcc plus TC_LDSHARED_ARGS.
 TOOLS = ld:LD:ld ldshared:LDSHARED:gcc cpp:CPP:cpp nm:NM:nm cc:CC:gcc as:AS:as \
         ranlib:RANLIB:ranlib cxx:CXX:g++ ar:AR:ar strip:STRIP:strip \
         objdump:OBJDUMP:objdump objcopy:OBJCOPY:objcopy readelf:READELF:readelf
-ifneq ($(strip $(TC_HAS_FORTRAN)),)
-TOOLS += fc:FC:gfortran
-endif
+TOOLS += $(if $(strip $(TC_HAS_FORTRAN)),fc:FC:gfortran)
 
 # Fields of a TOOLS entry.
 tool_role = $(word 1,$(subst :, ,$(1)))
@@ -141,11 +141,9 @@ CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CXXFLAGS += $(TC_EXTRA_CXXFLAGS)
 
-ifneq ($(strip $(TC_HAS_FORTRAN)),)
 FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 FFLAGS += $(TC_EXTRA_FFLAGS)
-endif
 
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)

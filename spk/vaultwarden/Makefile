@@ -7,8 +7,6 @@ DEPENDS = cross/vaultwarden cross/vaultwarden_web
 
 # rust edition 2024 required (see rust-version in vaultwarden Cargo.toml)
 MIN_RUSTC_VERSION = 1.97
-# issue with dependent component "libmimalloc-sys" (stdatomic.h missing)
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.

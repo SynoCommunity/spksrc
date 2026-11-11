@@ -54,7 +54,9 @@ TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..)
 # from the toolchain. libstdc++/libgcc_s are deliberately NOT here: DSM ships them,
 # and carrying a newer copy only matters once a gcc overlay can outpace the DSM one
 # -- that arrives with the overlay, as a separate TC_LIBS_OVERLAY list.
-TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
+# A library carried is examined like the shipped binaries, for the ones after it in the
+# list: libgfortran needs libquadmath, so it comes first.
+TC_LIBS_DEFAULT = libgfortran.so libquadmath.so libatomic.so
 
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
@@ -88,6 +90,7 @@ _install_tclib_() { \
    echo "===>      Add library from toolchain ($$(basename $$_src_))" ; \
    install -d -m 755 $(STAGING_DIR)/lib ; \
    install -m 644 "$$_src_" $(STAGING_DIR)/lib/ ; \
+   _carried_="$$_carried_ lib/$$(basename $$_src_)" ; \
    symlinks=$$(find $$(dirname "$$_src_")/. -maxdepth 1 -type l -name "$$_tclib_*" -printf '%f ' | xargs) ; \
    echo "===>      Add symlink from toolchain ($$symlinks)" ; \
    for _link_ in $$symlinks ; do \
@@ -101,13 +104,17 @@ endef
 # directory before it is read, the way copy.mk resolves them before packing.
 # Handed to objdump as written, a pattern is a path that does not exist and the
 # files it stands for are never examined.
+#
+# The libraries carried so far (_carried_) are read with them, so a dependency of one --
+# libgfortran's libquadmath -- is carried even when no shipped binary needs it directly.
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
+	_carried_="" ; \
 	for tclib in $(TC_LIBS_DEFAULT); do \
 	  echo  "===> SEARCHING for $${tclib}" ; \
 	  _need_all_="" ; _seen_="" ; \
 	  _plist_=$$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; \
-	  for _f_ in $$(cd $(STAGING_DIR) && eval ls -d $$_plist_ 2>/dev/null) ; do \
+	  for _f_ in $$(cd $(STAGING_DIR) && eval ls -d $$_plist_ 2>/dev/null) $$_carried_ ; do \
 	     _b_="$(STAGING_DIR)/$${_f_}" ; \
 	     _sn_=$$(objdump -p "$$_b_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$${tclib}" | head -1) ; \
 	     [ -n "$$_sn_" ] || continue ; \
