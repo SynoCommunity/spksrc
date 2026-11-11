@@ -1,13 +1,16 @@
 SVC_BACKGROUND=y
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/usr/sbin/netdata -D -P ${PID_FILE}"
+SERVICE_COMMAND="env NETDATA_RUN_DIR=${SYNOPKG_PKGVAR}/run/netdata ${SYNOPKG_PKGDEST}/usr/sbin/netdata -D -P ${PID_FILE}"
 
 service_postinst ()
 {
     mkdir -p "${SYNOPKG_PKGVAR}/lib/netdata" \
              "${SYNOPKG_PKGVAR}/log/netdata" \
              "${SYNOPKG_PKGVAR}/cache/netdata" \
-             "${SYNOPKG_PKGVAR}/etc/netdata"
+             "${SYNOPKG_PKGVAR}/etc/netdata" \
+             "${SYNOPKG_PKGVAR}/run/netdata"
+    chown "${EFF_USER}:synocommunity" "${SYNOPKG_PKGVAR}/run/netdata"
+    chmod 0770 "${SYNOPKG_PKGVAR}/run/netdata"
     # ensure the shipped default config is writable by the service user
     if [ -f "${SYNOPKG_PKGVAR}/etc/netdata/netdata.conf" ]; then
         chown "${EFF_USER}:synocommunity" "${SYNOPKG_PKGVAR}/etc/netdata/netdata.conf"

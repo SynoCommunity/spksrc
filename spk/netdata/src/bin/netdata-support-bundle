@@ -1,6 +1,7 @@
 #!/bin/sh
 # Netdata support bundle wrapper for DSM
 # Run as the package user so it can read the Agent's configuration and logs.
+# System-wide diagnostics may be incomplete compared with a root-run bundle.
 
 PKG_USER="sc-netdata"
 PKG_DIR="/var/packages/netdata"
@@ -16,4 +17,8 @@ if ! sudo -n true 2>/dev/null; then
     echo "Enter your DSM password when prompted."
 fi
 
-exec sudo -u "${PKG_USER}" HOME="${PKG_DIR}/var" "${CMD}" "$@"
+exec sudo -u "${PKG_USER}" env \
+    HOME="${PKG_DIR}/var" \
+    NETDATA_RUN_DIR="${PKG_DIR}/var/run/netdata" \
+    PATH="${PKG_DIR}/target/usr/sbin:${PKG_DIR}/target/usr/bin:/usr/local/bin:/usr/bin:/bin" \
+    "${CMD}" "$@"
