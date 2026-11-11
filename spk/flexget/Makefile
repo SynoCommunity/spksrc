@@ -3,11 +3,6 @@ SPK_VERS = 3.19.22
 SPK_REV = 18
 SPK_ICON = src/flexget.png
 
-# Python 3.14 not supported for:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
-# Pendulum not supported for:
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
-
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 # Require python314 SPK that ships built-in _zstd module

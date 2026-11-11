@@ -21,17 +21,7 @@ DEPENDS += cross/libiconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
 DEPENDS += cross/rhash
-
-OPTIONAL_DEPENDS += cross/rmlint
-OPTIONAL_DEPENDS += cross/rnm
-OPTIONAL_DEPENDS += cross/micro
-OPTIONAL_DEPENDS += cross/fzf
-OPTIONAL_DEPENDS += cross/ripgrep
-OPTIONAL_DEPENDS += cross/fd
-OPTIONAL_DEPENDS += cross/bat
-OPTIONAL_DEPENDS += cross/nnn
-OPTIONAL_DEPENDS += cross/ms-edit
-OPTIONAL_DEPENDS += cross/xstow
+DEPENDS += cross/eza cross/sd cross/lsd
 
 MAINTAINER = hgy59
 DISPLAY_NAME = SynoCli File Tools
@@ -40,60 +30,17 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-# PPC archs except QorIQ
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn
-OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
-
-DEPENDS += cross/rmlint
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
-endif
-
-# PPC archs are not supported with golang
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/micro cross/fzf
-OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor), fzf (fuzzy finder)"
-endif
-
-# Rust tools, each gated like the cross package it pulls so the request cannot outrun
-# what will be accepted. eza, lsd and sd need no gate at all: their only blocker was std's
-# pthread_setname_np, which this PR weak-links, so they now build on ppc853x too.
-DEPENDS += cross/eza
-OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
-
-DEPENDS += cross/sd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
-
-DEPENDS += cross/lsd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
-
-
-# bat and fd reach pipe2 through a dependency crate, which std's weak link does not cover
-ifeq ($(call version_ge,$(TC_GLIBC),2.9),1)
-DEPENDS += cross/bat
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
-
-DEPENDS += cross/fd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
-endif
-
-# ripgrep 14 is the PPC fallback and its pcre2 wants -std=c11/c99
-ifeq ($(call version_ge,$(TC_GCC),4.6),1)
-DEPENDS += cross/ripgrep
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
-endif
-
-# Rust Edition 2024 required
-ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
-DEPENDS += cross/ms-edit
-OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
-endif
-
-ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
-# A compiler with support for C++11 language features is required.
-DEPENDS += cross/xstow
-OPTIONAL_DESC := $(OPTIONAL_DESC)", xstow"
-endif
+# Each taken where its own floors admit the arch; descriptions follow spksrc.spk.mk.
+$(call depend,cross/nnn,nop)
+$(call depend,cross/rmlint,nop)
+$(call depend,cross/micro,nop)
+$(call depend,cross/fzf,nop)
+$(call depend,cross/bat,nop)
+$(call depend,cross/fd,nop)
+$(call depend,cross/ripgrep,nop)
+$(call depend,cross/ms-edit,nop)
+$(call depend,cross/xstow,nop)
+$(call depend,cross/rnm,nop)
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
@@ -115,6 +62,7 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     pixz, \
     pigz, \
     detox, iconv, dos2unix tools, \
+    eza, sd \(sed alternative\), lsd, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
 
@@ -177,9 +125,44 @@ PLIST_TRANSFORM = sed -e '/^rsc:include\/rhash\.h$$/d'
 
 include ../../mk/spksrc.spk.mk
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
-# A compiler with support for C++11 language features is required.
-DEPENDS += cross/rnm
+# The optional tools taken above, in the description.
+ifneq ($(filter cross/nnn,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+endif
+
+ifneq ($(filter cross/rmlint,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
+endif
+
+ifneq ($(filter cross/micro,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor)"
+endif
+
+ifneq ($(filter cross/fzf,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fzf (fuzzy finder)"
+endif
+
+ifneq ($(filter cross/bat,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
+endif
+
+ifneq ($(filter cross/fd,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
+endif
+
+ifneq ($(filter cross/ripgrep,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+endif
+
+ifneq ($(filter cross/ms-edit,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
+endif
+
+ifneq ($(filter cross/xstow,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", xstow"
+endif
+
+ifneq ($(filter cross/rnm,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 SPK_COMMANDS += bin/rnm
 endif

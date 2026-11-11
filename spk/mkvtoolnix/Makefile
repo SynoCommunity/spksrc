@@ -14,7 +14,6 @@ STARTABLE = no
 # Keep the DSM floor below at 7.2 so prepare.sh includes the package in the
 # DSM 7.2 build matrix.
 REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://mkvtoolnix.org/
 LICENSE  = GPLv2

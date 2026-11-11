@@ -97,7 +97,9 @@ If you only read one thing, read this. The details are in the dated log below.
   **`TC_EXTRA_LDFLAGS`** and are passed plainly, with `-latomic` auto-dropped
   where the gcc lacks it. They are *not* wrapped in `--as-needed`: `LDFLAGS`
   precedes the objects, so a front-placed library there resolves nothing yet and
-  the wrap discarded it outright.
+  the wrap discarded it outright. The `TC_EXTRA_*FLAGS` are written to
+  `tc_vars.flags.mk`, beside the flags they are folded into; `tc_vars.mk` holds the
+  toolchain's identity and paths (#7738).
   See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
 
 - **Build a host tool once, host it, reuse it.** A native package hosts its build
@@ -123,6 +125,117 @@ If you only read one thing, read this. The details are in the dated log below.
   shows which are active for your arch.
 
 ---
+
+??? note "November 11th 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
+
+    - **What:** the producers of the overlay archives that master downloads since
+      #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
+      `native/binutils-2.30` and `native/rustc-1.82`, which now produce the archives
+      the `overlay/` directories name, a generic arch's archive under the real arch it
+      shares a toolchain with, in the `toolchains/dsm<dsm>` and `rust/qoriq` releases.
+    - **A producer is a version and a component name.** The producers include
+      `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`,
+      the host optimisation flags and the two profile-guided passes
+      (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5% faster at `-O2` and
+      12.5% at `-O3`, `as` 10%. A generic arch is built as the real arch whose archive
+      it fetches (`arch-x64-7.1` builds `apollolake-7.1`), and an archive that exists
+      is not rebuilt, so `all-<dsm>` builds each one once, **`TOOLCHAIN_JOBS`** at a
+      time, and resumes where it stopped. An archive is written under a temporary
+      name, then renamed.
+    - **Switches are booleans.** `is_true`, `is_false`, `bool` and `assert_bool` join
+      the macros. See [Boolean values](../reference/macros.md#boolean-values).
+    - **Rust 1.98, built with gcc 8.5**: `native/rustc-1.98`, with the gcc decision of
+      `overlay.mk` (`OVERLAY_GCC`, `OVERLAY_GCC_VERSION`, `_OVERLAY_GCC_ON`), off for the
+      tree: the producer turns it on for itself.
+      Packages keep the vendor gcc, and the same rust.
+    - **What `tc_vars.overlay.mk` says about the overlays**, a file of their own beside
+      `tc_vars.mk`, which keeps the toolchain alone: one block per overlay the arch ships,
+      binutils, gcc and rust -- `TC_OVERLAY_<c>_ON` (`TRUE`/`FALSE`, whether the build uses
+      it), then `TC_OVERLAY_<c>` (its version), `_DIR` and `_PATH`, filled used or not -- and
+      `TC_RUST_LINK_VIA_BINUTILS` / `TC_OVERLAY_RUSTC_LINKER` for the Rust link through the
+      binutils shim; `$(call tc,…)` takes a `_PATH` only when ON. The tree's own names move to
+      `_OVERLAY_<c>_DIR` and `_OVERLAY_<c>_ON`, so the file no longer shadows them at parse --
+      a work dir generated with an overlay off used to keep it off whatever the switch -- and
+      a run whose switches resolve otherwise than the file records stops, asking for `make
+      clean`. `make overlay-<arch>-<tcvers>` shows what each overlay resolves to and whether
+      the work dir agrees; `make help-<arch>-<tcvers>` (= `make help ARCH=… TCVERSION=…`) adds
+      it and `check` to the package help, and every arch build prints both after its
+      `[BEGIN]`. `TC_KERNEL` sits with the versions.
+    - **The C locale for the producers** (`export LC_ALL := C`,
+      `spksrc.native-toolchain.mk`): the vendor gcc of DSM 5.2 aborts under any other
+      locale. Packages keep the caller's locale; the gcc overlay takes the vendor gcc out
+      of their builds.
+    - `PKG_NAME` picks a producer's component in `mk/spksrc.native-toolchain/`
+      (`gcc.mk`, `binutils.mk`, `rustc.mk`).
+    - **A producer's revision follows its consumer:** one past the overlay's `PKG_REV`
+      (`toolchain_published_rev`), `v1` for a new toolchain; `PKG_REV=vN` sets another. The
+      binutils gcc and rust build against stays at the published one.
+    - **gcc and binutils build with a build triple of their own**
+      (`TOOLCHAIN_BUILD_TRIPLE`, `--build=--host=<machine>-build_pc-linux-gnu`, as
+      crosstool-NG does). An x86_64 target shares the build host's triple, so both
+      configured as native tools: gcc linked its target libraries with the host's binutils
+      -- libgfortran got a `RUNPATH` that kept a package's libquadmath out of the loader's
+      reach on DSM, libstdc++ and libgcc_s a `-z separate-code` layout, the tools were
+      installed twice under a doubled prefix -- and binutils' `ld` honoured the host's
+      `LD_LIBRARY_PATH` and `LD_RUN_PATH`.
+    - **The archives they made** (#7749, #7750): binutils v5 and gcc v6 for the 30 x86_64
+      targets; the same for DSM 7.1, with `armv7-7.1` (built as `armada38x-7.1`),
+      `aarch64-7.1` (as `rtd1296-7.1`) and `evansport-7.1` given the overlays and
+      `comcerto2k-7.1` rebuilt, aligned on `x64-7.1`; rust 1.98 v2. On `x64-7.1`, whose
+      vendor gcc is 8.5 as well, gcc v6 and binutils v5 use about 12% less CPU time than
+      the vendor toolchain; training gcc on real code as well gained nothing. The archives
+      they replace leave the releases once this is merged.
+    - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
+      (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
+      macro documented the same way; `upper` and `lower` change case without a fork,
+      for the switches, the Rust triple suffixes, the arch-group patch directories and
+      the translated descriptions of INFO; `TRUE` and `FALSE` hold every spelling of a
+      switch; `read_makefile_var` reads one variable a Makefile
+      declares, and `dedup-files` is now `dedup_files`. The overlay decisions are split
+      the same way, `overlay.mk` reading `mk/spksrc.common/overlay/` (`binutils`,
+      `gcc`, `rustc`, `warnings`) in that order, and the toolchain side moves to
+      `mk/spksrc.toolchain/overlay/`. `overlay_dist_arch` joins the macros, replacing
+      `dist-arch.mk`.
+    - **What the overlay components share is written once:** `OVERLAY_COMPONENT_TEMPLATE`
+      creates the names every component has, `spksrc.overlay.mk` the archive and install
+      defaults, and `overlay_warn` picks a component's banner from its states.
+      `OVERLAY_BINUTILS_UNMATCHED` names the binutils overlay active beside the vendor
+      gcc, which no longer warns when the gcc overlay is active too.
+    - **`OVERLAY_<C>_VERSION`**, formerly `OVERLAY_<C>_VERS`: binutils and gcc default to
+      the newest the arch ships, like rust, rather than a pinned 2.30 and 8.5 -- the same
+      versions on every arch shipping them today, and empty where an arch ships none.
+      `OVERLAY_BINUTILS_ASKED` loses its leading `_`: it is carried to every sub-make.
+    - **`TC_BINUTILS` follows the gcc overlay:** with `OVERLAY_GCC=1`, whose binutils overlay
+      drives every compile, a `MIN_BINUTILS_VERSION` floor measures that `ld` rather than
+      the vendor one. Picking the default rust version no longer forks a shell on every
+      parse, only where the arch ships two versions.
+    - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
+      against, made by binutils' own `arch-<arch>-<dsm>`: profile-guided, and archived
+      under the revision its consumer publishes.
+    - **Rust is built as the official dist is**, no longer with x.py's `compiler` profile,
+      whose debug assertions made every rust package build slower and shipped a std with
+      its debug checks on: the `dist` profile, jemalloc, ThinLTO, one codegen unit, then
+      profile-guided -- rustc by x.py, LLVM, as a shared library, by gcc with
+      `HOST_OPTFLAGS` -- trained on the rustc-perf crates of the official dist. Release
+      builds of fd and bat for qoriq: 27% and 38% faster with rust 1.98, fd 23% with 1.82.
+    - The custom target takes `-Zunstable-options`, which rust 1.97+ requires for a JSON
+      target-spec.
+    - Nothing a package builds changes otherwise: builds keep using the archives as
+      published.
+    - See [Building and publishing an
+      overlay](toolchain.md#building-and-publishing-an-overlay).
+    - Pull request: [#7707](https://github.com/SynoCommunity/spksrc/pull/7707)
+
+??? note "November 8th 2026 — The toolchain's extra flags in tc_vars.flags.mk (#7738)"
+
+    - **What:** `TC_EXTRA_BUILD_FLAGS` and the `TC_EXTRA_<LANG>FLAGS` / `TC_EXTRA_LDFLAGS` /
+      `TC_EXTRA_RUSTFLAGS` move from `tc_vars.mk` to `tc_vars.flags.mk`, with the flags they
+      are already folded into: `tc_vars.mk` holds the toolchain's identity and paths. Their
+      readers, the CMake toolchain file and the Meson cross file, are generated with
+      `TC_VARS_ENV="flags rust"` and load that file; autotools builds load it anyway.
+    - **For a package:** a `TC_EXTRA_*` read in its own Makefile is defined only where the
+      flags are loaded -- not in a CMake or Meson build's own environment. None does in the
+      tree.
 
 ??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
 
@@ -1630,25 +1743,30 @@ If you only read one thing, read this. The details are in the dated log below.
     the root. This was not one big-bang move but a sequence of PRs, each carving
     out one concern at a time.
 
-    Final layout:
+    The layout today, with the directories added since (see
+    [Makefile System](makefile-system.md#include-hierarchy) for every file):
 
     ```text
     mk/
-    ├── spksrc.cross-cc.mk        ┐  entry points a Makefile includes
-    ├── spksrc.cross-cmake.mk     │  stay at the root (unchanged include paths)
-    ├── spksrc.spk.mk             ┘
-    ├── spksrc.common/     archs, directories, macros, logs, stage0
-    ├── spksrc.build/      per-step recipes: configure, compile, install, patch, …
-    ├── spksrc.cross/      cross-build env per build system: cmake, meson, rust, go
-    ├── spksrc.native/     native-build env per build system
-    ├── spksrc.rules/      depend, dependency-tree, pre-check, digests, tests
-    ├── spksrc.spk/        spk assembly: copy, icon, strip, publish
-    ├── spksrc.spk-meta/   meta initiators: ffmpeg, python, videodriver
-    ├── spksrc.service/    DSM service scripts and installers
-    ├── spksrc.wheel/      python wheel build/install
-    ├── spksrc.toolchain/  toolchain fetch + tc_vars generation
-    ├── spksrc.toolkit/    build-host toolkit (mirrors toolchain)
-    └── spksrc.kernel/     kernel-module build support
+    ├── spksrc.cross-cc.mk          ┐  entry points a Makefile includes
+    ├── spksrc.cross-cmake.mk       │  stay at the root (unchanged include paths)
+    ├── spksrc.spk.mk               ┘
+    ├── spksrc.common/           archs, directories, help, logs, stage0, dotnet,
+    │                            tc-capability; macros/ and overlay/ (decisions) by theme
+    ├── spksrc.build/            per-step recipes: configure, compile, install, patch, …
+    ├── spksrc.cross/            cross-build env per build system: cmake, meson, rust, go, dotnet
+    ├── spksrc.native/           native-build env per build system
+    ├── spksrc.native-toolchain/ overlay producers: binutils, gcc, rustc (#7707)
+    ├── spksrc.overlay/          overlay consumers: binutils, gcc, rust (#7701)
+    ├── spksrc.rules/            depend, dependency, dependency-tree, pre-check, digests,
+    │                            status, supported, check, overlay, tests
+    ├── spksrc.spk/              spk assembly: copy, icon, strip, publish
+    ├── spksrc.spk-meta/         meta initiators: ffmpeg, python, videodriver
+    ├── spksrc.service/          DSM service scripts and installers
+    ├── spksrc.wheel/            python wheel build/install
+    ├── spksrc.toolchain/        toolchain fetch, tc_vars generation, overlay/ use
+    ├── spksrc.toolkit/          build-host toolkit (mirrors toolchain)
+    └── spksrc.kernel/           kernel-module build support, for kernel/ and driver/
     ```
 
     ??? note "`spksrc.common/` — split `common.mk` (#6906)"

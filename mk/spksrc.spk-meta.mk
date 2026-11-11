@@ -3,6 +3,12 @@
 #
 # Meta-consumer SPK entry point: sets up the optional ffmpeg / python /
 # videodriver meta(s) for the package, then includes spksrc.spk.mk.
+#
+#   mk/spksrc.spk-meta/
+#   ├── base.mk          : SPK_BASE_TEMPLATE, with meta.mk (tc_vars.meta.mk)
+#   ├── python.mk        : when PYTHON_PACKAGE is set
+#   ├── ffmpeg.mk        : when FFMPEG_PACKAGE is set
+#   └── videodriver.mk   : when VIDEODRV_PACKAGE is set, with videodriver-depends.mk
 ###############################################################################
 
 # Common makefiles

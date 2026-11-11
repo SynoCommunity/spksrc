@@ -63,8 +63,8 @@ endif
 .PHONY: $(PRE_RUSTC_TARGET) $(RUSTC_TARGET) $(POST_RUSTC_TARGET)
 
 # The Tier-3 from-source build (config.toml, LLVM/stage builds, archive) lives in
-# the host-native package native/rustc-<vers>; overlay-rustc.mk keeps only the consumer /
-# package-build side (toolchain id + binutils linker wrapper).
+# the host-native package native/rustc-<vers>; spksrc.toolchain/overlay/rustc.mk keeps
+# only the consumer / package-build side (toolchain id + binutils linker wrapper).
 
 rustc_msg:
 	@$(MSG) "Installing rustc toolchain for $(NAME)"
@@ -113,7 +113,7 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	flock -u 5
 
 # The base rustup install only; the binutils linker wrapper is the rust overlay's own
-# artifact and hangs off overlay-rustc (overlay-rustc.mk), not this base pipeline.
+# artifact (spksrc.toolchain/overlay/rustc.mk), not this base pipeline's.
 post_rustc_target: $(RUSTC_TARGET)
 
 ifeq ($(wildcard $(RUSTC_COOKIE)),)

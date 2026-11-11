@@ -246,10 +246,11 @@ asks each candidate's own tree whether it supports `ARCH`-`TCVERSION` (the same 
   there; called earlier, it expands to nothing, silently. Virtual packages need it too.
 - **Never reset `DEPENDS`, `CONFIGURE_ARGS` or `OPTIONAL_DEPENDS` with `=` after a call**:
   it wipes what the calls declared, placeholders included. Use `+=`, or put the `=` first.
-- **Known limitation: do not test the content of `DEPENDS` or `CONFIGURE_ARGS` while
-  parsing**, after a call (`ifneq ($(filter cross/x,$(DEPENDS)),)`): until `spksrc.rules/depend.mk` has
-  run, they hold the placeholder, not the package. Where a Makefile must decide on that,
-  use a classic `ifeq` on the condition itself.
+- **Test the content of `DEPENDS` or `CONFIGURE_ARGS` only after the entry point**
+  (`include ../../mk/spksrc.spk.mk`, `spksrc.cross-*.mk`): until `spksrc.rules/depend.mk`
+  has run, they hold the placeholder, not the package, so an
+  `ifneq ($(filter cross/x,$(DEPENDS)),)` placed earlier is always false. After the
+  include it sees the verdict.
 - **A call inside an `ifeq` that a no-`ARCH` parse does not enter** (`VIDEODRV_ON`, an arch
   test) cannot declare its package: name it in `OPTIONAL_DEPENDS` yourself.
 - **Keep `ifeq` for conditions that belong to the consumer**, not to the dependency: a
@@ -456,22 +457,63 @@ package under both a required and an optional parent counts as required.
 The pre-check runs the same walk on the required set, so a refused build names every
 blocker at once instead of stopping at the first.
 
-**Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
-package belongs on its matching `cross/` package too, so a build is refused at its
-own level instead of failing deep in a dependency. If you add a floor to `spk/foo`,
-add it to `cross/foo` as well.
+**Declare a floor once, on the package that hits it.** That is a `cross/` package:
+the pre-check and `make check` walk the whole required tree, so `spk/foo` is refused by
+a floor on `cross/foo` -- or on anything below it -- and the refusal names that package.
+A copy in `spk/foo` adds nothing, and drifts when the `cross/` package moves. Declare
+`MIN_*` in a `cross/` Makefile before its `include ../../mk/spksrc.cross-*.mk`: set
+after it, a floor is not seen.
 
-**Let the essential dependencies set the floor.** Every mandatory dependency must
-build at the floor the package declares; if one of them needs a newer gcc or glibc,
-raise the floor on the package *and* its `cross/` to match. Do **not** push that
-floor onto a shared `cross/` library, though — a library keeps the minimum *it*
+An `spk/` declares only what it needs itself:
+
+- something the `spk/` builds on its own, such as a Python wheel compiled from
+  `WHEELS` (duplicity's protobuf wheel needs gcc 4.9: `MIN_GCC_VERSION = 4.9` in
+  `spk/duplicity`);
+- the platform it runs on, which no toolchain changes: `REQUIRED_MIN_DSM` /
+  `REQUIRED_MIN_SRM` when the package relies on something Synology ships only from a
+  given DSM version (a PHP, a web server, a system library).
+
+**Let each dependency carry its own floor.** A mandatory dependency's floor reaches
+every package above it through the tree: do not repeat it on the package. Nor push a
+package's floor down onto a shared `cross/` library -- a library keeps the minimum *it*
 needs, so other packages built against it at a lower floor stay buildable.
+
+**Check what a gcc floor hides.** A floor found on the vendor toolchains can mask a
+further one: once the gcc overlay meets `MIN_GCC_VERSION` everywhere, the same package
+may stop on an old glibc (mergerfs needs glibc 2.19 for `O_TMPFILE`, hidden behind its
+gcc 4.8). When in doubt, build it with the overlay on ppc853x-5.2, 88f6281-6.2.4,
+x86-5.2 and hi3535-6.2.4 -- glibc 2.8, 2.15, 2.17 and 2.19.
 
 **Make an optional dependency optional instead of raising the floor.** When a
 dependency is optional, do not lift the whole package's floor for it. Declare it with
 `$(call depend,cross/x,--enable-x)`: it is taken, with its configure option, wherever its
 own floors are met, and dropped elsewhere -- the way ffmpeg's codecs are wired. See
 [How DEPENDS and OPTIONAL_DEPENDS are processed](#how-depends-and-optional_depends-are-processed).
+
+In an `spk/` that gathers tools, every optional one goes the same way, grouped right after
+`spksrc.common.mk`; what comes with a tool -- its description, its commands -- follows
+`spksrc.spk.mk`, where the verdicts are known:
+
+```makefile
+include ../../mk/spksrc.common.mk
+
+$(call depend,cross/nnn,nop)
+$(call depend,cross/fuse3|cross/fuse,nop)
+
+# ...
+
+include ../../mk/spksrc.spk.mk
+
+ifneq ($(filter cross/nnn,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn"
+SPK_COMMANDS += bin/nnn
+endif
+```
+
+Do not add a tool under an arch list or a `TC_*` test copied from its `cross/` package:
+the copy drifts, and a dependency added under a condition is invisible to
+`dependency-list-spk`, so the CI neither fetches it nor rebuilds the package when it
+changes.
 
 ### Exclude architectures explicitly
 

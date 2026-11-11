@@ -2,7 +2,8 @@
 # spksrc.spk-meta/videodriver.mk
 #
 # Video-driver meta integration: selects the videodriver meta on supported
-# archs when VIDEODRV_PACKAGE is set.
+# archs when VIDEODRV_PACKAGE is set. Its library list is videodriver-depends.mk,
+# shared with spk/synocli-videodriver.
 ###############################################################################
 
 # spk/synocli-videodriver's MIN_KERNEL_VERSION, asked the same here: x64_ARCHS contains

@@ -6,12 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/monit
 
-# Monit uses C11 stdatomic.h, requiring GCC >= 4.9.
-MIN_GCC_VERSION = 4.9
-# The PPC toolchain lacks a usable POSIX thread library.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-UNSUPPORTED_ARCHS_REASON = PPC toolchain lacks a usable POSIX thread library
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 DISPLAY_NAME = Monit

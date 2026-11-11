@@ -7,14 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/libssh2 cross/libexpat cross/c-ares cross/sqlite
 
-# A compiler with support for C++11 language features is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
-# compiler too old
-UNSUPPORTED_ARCHS += $(ARCH)
-endif
+# C++11: configure stops on gcc 4.7.3 and older ("A compiler with support for C++11
+# language features is required").
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://aria2.github.io/
 COMMENT  = aria2 is a lightweight multi-protocol & multi-source command-line download utility. It supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink.

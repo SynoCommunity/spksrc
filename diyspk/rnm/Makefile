@@ -14,7 +14,3 @@ LICENSE = GPL v3.0
 SPK_COMMANDS = bin/rnm
 
 include ../../mk/spksrc.spk.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
-UNSUPPORTED_ARCHS = $(ARCH)
-endif

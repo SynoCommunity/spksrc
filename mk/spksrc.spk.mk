@@ -195,9 +195,9 @@ $(WORK_DIR)/INFO:
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
 	@echo "\"" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	  $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	  $(shell [ ! -z "$(DESCRIPTION_$(call upper,$(LANGUAGE)))" ] && \
 	    /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
-	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "$(DESCRIPTION_$(call upper,$(LANGUAGE)))"  | sed -e 's/"/\\\\\\"/g' && \
 	    /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
