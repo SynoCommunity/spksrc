@@ -46,6 +46,13 @@ clean-overlay-consumers:
 	@$(MSG) "clean toolchain $(TC)"
 endif
 
+# Installed at tcvars time too, not only as a DEPENDS of the toolchain (TC_OVERLAY_ALL): _all
+# is skipped once the toolchain cookie exists, so an overlay that arrived afterwards, or was
+# cleaned since, would leave tc_vars pointing at tools that were never extracted. MAKEFLAGS
+# cleared: the caller's command line is not the overlay's.
+.PHONY: overlay-binutils-install
+overlay-binutils-install:
+	@$(if $(_OVERLAY_BINUTILS_ON),MAKEFLAGS= $(MAKE) --no-print-directory -C $(firstword $(_OVERLAY_BINUTILS_DIR)),:)
 
 # Report a degraded or risky state. Conditions AND wording both come from
 # spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):

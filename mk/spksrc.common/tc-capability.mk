@@ -22,8 +22,8 @@
 #
 # Resolved statically from the toolchain's own Makefile -- TC_GCC, TC_GLIBC,
 # TC_KERNEL and TC_BINUTILS, each declared there beside TC_DIST -- so the answer
-# never depends on how the toolchain was last built. TC_BINUTILS is the one an
-# overlay can replace, and it reports the overlay's version when one is active.
+# never depends on how the toolchain was last built. TC_GCC and TC_BINUTILS are the
+# two an overlay can replace, and each reports the overlay's version when one is active.
 #
 # A failing check sets TC_CAPABILITY_UNSUPPORTED to a human sentence; pre-check.mk
 # turns that into the arch-refusal error, next to UNSUPPORTED_ARCHS.
@@ -31,7 +31,11 @@
 
 # Does this toolchain's gcc ship libatomic? Ask it -- a gcc too old to have it also predates
 # __atomic_* and never needs it. Lazy (=), outside the ARCH guard: it runs the cross gcc.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+#
+# The one a build will USE, not the one shipped: the gcc overlay has libatomic exactly where
+# the vendor gcc predates it, and emits the __atomic_* calls that need it.
+_TC_LIBATOMIC_CC = $(if $(_OVERLAY_GCC_ON),$(firstword $(_OVERLAY_GCC_DIR))/work/install/usr/local/bin/$(TC_PREFIX)gcc-$(OVERLAY_GCC_VERSION),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(_TC_LIBATOMIC_CC) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 # Outside the guard on purpose: the native producers read TC_HAS_LIBATOMIC with no ARCH.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
@@ -45,17 +49,23 @@ _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
 # over the same file, on every parse the framework goes through.
 _TC_CAP_DECL := $(shell sed -n 's/^\(TC_GCC\|TC_GLIBC\|TC_KERNEL\|TC_BINUTILS\) *= *\(.*\)/\1=\2/p' $(_TC_CAP_MK) 2>/dev/null)
 _tc_cap_of    = $(patsubst $(1)=%,%,$(filter $(1)=%,$(_TC_CAP_DECL)))
-TC_GCC      := $(call _tc_cap_of,TC_GCC)
 TC_GLIBC    := $(call _tc_cap_of,TC_GLIBC)
 TC_KERNEL   := $(call _tc_cap_of,TC_KERNEL)
+
+# TC_GCC is the compiler a build will actually use: the ACTIVE gcc overlay's, else the
+# toolchain's own, which TC_GCC_VENDOR keeps for a caller that means the stock one. So a
+# MIN_GCC_VERSION floor, and a package's version_ge selection, follow the compiler that
+# compiles. overlay.mk resolves the version, where the consumer path is known.
+TC_GCC_VENDOR := $(call _tc_cap_of,TC_GCC)
+TC_GCC := $(call overlay_gcc_version,$(TC_GCC_VENDOR))
 
 # TC_BINUTILS is the as/ld a build will actually use: the ACTIVE overlay's, else the
 # toolchain's own, which TC_BINUTILS_VENDOR keeps for a caller that means the stock one.
 # Without this the floor below would refuse an arch the overlay had just equipped -- the
-# whole point of a binutils floor being that a newer as/ld answers it. Inert by default
-# today (OVERLAY_BINUTILS ?= 0, the narrow rust link leaving C on the vendor's); live for
-# OVERLAY_BINUTILS=1, and for a gcc overlay, which turns it on because gcc 8.5 needs its
-# own assembler. overlay.mk resolves the version, where the consumer path is known.
+# whole point of a binutils floor being that a newer as/ld answers it. Live wherever the
+# gcc overlay is active, which turns it on because gcc 8.5 needs its own assembler, and for
+# OVERLAY_BINUTILS=1; the narrow rust link alone leaves C on the vendor's. overlay.mk
+# resolves the version, where the consumer path is known.
 TC_BINUTILS_VENDOR := $(call _tc_cap_of,TC_BINUTILS)
 TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS_VENDOR))
 

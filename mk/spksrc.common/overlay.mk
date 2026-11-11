@@ -33,6 +33,7 @@
 #   shared    TC_OVERLAY_ALL                every overlay dir of the arch, installed with it
 #             RUST_LINK_VIA_BINUTILS        the Rust link through the binutils overlay ld
 #             overlay_binutils_version      $(call ...,<vendor>): the as/ld version in use
+#             overlay_gcc_version           $(call ...,<vendor>): the gcc version in use
 #             overlay_warn                  $(call ...,<C>,<states>): the banner to print
 #
 #   created by OVERLAY_COMPONENT_TEMPLATE, for every <c> -- no assignment to search for:
@@ -44,6 +45,7 @@
 #             _OVERLAY_BINUTILS_WANTED   global overlay, the narrow rust link, or a
 #                                        gcc overlay (which has no as/ld of its own)
 #             _OVERLAY_BINUTILS_PKG_VERS the global overlay's PKG_VERS, when it is on
+#             _OVERLAY_GCC_PKG_VERS      the gcc overlay's PKG_VERS, when it is active
 #             _OVERLAY_RUSTC_*           the rust candidates, by version and gcc variant
 #
 # One file per component under spksrc.common/overlay/, read in a fixed order: the
@@ -148,6 +150,13 @@ _OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(_O
 # toolchain's Makefile for a package, while a toolchain declares its own and
 # spksrc.toolchain/tc_vars.mk emits it. One macro so they cannot drift apart.
 overlay_binutils_version = $(or $(strip $(_OVERLAY_BINUTILS_PKG_VERS)),$(strip $(1)))
+
+# The same for gcc: the active overlay's PKG_VERS (8.5.0), what tc-capability.mk reports for
+# TC_GCC, so MIN_GCC_VERSION floors and version_ge selections follow the compiler a build
+# uses. PKG_VERS rather than OVERLAY_GCC_VERSION, the directory form (8.5), which would read
+# as older than a vendor 8.5.0. TC_GCC_VENDOR keeps the toolchain's own.
+_OVERLAY_GCC_PKG_VERS := $(if $(_OVERLAY_GCC_ON),$(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS))
+overlay_gcc_version = $(or $(strip $(_OVERLAY_GCC_PKG_VERS)),$(strip $(1)))
 
 # The switches, and what the first make was asked (OVERLAY_BINUTILS_ASKED, binutils.mk),
 # on the command line of every sub-make that resolves a toolchain WITHIN this package:
