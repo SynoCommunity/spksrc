@@ -5,8 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/trapexit/mergerfs/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# toolchains lacking -std=c++11 and/or atomic support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# C++11: gcc 4.7.3 and older stop in its fmt copy and on -std=c++11.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://trapexit.github.io/mergerfs/
 COMMENT  = mergerfs - a featureful union filesystem.

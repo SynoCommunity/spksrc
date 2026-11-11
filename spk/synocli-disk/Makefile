@@ -11,7 +11,6 @@ DEPENDS += cross/disktype
 
 OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
 OPTIONAL_DEPENDS += cross/smartmontools
-OPTIONAL_DEPENDS += cross/mergerfs
 OPTIONAL_DEPENDS += cross/gpart
 OPTIONAL_DEPENDS += cross/dar
 
@@ -22,6 +21,7 @@ OPTIONAL_DESC =
 SPK_COMMANDS =
 
 include ../../mk/spksrc.common.mk
+$(call depend,cross/mergerfs,nop)
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # Tools built with go are not supported on PPC archs
@@ -99,12 +99,10 @@ SPK_COMMANDS += bin/disktype
 
 include ../../mk/spksrc.spk.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/mergerfs
+# mergerfs where its own floors admit it (cross/mergerfs), its commands with it.
+ifneq ($(filter cross/mergerfs,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", mergerfs"
 SPK_COMMANDS += bin/mergerfs bin/mergerfs-fusermount sbin/mount.mergerfs
-endif
 endif
 
 ifeq ($(call version_ge, $(TC_GCC), 4.9.3),1)
