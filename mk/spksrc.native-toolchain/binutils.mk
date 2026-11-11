@@ -15,6 +15,7 @@ GNU_CONFIGURE = 1
 # Install the target toolchain first so --with-sysroot resolves.
 PRE_CONFIGURE_TARGET = tc-install
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
+CONFIGURE_ARGS += --build=$(TOOLCHAIN_BUILD_TRIPLE) --host=$(TOOLCHAIN_BUILD_TRIPLE)
 CONFIGURE_ARGS += --program-prefix=$(TC_TARGET)-
 CONFIGURE_ARGS += --with-sysroot=$(TC_SYSROOT_DIR)
 CONFIGURE_ARGS += --disable-nls --disable-werror --disable-gdb

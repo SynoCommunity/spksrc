@@ -27,6 +27,7 @@
 #   tc-install   runs the base toolchain's own build, overlays included, whose cookies make
 #                it a no-op once done; not a DEPENDS, which would hand it this WORK_DIR
 #   TC_VENDOR_ENV  the prefix a $(shell) running a vendor tool needs (the C locale)
+#   TOOLCHAIN_BUILD_TRIPLE  the --build/--host a component configures with, never the target's
 #   HOST_OPTFLAGS  how the host compiler should build the component (opt in through
 #                  NATIVE_CFLAGS & co), profile-guided under TOOLCHAIN_PGO
 #   TOOLCHAIN_DIST_ARCH     the arch the archive is named after (overlay_dist_arch)
@@ -103,6 +104,12 @@ TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 # _nl_intern_locale_data: Assertion ... failed". The export above reaches recipes, but
 # $(shell) only from make 4.4.
 TC_VENDOR_ENV = LC_ALL=C
+
+# The build and host triple a component configures with, its own, as crosstool-NG does.
+# Sharing the target's -- an x86_64 target on an x86_64 build host -- autoconf configures a
+# native tool: gcc links its target libraries with the host's binutils instead of
+# --with-build-time-tools, ld honours the host's LD_LIBRARY_PATH and LD_RUN_PATH.
+TOOLCHAIN_BUILD_TRIPLE = $(shell uname -m)-build_pc-linux-gnu
 
 # The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
 # (single source of truth -- the same value tc_vars emits as SYSROOT). A plain string, so

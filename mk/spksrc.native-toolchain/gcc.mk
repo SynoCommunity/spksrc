@@ -145,11 +145,7 @@ ENV += CFLAGS_FOR_TARGET="-g -O2" CXXFLAGS_FOR_TARGET="-g -O2"
 
 # GNU_CONFIGURE already adds --prefix=$(INSTALL_PREFIX).
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
-# A build triple of its own, as crosstool-NG does: sharing the target's (an x86_64 target
-# on an x86_64 host), gcc configures as a native compiler and links its target libraries
-# with the host's binutils instead of --with-build-time-tools -- RUNPATH, separate-code.
-_GCC_BUILD_TRIPLE = $(shell uname -m)-build_pc-linux-gnu
-CONFIGURE_ARGS += --build=$(_GCC_BUILD_TRIPLE) --host=$(_GCC_BUILD_TRIPLE)
+CONFIGURE_ARGS += --build=$(TOOLCHAIN_BUILD_TRIPLE) --host=$(TOOLCHAIN_BUILD_TRIPLE)
 
 # The sysroot must be RELOCATABLE: this archive is extracted somewhere else entirely.
 # GCC only makes it so when the configured sysroot lies UNDER the configured prefix
