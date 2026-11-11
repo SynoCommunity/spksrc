@@ -1,5 +1,5 @@
 PKG_NAME = utf8proc
-PKG_VERS = 2.11.0
+PKG_VERS = 2.12.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/JuliaStrings/utf8proc/archive/refs/tags
