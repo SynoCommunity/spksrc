@@ -1,0 +1,11 @@
+--- build.sh
++++ build.sh
+@@ -323,7 +323,7 @@
+   cat contrib/lualibs/mympd/80-tmpvar.lua >> "$MYMPD_BUILDDIR/contrib/lualibs/mympd.lua"
+   cat contrib/lualibs/mympd/99-end.lua >> "$MYMPD_BUILDDIR/contrib/lualibs/mympd.lua"
+   echo "Compiling lua libraries"
+-  LUAC=$(command -v luac5.4 2> /dev/null || command -v luac 2> /dev/null || true)
++  LUAC=$(command -v luac 2> /dev/null || command -v luac5.4 2> /dev/null || true)
+   if [ -z "$LUAC" ]
+   then
+     echo_error "luac not found"
