@@ -409,8 +409,8 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 | Component | Versions | Toolchains | Used by builds |
 |-----------|----------|------------|----------------|
 | rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
-| binutils | 2.30 | 67 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
-| gcc | 8.5 | the same 67 | not yet: installed only |
+| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
+| gcc | 8.5 | the same 68 | not yet: installed only |
 
 ### Where the overlay code lives
 
