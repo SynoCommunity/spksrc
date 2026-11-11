@@ -1,0 +1,19 @@
+#!/bin/sh
+# Netdata CLI wrapper for DSM
+# The command pipe is owned by the package user, so run the client as that user.
+
+PKG_USER="sc-netdata"
+PKG_DIR="/var/packages/netdata"
+CMD="${PKG_DIR}/target/usr/sbin/netdatacli"
+
+if [ ! -x "${CMD}" ]; then
+    echo "Error: Cannot find netdatacli" >&2
+    exit 1
+fi
+
+if ! sudo -n true 2>/dev/null; then
+    echo "Netdata CLI tools require administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+exec sudo -u "${PKG_USER}" HOME="${PKG_DIR}/var" "${CMD}" "$@"
