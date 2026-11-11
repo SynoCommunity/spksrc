@@ -7,6 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # C++11: gcc 4.7.3 and older stop in its fmt copy and on -std=c++11.
 MIN_GCC_VERSION = 4.8
+# O_TMPFILE, which glibc defines from 2.19 on.
+MIN_GLIBC_VERSION = 2.19
 
 HOMEPAGE = https://trapexit.github.io/mergerfs/
 COMMENT  = mergerfs - a featureful union filesystem.
