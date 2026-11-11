@@ -9,11 +9,6 @@ DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 DEPENDS += cross/disktype
 
-OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
-OPTIONAL_DEPENDS += cross/smartmontools
-OPTIONAL_DEPENDS += cross/gpart
-OPTIONAL_DEPENDS += cross/dar
-
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
 
@@ -21,47 +16,20 @@ OPTIONAL_DESC =
 SPK_COMMANDS =
 
 include ../../mk/spksrc.common.mk
+
+# Each taken where its own floors admit the arch; descriptions and commands follow
+# spksrc.spk.mk. mergerfs comes first: it fails to build once cross/fuse is installed.
 $(call depend,cross/mergerfs,nop)
-
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# Tools built with go are not supported on PPC archs
-DEPENDS += cross/duf cross/gdu cross/tdu
-OPTIONAL_DESC := $(OPTIONAL_DESC)", duf, gdu, tdu"
-SPK_COMMANDS += bin/duf bin/gdu bin/tdu
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# not supported on old PPC archs
-OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
-SPK_COMMANDS += bin/dua bin/dutree
-$(call depend,cross/dua cross/dutree,nop)
-endif
-
-
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/smartmontools
-OPTIONAL_DESC := $(OPTIONAL_DESC)", smartmontools \(smartctl\)"
-# smartctl of this package will not be found by path, because /bin/smartctl is found first
-# you have to use smartctl7 (or /usr/local/bin/smartctl or /var/packages/synocli-disk/target/sbin/smartctl)
-SPK_COMMANDS += sbin/smartctl7 sbin/smartctl sbin/smartd sbin/update-smart-drivedb
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/gpart
-OPTIONAL_DESC := $(OPTIONAL_DESC)", gpart"
-SPK_COMMANDS += sbin/gpart
-
-DEPENDS += cross/fuse3
-DEPENDS += cross/s3backer
-OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse3, s3backer"
-SPK_COMMANDS += bin/fusermount3 sbin/mount.fuse3
-SPK_COMMANDS += bin/s3backer
-
-else
-DEPENDS += cross/fuse
-OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse"
-SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
-endif
+$(call depend,cross/duf,nop)
+$(call depend,cross/gdu,nop)
+$(call depend,cross/tdu,nop)
+$(call depend,cross/dua,nop)
+$(call depend,cross/dutree,nop)
+$(call depend,cross/smartmontools,nop)
+$(call depend,cross/gpart,nop)
+$(call depend,cross/fuse3|cross/fuse,nop)
+$(call depend,cross/s3backer,nop)
+$(call depend,cross/dar,nop)
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -99,15 +67,65 @@ SPK_COMMANDS += bin/disktype
 
 include ../../mk/spksrc.spk.mk
 
-# mergerfs where its own floors admit it (cross/mergerfs), its commands with it.
+# The optional tools taken above, in the description and the commands.
 ifneq ($(filter cross/mergerfs,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", mergerfs"
 SPK_COMMANDS += bin/mergerfs bin/mergerfs-fusermount sbin/mount.mergerfs
 endif
 
-ifeq ($(call version_ge, $(TC_GCC), 4.9.3),1)
-# DAR: Only archs with C++ compiler support for c++14 standard are supported
-DEPENDS += cross/dar
+ifneq ($(filter cross/duf,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", duf"
+SPK_COMMANDS += bin/duf
+endif
+
+ifneq ($(filter cross/gdu,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", gdu"
+SPK_COMMANDS += bin/gdu
+endif
+
+ifneq ($(filter cross/tdu,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", tdu"
+SPK_COMMANDS += bin/tdu
+endif
+
+ifneq ($(filter cross/dua,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dua"
+SPK_COMMANDS += bin/dua
+endif
+
+ifneq ($(filter cross/dutree,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dutree"
+SPK_COMMANDS += bin/dutree
+endif
+
+ifneq ($(filter cross/smartmontools,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", smartmontools \(smartctl\)"
+# smartctl of this package will not be found by path, because /bin/smartctl is found first
+# you have to use smartctl7 (or /usr/local/bin/smartctl or /var/packages/synocli-disk/target/sbin/smartctl)
+SPK_COMMANDS += sbin/smartctl7 sbin/smartctl sbin/smartd sbin/update-smart-drivedb
+endif
+
+ifneq ($(filter cross/gpart,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", gpart"
+SPK_COMMANDS += sbin/gpart
+endif
+
+ifneq ($(filter cross/fuse3,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse3"
+SPK_COMMANDS += bin/fusermount3 sbin/mount.fuse3
+endif
+
+ifneq ($(filter cross/s3backer,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", s3backer"
+SPK_COMMANDS += bin/s3backer
+endif
+
+ifneq ($(filter cross/fuse,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse"
+SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
+endif
+
+ifneq ($(filter cross/dar,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
 SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
 endif
