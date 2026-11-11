@@ -14,7 +14,8 @@ DEPENDS = cross/fuse3 cross/glib
 # below, has no AF_VSOCK at all, which is why it serves ARMv5 and its glibc 2.15.
 MIN_GLIBC_VERSION = 2.18
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+# __kernel_sa_family_t (linux/socket.h), which the 2.6.32 headers lack.
+MIN_KERNEL_VERSION = 3.2
 
 HOMEPAGE = https://github.com/libfuse/sshfs
 COMMENT = sshfs is a network filesystem client to connect to SSH servers.

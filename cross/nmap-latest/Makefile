@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpcap cross/openssl3
 
-# latest version for OLD_PPC_ARCHS is 7.92
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# latest version for ARMv5 and qoriq is 7.98
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(PPC_ARCHS)
+# libdnet finds no routing interface without linux/netlink.h, which does not compile
+# against the 2.6.32 headers. Below this floor cross/nmap falls through to nmap-7.98.
+MIN_KERNEL_VERSION = 3.2
 
 HOMEPAGE = https://nmap.org/
 COMMENT  = Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
