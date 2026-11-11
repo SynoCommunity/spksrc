@@ -126,45 +126,14 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "November 8th 2026 — The toolchain's extra flags in tc_vars.flags.mk (#7738)"
-
-    - **What:** `TC_EXTRA_BUILD_FLAGS` and the `TC_EXTRA_<LANG>FLAGS` / `TC_EXTRA_LDFLAGS` /
-      `TC_EXTRA_RUSTFLAGS` move from `tc_vars.mk` to `tc_vars.flags.mk`, with the flags they
-      are already folded into: `tc_vars.mk` holds the toolchain's identity and paths. Their
-      readers, the CMake toolchain file and the Meson cross file, are generated with
-      `TC_VARS_ENV="flags rust"` and load that file; autotools builds load it anyway.
-    - **For a package:** a `TC_EXTRA_*` read in its own Makefile is defined only where the
-      flags are loaded -- not in a CMake or Meson build's own environment. None does in the
-      tree.
-
-??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
-
-    - **What:** the generated CMake toolchain file appends the toolchain's sysroot to
-      `CMAKE_FIND_ROOT_PATH`, after the staging and the meta roots. With
-      `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY/INCLUDE = ONLY` and the staging as the only root,
-      a `find_library`/`find_path` aimed at glibc itself -- `m`, `c`, `sys/epoll.h` --
-      returned `NOTFOUND` while the build went on: jasper linked `pow`/`sqrt` without
-      `libm` in `DT_NEEDED`, mosquitto fell back from epoll to a busy-looping poll, LLVM
-      dropped libxml2. Found by mreid-tt's audit of the CMake packages. What is built in
-      the staging still wins. Some sysroots carry more than glibc -- `libbfd` on most,
-      bz2, expat and uuid on ppc853x-5.2 -- now found where a package probes them
-      undeclared: declare what a package uses.
-    - **TC_SYSROOT:** still declared in the toolchain Makefile -- stage0 writes `tc_vars.mk`
-      before the toolchain is extracted -- and now checked against what its gcc reports
-      (`-print-sysroot`) when a package's `tcvars` runs: a toolchain whose declaration
-      differs stops there. ppc853x-5.2 declared `$(TC_TARGET)`, the tooldir above its
-      sysroot, so its `SYSROOT`, crossenv's `--sysroot` and binutils' `--with-sysroot`
-      pointed there; it now declares `$(TC_TARGET)/libc`, and names its
-      `TC_INCLUDE`/`TC_LIBRARY` tooldir directly, so its `-I`/`-L` are unchanged.
-
-??? note "November 3rd 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
+??? note "November 11th 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
 
     - **What:** the producers of the overlay archives that master downloads since
       #7701. `native/gcc-8.5` (with `gmp`, `mpfr`, `mpc` and `isl`) joins
       `native/binutils-2.30` and `native/rustc-1.82`, which now produce the archives
-      the `overlay/` directories name: binutils `v4`, a generic arch's archive under
-      the real arch it shares a toolchain with, in the `toolchains/dsm<dsm>` releases.
-    - **A producer is a version, a rev and a component name.** The producers include
+      the `overlay/` directories name, a generic arch's archive under the real arch it
+      shares a toolchain with, in the `toolchains/dsm<dsm>` and `rust/qoriq` releases.
+    - **A producer is a version and a component name.** The producers include
       `mk/spksrc.native-toolchain.mk`, which carries `arch-<arch>-<dsm>`, `all-<dsm>`,
       the host optimisation flags and the two profile-guided passes
       (**`TOOLCHAIN_PGO`**, on for gcc and binutils): cc1 8.5% faster at `-O2` and
@@ -201,11 +170,21 @@ If you only read one thing, read this. The details are in the dated log below.
     - **A producer's revision follows its consumer:** one past the overlay's `PKG_REV`
       (`toolchain_published_rev`), `v1` for a new toolchain; `PKG_REV=vN` sets another. The
       binutils gcc and rust build against stays at the published one.
-    - **gcc builds with a build triple of its own** (`--build=--host=<machine>-build_pc-linux-gnu`):
-      for an x86_64 target it configured as a native compiler and linked its target
-      libraries with the host's binutils -- libgfortran got a `RUNPATH` that kept a
-      package's libquadmath out of the loader's reach on DSM. The x86_64 gcc archives are
-      rebuilt as v6.
+    - **gcc and binutils build with a build triple of their own**
+      (`TOOLCHAIN_BUILD_TRIPLE`, `--build=--host=<machine>-build_pc-linux-gnu`, as
+      crosstool-NG does). An x86_64 target shares the build host's triple, so both
+      configured as native tools: gcc linked its target libraries with the host's binutils
+      -- libgfortran got a `RUNPATH` that kept a package's libquadmath out of the loader's
+      reach on DSM, libstdc++ and libgcc_s a `-z separate-code` layout, the tools were
+      installed twice under a doubled prefix -- and binutils' `ld` honoured the host's
+      `LD_LIBRARY_PATH` and `LD_RUN_PATH`.
+    - **The archives they made** (#7749, #7750): binutils v5 and gcc v6 for the 30 x86_64
+      targets; the same for DSM 7.1, with `armv7-7.1` (built as `armada38x-7.1`),
+      `aarch64-7.1` (as `rtd1296-7.1`) and `evansport-7.1` given the overlays and
+      `comcerto2k-7.1` rebuilt, aligned on `x64-7.1`; rust 1.98 v2. On `x64-7.1`, whose
+      vendor gcc is 8.5 as well, gcc v6 and binutils v5 use about 12% less CPU time than
+      the vendor toolchain; training gcc on real code as well gained nothing. The archives
+      they replace leave the releases once this is merged.
     - **One file per theme.** `macros.mk` includes `mk/spksrc.common/macros/`
       (`string`, `version`, `bool`, `list`, `depend`, `tools`, `archs`, `runlog`), each
       macro documented the same way; `upper` and `lower` change case without a fork,
@@ -232,7 +211,7 @@ If you only read one thing, read this. The details are in the dated log below.
       parse, only where the arch ships two versions.
     - The producers share `TOOLCHAIN_BINUTILS_*`, the binutils gcc and rust are built
       against, made by binutils' own `arch-<arch>-<dsm>`: profile-guided, and archived
-      under binutils' own revision, ready to publish.
+      under the revision its consumer publishes.
     - **Rust is built as the official dist is**, no longer with x.py's `compiler` profile,
       whose debug assertions made every rust package build slower and shipped a std with
       its debug checks on: the `dist` profile, jemalloc, ThinLTO, one codegen unit, then
@@ -246,6 +225,37 @@ If you only read one thing, read this. The details are in the dated log below.
     - See [Building and publishing an
       overlay](toolchain.md#building-and-publishing-an-overlay).
     - Pull request: [#7707](https://github.com/SynoCommunity/spksrc/pull/7707)
+
+??? note "November 8th 2026 — The toolchain's extra flags in tc_vars.flags.mk (#7738)"
+
+    - **What:** `TC_EXTRA_BUILD_FLAGS` and the `TC_EXTRA_<LANG>FLAGS` / `TC_EXTRA_LDFLAGS` /
+      `TC_EXTRA_RUSTFLAGS` move from `tc_vars.mk` to `tc_vars.flags.mk`, with the flags they
+      are already folded into: `tc_vars.mk` holds the toolchain's identity and paths. Their
+      readers, the CMake toolchain file and the Meson cross file, are generated with
+      `TC_VARS_ENV="flags rust"` and load that file; autotools builds load it anyway.
+    - **For a package:** a `TC_EXTRA_*` read in its own Makefile is defined only where the
+      flags are loaded -- not in a CMake or Meson build's own environment. None does in the
+      tree.
+
+??? note "November 6th 2026 — CMake finds what the toolchain's sysroot provides (#7729)"
+
+    - **What:** the generated CMake toolchain file appends the toolchain's sysroot to
+      `CMAKE_FIND_ROOT_PATH`, after the staging and the meta roots. With
+      `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY/INCLUDE = ONLY` and the staging as the only root,
+      a `find_library`/`find_path` aimed at glibc itself -- `m`, `c`, `sys/epoll.h` --
+      returned `NOTFOUND` while the build went on: jasper linked `pow`/`sqrt` without
+      `libm` in `DT_NEEDED`, mosquitto fell back from epoll to a busy-looping poll, LLVM
+      dropped libxml2. Found by mreid-tt's audit of the CMake packages. What is built in
+      the staging still wins. Some sysroots carry more than glibc -- `libbfd` on most,
+      bz2, expat and uuid on ppc853x-5.2 -- now found where a package probes them
+      undeclared: declare what a package uses.
+    - **TC_SYSROOT:** still declared in the toolchain Makefile -- stage0 writes `tc_vars.mk`
+      before the toolchain is extracted -- and now checked against what its gcc reports
+      (`-print-sysroot`) when a package's `tcvars` runs: a toolchain whose declaration
+      differs stops there. ppc853x-5.2 declared `$(TC_TARGET)`, the tooldir above its
+      sysroot, so its `SYSROOT`, crossenv's `--sysroot` and binutils' `--with-sysroot`
+      pointed there; it now declares `$(TC_TARGET)/libc`, and names its
+      `TC_INCLUDE`/`TC_LIBRARY` tooldir directly, so its `-I`/`-L` are unchanged.
 
 ??? note "November 1st 2026 — Toolchain overlays in overlay/, installed with their toolchain (#7701)"
 

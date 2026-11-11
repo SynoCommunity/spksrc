@@ -328,7 +328,7 @@ TC_TARGET := $(call read_makefile_var,$(TC_DIR)/Makefile,TC_TARGET)
 `$(call toolchain_published_rev,<arch>,<dsm>,<suffix>)` reads an overlay's `PKG_REV` that way: the revision at which the archive of `<arch>-<dsm>` is published, for the overlay directory suffix `<suffix>`. It takes the arch's own overlay, `overlay/syno-<arch>-<dsm>_<suffix>`, or else that of a generic arch built as it (`overlay_dist_arch`): `x64-7.1` installs `apollolake-7.1`'s archive, which has no overlay of its own. It is empty where neither exists. A producer builds one past it (`mk/spksrc.native-toolchain.mk`).
 
 ```makefile
-$(call toolchain_published_rev,apollolake,7.1,gcc-8.5)           # v5, through x64-7.1
+$(call toolchain_published_rev,apollolake,7.1,gcc-8.5)           # v6, through x64-7.1
 $(call toolchain_published_rev,qoriq,6.2.4,rust-1.82_gcc-4.9.3)  # v5
 $(call toolchain_published_rev,armv7,7.1,rust-1.98_gcc-8.5)      # empty: no such overlay
 ```

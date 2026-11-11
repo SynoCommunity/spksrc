@@ -51,7 +51,7 @@ endef
 
 # Macro: the revision a toolchain archive is published at
 #
-#   $(call toolchain_published_rev,apollolake,7.1,gcc-8.5)   -> v5
+#   $(call toolchain_published_rev,apollolake,7.1,gcc-8.5)   -> v6
 #
 # The PKG_REV of the overlay that installs it: the arch's own, or else that of a generic
 # arch built as it (overlay_dist_arch) -- x64-7.1 fetches apollolake-7.1's archive, which
