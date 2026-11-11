@@ -43,10 +43,12 @@ CHANGELOG  = "1. Update ntfs-3g_ntfsprogs to v2026.9.28. <br/>"
 CHANGELOG += "2. Update dar to v2.8.6. <br/>"
 CHANGELOG += "3. Update davfs2 to v1.7.3. <br/>"
 CHANGELOG += "4. Update e2fsprogs to v1.47.4. <br/>"
-CHANGELOG += "5. Update lsscsi to v0.33. <br/>"
-CHANGELOG += "6. Update ddrescue to v1.30. <br/>"
-CHANGELOG += "7. Update gdu to v5.32.0. <br/>"
-CHANGELOG += "8. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
+CHANGELOG += "5. Update testdisk to v7.2. <br/>"
+CHANGELOG += "6. Update lsscsi to v0.33. <br/>"
+CHANGELOG += "7. Update ddrescue to v1.30. <br/>"
+CHANGELOG += "8. Update gdu to v5.39.0 (v5.32.0 on older kernels). <br/>"
+CHANGELOG += "9. Update mergerfs to v2.42.0 (v2.40.2 on older toolchains, including qoriq). <br/>"
+CHANGELOG += "10. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 

@@ -1,27 +1,7 @@
-PKG_NAME = gdu
-PKG_VERS = 5.32.0
-PKG_EXT = tgz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/dundee/gdu/releases/download/v$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = gdu-virtual
 
-# Builds with go 1.23, so for kernels older than 3.2 (ARMv5) too
-MIN_GO_VERSION = 1.23
+include ../../mk/spksrc.common.mk
 
-HOMEPAGE = https://github.com/dundee/gdu
-COMMENT  = Fast disk usage analyzer with console interface written in Go.
-LICENSE  = MIT
+$(call depend,cross/gdu-latest|cross/gdu-5.32.0)
 
-COMPILE_TARGET = gdu_compile
-INSTALL_TARGET = gdu_install
-
-include ../../mk/spksrc.cross-go.mk
-
-.PHONY: gdu_compile
-gdu_compile:
-	@$(RUN) VERSION=$(PKG_VERS) $(MAKE) build
-
-.PHONY: gdu_install
-gdu_install:
-	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin/
-	@$(RUN) ; install -m 755 dist/gdu $(STAGING_INSTALL_PREFIX)/bin/
+include ../../mk/spksrc.cross-virtual.mk
