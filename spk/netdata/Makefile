@@ -1,6 +1,6 @@
 SPK_NAME = netdata
-SPK_VERS = 2.12.2
-SPK_REV = 5
+SPK_VERS = 2.12.3
+SPK_REV = 6
 SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
@@ -12,7 +12,7 @@ MIN_GCC_VERSION = 7.5
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
-CHANGELOG = "1. Update Netdata to v2.12.2."
+CHANGELOG = "1. Update Netdata to v2.12.3."
 
 HOMEPAGE = https://www.netdata.cloud
 HELPURL = https://docs.synocommunity.com/packages/netdata/
