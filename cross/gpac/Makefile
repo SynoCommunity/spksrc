@@ -13,9 +13,8 @@ LICENSE  = LGPLv2
 
 # quickjs-libc includes stdatomic.h unconditionally, which needs GCC >= 4.9.
 MIN_GCC_VERSION = 4.9
-# The PPC toolchain headers lack SYS_DVBT2.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-UNSUPPORTED_ARCHS_REASON = PPC toolchain headers lack SYS_DVBT2
+# SYS_DVBT2 (linux/dvb/frontend.h), which the 2.6.32 headers lack.
+MIN_KERNEL_VERSION = 3.2
 
 DEPENDS = cross/zlib
 
