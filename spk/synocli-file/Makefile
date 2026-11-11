@@ -23,7 +23,6 @@ DEPENDS += cross/patch
 DEPENDS += cross/rhash
 
 OPTIONAL_DEPENDS += cross/rmlint
-OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
 OPTIONAL_DEPENDS += cross/ripgrep
@@ -39,6 +38,7 @@ DISPLAY_NAME = SynoCli File Tools
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
+$(call depend,cross/rnm,nop)
 
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -177,9 +177,8 @@ PLIST_TRANSFORM = sed -e '/^rsc:include\/rhash\.h$$/d'
 
 include ../../mk/spksrc.spk.mk
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
-# A compiler with support for C++11 language features is required.
-DEPENDS += cross/rnm
+# rnm where its own floors admit it (cross/rnm), its description and command with it.
+ifneq ($(filter cross/rnm,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 SPK_COMMANDS += bin/rnm
 endif
