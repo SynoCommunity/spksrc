@@ -22,6 +22,7 @@ virtualenv==21.10.0
 distlib==0.4.4
 # 4.2.10 and later: the same python-sbom hook
 filelock==4.2.9
+packaging==26.3
 platformdirs==4.14.5
 python-discovery==1.9.5
 six==1.17.0
