@@ -11,6 +11,7 @@ HOMEPAGE = http://www.openblas.net/
 COMMENT  = OpenBLAS is an optimized BLAS (Basic Linear Algebra Subprograms) library based on GotoBLAS2 1.13 BSD version.
 LICENSE  = 3-Clause BSD
 
+# PowerPC: no TARGET for the e500 cores, whose SPE has no classic FPU for OpenBLAS's kernels.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 CONFIGURE_ARGS  = -DBUILD_SHARED_LIBS=ON
@@ -28,6 +29,14 @@ ifeq ($(GCC_DEBUG_INFO),1)
 endif
 
 include ../../mk/spksrc.common.mk
+
+# A toolchain without gfortran (the vendor ones of DSM 5.2 and of most of DSM 6.2.4) would
+# have CMake take the build host's, which links nothing for the target: LAPACK is built from
+# its C translation instead, whose -Werror=incompatible-pointer-types needs gcc 5.
+ifeq ($(wildcard $(call tc,gfortran)),)
+CONFIGURE_ARGS += -DNOFORTRAN=1 -DC_LAPACK=1
+MIN_GCC_VERSION = 5
+endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 # From Debian rule file:
