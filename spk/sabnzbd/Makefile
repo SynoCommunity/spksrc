@@ -5,7 +5,11 @@ SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python314
 
-DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+DEPENDS  = cross/ionice
+DEPENDS += cross/coreutils
+DEPENDS += cross/par2cmdline-turbo
+DEPENDS += cross/7zz
+DEPENDS += cross/sabnzbd
 DEPENDS += cross/unrar
 
 # Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
