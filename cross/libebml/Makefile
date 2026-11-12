@@ -7,6 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# C++14 generic lambdas (EbmlMaster.cpp): gcc 4.9.
+MIN_GCC_VERSION = 4.9
+
 HOMEPAGE = http://matroska.org
 COMMENT  = libebml is a C++ libary to parse EBML files.
 LICENSE  = LGPL

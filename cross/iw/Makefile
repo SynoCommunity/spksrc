@@ -7,6 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libnl
 
+# htole16 and friends (endian.h): glibc 2.9.
+MIN_GLIBC_VERSION = 2.9
+
 HOMEPAGE = https://wireless.docs.kernel.org/en/latest/en/users/documentation/iw.html
 COMMENT  = iw is the nl80211 based configuration utility for wireless devices.
 LICENSE  = ISC

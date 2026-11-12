@@ -7,6 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libebml
 
+# C++14 generic lambdas (libebml's EbmlMaster.cpp): gcc 4.9.
+MIN_GCC_VERSION = 4.9
+
 HOMEPAGE = https://matroska.org/
 COMMENT  = libmatroska is a C++ libary to parse Matroska files (.mkv and .mka).
 LICENSE  = LGPL
