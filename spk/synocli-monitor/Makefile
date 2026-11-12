@@ -14,10 +14,14 @@ DEPENDS += cross/cpulimit
 DEPENDS += cross/net-snmp
 DEPENDS += cross/lm-sensors
 
-OPTIONAL_DEPENDS  = cross/bandwhich cross/procs
-OPTIONAL_DEPENDS += cross/btop
-
 include ../../mk/spksrc.common.mk
+
+# Each taken where its own floors admit the arch; descriptions follow spksrc.spk.mk.
+$(call depend,cross/bandwhich,nop)
+$(call depend,cross/bottom,nop)
+$(call depend,cross/procs,nop)
+$(call depend,cross/btop,nop)
+
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
 # include process utilities including pstree for DSM<6 and DSM>2
 BUSYBOX_CONFIG = procutils.dsm5
@@ -27,17 +31,6 @@ BUSYBOX_CONFIG = procutils
 OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
 endif
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
-DEPENDS += cross/bandwhich cross/procs
-$(call depend,cross/bottom,nop)
-endif
-
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-OPTIONAL_DESC := $(OPTIONAL_DESC)", btop"
-DEPENDS += cross/btop
-endif
 
 MAINTAINER = hgy59
 
@@ -71,3 +64,20 @@ SPK_COMMANDS += bin/snmpinform bin/snmpnetstat bin/snmpps bin/snmpstatus bin/snm
 SPK_COMMANDS += bin/sensors bin/sensors-conf-convert sbin/fancontrol sbin/sensors-detect
 
 include ../../mk/spksrc.spk.mk
+
+# The optional tools taken above, in the description.
+ifneq ($(filter cross/bandwhich,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich"
+endif
+
+ifneq ($(filter cross/bottom,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bottom"
+endif
+
+ifneq ($(filter cross/procs,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", procs"
+endif
+
+ifneq ($(filter cross/btop,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", btop"
+endif
