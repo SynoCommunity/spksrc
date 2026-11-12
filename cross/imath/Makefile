@@ -8,6 +8,9 @@ PKG_DIR = Imath-$(PKG_VERS)
 
 DEPENDS =
 
+# CMake's cxx_std_14 compile feature: gcc 4.7.3 has none, 4.8.3 builds.
+MIN_GCC_VERSION = 4.8
+
 HOMEPAGE = https://github.com/AcademySoftwareFoundation/Imath
 COMMENT  = C++ and python library of 2D and 3D vector, matrix, and math operations for computer graphics.
 LICENSE  = BSD-3-Clause
