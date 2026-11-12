@@ -2,9 +2,9 @@
 # - remove -fprofile-correction
 # - replace -std=c11 by -std=c99
 #
---- configure.ac.orig	2023-08-24 12:09:18.000000000 +0000
-+++ configure.ac	2024-03-02 20:17:15.812508858 +0000
-@@ -1989,7 +1989,7 @@
+--- configure.ac.orig
++++ configure.ac
+@@ -1997,7 +1997,7 @@
          ;;
        *)
          PGO_PROF_GEN_FLAG="-fprofile-generate"
@@ -13,7 +13,7 @@
          LLVM_PROF_MERGER="true"
          LLVM_PROF_FILE=""
          ;;
-@@ -2195,7 +2195,7 @@
+@@ -2203,7 +2203,7 @@
  # tweak BASECFLAGS based on compiler and platform
  case $GCC in
  yes)

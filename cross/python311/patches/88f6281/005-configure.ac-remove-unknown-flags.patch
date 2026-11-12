@@ -2,9 +2,9 @@
 # - remove -ffat-lto-objects
 # - replace -std=c11 by -std=c99
 #
---- configure.ac.orig	2022-06-06 11:53:30.000000000 +0000
-+++ configure.ac	2022-06-19 15:36:23.019811638 +0000
-@@ -1872,7 +1872,7 @@ if test "$Py_LTO" = 'true' ; then
+--- configure.ac.orig
++++ configure.ac
+@@ -1918,7 +1918,7 @@
            LTOCFLAGS="-flto"
            ;;
          *)
@@ -13,7 +13,7 @@
            ;;
        esac
        ;;
-@@ -2157,7 +2157,7 @@ AC_DEFUN([PY_CHECK_CC_WARNING], [
+@@ -2203,7 +2203,7 @@
  # tweak BASECFLAGS based on compiler and platform
  case $GCC in
  yes)
@@ -22,4 +22,3 @@
  
      PY_CHECK_CC_WARNING([enable], [extra], [if we can add -Wextra])
      AS_VAR_IF([ac_cv_enable_extra_warning], [yes],
-
