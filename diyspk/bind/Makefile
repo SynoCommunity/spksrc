@@ -1,10 +1,5 @@
 SPK_NAME = bind
-SPK_VERS = 9.20.30
 SPK_REV = 1
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-OPTIONAL_DEPENDS = cross/bind-9.20 cross/bind-9.18 cross/bind-9.16
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = BIND \(Berkeley Internet Name Domain\) is a complete, highly portable implementation of the DNS \(Domain Name System\) protocol.
@@ -15,26 +10,13 @@ LICENSE = MPL 2.0
 
 SPK_COMMANDS = bin/arpaname bin/delv bin/dig bin/mdig
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge,${TCVERSION},7.0),1)
-# DSM 7
-ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/bind-9.20
-else
-DEPENDS += cross/bind-9.18
-SPK_VERS = 9.18.50
-endif
-else
-# DSM 6
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/bind-9.16
-SPK_VERS = 9.16.50
-else ifeq ($(ARCH)-$(TCVERSION),x86-5.2)
-DEPENDS += cross/bind-9.16
-SPK_VERS = 9.16.50
-else
-DEPENDS += cross/bind-9.18
-SPK_VERS = 9.18.50
-endif
-endif
+# The newest bind whose floors the arch meets, as cross/bind picks it: spelled out here,
+# where the version it names becomes the package's.
+$(call depend,cross/bind-9.20|cross/bind-9.18|cross/bind-9.16)
+# Its PKG_VERS, read lazily: spksrc.spk.mk resolves the alternative (depend.mk) before it
+# names the package file. 9.20's where no arch is set.
+SPK_VERS = $(call read_makefile_var,../../$(or $(firstword $(filter cross/bind-%,$(DEPENDS))),cross/bind-9.20)/Makefile,PKG_VERS)
+
+include ../../mk/spksrc.spk.mk

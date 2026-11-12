@@ -1,11 +1,16 @@
 PKG_NAME = iw
-PKG_VERS = 6.9
+PKG_VERS = 6.17
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.kernel.org/pub/software/network/iw
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libnl
+
+# htole16 and friends (endian.h): glibc 2.9.
+MIN_GLIBC_VERSION = 2.9
+# C99 for-loop declarations (util.c): gcc defaults to gnu89 before 5.
+ADDITIONAL_CFLAGS = -std=gnu99
 
 HOMEPAGE = https://wireless.docs.kernel.org/en/latest/en/users/documentation/iw.html
 COMMENT  = iw is the nl80211 based configuration utility for wireless devices.

@@ -8,6 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# C++11: gcc 4.7.3 stops on it, 4.8.3 builds.
+MIN_GCC_VERSION = 4.8
+
 HOMEPAGE = https://github.com/kainjow/Mustache
 COMMENT  = text templates for modern C++.
 LICENSE  = BSL 1.0

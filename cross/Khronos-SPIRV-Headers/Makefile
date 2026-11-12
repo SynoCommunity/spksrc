@@ -5,6 +5,9 @@ PKG_DIST_NAME = vulkan-sdk-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-vulkan-sdk-$(PKG_VERS)
 
+# C++11 enum class (spirv.hpp11): gcc 4.4.
+MIN_GCC_VERSION = 4.4
+
 HOMEPAGE = https://github.com/KhronosGroup/SPIRV-Headers
 COMMENT = Machine-readable files for the SPIR-V Registry
 LICENSE = Copyright (c) 2015-2024 The Khronos Group Inc.

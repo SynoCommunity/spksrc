@@ -1,0 +1,28 @@
+#!/bin/sh
+# Netdata support bundle wrapper for DSM
+# Run as the package user so it can read the Agent's configuration and logs.
+# System-wide diagnostics may be incomplete compared with a root-run bundle.
+
+PKG_USER="sc-netdata"
+PKG_DIR="/var/packages/netdata"
+CMD="${PKG_DIR}/target/usr/sbin/netdata-support-bundle"
+
+if [ ! -x "${CMD}" ]; then
+    echo "Error: Cannot find netdata-support-bundle" >&2
+    exit 1
+fi
+
+if ! sudo -n true 2>/dev/null; then
+    echo "The Netdata support bundle requires administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+exec sudo -u "${PKG_USER}" env \
+    HOME="${PKG_DIR}/var" \
+    NETDATA_RUN_DIR="${PKG_DIR}/var/run/netdata" \
+    NETDATA_USER_CONFIG_DIR="${PKG_DIR}/var/etc/netdata" \
+    NETDATA_LOG_DIR="${PKG_DIR}/var/log/netdata" \
+    NETDATA_LIB_DIR="${PKG_DIR}/var/lib/netdata" \
+    NETDATA_CACHE_DIR="${PKG_DIR}/var/cache/netdata" \
+    PATH="${PKG_DIR}/target/usr/sbin:${PKG_DIR}/target/usr/bin:/usr/local/bin:/usr/bin:/bin" \
+    "${CMD}" "$@"

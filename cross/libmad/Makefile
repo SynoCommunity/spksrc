@@ -7,6 +7,9 @@ PKG_DIR = mad-$(PKG_VERS)-source
 
 DEPENDS =
 
+# mad.h's deprecated("message") attribute: gcc 4.5.
+MIN_GCC_VERSION = 4.5
+
 HOMEPAGE = https://codeberg.org/tenacityteam/libmad
 COMMENT  = High-quality fixed-point MPEG audio decoder with 24-bit output.
 LICENSE  = GPLv2

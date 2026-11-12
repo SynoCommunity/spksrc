@@ -8,7 +8,10 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/saltgui
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# The protobuf wheel includes stdatomic.h (upb/port/atomic.h), which gcc ships from 4.9 on.
+MIN_GCC_VERSION = 4.9
+# cryptography's asn1 crate requires rustc 1.83.
+MIN_RUSTC_VERSION = 1.83
 # SRM 1.2 toolchains fail to build wheel pyzmq
 REQUIRED_MIN_SRM = 1.3
 
