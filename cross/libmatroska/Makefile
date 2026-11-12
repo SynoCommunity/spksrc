@@ -1,5 +1,5 @@
 PKG_NAME = libmatroska
-PKG_VERS = 1.7.1
+PKG_VERS = 1.7.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://dl.matroska.org/downloads/libmatroska
@@ -15,5 +15,8 @@ COMMENT  = libmatroska is a C++ libary to parse Matroska files (.mkv and .mka).
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+
+# Static by default since 1.7.2 (cmake_dependent_option, OFF).
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.cross-cmake.mk
