@@ -8,6 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# anonymous members of ZopfliCostModel (backward_references_hq.c): gcc 4.6.
+MIN_GCC_VERSION = 4.6
+
 HOMEPAGE = https://github.com/google/brotli/
 COMMENT  = Brotli compression format.
 LICENSE  = MIT
