@@ -1,11 +1,12 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 5.1.3
-SPK_REV = 84
+SPK_REV = 85
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python314
 
 DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+DEPENDS += cross/unrar
 
 # Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
 MIN_GCC_VERSION = 7
@@ -18,7 +19,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 5.1.3. <br/>2. Fixes an unauthenticated API access vulnerability (GHSA-q326-jpxx-jmjc) and a PAR2 symlink remote code execution vulnerability (GHSA-mjwj-v5mr-cmcg); see https://sabnzbd.org/5-1-vulnerabilities."
+CHANGELOG = "1. Update unrar to v7.3.2."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -35,9 +36,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.common.mk
-
-# unrar 7 where its floors admit the arch, unrar 6 otherwise.
-$(call depend,cross/unrar7|cross/unrar)
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
