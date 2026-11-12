@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/git-lfs/git-lfs/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
-
 HOMEPAGE = https://git-lfs.com/
 COMMENT  = Git extension for versioning large files.
 LICENSE  = MIT
