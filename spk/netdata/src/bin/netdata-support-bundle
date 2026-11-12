@@ -20,5 +20,9 @@ fi
 exec sudo -u "${PKG_USER}" env \
     HOME="${PKG_DIR}/var" \
     NETDATA_RUN_DIR="${PKG_DIR}/var/run/netdata" \
+    NETDATA_USER_CONFIG_DIR="${PKG_DIR}/var/etc/netdata" \
+    NETDATA_LOG_DIR="${PKG_DIR}/var/log/netdata" \
+    NETDATA_LIB_DIR="${PKG_DIR}/var/lib/netdata" \
+    NETDATA_CACHE_DIR="${PKG_DIR}/var/cache/netdata" \
     PATH="${PKG_DIR}/target/usr/sbin:${PKG_DIR}/target/usr/bin:/usr/local/bin:/usr/bin:/bin" \
     "${CMD}" "$@"

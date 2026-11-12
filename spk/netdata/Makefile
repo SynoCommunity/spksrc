@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
 CHANGELOG = "1. Update Netdata to v2.12.3. <br/>"
-CHANGELOG += "2. Add netdatacli and netdata-support-bundle wrappers and expose nd-mcp."
+CHANGELOG += "2. Add netdatacli and netdata-support-bundle wrappers, expose nd-mcp, and teach support-bundle the package paths."
 
 HOMEPAGE = https://www.netdata.cloud
 HELPURL = https://docs.synocommunity.com/packages/netdata/

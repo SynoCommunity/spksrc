@@ -15,9 +15,8 @@ HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
 LICENSE  = GPLv3
 
-# netdata compiles C++17, which requires gcc 7.5 or newer (verified against the oldest
-# DSM 7 toolchain); older toolchains cannot compile it.
-MIN_GCC_VERSION = 7.5
+# Netdata requires C++17 for its bundled Abseil/Protobuf; upstream sets the minimum at GCC 8.
+MIN_GCC_VERSION = 8
 
 ACLK_SCHEMAS_DIR = aclk-schemas-$(shell grep "^PKG_VERS " ../aclk-schemas/Makefile | sed 's/.*= //')
 

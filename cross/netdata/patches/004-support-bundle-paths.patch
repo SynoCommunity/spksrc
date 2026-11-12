@@ -1,0 +1,33 @@
+# Let the DSM wrapper point support-bundle at the package's config, log, lib
+# and cache directories, which are outside its standard discovery paths.
+--- packaging/installer/netdata-support-bundle.orig
++++ packaging/installer/netdata-support-bundle
+@@ -1229,20 +1229,20 @@
+   # path candidates per install type: FHS packages, static (/opt/netdata),
+   # FreeBSD ports (/usr/local + /var/db), Homebrew (incl. Apple Silicon prefix)
+   CONFDIR=""
+-  for d in /etc/netdata /opt/netdata/etc/netdata /usr/local/etc/netdata /opt/homebrew/etc/netdata; do
+-    [ -d "$d" ] && { CONFDIR="$d"; break; }
++  for d in "${NETDATA_USER_CONFIG_DIR:-}" /etc/netdata /opt/netdata/etc/netdata /usr/local/etc/netdata /opt/homebrew/etc/netdata; do
++    [ -n "$d" ] && [ -d "$d" ] && { CONFDIR="$d"; break; }
+   done
+   LOGDIR=""
+-  for d in /var/log/netdata /opt/netdata/var/log/netdata /usr/local/var/log/netdata /opt/homebrew/var/log/netdata; do
+-    [ -d "$d" ] && { LOGDIR="$d"; break; }
++  for d in "${NETDATA_LOG_DIR:-}" /var/log/netdata /opt/netdata/var/log/netdata /usr/local/var/log/netdata /opt/homebrew/var/log/netdata; do
++    [ -n "$d" ] && [ -d "$d" ] && { LOGDIR="$d"; break; }
+   done
+   LIBDIR=""
+-  for d in /var/lib/netdata /opt/netdata/var/lib/netdata /var/db/netdata /usr/local/var/lib/netdata /opt/homebrew/var/lib/netdata; do
+-    [ -d "$d" ] && { LIBDIR="$d"; break; }
++  for d in "${NETDATA_LIB_DIR:-}" /var/lib/netdata /opt/netdata/var/lib/netdata /var/db/netdata /usr/local/var/lib/netdata /opt/homebrew/var/lib/netdata; do
++    [ -n "$d" ] && [ -d "$d" ] && { LIBDIR="$d"; break; }
+   done
+   CACHEDIR=""
+-  for d in /var/cache/netdata /opt/netdata/var/cache/netdata /var/db/netdata/cache /usr/local/var/cache/netdata /opt/homebrew/var/cache/netdata; do
+-    [ -d "$d" ] && { CACHEDIR="$d"; break; }
++  for d in "${NETDATA_CACHE_DIR:-}" /var/cache/netdata /opt/netdata/var/cache/netdata /var/db/netdata/cache /usr/local/var/cache/netdata /opt/homebrew/var/cache/netdata; do
++    [ -n "$d" ] && [ -d "$d" ] && { CACHEDIR="$d"; break; }
+   done
+ 
+   NETDATA_BIN=$(command -v netdata 2>/dev/null)
