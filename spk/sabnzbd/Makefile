@@ -6,7 +6,6 @@ SPK_ICON = src/sabnzbd.png
 PYTHON_PACKAGE = python314
 
 DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
-OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
 
 # Ensure C++17 compatibility -- sabctools >= 9.0.0 -> -std=c++17 >= gcc-7
 MIN_GCC_VERSION = 7
@@ -36,13 +35,9 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-DEPENDS += cross/unrar
-else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/unrar
-else
-DEPENDS += cross/unrar7
-endif
+
+# unrar 7 where its floors admit the arch, unrar 6 otherwise.
+$(call depend,cross/unrar7|cross/unrar)
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
