@@ -8,6 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# #pragma GCC diagnostic inside functions (ffc.h): gcc 4.6.
+MIN_GCC_VERSION = 4.6
+
 HOMEPAGE = https://github.com/redis/hiredis
 COMMENT = Minimalistic C client for Redis >= 1.2.
 LICENSE = 3-Clause BSD
