@@ -5,6 +5,10 @@ PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS)
 
+# Its cmake refuses a host gcc older than 4.8 (CheckCompilerVersion.cmake: GCC_MIN); the
+# 5.1 soft limit is lifted below.
+MIN_GCC_VERSION = 4.8
+
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
 LICENSE = Apache v2.0 with LLVM Exceptions

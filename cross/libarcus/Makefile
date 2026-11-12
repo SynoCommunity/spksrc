@@ -8,6 +8,9 @@ PKG_DIR = libArcus-$(PKG_VERS)
 
 DEPENDS = cross/protobuf
 
+# C++11 (Types.h): gcc 4.7.3 stops on it, 4.8.3 builds.
+MIN_GCC_VERSION = 4.8
+
 HOMEPAGE = https://ultimaker.com/software/ultimaker-cura
 COMMENT = Communication library between internal components for Ultimaker software.
 LICENSE = LGPLv3

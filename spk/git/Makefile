@@ -4,7 +4,6 @@ SPK_REV = 42
 SPK_ICON = src/git.png
 
 DEPENDS = cross/git
-OPTIONAL_DEPENDS = cross/git-lfs
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
@@ -24,9 +23,14 @@ SPK_COMMANDS += bin/git-upload-archive
 SPK_COMMANDS += bin/git-upload-pack
 SPK_COMMANDS += bin/scalar
 
+include ../../mk/spksrc.common.mk
+
+# Taken where its own floors admit the arch (cross/git-lfs: Go's); its command follows
+# spksrc.spk.mk.
+$(call depend,cross/git-lfs,nop)
+
 include ../../mk/spksrc.spk.mk
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/git-lfs
+ifneq ($(filter cross/git-lfs,$(DEPENDS)),)
 SPK_COMMANDS += bin/git-lfs
 endif

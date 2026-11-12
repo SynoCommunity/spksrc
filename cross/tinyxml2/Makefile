@@ -8,6 +8,9 @@ PKG_DIR = tinyxml2-$(PKG_VERS)
 
 DEPENDS =
 
+# C++11 override (tinyxml2.h): gcc 4.7.
+MIN_GCC_VERSION = 4.7
+
 HOMEPAGE = https://github.com/leethomason/tinyxml2
 COMMENT  = TinyXML2 is a simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
 LICENSE  = zlib-license
