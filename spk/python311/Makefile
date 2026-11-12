@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.15
+SPK_VERS = 3.11.18
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/python311
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.$(subst python3,,$(SPK_NAME))
-CHANGELOG = "1. Update to Python 3.11.15"
+CHANGELOG = "1. Update to Python 3.11.18"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
