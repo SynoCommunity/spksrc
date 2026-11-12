@@ -4,7 +4,6 @@ SPK_REV = 6
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
-OPTIONAL_DEPENDS = cross/postgis cross/pgvector
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
@@ -23,12 +22,9 @@ NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
 
-# PostGIS requires gcc 8+ (libgeos 3.14.1 and libroj 9.8.1 demand C++17)
-# Only include postgis if toolchain supports required gcc
-ifeq ($(call version_ge, $(TC_GCC), 8),1)
-DEPENDS += cross/postgis
-DEPENDS += cross/pgvector
-endif
+# PostGIS and pgvector together, where PostGIS's floors admit the arch (gcc 8: libgeos and
+# proj demand C++17).
+$(call depend,cross/postgis cross/pgvector,nop)
 
 # Common PostgreSQL commands available via /usr/local/bin/
 SPK_COMMANDS  = bin/psql
