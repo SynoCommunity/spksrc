@@ -102,19 +102,22 @@ COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+# The PLIST names the install directory openjdk-@JAVA_VERSION@.
+PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
+
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # force cross compilation
 CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 
 # ABI profile for ARM builds:
 #   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 endif
 
 .PHONY: java-21-openjdk_pre_configure
