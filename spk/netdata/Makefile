@@ -5,10 +5,6 @@ SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
 
-# netdata compiles C++17, which requires gcc 7.5 or newer (verified against the oldest
-# DSM 7 toolchain); older toolchains cannot compile it.
-MIN_GCC_VERSION = 7.5
-
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
