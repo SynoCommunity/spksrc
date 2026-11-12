@@ -10,9 +10,6 @@ DEPENDS += cross/libgeos
 DEPENDS += cross/libproj
 DEPENDS += cross/json-c
 
-# libgeos and libproj:
-MIN_GCC_VERSION = 8
-
 HOMEPAGE = https://postgis.net/
 COMMENT = PostGIS extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data.
 LICENSE = GPLv2

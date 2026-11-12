@@ -22,9 +22,10 @@ NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
 
-# PostGIS and pgvector together, where PostGIS's floors admit the arch (gcc 8: libgeos and
-# proj demand C++17).
-$(call depend,cross/postgis cross/pgvector,nop)
+# Each where its own floors admit the arch: PostGIS's through libgeos and libproj (gcc 8),
+# pgvector's own (gcc 5).
+$(call depend,cross/postgis,nop)
+$(call depend,cross/pgvector,nop)
 
 # Common PostgreSQL commands available via /usr/local/bin/
 SPK_COMMANDS  = bin/psql
