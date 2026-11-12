@@ -14,13 +14,10 @@ LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_DEPENDS = "Perl"
 
-OPTIONAL_DEPENDS = cross/llvm
-
 include ../../mk/spksrc.common.mk
 
-ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
-DEPENDS += cross/llvm
-endif
+# Taken where its own floors admit the arch (cross/llvm: llvm-latest, or llvm-9.0 from gcc 4.8).
+$(call depend,cross/llvm,nop)
 
 # build binutils bofore the following
 # otherwise it fails to build for ARMv5
