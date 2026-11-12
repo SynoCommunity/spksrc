@@ -1,21 +1,8 @@
-PKG_NAME = unrar
-PKG_VERS = 6.2.12
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)src-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.rarlab.com/rar
-PKG_DIR = $(PKG_NAME)
+PKG_NAME = unrar-virtual
 
-DEPENDS =
+include ../../mk/spksrc.common.mk
 
-HOMEPAGE = https://rarlab.com
-COMMENT  = Extract files from rar archives.
-LICENSE  = freeware
+# unrar 7 where its floors admit the arch (gcc 5), unrar 6.2 otherwise.
+$(call depend,cross/unrar-latest|cross/unrar-6.2)
 
-# unrar compiles with -std=c++11, which gcc accepts from 4.7:
-#   cc1plus: error: unrecognized command line option '-std=c++11'
-MIN_GCC_VERSION = 4.7
-
-CONFIGURE_TARGET = nop
-INSTALL_ARGS = install DESTDIR=$(STAGING_INSTALL_PREFIX)
-
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-virtual.mk
