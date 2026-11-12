@@ -2,8 +2,8 @@
 # ==> Always install latest version (service-setup.sh:install_python_virtualenv)
 # ==> We use module 'ensurepip' to install latest version included
 #pip==25.2
-setuptools==82.0.1
-wheel==0.46.3
+setuptools==84.2.1
+wheel==0.48.0
 
 # Always use latest version available
 #certifi==2025.8.3
@@ -13,14 +13,17 @@ certifi
 # to create their local virtualenv
 # in order to install wheels within
 # their running environment
-virtualenv==21.2.0
+# 21.11 and later build with hatchling's python-sbom hook, absent from the crossenv
+virtualenv==21.10.0
 
 # Other mandatory wheels that
 # gets install by default as
 # basic dependencies of above
-distlib==0.4.0
-filelock==3.25.2
-platformdirs==4.9.4
+distlib==0.4.4
+# 4.2.10 and later: the same python-sbom hook
+filelock==4.2.9
+platformdirs==4.14.5
+python-discovery==1.9.5
 six==1.17.0
 
 ##
