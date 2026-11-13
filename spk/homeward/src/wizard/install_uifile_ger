@@ -1,0 +1,28 @@
+[
+  {
+    "step_title": "Freigegebener Ordner",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "In diesem freigegebenen Ordner sichert Homeward seine Konfiguration und kann dorthin synchronisieren. Der Ordner wird bei der Installation angelegt, falls er noch nicht existiert.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Freigegebener Ordner",
+            "defaultValue": "homeward",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Unterordner werden nicht unterstützt."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": "Homeward läuft als interner Benutzer <b>sc-homeward</b>. Für Backups oder Sync in andere freigegebene Ordner gib diesem Benutzer unter Systemsteuerung › Freigegebener Ordner Lese-/Schreibrechte. Mehr im <a target=\"_blank\" href=\"https://github.com/sebiweise/homeward/blob/master/docs/user-guide.md\">Benutzerhandbuch</a>."
+      }
+    ]
+  }
+]
