@@ -1,5 +1,5 @@
 PKG_NAME = extism-js
-PKG_VERS = 1.6.0
+PKG_VERS = 1.7.0
 PKG_EXT = gz
 PKG_DIST_NAME = extism-js-x86_64-linux-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/extism/js-pdk/releases/download/v$(PKG_VERS)
