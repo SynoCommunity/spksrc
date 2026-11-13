@@ -1,5 +1,5 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 4.1
+SPK_VERS = 4.2
 SPK_REV = 17
 SPK_ICON = src/synocli-disk.png
 
@@ -30,6 +30,9 @@ $(call depend,cross/gpart,nop)
 $(call depend,cross/fuse3|cross/fuse,nop)
 $(call depend,cross/s3backer,nop)
 $(call depend,cross/dar,nop)
+$(call depend,cross/compsize,nop)
+$(call depend,cross/dysk,nop)
+$(call depend,cross/duperemove,nop)
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
 LICENSE  = Each tool is licensed under its respective license.
@@ -49,6 +52,9 @@ CHANGELOG += "7. Update ddrescue to v1.30. <br/>"
 CHANGELOG += "8. Update gdu to v5.39.0 (v5.32.0 on older kernels). <br/>"
 CHANGELOG += "9. Update mergerfs to v2.42.0 (v2.40.2 on older toolchains, including qoriq). <br/>"
 CHANGELOG += "10. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
+CHANGELOG += "11. Add compsize for inspecting Btrfs compression. <br/>"
+CHANGELOG += "12. Add duperemove 0.14.1 for deduplicating Btrfs files. <br/>"
+CHANGELOG += "13. Add dysk. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
@@ -133,4 +139,19 @@ endif
 ifneq ($(filter cross/dar,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
 SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
+endif
+
+ifneq ($(filter cross/compsize,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", compsize"
+SPK_COMMANDS += bin/compsize
+endif
+
+ifneq ($(filter cross/dysk,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dysk"
+SPK_COMMANDS += bin/dysk
+endif
+
+ifneq ($(filter cross/duperemove,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", duperemove"
+SPK_COMMANDS += bin/duperemove bin/hashstats bin/btrfs-extent-same
 endif
