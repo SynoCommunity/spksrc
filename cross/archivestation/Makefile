@@ -3,11 +3,11 @@ PKG_VERS = 1.1.1
 UPSTREAM_REV = 1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = ArchiveStation-$(PKG_VERS)-$(UPSTREAM_REV)-source.tar.gz
-PKG_DIST_SITE = https://github.com/jbdemonte/synology-archive-downloader/releases/download/v$(PKG_VERS)-$(UPSTREAM_REV)
+PKG_DIST_SITE = https://github.com/jbdemonte/synology-archive-station/releases/download/v$(PKG_VERS)-$(UPSTREAM_REV)
 PKG_DIST_FILE = $(PKG_DIST_NAME)
 PKG_DIR = ArchiveStation-$(PKG_VERS)-$(UPSTREAM_REV)-source
 
-HOMEPAGE = https://github.com/jbdemonte/synology-archive-downloader
+HOMEPAGE = https://github.com/jbdemonte/synology-archive-station
 COMMENT = Internet Archive downloader integrated into the DSM desktop.
 LICENSE = MIT
 

@@ -1,6 +1,6 @@
 # Archive Station
 
-[Archive Station](https://github.com/jbdemonte/synology-archive-downloader) downloads Internet Archive item files directly to your NAS. Each item has its own directory, with the original subdirectories preserved. Public items need no account; an optional Internet Archive account adds the restricted files it is authorized to download.
+[Archive Station](https://github.com/jbdemonte/synology-archive-station) downloads Internet Archive item files directly to your NAS. Each item has its own directory, with the original subdirectories preserved. Public items need no account; an optional Internet Archive account adds the restricted files it is authorized to download.
 
 ## Requirements
 
@@ -52,7 +52,7 @@ There is no automatic migration in this initial recipe. A manual migration was t
 
 ## Build and validation
 
-The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/DISTRIBUTIONS.md). Final distribution metadata is rendered through the standard `POST_STRIP_TARGET` hook. Run `make clean` before rebuilding after a source version or package revision change; spksrc caches the intermediate build steps and `INFO`.
+The recipe invokes the upstream `scripts/stage_synology.py` command and supplies the package identity through service environment variables. Application code, styles and all language catalogs are used unchanged; no source patches are required. Artifact checks are maintained in the [upstream repository](https://github.com/jbdemonte/synology-archive-station/blob/main/docs/DISTRIBUTIONS.md). Final distribution metadata is rendered through the standard `POST_STRIP_TARGET` hook. Run `make clean` before rebuilding after a source version or package revision change; spksrc caches the intermediate build steps and `INFO`.
 
 The recipe uses the checksum-verified upstream 1.1.1-1 source release and a pinned pure-Python dependency. `UPSTREAM_REV` identifies the upstream source archive independently of the SynoCommunity `SPK_REV`, which remains 1 for this first package submission. From the spksrc build environment:
 
@@ -77,4 +77,4 @@ Hardware validation of the initial 1.0.0 recipe on a DS918+ with DSM 7.1.1 Updat
 
 The DSM 7.2 artifact was built and inspected but has not been installed on DSM 7.2 hardware. DSM 7.4.1 session recovery has not been hardware-verified; missing or stale DSM token recovery is covered by simulated browser sessions. Other NAS architectures still need hardware testing.
 
-See the [upstream usage guide](https://github.com/jbdemonte/synology-archive-downloader/blob/main/docs/USAGE.md) for the full feature reference.
+See the [upstream usage guide](https://github.com/jbdemonte/synology-archive-station/blob/main/docs/USAGE.md) for the full feature reference.

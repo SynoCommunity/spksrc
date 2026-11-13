@@ -17,7 +17,7 @@ MAINTAINER = jbdemonte
 DESCRIPTION = Download Internet Archive items into separate folders with file selection, progress tracking, resumable transfers, integrity verification and scheduling. Public items need no account; an optional Internet Archive account adds the restricted files it is authorized to download. Opens inside the DSM desktop and uses your administrator session.
 DISPLAY_NAME = Archive Station
 CHANGELOG = "Initial SynoCommunity package of Archive Station 1.1.1, with optional Internet Archive accounts for restricted files and recorded integrity checks."
-HOMEPAGE = https://github.com/jbdemonte/synology-archive-downloader
+HOMEPAGE = https://github.com/jbdemonte/synology-archive-station
 LICENSE = MIT
 STARTABLE = yes
 
