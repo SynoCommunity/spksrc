@@ -1,0 +1,17 @@
+# Patch default config
+# - Use package specific default config file and template dir
+# - This is particularly useful for command-line use, as it avoids the need for
+#   environment variables.
+# 
+--- server/config_unix.go.orig	2026-10-07 15:09:48.000000000 +0000
++++ server/config_unix.go	2026-10-08 07:36:00.156848603 +0000
+@@ -3,6 +3,7 @@
+ package server
+ 
+ func init() {
+-	DefaultConfigFile = "/etc/ntfy/server.yml"
+-	DefaultTemplateDir = "/etc/ntfy/templates"
++        // use package folder
++	DefaultConfigFile = "/var/packages/ntfy/var/server.yml"
++	DefaultTemplateDir = "/var/packages/ntfy/var/templates"
+ }
