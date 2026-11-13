@@ -10,21 +10,21 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master 51ec612fa (Oct 22nd 2026).  100 is the diff
-bc5e863a4..f3f03a23f -- uknunknown's dev_transcoding_2026 head, which still
-sits on bc5e863a4, so no rebase is needed here (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
+Package base: master 941d132fd (Nov 1st 2026).  100 is the diff
+941d132fd..1d4a5bc8e -- uknunknown's dev_transcoding_2026 head, which he has
+now rebased onto that same master, so for the first time the patch is a plain
+diff from the package base and nothing straddles two bases (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
 547f8bfae, 601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  Regenerate
 whenever his head moves, and note that he force-pushes -- a plain
 `git fetch` is then rejected as non-fast-forward, so fetch with +refs or -f.
 
-Note that the diff's left side is bc5e863a4, an older base than the tarball,
-and that this is fine as long as the commits in between leave this patch's
-files alone -- or touch them somewhere else.  Over bc5e863a4..51ec612fa, 73
-commits with #2206 and #2160 among them, upstream and this patch both touch
-src/timeshift.c, src/dvr/dvr_rec.c and src/htsp_server.c, and 100's hunks in
-all three still applied with no fuzz and no offset.  The intersection is a
-cheap warning, not a verdict: when it is empty nothing can move, and when it
-is not, the chain test below settles it.  Check the intersection first:
+His branch used to sit on an older master than the tarball, which worked only
+as long as the commits in between left this patch's files alone -- or touched
+them somewhere else.  That hazard is gone while the two bases agree, but it
+comes back the moment he stops rebasing, so the check is worth keeping.  The
+intersection of the files upstream changed with the files a patch targets is a
+cheap warning that something might move, not a verdict: when it is empty
+nothing can move, and when it is not, the chain test below settles it:
 
   cd <tvheadend clone>
   git diff --name-only <old base> <new base> | sort -u > /tmp/upstream.txt
@@ -62,6 +62,9 @@ generated from its own commit on a local branch over his:
 (the numbers below are the older, now dropped, set)
 
   101  keep the QSV scaler width even
+  102  (that number was reused in Oct 2026 for the QSV MediaSDK/oneVPL fix of
+       SynoCommunity#7653, and is now free again: uknunknown took that fix
+       into his branch, so it arrives with 100)
   102  ship 360 rather than 384 as the default profile height: 16:9 does not
        divide into 384, so each path rounds the width its own way, while 360 is
        a whole 640 for 16:9 and 480 for 4:3 (a fresh install only)
