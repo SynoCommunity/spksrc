@@ -45,7 +45,14 @@ Read through the [developer basics](../developer-guide/basics/index.md) to under
 - Build workflow and targets
 - How cross-compilation works
 
-### 3. Find Something to Work On
+### 3. Using an AI Assistant?
+
+Point it at [`AGENTS.md`](https://github.com/SynoCommunity/spksrc/blob/master/AGENTS.md) in
+the repository root before it touches anything — it carries the conventions and the
+framework specifics an assistant cannot infer. See
+[Working with an AI Assistant](development-process.md#working-with-an-ai-assistant).
+
+### 4. Find Something to Work On
 
 **Good first issues:**
 
@@ -59,7 +66,7 @@ Read through the [developer basics](../developer-guide/basics/index.md) to under
 - Architecture-specific fixes
 - Framework improvements
 
-### 4. Follow the Development Process
+### 5. Follow the Development Process
 
 See [Development Process](development-process.md) for the full workflow from fork to merge.
 
