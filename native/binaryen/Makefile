@@ -1,5 +1,5 @@
 PKG_NAME = binaryen
-PKG_VERS = version_124
+PKG_VERS = version_133
 PKG_EXT = tar.gz
 PKG_DIST_NAME = binaryen-$(PKG_VERS)-x86_64-linux.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/WebAssembly/binaryen/releases/download/$(PKG_VERS)

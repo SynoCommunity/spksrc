@@ -101,7 +101,8 @@ install_ml_packages()
         "huggingface-hub>=1.0,<2.0" \
         "numpy>=2.4.0,<3.0" \
         "orjson>=3.9.5" \
-        "pillow>=12.2,<13" \
+        "pillow>=13,<14" \
+        "pillow-jxl-plugin>=1.3.8,<2.0" \
         "tokenizers>=0.15.0,<1.0" \
         "fastapi>=0.95.2,<1.0" \
         "uvicorn>=0.22.0,<1.0" \
@@ -116,7 +117,9 @@ install_ml_packages()
     # guards the rknn/export extras, which are not installed; the consumed
     # core (constants, onnx utils, runtime) is pure Python, so bypass the
     # version check for this package only.
-    "${ML_VENV}/bin/pip3" install --no-cache-dir --ignore-requires-python \
+    # The wheel keeps version 0.2.0 even when its pinned git revision changes,
+    # so force reinstallation is needed.
+    "${ML_VENV}/bin/pip3" install --no-cache-dir --force-reinstall --ignore-requires-python \
         "${SYNOPKG_PKGDEST}/share/immich/wheelhouse/immich_model-0.2.0-py3-none-any.whl" 2>&1
     # rapidocr can pull in the GUI opencv-python variant, which needs libGL on
     # DSM. Only when that variant is present, remove it and restore headless.
