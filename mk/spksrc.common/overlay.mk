@@ -33,6 +33,7 @@
 #   shared    TC_OVERLAY_ALL                every overlay dir of the arch, installed with it
 #             RUST_LINK_VIA_BINUTILS        the Rust link through the binutils overlay ld
 #             overlay_binutils_version      $(call ...,<vendor>): the as/ld version in use
+#             overlay_gcc_version           $(call ...,<vendor>): the gcc version in use
 #             overlay_warn                  $(call ...,<C>,<states>): the banner to print
 #
 #   created by OVERLAY_COMPONENT_TEMPLATE, for every <c> -- no assignment to search for:
@@ -44,6 +45,7 @@
 #             _OVERLAY_BINUTILS_WANTED   global overlay, the narrow rust link, or a
 #                                        gcc overlay (which has no as/ld of its own)
 #             _OVERLAY_BINUTILS_PKG_VERS the global overlay's PKG_VERS, when it is on
+#             _OVERLAY_GCC_PKG_VERS      the gcc overlay's PKG_VERS, when it is active
 #             _OVERLAY_RUSTC_*           the rust candidates, by version and gcc variant
 #
 # One file per component under spksrc.common/overlay/, read in a fixed order: the
@@ -79,20 +81,19 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 #                        gcc, hence off by default -- OVERLAY_GCC is what matches it, and
 #                        turns it on (_OVERLAY_BINUTILS_ON); asking 0 alongside an active
 #                        gcc overlay stops the build (OVERLAY_BINUTILS_REFUSED).
-# OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix;
-#                        inert where the arch ships none.
+# OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix. On
+#                        by default; inert where the arch ships none.
 #
 # Defaulted here, before the components: the rust pool and _OVERLAY_RUSTC_DIR (rustc.mk) are
 # immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
 # unset switch while everything later sees the default.
 OVERLAY_RUSTC    ?= 1
 OVERLAY_BINUTILS ?= 0
-# Off by default, tree-wide: packages keep the vendor gcc, and the producer of a rust
-# built with the gcc overlay turns it on for itself (native/rustc-1.98). Tree-wide because a
-# package that selects a meta on TC_GCC must agree with the meta spk-meta-source builds,
-# and FWRD_ARGS_SPK does not carry the switch. OVERLAY_BINUTILS follows through
-# _OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
-OVERLAY_GCC      ?= 0
+# On by default, tree-wide. A package that selects a meta on TC_GCC must agree with the meta
+# spk-meta-source builds, and FWRD_ARGS_SPK does not carry the switch: only a shared
+# default makes both decide the same way. Inert wherever the arch ships no gcc overlay.
+# OVERLAY_BINUTILS follows through _OVERLAY_BINUTILS_ON: gcc 8.5 needs its assembler.
+OVERLAY_GCC      ?= 1
 # A typo must not read as "off": anything neither true nor false (macros.mk) stops here.
 $(foreach v,OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC,$(call assert_bool,$($(v)),$(v)))
 
@@ -148,6 +149,13 @@ _OVERLAY_BINUTILS_PKG_VERS := $(if $(or $(call is_true,$(OVERLAY_BINUTILS)),$(_O
 # toolchain's Makefile for a package, while a toolchain declares its own and
 # spksrc.toolchain/tc_vars.mk emits it. One macro so they cannot drift apart.
 overlay_binutils_version = $(or $(strip $(_OVERLAY_BINUTILS_PKG_VERS)),$(strip $(1)))
+
+# The same for gcc: the active overlay's PKG_VERS (8.5.0), what tc-capability.mk reports for
+# TC_GCC, so MIN_GCC_VERSION floors and version_ge selections follow the compiler a build
+# uses. PKG_VERS rather than OVERLAY_GCC_VERSION, the directory form (8.5), which would read
+# as older than a vendor 8.5.0. TC_GCC_VENDOR keeps the toolchain's own.
+_OVERLAY_GCC_PKG_VERS := $(if $(_OVERLAY_GCC_ON),$(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS))
+overlay_gcc_version = $(or $(strip $(_OVERLAY_GCC_PKG_VERS)),$(strip $(1)))
 
 # The switches, and what the first make was asked (OVERLAY_BINUTILS_ASKED, binutils.mk),
 # on the command line of every sub-make that resolves a toolchain WITHIN this package:

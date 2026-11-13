@@ -258,7 +258,7 @@ The toolchain bootstrap (stage 1; the toolchain-dir `tc_vars.mk` also at stage 0
 | File | Contents | Loaded into the make env |
 |------|----------|--------------------------|
 | `tc_vars.mk` | Toolchain identity and paths (`TC_PATH`, `TC_TARGET`, `TC_SYSROOT`, `TC_GCC`, ...) | **always** |
-| `tc_vars.overlay.mk` | The overlays the arch ships: `TC_OVERLAY_<c>_ON`, version, consumer and bin dirs | **always** |
+| `tc_vars.overlay.mk` | The overlays the arch ships: `TC_OVERLAY_<c>_ON`, version, consumer and bin dirs; the gcc drivers' suffix | **always** |
 | `tc_vars.flags.mk` | C / C++ / CPP / LD compiler & linker flags, and the toolchain's `TC_EXTRA_*FLAGS` | autotools |
 | `tc_vars.autotools.mk` | Autotools (`configure`) environment | autotools |
 | `tc_vars.rust.mk` | Rust / Cargo environment | **every cross package** |

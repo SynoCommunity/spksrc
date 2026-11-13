@@ -48,7 +48,11 @@ TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
 # The toolchain's <target> root: a runtime library can sit in more than one place
 # under it (the sysroot lib, the compiler's own lib/lib64), so the search for a copy
 # to carry starts here rather than at the sysroot lib alone.
-TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..)
+#
+# An active gcc overlay adds a second root: it keeps its runtimes under
+# lib/gcc/<target>/<version>/ (--enable-version-specific-runtime-libs), in its own
+# consumer directory, outside the base toolchain entirely.
+TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..) $(if $(_OVERLAY_GCC_ON),$(firstword $(_OVERLAY_GCC_DIR))/work/install)
 
 # Runtime libraries DSM does not ship, so any binary that needs one has to carry it
 # from the toolchain. libstdc++/libgcc_s are deliberately NOT here: DSM ships them,
@@ -57,6 +61,15 @@ TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..)
 # A library carried is examined like the shipped binaries, for the ones after it in the
 # list: libgfortran needs libquadmath, so it comes first.
 TC_LIBS_DEFAULT = libgfortran.so libquadmath.so libatomic.so
+
+# The overlay list the comment above anticipates. A gcc overlay outpaces the compiler DSM
+# ships, so a C++ binary built with it links against a libstdc++ newer than the NAS has and
+# will not start without a copy. Only when the overlay is ACTIVE: on a stock build DSM's own
+# copy is the right one, and shipping a second would be a regression. The copy is picked by
+# the UNION of the symbol versions every shipped binary needs, so it takes the overlay's
+# libstdc++ rather than the sysroot's older one under the same roots. After the default
+# list, and libstdc++ before libgcc_s, which it and libgfortran need.
+TC_LIBS_OVERLAY = $(if $(_OVERLAY_GCC_ON),libstdc++.so libgcc_s.so)
 
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
@@ -110,7 +123,7 @@ endef
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
 	_carried_="" ; \
-	for tclib in $(TC_LIBS_DEFAULT); do \
+	for tclib in $(TC_LIBS_DEFAULT) $(TC_LIBS_OVERLAY); do \
 	  echo  "===> SEARCHING for $${tclib}" ; \
 	  _need_all_="" ; _seen_="" ; \
 	  _plist_=$$(sed 's/:/ /' $(INSTALL_PLIST) | awk '$$1=="lib"||$$1=="bin"{print $$2}') ; \

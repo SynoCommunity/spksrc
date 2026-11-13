@@ -60,6 +60,7 @@
 #      ├── tc-normalize.mk  : post-extraction normalization of the sysroot
 #      ├── overlay/
 #      │   ├── binutils.mk  : uses the binutils overlay (shim, -B), cleans every overlay
+#      │   ├── gcc.mk       : uses the gcc overlay (installed at tcvars, its warnings)
 #      │   └── rustc.mk     : uses the rust overlay (synology triple, rustup toolchain)
 #      ├── tc-rust.mk       : rustup base install and target support
 #      └── tc_vars.mk       : generates the tc_vars* files
@@ -206,9 +207,11 @@ DEPENDS += $(addprefix overlay/,$(notdir $(TC_OVERLAY_ALL)))
 endif
 
 # OVERLAY_<component> family together, base layer first: overlay/binutils.mk sets the
-# shim path / -B flag that overlay/rustc.mk and tc_vars read, and overlay/rustc.mk
-# resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust.mk then consumes.
+# shim path / -B flag that overlay/rustc.mk and tc_vars read, overlay/gcc.mk installs the
+# gcc overlay after it, and overlay/rustc.mk resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that
+# tc-rust.mk then consumes.
 include ../../mk/spksrc.toolchain/overlay/binutils.mk
+include ../../mk/spksrc.toolchain/overlay/gcc.mk
 include ../../mk/spksrc.toolchain/overlay/rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 

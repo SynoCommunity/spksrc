@@ -46,8 +46,9 @@ ARCHIVE_KEEP = .
 # This rustc exists to be built BY the gcc 8.5 overlay -- that is the whole point of the
 # 1.98 line here, and without it RUST_CC is the vendor gcc: 4.9.3 on qoriq, which has no
 # __builtin_sadd_overflow (GCC 5) and fails compiling compiler-rt for compiler_builtins.
-# overlay.mk leaves it off for the tree; this line, read first, turns it on for this
-# producer. `?=`, so a command line or the environment can still say otherwise.
+# overlay.mk defaults it on for the tree; this line, read first, is what still holds when
+# local.mk turns it off tree-wide. `?=`, so a command line or the environment can still say
+# otherwise.
 OVERLAY_GCC ?= 1
 
 include ../../mk/spksrc.native-toolchain.mk

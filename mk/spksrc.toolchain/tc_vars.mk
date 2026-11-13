@@ -59,6 +59,10 @@ COOKIE_PREFIX =
 TC_PATH                   = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
 TC_OVERLAY_BINUTILS_PATH  = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_BIN)/)
 TC_OVERLAY_GCC_PATH       = $(if $(strip $(_OVERLAY_GCC_DIR)),$(firstword $(_OVERLAY_GCC_DIR))/work/install/usr/local/bin/)
+# The suffix the gcc-family drivers carry in THIS build, empty unless the gcc overlay is ON:
+# the overlay names its drivers for its directory's version (<target>-gcc-8.5, g++-8.5),
+# the vendor's have none. Not PKG_VERS: the gcc-8.5.0 alias has no g++ beside it.
+TC_GCC_SUFFIX             = $(if $(_OVERLAY_GCC_ON),-$(OVERLAY_GCC_VERSION))
 
 # The cmake variable a tool fills, given its TOOLS name; the build-host twin is the
 # same with _FOR_BUILD appended. Anything not named here is CMAKE_<name>.
@@ -417,9 +421,9 @@ tc_flags:
 #
 # TC_BINUTILS sits beside TC_GCC, TC_GLIBC and TC_KERNEL, the four a toolchain declares:
 # it was the one missing here, so a package reading the generated file saw an empty value
-# where the other three were there. Emitted as the version this build will use -- the
-# overlay's as/ld when that is what every compile goes through, like TC_GCC under a gcc
-# overlay -- through the same macro tc-capability.mk resolves a package's with.
+# where the other three were there. TC_GCC and TC_BINUTILS are emitted as the versions this
+# build will use -- the gcc overlay's when it is active, and its binutils overlay's as/ld --
+# through the same macros tc-capability.mk resolves a package's with.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -433,7 +437,7 @@ tc_vars:
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
-	echo TC_GCC := $(TC_GCC) ; \
+	echo TC_GCC := $(call overlay_gcc_version,$(TC_GCC)) ; \
 	echo TC_GLIBC := $(TC_GLIBC) ; \
 	echo TC_BINUTILS := $(call overlay_binutils_version,$(TC_BINUTILS)) ; \
 	echo TC_KERNEL := $(TC_KERNEL)$(if $(filter 1,$(call version_ge, $(TC_KERNEL), 4.4)),+)
@@ -445,10 +449,11 @@ tc_vars:
 # TC_OVERLAY_<c> is its version (beside TC_BINUTILS / TC_GCC, the ones the build takes),
 # TC_OVERLAY_<c>_DIR its consumer dir and TC_OVERLAY_<c>_PATH its bin dir (binutils and gcc;
 # trailing slash, like TC_PATH), filled used or not. The tc macro (macros/tools.mk) takes a
-# _PATH only when ON. The tree computes none of these names -- its own are _OVERLAY_<c>_DIR
-# and _OVERLAY_<c>_ON -- so the file, included at parse, records without changing a
-# decision; stage0.mk compares TC_OVERLAY_<c>_ON with what a run resolves, and stops a run
-# that differs. Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on
+# _PATH only when ON, and appends TC_GCC_SUFFIX, the build's: empty unless the gcc overlay
+# is ON. The tree computes none of these names -- its own are _OVERLAY_<c>_DIR and
+# _OVERLAY_<c>_ON -- so the file, included at parse, records without changing a decision;
+# stage0.mk compares TC_OVERLAY_<c>_ON with what a run resolves, and stops a run that
+# differs. Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on
 # wherever a rust overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim
 # TC_OVERLAY_RUSTC_LINKER (the -Clink-arg=-B of the Rust link flags).
 tc_overlay_vars:
@@ -460,6 +465,7 @@ tc_overlay_vars:
 	echo TC_OVERLAY_GCC := $(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_GCC_DIR := $(firstword $(_OVERLAY_GCC_DIR)) ; \
 	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH) ; \
+	echo TC_GCC_SUFFIX := $(TC_GCC_SUFFIX) ; \
 	echo TC_OVERLAY_RUSTC_ON := $(if $(_OVERLAY_RUSTC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_RUSTC := $(call read_makefile_var,$(firstword $(_OVERLAY_RUSTC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_RUSTC_DIR := $(firstword $(_OVERLAY_RUSTC_DIR)) ; \
@@ -479,7 +485,7 @@ tcvars-sysroot-check:
 	  { echo "TC_SYSROOT = $(TC_SYSROOT) is not the sysroot $(TC_PREFIX)gcc reports: $${gcc_sysroot:-none}" >&2 ; exit 1 ; }
 
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
-tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
+tcvars: overlay-binutils-warn overlay-gcc-warn overlay-rustc-warn overlay-gcc-install generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
 # The check before the cookie: a failed one is not skipped next time.
 $(TCVARS_COOKIE): tcvars-sysroot-check $(POST_TCVARS_TARGET)
