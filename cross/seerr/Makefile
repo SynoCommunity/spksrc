@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.5.1
+PKG_VERS = 3.5.2
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -61,18 +61,23 @@ seerr_install:
 	# ------------------------------------------------------------
 	# 2. Install deps + build
 	# ------------------------------------------------------------
-	$(RUN) pnpm install --frozen-lockfile
+	$(RUN) pnpm install --frozen-lockfile --ignore-scripts
 	$(RUN) COMMIT_TAG=$(PKG_VERS) pnpm build
 
 	# ------------------------------------------------------------
 	# 3. Native binaries for target architecture ($(NODE_ARCH))
 	# ------------------------------------------------------------
-	# sqlite3 - download prebuilt napi binary
-	$(RUN) sh -c 'cd node_modules/sqlite3 && npx prebuild-install -r napi --platform linux --arch $(NODE_ARCH)'
+	# sqlite3 - build from source; its prebuilt requires GLIBC 2.38 (DSM 7.2 has 2.36)
+	$(RUN) sh -c 'cd node_modules/sqlite3 && \
+		$(WORK_DIR)/$(PKG_DIR)/node_modules/.bin/node-gyp rebuild \
+			--arch=$(NODE_ARCH) \
+			--nodedir=$(WORK_DIR)/../../../native/nodejs-22/work-native/node'
+	$(RUN) $(call tc,strip) --strip-unneeded node_modules/sqlite3/build/Release/node_sqlite3.node
 
 	# bcrypt bundles prebuilts in prebuilds/ dir
-	# Keep only the target architecture prebuild (linux-x64 or linux-arm64)
+	# Keep only the target architecture's glibc prebuild
 	$(RUN) find node_modules/bcrypt/prebuilds -mindepth 1 -maxdepth 1 ! -name "linux-$(NODE_ARCH)" -exec rm -rf {} +
+	$(RUN) find node_modules/bcrypt/prebuilds/linux-$(NODE_ARCH) -name '*.musl.node' -delete
 	$(RUN) rm -rf node_modules/bcrypt/lib
 
 	# ------------------------------------------------------------

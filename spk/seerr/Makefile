@@ -1,6 +1,6 @@
 SPK_NAME = seerr
-SPK_VERS = 3.5.1
-SPK_REV = 10
+SPK_VERS = 3.5.2
+SPK_REV = 11
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
@@ -14,7 +14,7 @@ REQUIRED_MIN_DSM = 7.2
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Media request management for Jellyfin, Plex, and Emby with automation integrations."
 DISPLAY_NAME = Seerr
-CHANGELOG = "1. Update to v3.5.1"
+CHANGELOG = "Update to v3.5.2 (security fixes)"
 HOMEPAGE = https://github.com/seerr-team/seerr
 LICENSE = MIT
 
