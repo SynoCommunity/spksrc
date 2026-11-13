@@ -122,6 +122,7 @@ install_python_wheels ()
     if [ -s ${requirements} ]; then
        echo "Install packages from wheels [${requirements}]"
        pip3 install $([ $# -gt 0 ] && echo $*) \
+                   $([ "${WHEELHOUSE_COMPLETE}" = "1" ] && echo --no-index) \
                    --disable-pip-version-check \
                    --force-reinstall \
                    --cache-dir ${cachedir} \
