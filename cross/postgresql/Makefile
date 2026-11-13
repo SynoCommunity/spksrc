@@ -1,6 +1,6 @@
 PKG_NAME = postgresql
 # WARNING: ensure this version is used as PG_VERSION in cross/postgis
-PKG_VERS = 17.11
+PKG_VERS = 17.12
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)

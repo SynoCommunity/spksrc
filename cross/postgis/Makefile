@@ -1,5 +1,5 @@
 PKG_NAME = postgis
-PKG_VERS = 3.6.4
+PKG_VERS = 3.7.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/postgis/source
@@ -9,6 +9,7 @@ DEPENDS = cross/postgresql
 DEPENDS += cross/libgeos
 DEPENDS += cross/libproj
 DEPENDS += cross/json-c
+DEPENDS += cross/gmp
 
 HOMEPAGE = https://postgis.net/
 COMMENT = PostGIS extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data.
@@ -21,7 +22,7 @@ GNU_CONFIGURE = 1
 # - provide postgresql include dirs.
 # - provide postresql version
 PG_CONFIG = $(WORK_DIR)/$(PKG_DIR)/pg_config
-PG_VERSION = 17.11
+PG_VERSION = 17.12
 
 PRE_CONFIGURE_TARGET = $(PG_CONFIG)
 
@@ -87,5 +88,5 @@ $(PG_CONFIG):
 
 .PHONY: postgis_post_install
 postgis_post_install:
-	@# Ship the missing upgrade tag script so in-place 3.5.7 -> 3.6.4 upgrades work
+	@# Ship the missing upgrade tag script so in-place 3.5.7 -> 3.7.0 upgrades work
 	ln -sf postgis--TEMPLATED--TO--ANY.sql $(STAGING_INSTALL_PREFIX)/share/extension/postgis--3.5.7--ANY.sql

@@ -1,5 +1,5 @@
 PKG_NAME = libgeos
-PKG_VERS = 3.14.1
+PKG_VERS = 3.15.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = geos-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/geos
