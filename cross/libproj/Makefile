@@ -1,5 +1,5 @@
 PKG_NAME = libproj
-PKG_VERS = 9.8.1
+PKG_VERS = 9.9.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = proj-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/proj

@@ -1,6 +1,0 @@
-[{
-    "step_title": "PostgreSQL Upgrade",
-    "items": [{
-        "desc": "Your PostgreSQL databases and configuration will be preserved during the upgrade.<br><br>The service will be temporarily unavailable while the upgrade is in progress."
-    }]
-}]
