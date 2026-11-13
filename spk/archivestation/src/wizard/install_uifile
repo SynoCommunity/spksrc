@@ -1,0 +1,11 @@
+[
+  {
+    "step_title": "Archive Station",
+    "items": [
+      {
+        "type": "description",
+        "desc": "Open Archive Station from the DSM main menu using an administrator account. The ArchiveStation shared folder is created for downloads. To use another folder, grant Read/Write access to the system internal user sc-archivestation. Python 3.12 is required; Waitress is downloaded from PyPI during installation. The standalone GitHub package must be removed first; see the migration instructions before uninstalling it."
+      }
+    ]
+  }
+]
