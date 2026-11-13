@@ -1,6 +1,6 @@
 SPK_NAME = immich
-SPK_VERS = 3.3.6
-SPK_REV = 10
+SPK_VERS = 3.4.1
+SPK_REV = 11
 SPK_ICON = src/immich.png
 
 DEPENDS = cross/immich cross/immich-geodata
@@ -11,7 +11,7 @@ REQUIRED_MIN_DSM = 7.2
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Immich
 DESCRIPTION = Self-hosted photo and video backup solution.
-CHANGELOG = "Update Immich to v3.3.6."
+CHANGELOG = "Update Immich to v3.4.1."
 HOMEPAGE = https://immich.app
 LICENSE = GPLv3
 
@@ -32,7 +32,7 @@ SPK_COMMANDS = bin/immich-admin
 
 # immich-model is a git-only dependency (see machine-learning/uv.lock);
 # the wheel is prebuilt here (pinned rev) so no git binary is needed on DSM.
-IMMICH_MODEL_REV = 8bf3fd1b44b0c8608f52fb6e50ddff52826576d8
+IMMICH_MODEL_REV = a1eeff2c2118d76067efecf4cc4630998eac519a
 
 include ../../mk/spksrc.spk.mk
 
