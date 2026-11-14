@@ -1,6 +1,6 @@
 SPK_NAME = zabbix-agent
-SPK_VERS = 7.4.16
-SPK_REV = 2
+SPK_VERS = 8.0.0
+SPK_REV = 3
 SPK_ICON = src/zabbix.png
 
 DEPENDS = cross/zabbix-agent
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Monitor anything - networks, cloud, websites, IoT, and more. Zabbix Agent is a Zabbix daemon for monitoring of various server parameters.
 DISPLAY_NAME = Zabbix Agent
 
-CHANGELOG = "Update to v7.4.16."
+CHANGELOG = "Update to v8.0.0 (LTS)."
 
 HOMEPAGE = https://www.zabbix.com
 LICENSE  = AGPLv3

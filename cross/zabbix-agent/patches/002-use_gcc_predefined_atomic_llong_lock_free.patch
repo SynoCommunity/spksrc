@@ -1,0 +1,50 @@
+# GCC < 5 defines ATOMIC_LLONG_LOCK_FREE as a function-like expression that cannot be used in #if (DSM 6 and comcerto2k-7.1 toolchains).
+--- include/zbxcacheconfig.h.orig
++++ include/zbxcacheconfig.h
+@@ -1285,7 +1285,7 @@
+ typedef struct
+ {
+ 	/* without lockless uint64 atomics use zbx_uint64_t and always lock cache before accessing it */
+-#if ATOMIC_LLONG_LOCK_FREE == 2
++#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && __GCC_ATOMIC_LLONG_LOCK_FREE == 2
+ 	zbx_atomic_uint64_t	config;		/* configuration cache revision, increased every sync */
+ #else
+ 	zbx_uint64_t	config;
+--- src/libs/zbxcacheconfig/dbconfig_atomic.c.orig
++++ src/libs/zbxcacheconfig/dbconfig_atomic.c
+@@ -30,7 +30,7 @@
+ {
+ 	zbx_dc_config_t	*config = get_dc_config();
+ 
+-#if ATOMIC_LLONG_LOCK_FREE == 2
++#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && __GCC_ATOMIC_LLONG_LOCK_FREE == 2
+ 	atomic_store_explicit(&config->revision.config, revision, memory_order_release);
+ #else
+ 	config->revision.config = revision;
+@@ -52,7 +52,7 @@
+ 	zbx_dc_config_t	*config = get_dc_config();
+ 	zbx_uint64_t	revision;
+ 
+-#if ATOMIC_LLONG_LOCK_FREE == 2
++#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && __GCC_ATOMIC_LLONG_LOCK_FREE == 2
+ 	revision = atomic_load_explicit(&config->revision.config, memory_order_acquire);
+ #else
+ 	revision = config->revision.config;
+@@ -75,7 +75,7 @@
+ {
+ 	zbx_dc_config_t	*config = get_dc_config();
+ 
+-#if ATOMIC_LLONG_LOCK_FREE == 2
++#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && __GCC_ATOMIC_LLONG_LOCK_FREE == 2
+ 	revision->config = atomic_load_explicit(&config->revision.config, memory_order_acquire);
+ 
+ 	revision->expression = config->revision.expression;
+@@ -104,7 +104,7 @@
+ 	zbx_dc_config_t	*config = get_dc_config();
+ 	zbx_uint64_t	revision;
+ 
+-#if ATOMIC_LLONG_LOCK_FREE == 2
++#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && __GCC_ATOMIC_LLONG_LOCK_FREE == 2
+ 	revision = atomic_load_explicit(&config->revision.config, memory_order_acquire);
+ #else
+ 	RDLOCK_CACHE_CONFIG_HISTORY;
