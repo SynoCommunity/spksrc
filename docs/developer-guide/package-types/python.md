@@ -68,7 +68,10 @@ For every wheel that must be bundled, the framework:
    by the runtime virtualenv.
 
 Pure-python wheels are downloaded at install time instead of being bundled,
-unless `WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1` is set.
+unless `WHEELS_OFFLINE = 1` is set: the SPK then ships every wheel, and the
+installer runs pip with `--no-index`. The wheelhouse must hold the whole
+dependency set, including what the python package already provides, since
+`install_python_wheels` reinstalls with `--force-reinstall`.
 
 ## Creating a Python SPK
 
@@ -102,7 +105,7 @@ set before the `include`.
 | `WHEELS_CFLAGS` / `WHEELS_CPPFLAGS` / `WHEELS_CXXFLAGS` / `WHEELS_LDFLAGS` | Extra compiler/linker flags for C/C++ wheels |
 | `PYTHON_LIMITED_API` | Limited API tag for `requirements-abi3.txt` wheels (default `cp37`) |
 | `WHEEL_DEFAULT_PREFIX` | Type used for an unrecognized requirement filename (`crossenv` with `ARCH`, otherwise `pure`) |
-| `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` | Bundle pure-python wheels into the SPK instead of downloading them at install time |
+| `WHEELS_OFFLINE` | Bundle pure-python wheels into the SPK and install every wheel without an index |
 
 At the SPK level several wheels are built from the same variable, so the flag
 variables above accept a **per-wheel** `[name] flags` syntax — only the bracket
@@ -355,7 +358,7 @@ Check the wheel filenames on [PyPI](https://pypi.org/):
 
 ## Examples
 
-- [borgbackup](https://github.com/SynoCommunity/spksrc/tree/master/spk/borgbackup) — SPK with pure + crossenv requirement files, per-wheel `WHEELS_CFLAGS`, and `WHEELS_PURE_PYTHON_PACKAGING_ENABLE`
+- [borgbackup](https://github.com/SynoCommunity/spksrc/tree/master/spk/borgbackup) — SPK with pure + crossenv requirement files, per-wheel `WHEELS_CFLAGS`, and `WHEELS_OFFLINE`
 - [python314-wheels](https://github.com/SynoCommunity/spksrc/tree/master/spk/python314-wheels) — wheel testing package exercising many wheel types and `python/` dependencies
 
 ## See also
