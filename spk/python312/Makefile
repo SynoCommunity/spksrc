@@ -1,7 +1,7 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.13
+SPK_VERS = 3.12.16
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python3.png
 
 # Needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.$(subst python3,,$(SPK_NAME))
-CHANGELOG = "1. Update to Python 3.12.13"
+CHANGELOG = "1. Update to Python 3.12.16"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -23,8 +23,8 @@ LICENSE  = PSF
 # Force compiler LTO optimizations
 ENV += PYTHON_OPTIMIZE=1
 
-# Force building pure-python wheels
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+# Bundle every wheel and install offline
+WHEELS_OFFLINE = 1
 WHEELS = src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh

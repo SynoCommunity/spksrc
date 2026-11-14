@@ -42,9 +42,9 @@ PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
 
-# Enable pure-python packaging
-ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = FALSE
+# Bundle the pure-python wheels and install offline (--no-index)
+ifeq ($(strip $(WHEELS_OFFLINE)),)
+WHEELS_OFFLINE = FALSE
 WHEELS_2_DOWNLOAD = $(patsubst %$(WHEELS_PURE_PYTHON),,$(WHEELS))
 else
 WHEELS_2_DOWNLOAD = $(WHEELS)
