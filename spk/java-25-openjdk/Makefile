@@ -1,8 +1,8 @@
 SPK_NAME = java-25-openjdk
-JAVA_RELEASE = 9
-JAVA_VERSION = 25.0.3
-SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
-SPK_REV = 1
+JAVA_RELEASE = 1
+JAVA_VERSION = 25.0.5.0.3
+SPK_VERS = 25.0.5
+SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-25-openjdk
@@ -18,7 +18,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 25 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 25 OpenJDK
-CHANGELOG = "init package."
+CHANGELOG = "Update to v25.0.5.0.3+1 with October 2026 security fixes."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/25/
 LICENSE_FILE = src/LICENSE
@@ -30,7 +30,6 @@ SPK_COMMANDS += bin/javac
 SPK_COMMANDS += bin/javadoc
 SPK_COMMANDS += bin/javap
 SPK_COMMANDS += bin/jcmd
-SPK_COMMANDS += bin/jconsole
 SPK_COMMANDS += bin/jdb
 SPK_COMMANDS += bin/jdeprscan
 SPK_COMMANDS += bin/jdeps

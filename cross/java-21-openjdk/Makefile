@@ -1,8 +1,8 @@
 PKG_NAME = java-21-openjdk
 JAVA_REPO_NAME = jdk21u
 JAVA_NAME = jdk
-JAVA_RELEASE = 11
-JAVA_VERSION = 21.0.5
+JAVA_RELEASE = 1
+JAVA_VERSION = 21.0.13.0.3
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -45,8 +45,7 @@ LICENSE  = GPLv2 with the Classpath Exception
 MIN_GCC_VERSION = 6
 
 PRE_CONFIGURE_TARGET = java-21-openjdk_pre_configure
-PRE_COMPILE_TARGET = java-21-openjdk_pre_compile
-POST_INSTALL_TARGET = java-21-openjdk_post_install
+INSTALL_TARGET = java-21-openjdk_install
 
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-21/work-native/jdk-21
@@ -103,19 +102,22 @@ COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+# The PLIST names the install directory openjdk-@JAVA_VERSION@.
+PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
+
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # force cross compilation
 CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 
 # ABI profile for ARM builds:
 #   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 endif
 
 .PHONY: java-21-openjdk_pre_configure
@@ -123,13 +125,13 @@ java-21-openjdk_pre_configure:
 	@$(MSG) "- Make configure script executable"
 	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
 
-.PHONY: java-21-openjdk_pre_compile
-java-21-openjdk_pre_compile:
-	@$(MSG) "- Force openjdk to install into the package install folder"
-	@sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
-
-.PHONY: java-21-openjdk_post_install
-java-21-openjdk_post_install:
+# jdk21u has no install target since 21.0.13: copy the image, as java-25-openjdk does.
+JDK_IMAGE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/linux-*-server-release/images/jdk
+.PHONY: java-21-openjdk_install
+java-21-openjdk_install:
+	@$(MSG) "- Install jdk"
+	@mkdir -p $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/ $(STAGING_INSTALL_PREFIX)/bin
+	@cp -rpf $(JDK_IMAGE_DIR)/* $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@$(MSG) "- Link binaries into bin folder"
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
 	@$(MSG) "- Add license files"

@@ -13,7 +13,7 @@ Last-Update: 2024-05-02
 
 --- a/make/autoconf/flags-ldflags.m4
 +++ b/make/autoconf/flags-ldflags.m4
-@@ -133,7 +133,6 @@ AC_DEFUN([FLAGS_SETUP_LDFLAGS_HELPER],
+@@ -136,7 +136,6 @@ AC_DEFUN([FLAGS_SETUP_LDFLAGS_HELPER],
  
    # Setup LDFLAGS for linking executables
    if test "x$TOOLCHAIN_TYPE" = xgcc; then
