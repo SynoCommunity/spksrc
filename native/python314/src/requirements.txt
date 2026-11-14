@@ -1,4 +1,4 @@
 pip==24.3.1
-setuptools==82.0.1
-wheel==0.46.3
-crossenv==1.6.1
+setuptools==84.2.1
+wheel==0.48.0
+crossenv==1.6.2
