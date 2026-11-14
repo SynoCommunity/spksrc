@@ -136,7 +136,7 @@ install_python_wheels ()
     fi
 
     echo "Installed modules:"
-    pip3 freeze
+    pip3 freeze --all --no-cache-dir --disable-pip-version-check
 }
 
 
