@@ -62,7 +62,7 @@ endif
 	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
 	if [ "$(WHEEL_URL)" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
-	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \
+	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_OFFLINE)" = "1" ]; then \
 	   echo "WARNING: Skipping download - pure python packaging disabled" ; \
 	else \
 	   query="curl -s https://pypi.org/pypi/$(WHEEL_NAME)/json" ; \
