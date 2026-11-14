@@ -7,7 +7,7 @@ PYTHON_PACKAGE = python314
 SPK_DEPENDS = "ffmpeg8"
 
 WHEELS = src/requirements-pure.txt src/requirements-crossenv.txt
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_OFFLINE = 1
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Portable file server with resumable uploads, file sharing, and WebDAV.
