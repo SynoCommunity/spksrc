@@ -1,0 +1,129 @@
+--- Makefile.orig
++++ Makefile
+@@ -54,7 +54,7 @@
+ 			-DDEBUG_BUILD -DSQLITE_DEBUG -DSQLITE_MEMDEBUG \
+ 			-DSQLITE_ENABLE_EXPLAIN_COMMENTS -fsanitize-address-use-after-scope
+ else
+-	CFLAGS += -O2 --std=gnu2x
++	CFLAGS += -O2 -std=gnu11
+ endif
+ 
+ override CFLAGS += -D_FILE_OFFSET_BITS=64 -DVERSTRING=\"$(VERSION)\" \
+--- btrfs-util.c.orig
++++ btrfs-util.c
+@@ -31,6 +31,27 @@
+ #include <fcntl.h>
+ #include <uuid/uuid.h>
+ 
++// support older kernel headers:
++#ifndef BTRFS_FS_INFO_FLAG_METADATA_UUID
++#define BTRFS_FS_INFO_FLAG_METADATA_UUID (1ULL << 2)
++
++struct btrfs_ioctl_fs_info_args_extended {
++    __u64 max_id;
++    __u64 num_devices;
++    __u8 fsid[BTRFS_FSID_SIZE];
++    __u32 nodesize;
++    __u32 sectorsize;
++    __u32 clone_alignment;
++    __u16 csum_type;
++    __u16 csum_size;
++    __u64 flags;
++    __u64 generation;
++    __u8 metadata_uuid[BTRFS_FSID_SIZE];
++    __u8 reserved[944];
++};
++#define btrfs_ioctl_fs_info_args btrfs_ioctl_fs_info_args_extended
++#endif
++
+ #include "btrfs-util.h"
+ #include "debug.h"
+ #include "util.h"
+--- dbfile.c.orig
++++ dbfile.c
+@@ -1357,7 +1357,7 @@
+ }
+ 
+ static int iter_cb(void *priv, int argc, char **argv,
+-		char **column [[maybe_unused]])
++		char **column)
+ {
+ 	iter_files_func func = priv;
+ 
+--- filerec.c.orig
++++ filerec.c
+@@ -32,7 +32,7 @@
+ 
+ static GMutex filerec_fd_mutex;
+ struct list_head filerec_list;
+-static struct rb_root filerec_by_inum = RB_ROOT;
++static struct rb_root filerec_by_inum;
+ unsigned long long num_filerecs = 0ULL;
+ unsigned int dedupe_seq = 0;
+ 
+--- find_dupes.c.orig
++++ find_dupes.c
+@@ -455,7 +455,7 @@
+ 	struct results_tree *dupe_extents;
+ };
+ 
+-static void find_dupes_thread(struct cmp_ctxt *ctxt, void *priv [[maybe_unused]])
++static void find_dupes_thread(struct cmp_ctxt *ctxt, void *priv)
+ {
+ 
+ 	struct results_tree *dupe_extents = ctxt->dupe_extents;
+--- hash-tree.c.orig
++++ hash-tree.c
+@@ -163,7 +163,7 @@
+ 	free_file_hash_head(head);
+ }
+ 
+-static int cmp_blocks(void *priv [[maybe_unused]], struct list_head *a,
++static int cmp_blocks(void *priv, struct list_head *a,
+ 		struct list_head *b)
+ {
+ 	struct file_block *fba, *fbb;
+--- hashstats.c.orig
++++ hashstats.c
+@@ -118,8 +118,8 @@
+ 	}
+ }
+ 
+-static int print_files_cb(void *priv [[maybe_unused]], int argc,
+-		char **argv, char **column [[maybe_unused]])
++static int print_files_cb(void *priv, int argc,
++		char **argv, char **column)
+ {
+ 	int i;
+ 	for(i = 0; i < argc; i++)
+--- memstats.h.orig
++++ memstats.h
+@@ -32,7 +32,7 @@
+ #endif
+ static inline void increment_counters(unsigned long long *num_type,
+ 				      unsigned long long *max_type,
+-				      unsigned long long count, GMutex *mutex [[maybe_unused]])
++				      unsigned long long count, GMutex *mutex)
+ {
+ #ifdef	LOCK_MEMSTATS
+ 	g_mutex_lock(mutex);
+@@ -45,7 +45,7 @@
+ #endif
+ }
+ static inline void decrement_counters(unsigned long long *num_type,
+-				      GMutex *mutex [[maybe_unused]])
++				      GMutex *mutex)
+ {
+ #ifdef	LOCK_MEMSTATS
+ 	g_mutex_lock(mutex);
+--- util.c.orig
++++ util.c
+@@ -255,7 +255,7 @@
+ 	uint64_t sockets[64] = {0,}; /* supports up to 64 sockets with
+ 					64 cores per socket */
+ 
+-	FILE *fp = popen("lscpu -p", "r");
++	FILE *fp = popen("lscpu -p 2>/dev/null", "r");
+ 	if (fp == NULL) {
+ 		fprintf(stderr, "ERROR: Can't start lscpu\n");
+ 		return -EINVAL;

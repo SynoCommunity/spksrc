@@ -1,0 +1,3 @@
+bin:bin/btrfs-extent-same
+bin:bin/duperemove
+bin:bin/hashstats

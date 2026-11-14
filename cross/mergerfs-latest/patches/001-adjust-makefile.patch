@@ -1,0 +1,17 @@
+--- Makefile.orig
++++ Makefile
+@@ -39,13 +39,7 @@
+ 
+ DEFAULT_RELEASE := debian:13.amd64
+ 
+-ifndef GIT_REPO
+-ifneq ($(shell $(GIT) --version 2> /dev/null),)
+-ifeq  ($(shell test -e .git; echo $$?),0)
+-GIT_REPO = 1
+-endif
+-endif
+-endif
++GIT_REPO = 0
+ 
+ USE_XATTR ?= 1
+ UGID_USE_RWLOCK ?= 0

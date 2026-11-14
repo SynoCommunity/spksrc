@@ -30,6 +30,9 @@ The `synocli-disk` package provides some disk related tools to advanced Linux us
 | [mergerfs](https://trapexit.github.io/mergerfs/) | mergerfs is a FUSE based union filesystem geared towards simplifying storage and management of files across numerous commodity storage devices. It is similar to mhddfs, unionfs, and aufs. mergerfs must be run as `root`. | ISC |
 | [disktype](https://disktype.sourceforge.net/) | Detects the content format of a disk or disk image by checking for signatures of file systems, partition tables, and boot codes. | MIT |
 | [gpart](https://github.com/baruch/gpart) | Gpart is a small tool which tries to guess what partitions are on a PC type, MBR-partitioned hard disk in case the primary partition table was damaged. | GPLv2 |
+| [compsize](https://github.com/kilobyte/compsize) | Btrfs tool that reports the compression type and ratio of files. Requires root to query the Btrfs tree search ioctl. | GPLv2+ |
+| [duperemove](https://markfasheh.github.io/duperemove/duperemove.html) | Finds identical file extents on Btrfs and submits them for deduplication. Scanning works as a normal user; `-d` requires root. | GPLv2 |
+| [dysk](https://dystroy.org/dysk/) | A `df`-like utility that shows filesystem type, disk usage, free space, and mount points. | MIT |
 
 ### davfs2 - Mount WebDAV Shares
 

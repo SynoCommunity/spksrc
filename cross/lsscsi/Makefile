@@ -1,5 +1,5 @@
 PKG_NAME = lsscsi
-PKG_VERS = 0.32
+PKG_VERS = 0.33
 PKG_EXT = tar.gz
 PKG_DIST_NAME = r$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -13,5 +13,10 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --prefix="$(STAGING_INSTALL_PREFIX)"
 ADDITIONAL_CFLAGS = -O2
+PRE_CONFIGURE_TARGET = lsscsi_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: lsscsi_pre_configure
+lsscsi_pre_configure:
+	@$(RUN) autoreconf -i

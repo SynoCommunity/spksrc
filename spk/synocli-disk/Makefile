@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 4.1
-SPK_REV = 16
+SPK_VERS = 4.2
+SPK_REV = 17
 SPK_ICON = src/synocli-disk.png
 
 # ATTENTION: build order of dependent packages matters
@@ -30,20 +30,31 @@ $(call depend,cross/gpart,nop)
 $(call depend,cross/fuse3|cross/fuse,nop)
 $(call depend,cross/s3backer,nop)
 $(call depend,cross/dar,nop)
+$(call depend,cross/compsize,nop)
+$(call depend,cross/dysk,nop)
+$(call depend,cross/duperemove,nop)
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
-LICENSE  = Each tool is licensed under it\'s respective license.
+LICENSE  = Each tool is licensed under its respective license.
 
 DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Disk Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
-DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescue$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Update dar from v2.7.19 to v2.8.1 and add SFTP repository support. <br/>"
-CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
-CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5, qoriq and x86). <br/>"
-CHANGELOG += "4. Update duf from v0.8.1 to v0.9.1. <br/>"
-CHANGELOG += "5. Update s3backer from v2.1.5 to v2.1.6. <br/>"
+CHANGELOG  = "1. Update ntfs-3g_ntfsprogs to v2026.9.28. <br/>"
+CHANGELOG += "2. Update dar to v2.8.6. <br/>"
+CHANGELOG += "3. Update davfs2 to v1.7.3. <br/>"
+CHANGELOG += "4. Update e2fsprogs to v1.47.4. <br/>"
+CHANGELOG += "5. Update testdisk to v7.2. <br/>"
+CHANGELOG += "6. Update lsscsi to v0.33. <br/>"
+CHANGELOG += "7. Update ddrescue to v1.30. <br/>"
+CHANGELOG += "8. Update gdu to v5.39.0 (v5.32.0 on older kernels). <br/>"
+CHANGELOG += "9. Update mergerfs to v2.42.0 (v2.40.2 on older toolchains, including qoriq). <br/>"
+CHANGELOG += "10. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
+CHANGELOG += "11. Add compsize for inspecting Btrfs compression. <br/>"
+CHANGELOG += "12. Add duperemove 0.14.1 for deduplicating Btrfs files. <br/>"
+CHANGELOG += "13. Add dysk. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
@@ -128,4 +139,19 @@ endif
 ifneq ($(filter cross/dar,$(DEPENDS)),)
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
 SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
+endif
+
+ifneq ($(filter cross/compsize,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", compsize"
+SPK_COMMANDS += bin/compsize
+endif
+
+ifneq ($(filter cross/dysk,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dysk"
+SPK_COMMANDS += bin/dysk
+endif
+
+ifneq ($(filter cross/duperemove,$(DEPENDS)),)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", duperemove"
+SPK_COMMANDS += bin/duperemove bin/hashstats bin/btrfs-extent-same
 endif
