@@ -1,5 +1,6 @@
 # basic default wheels
-# ==> ensurepip installs its bundled pip offline, which then installs this one from the wheelhouse
+# ==> ensurepip installs its bundled pip offline,
+# ==> which then installs this one from the wheelhouse
 pip==26.3
 setuptools==84.2.1
 wheel==0.48.0
@@ -12,14 +13,15 @@ certifi
 # to create their local virtualenv
 # in order to install wheels within
 # their running environment
-# 21.11 and later build with hatchling's python-sbom hook, absent from the crossenv
+# 21.11 and later list python-sbom[hatch] in their build requirements, absent from
+# the crossenv: wheels build with --no-build-isolation ("Unknown build hook")
 virtualenv==21.10.0
 
 # Other mandatory wheels that
 # gets install by default as
 # basic dependencies of above
 distlib==0.4.4
-# 4.2.10 and later: the same python-sbom hook
+# 4.2.10 and later: python-sbom[hatch] too, as virtualenv above
 filelock==4.2.9
 packaging==26.3
 platformdirs==4.14.5
