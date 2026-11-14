@@ -183,9 +183,9 @@ ifneq ($(strip $(SERVICE_CERT)),)
 	@echo 'SERVICE_CERT="$(SERVICE_CERT)"' >> $@
 	@echo '' >> $@
 endif
-ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
-	@echo "# The wheelhouse ships the pure wheels too: install_python_wheels needs no index" >> $@
-	@echo 'WHEELHOUSE_COMPLETE=1' >> $@
+ifneq ($(filter 1 ON TRUE,$(WHEELS_OFFLINE)),)
+	@echo "# The wheelhouse ships every wheel: install_python_wheels runs pip with --no-index" >> $@
+	@echo 'WHEELS_OFFLINE=1' >> $@
 	@echo '' >> $@
 endif
 ifneq ($(STARTABLE),no)

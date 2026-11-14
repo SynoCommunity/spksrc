@@ -23,8 +23,8 @@ LICENSE  = PSF
 # Force compiler LTO optimizations
 ENV += PYTHON_OPTIMIZE=1
 
-# Force building pure-python wheels
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+# Bundle every wheel and install offline
+WHEELS_OFFLINE = 1
 WHEELS = src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh

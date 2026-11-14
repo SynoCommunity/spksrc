@@ -1,7 +1,6 @@
 # basic default wheels
-# ==> Always install latest version (service-setup.sh:install_python_virtualenv)
-# ==> We use module 'ensurepip' to install latest version included
-#pip==25.2
+# ==> ensurepip installs its bundled pip offline, which then installs this one from the wheelhouse
+pip==26.3
 setuptools==84.2.1
 wheel==0.48.0
 
