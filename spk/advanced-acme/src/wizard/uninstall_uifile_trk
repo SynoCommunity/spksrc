@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Advanced ACME'yi kaldır",
+    "items": [
+      {
+        "desc": "DSM'ye yüklenen sertifikalar kalır ancak artık yenilenmez. Verileri silerseniz Advanced ACME tarafından oluşturulan “advanced-acme” DSM kullanıcısı da kaldırılır."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Advanced ACME'nin kayıtlı erişim bilgilerini ve sertifika verilerini sil (DSM hesabı, DNS anahtarları, ACME hesapları)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

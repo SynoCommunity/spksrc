@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Afinstaller Advanced ACME",
+    "items": [
+      {
+        "desc": "Certifikaterne, der er installeret i DSM, bliver, men fornyes ikke længere. Hvis du sletter dataene, fjernes også DSM-brugeren »advanced-acme«, som Advanced ACME har oprettet."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Slet gemte adgangsoplysninger og certifikatdata for Advanced ACME (DSM-konto, DNS-nøgler, ACME-konti)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]
