@@ -107,20 +107,23 @@ include ../../mk/spksrc.cross-cc.mk
 # The PLIST names the install directory openjdk-@JAVA_VERSION@.
 PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
 
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # force cross compilation
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+endif
 
 # ABI profile for ARM builds:
 #   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
-else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+endif
+
 # No --with-abi-profile=arm-vfp-hflt: it adds -mthumb, and the 3.2 kernels resume a Thumb-2
 # VFP instruction trapped on a subnormal 2 bytes short (Armada 370, VFPv3-D16), so the VM
 # crashed at start. java-17 builds without it, ARM mode and hard float, and runs there.
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 endif
 
