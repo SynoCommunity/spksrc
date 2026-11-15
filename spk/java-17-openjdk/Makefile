@@ -47,5 +47,9 @@ SPK_COMMANDS += bin/jstatd
 SPK_COMMANDS += bin/keytool
 SPK_COMMANDS += bin/rmiregistry
 SPK_COMMANDS += bin/serialver
+# named for this version: the unversioned ones go to the JDK started last
+SPK_COMMANDS += bin/java17
+SPK_COMMANDS += bin/javac17
+SPK_COMMANDS += bin/jar17
 
 include ../../mk/spksrc.spk.mk

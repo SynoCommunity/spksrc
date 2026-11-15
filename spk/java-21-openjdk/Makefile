@@ -46,5 +46,9 @@ SPK_COMMANDS += bin/jwebserver
 SPK_COMMANDS += bin/keytool
 SPK_COMMANDS += bin/rmiregistry
 SPK_COMMANDS += bin/serialver
+# named for this version: the unversioned ones go to the JDK started last
+SPK_COMMANDS += bin/java21
+SPK_COMMANDS += bin/javac21
+SPK_COMMANDS += bin/jar21
 
 include ../../mk/spksrc.spk.mk
