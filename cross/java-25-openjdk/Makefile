@@ -125,9 +125,9 @@ PLIST_TRANSFORM += -e '/jmods\/jdk.internal.vm.ci/d' -e '/jmods\/jdk.graal.compi
 # no serviceability agent (jhsdb) on Zero
 PLIST_TRANSFORM += -e '/bin\/jhsdb/d' -e '/lib\/libsaproc/d' -e '/jmods\/jdk.hotspot.agent/d'
 
-ifneq ($(filter $(ARCH),$(ARMv7_ARCHS)),)
-CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
-endif
+# No --with-abi-profile on ARMv7: its arm-vfp-hflt adds -mthumb, and the 3.2 kernels resume a
+# Thumb-2 VFP instruction trapped on a subnormal 2 bytes short (Armada 370, VFPv3-D16), which
+# crashes libjvm at its first dlopen. The toolchain's default, ARM mode and hard float, is kept.
 
 ifneq ($(filter $(ARCH),$(i686_ARCHS)),)
 CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
