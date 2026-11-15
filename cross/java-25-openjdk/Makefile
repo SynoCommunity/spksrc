@@ -9,10 +9,9 @@ PKG_DIST_NAME  = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE  = https://github.com/openjdk/jdk25u/archive
 PKG_DIR        = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
-# gcc < 10.0 is not officially supported
-# DSM 7.1 toolchain: WARNING: You are using gcc 8.5.0 which is older than 10.0. This is not a supported configuration.
-REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_DSM = 1.3
+# configure: "WARNING: You are using gcc 8.5.0 which is older than 10.0. This is not a
+# supported configuration." (the DSM 7.1 toolchains; DSM 7.2 has gcc 12.2)
+MIN_GCC_VERSION = 10
 # Java 25 does not support 32 bit architectures
 # if we really want it, we could try the debian patches for 32-bit support
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
