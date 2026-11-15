@@ -122,6 +122,8 @@ CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 PLIST_TRANSFORM += -e 's%lib/server/%lib/zero/%' -e '/lib\/zero\/classes/d'
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/libsleef/d'
 PLIST_TRANSFORM += -e '/jmods\/jdk.internal.vm.ci/d' -e '/jmods\/jdk.graal.compiler/d'
+# no serviceability agent (jhsdb) on Zero
+PLIST_TRANSFORM += -e '/bin\/jhsdb/d' -e '/lib\/libsaproc/d' -e '/jmods\/jdk.hotspot.agent/d'
 
 ifneq ($(filter $(ARCH),$(ARMv7_ARCHS)),)
 CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt

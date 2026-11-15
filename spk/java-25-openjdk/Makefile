@@ -7,6 +7,8 @@ SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-25-openjdk
 
+include ../../mk/spksrc.common.mk
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 25 is the open-source reference implementation of version 25 of the Java SE Platform as specified by JSR 400 in the Java Community Process.
 
@@ -28,7 +30,10 @@ SPK_COMMANDS += bin/jdb
 SPK_COMMANDS += bin/jdeprscan
 SPK_COMMANDS += bin/jdeps
 SPK_COMMANDS += bin/jfr
+ifeq ($(filter $(ARCH),$(32bit_ARCHS)),)
+# Zero, the 32-bit VM, has no serviceability agent
 SPK_COMMANDS += bin/jhsdb
+endif
 SPK_COMMANDS += bin/jimage
 SPK_COMMANDS += bin/jinfo
 SPK_COMMANDS += bin/jlink
