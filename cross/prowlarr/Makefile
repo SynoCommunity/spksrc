@@ -25,6 +25,12 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
+# No Prowlarr build is published for the other archs.
+ifeq ($(PKG_DIST_ARCH),)
+UNSUPPORTED_ARCHS += $(ARCH)
+UNSUPPORTED_ARCHS_REASON = no Prowlarr build is published for this arch
+endif
+
 include ../../mk/spksrc.cross-install.mk
 
 .PHONY: prowlarr_install

@@ -7,6 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# CLOCK_MONOTONIC_RAW (bits/time.h): glibc 2.12.
+MIN_GLIBC_VERSION = 2.12
+
 HOMEPAGE = https://www.alsa-project.org/
 COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system.
 LICENSE  = LGPLv2.1

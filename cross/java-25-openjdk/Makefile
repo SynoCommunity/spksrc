@@ -1,8 +1,8 @@
 PKG_NAME       = java-25-openjdk
 JAVA_REPO_NAME = jdk25u
 JAVA_NAME      = jdk
-JAVA_RELEASE   = 9
-JAVA_VERSION   = 25.0.3
+JAVA_RELEASE   = 1
+JAVA_VERSION   = 25.0.5.0.3
 PKG_VERS       = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT        = tar.gz
 PKG_DIST_NAME  = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -103,13 +103,16 @@ COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+# The PLIST names the install directory openjdk-@JAVA_VERSION@.
+PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
+
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
 # remove targets not created for aarch64
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/server\/classes/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/server\/classes/d'
 else
 # remove targets not created for x64
-PLIST_TRANSFORM = sed -e '/lib\/libsleef/d'
+PLIST_TRANSFORM += -e '/lib\/libsleef/d'
 endif
 
 .PHONY: java-25-openjdk_pre_configure

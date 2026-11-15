@@ -100,9 +100,12 @@ COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+# The PLIST names the install directory openjdk-@JAVA_VERSION@.
+PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
+
 ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # "Intel Short Vector Math Library (SVML)" is built for x64 only
-PLIST_TRANSFORM = sed -e '/lib\/libjsvml.so/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml.so/d'
 endif
 
 .PHONY: java-17-openjdk_pre_configure

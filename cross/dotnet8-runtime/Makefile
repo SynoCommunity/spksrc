@@ -20,8 +20,10 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
+# No .NET runtime build is published for the other archs.
 ifeq ($(PKG_DIST_ARCH),)
-$(error Unsupported ARCH $(ARCH))
+UNSUPPORTED_ARCHS += $(ARCH)
+UNSUPPORTED_ARCHS_REASON = no .NET runtime build is published for this arch
 endif
 
 HOMEPAGE = https://dotnet.microsoft.com/

@@ -29,4 +29,10 @@ LICENSE  = GPLv2
 # source is extracted directly to the install folder
 INSTALL_TARGET = nop
 
+# No Ombi build is published for the other archs.
+ifeq ($(PKG_DIST_ARCH),)
+UNSUPPORTED_ARCHS += $(ARCH)
+UNSUPPORTED_ARCHS_REASON = no Ombi build is published for this arch
+endif
+
 include ../../mk/spksrc.cross-install.mk
