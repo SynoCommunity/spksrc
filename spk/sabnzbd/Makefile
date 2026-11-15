@@ -23,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Fix a crash on access to the web interface on Armada 370 and Armada XP models (DS115j, DS213j, ...): the Rust modules (orjson, cryptography) are rebuilt with Rust 1.100."
+CHANGELOG = "1. Fix a crash on access to the web interface on Armada 370 and Armada XP models (DS115j, DS213j, ...): the Rust modules (orjson, cryptography) are rebuilt with Rust 1.100. <br/>2. Update unrar to 7.3.2 (6.2.12 where the toolchain is older than gcc 5)."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
