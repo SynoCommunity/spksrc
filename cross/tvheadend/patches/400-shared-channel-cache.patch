@@ -6,7 +6,7 @@ channel change, a DVR-driven cache warmup, and our fixes on top.
 
 tvheadend/tvheadend#2249, the whole of it: the 29 commits of th0ma7/tvheadend
 branch record-from-buffer, rebased onto the package base as
-941d132fd..415f464ad.
+15068a978..5aa7f19c5.
 
 Patch 300 is gone: #2206, the stable stream/PID mapping 400 used to sit on, is
 upstream as of this base.  `git rebase` dropped its three commits on its own,
@@ -2334,7 +2334,7 @@ only the branch logic comes from #2249.  See 200-upstream-prs-HOWTO.txt.
  
 --- src/parsers/message.c.orig
 +++ src/parsers/message.c
-@@ -370,20 +370,38 @@
+@@ -373,20 +373,38 @@
  /**
   * Parser create
   */

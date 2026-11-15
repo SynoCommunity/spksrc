@@ -10,10 +10,11 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master 941d132fd (Nov 1st 2026).  100 is the diff
-941d132fd..1d4a5bc8e -- uknunknown's dev_transcoding_2026 head, which he has
-now rebased onto that same master, so for the first time the patch is a plain
-diff from the package base and nothing straddles two bases (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
+Package base: master 15068a978 (Nov 15th 2026).  100 is the diff
+88b1293e6..dbffe9fb3 -- uknunknown's dev_transcoding_2026 head.  He rebases
+now, but on his own schedule: 88b1293e6 is one commit behind this base, and
+that commit touches only src/parsers/message.c, which this patch does not,
+so the diff applies to the tarball unchanged (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
 547f8bfae, 601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  Regenerate
 whenever his head moves, and note that he force-pushes -- a plain
 `git fetch` is then rejected as non-fast-forward, so fetch with +refs or -f.
