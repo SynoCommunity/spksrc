@@ -48,8 +48,10 @@ Each package links all its JDK commands into `/usr/local/bin` (`java`, `javac`, 
 | Java 25 | `java25`, `javac25`, `jar25` |
 
 When several versions are installed, the unversioned commands (`java`, `javac`, ...) belong to the package
-DSM **started last**. Use the versioned commands, or a `JAVA_HOME` (below), to get a given version whatever
-the start order:
+DSM **started last**: usually the one installed or updated last, since Package Center starts a package after
+installing it, but a restart changes it. Stopping any of the JDK packages also removes the unversioned
+commands, even when they pointed to another version, until a JDK is started again. Use the versioned
+commands, or a `JAVA_HOME` (below), to get a given version whatever the start order:
 
 ```bash
 java -version      # the JDK started last
@@ -100,10 +102,11 @@ than on a 64-bit NAS, by one to two orders of magnitude.
 
 ## Troubleshooting
 
-### `java` runs the wrong version
+### `java` runs the wrong version, or is missing
 
-The unversioned commands follow the package started last. Use `java17`, `java21` or `java25`, or set
-`JAVA_HOME` as shown above.
+The unversioned commands follow the package started last, and stopping a JDK package removes them. Use
+`java17`, `java21` or `java25`, or set `JAVA_HOME` as shown above; or start again, in Package Center, the
+version that should own `java`.
 
 ### `java: command not found` after installing from the command line
 
