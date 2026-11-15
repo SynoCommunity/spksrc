@@ -18,7 +18,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 25 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 25 OpenJDK
-CHANGELOG = "Update to v25.0.5.0.3+1 with October 2026 security fixes."
+CHANGELOG = "1. Update to v25.0.5.0.3+1 with October 2026 security fixes.<br/>2. Add the DejaVu fonts, so that Java can render text: DSM ships no font."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/25/
 LICENSE_FILE = src/LICENSE

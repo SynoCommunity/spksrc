@@ -4,7 +4,7 @@ JAVA_NAME = jdk
 JAVA_RELEASE = 1
 JAVA_VERSION = 17.0.21.0.3
 SPK_VERS = 17.0.21
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-17-openjdk
@@ -14,7 +14,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 17 OpenJDK
-CHANGELOG = "Update to v17.0.21.0.3+1 with October 2026 security fixes."
+CHANGELOG = "Add the DejaVu fonts, so that Java can render text: DSM ships no font."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 LICENSE_FILE = src/LICENSE

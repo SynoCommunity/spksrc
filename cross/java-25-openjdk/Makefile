@@ -33,6 +33,8 @@ BUILD_DEPENDS += cross/libXt
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
 DEPENDS += cross/fontconfig
+# a font for AWT text: DSM has none, and fontconfig finds it through etc/fonts/conf.d
+DEPENDS += cross/dejavu
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
@@ -132,3 +134,9 @@ java-25-openjdk_install:
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@$(MSG) "- Point fontconfig at the bundled DejaVu fonts"
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d
+	@printf '%s\n' '<?xml version="1.0"?>' '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">' '<fontconfig>' \
+	  '  <dir>$(INSTALL_PREFIX)/share/dejavu/fonts</dir>' \
+	  '  <include ignore_missing="yes">$(INSTALL_PREFIX)/share/dejavu/fontconfig</include>' \
+	  '</fontconfig>' > $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d/60-dejavu.conf

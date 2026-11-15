@@ -166,3 +166,4 @@ rsc:jvm/openjdk-@JAVA_VERSION@/release
 rsc:jvm/openjdk-@JAVA_VERSION@/LICENSE
 rsc:jvm/openjdk-@JAVA_VERSION@/ADDITIONAL_LICENSE_INFO
 rsc:jvm/openjdk-@JAVA_VERSION@/ASSEMBLY_EXCEPTION
+rsc:etc/fonts/conf.d/60-dejavu.conf
