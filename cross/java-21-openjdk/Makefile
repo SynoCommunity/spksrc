@@ -118,7 +118,9 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
+# No --with-abi-profile=arm-vfp-hflt: it adds -mthumb, and the 3.2 kernels resume a Thumb-2
+# VFP instruction trapped on a subnormal 2 bytes short (Armada 370, VFPv3-D16), so the VM
+# crashed at start. java-17 builds without it, ARM mode and hard float, and runs there.
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 endif
 
