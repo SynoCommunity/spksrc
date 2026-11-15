@@ -87,7 +87,8 @@ tvh_extra_install:
 	install -m 755 src/tv_postremove_cleanup.sh $(STAGING_DIR)/bin/tv_postremove_cleanup.sh
 
 .PHONY: tvh_post_service
+# The installed package name, not the spk directory: spk/ffmpeg4 installs as "ffmpeg".
 tvh_post_service:
 	sed -i -e 's/_PYTHON_PACKAGE_/$(PYTHON_PACKAGE)/g' \
-	       -e 's/_FFMPEG_PACKAGE_/$(FFMPEG_PACKAGE)/g' \
+	       -e 's/_FFMPEG_PACKAGE_/$(or $(FFMPEG_SPK_NAME),$(FFMPEG_PACKAGE))/g' \
 	           $(WORK_DIR)/scripts/service-setup
