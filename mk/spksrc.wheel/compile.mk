@@ -54,7 +54,7 @@ ifeq ($(wildcard $(WHEELHOUSE)),)
 	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
 	@mkdir -p $(WHEELHOUSE)
 endif
-ifneq ($(or $(filter-out pure,$(WHEEL_TYPE)),$(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE))),)
+ifneq ($(or $(filter-out pure,$(WHEEL_TYPE)),$(filter 1 ON TRUE,$(WHEELS_OFFLINE))),)
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 endif
@@ -86,13 +86,13 @@ ifneq ($(WHEEL_TYPE),pure)
 	   PIP_GLOBAL_OPTION="$${global_options}" \
 	   $(MAKE) --no-print-directory \
 	   cross-compile-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
-else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+else ifneq ($(filter 1 ON TRUE,$(WHEELS_OFFLINE)),)
 	@REQUIREMENT=$(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) \
 	   WHEEL_NAME=$(WHEEL_NAME) \
 	   WHEEL_VERSION=$(WHEEL_VERSION) \
 	   $(MAKE) --no-print-directory \
 	   pure-build-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
-else ifeq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+else ifeq ($(filter 1 ON TRUE,$(WHEELS_OFFLINE)),)
 	@echo "WARNING: Skipping building pure Python wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] - pure python packaging disabled"
 else
 	$(error No wheel to process)

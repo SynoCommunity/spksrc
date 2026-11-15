@@ -99,7 +99,7 @@ install_python_wheel:
 					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
 				fi ; \
 				$(MSG) "Copying to wheelhouse: $${w} -> share/wheelhouse/$${_new_name}" ; \
-				cp -f $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
+				install -m 0644 $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
 			done ; \
 		fi ; \
 	fi

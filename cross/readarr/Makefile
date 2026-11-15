@@ -27,6 +27,12 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
+# No Readarr build is published for the other archs.
+ifeq ($(PKG_DIST_ARCH),)
+UNSUPPORTED_ARCHS += $(ARCH)
+UNSUPPORTED_ARCHS_REASON = no Readarr build is published for this arch
+endif
+
 include ../../mk/spksrc.cross-install.mk
 
 .PHONY: readarr_install

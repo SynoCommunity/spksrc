@@ -122,6 +122,7 @@ install_python_wheels ()
     if [ -s ${requirements} ]; then
        echo "Install packages from wheels [${requirements}]"
        pip3 install $([ $# -gt 0 ] && echo $*) \
+                   $([ "${WHEELS_OFFLINE}" = "1" ] && echo --no-index) \
                    --disable-pip-version-check \
                    --force-reinstall \
                    --cache-dir ${cachedir} \
@@ -135,7 +136,7 @@ install_python_wheels ()
     fi
 
     echo "Installed modules:"
-    pip3 freeze
+    pip3 freeze --all --no-cache-dir --disable-pip-version-check
 }
 
 

@@ -126,6 +126,26 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 14th 2026 — A python spk that ships every wheel installs them without an index (#7770)"
+
+    - **What:** `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` becomes **`WHEELS_OFFLINE`**. Set to
+      `1`, the spk bundles its pure-python wheels as before, and its generated
+      `service-setup` carries `WHEELS_OFFLINE=1`, on which `install_python_wheels` adds
+      `--no-index`: the postinst no longer queries PyPI.
+    - **The wheelhouse must hold the whole dependency set**, including what the python
+      package already provides: `install_python_wheels` passes `--force-reinstall`, so pip
+      looks for those in the wheelhouse too. borgbackup gains `certifi`, `packaging` and
+      `six` for it.
+    - **pip comes from the wheelhouse.** `ensurepip` installs the pip bundled with CPython,
+      offline; a `pip==` pin in `requirements-pure.txt` then replaces it from the wheelhouse
+      (26.3 in python311 and python312).
+    - **The wheelhouse is readable**: wheels are copied with `install -m 0644`. Those built
+      by `flit_core` (`packaging`, `wheel`) came out `0600`.
+    - **Why:** python311 and python312 lacked `packaging`, which `wheel` requires, and
+      installed only because pip fell back on PyPI. Offline, a missing wheel shows at the
+      first install instead of being fetched silently.
+    - **PR:** [#7770](https://github.com/SynoCommunity/spksrc/pull/7770)
+
 ??? note "November 11th 2026 — The overlay producers: gcc 8.5, binutils 2.30 and rust, profile-guided (#7707)"
 
     - **What:** the producers of the overlay archives that master downloads since
