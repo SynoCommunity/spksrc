@@ -37,6 +37,7 @@ CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding 
 CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP timeshift and keep tuned channels \(TVH-\#2249\)<br/>"
 CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 CHANGELOG += "5. Intel Quick Sync Video (QSV) with MediaSDK or oneVPL, on DSM 6 too<br/>"
+CHANGELOG += "6. Fix the FFmpeg 4 dependency on the archs that use it (DSM 6.2, ARMv5, ...): the package is \"ffmpeg\", not \"ffmpeg4\" \(\#7719\)<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/
