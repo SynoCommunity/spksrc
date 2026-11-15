@@ -1,8 +1,8 @@
 diff --git .github/workflows/build-ci.yml .github/workflows/build-ci.yml
-index 66b1a3532..1b5392e4c 100644
+index bbffd2221..8f65b348d 100644
 --- .github/workflows/build-ci.yml
 +++ .github/workflows/build-ci.yml
-@@ -346,7 +346,7 @@ jobs:
+@@ -352,7 +352,7 @@ jobs:
            export STATICLIB_CACHE="$PWD/.staticlib"
            export VUE_FILE_CACHE="$PWD/.vuecache"
            export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
@@ -12,10 +12,10 @@ index 66b1a3532..1b5392e4c 100644
          run: cp rpm/RPMS/*/tvheadend*.rpm .
        - uses: actions/upload-artifact@v4
 diff --git .github/workflows/build-cloudsmith.yml .github/workflows/build-cloudsmith.yml
-index 569975884..4a7261bff 100644
+index fd25ba7a4..b43338d1c 100644
 --- .github/workflows/build-cloudsmith.yml
 +++ .github/workflows/build-cloudsmith.yml
-@@ -362,7 +362,7 @@ jobs:
+@@ -368,7 +368,7 @@ jobs:
            export STATICLIB_CACHE="$PWD/.staticlib"
            export VUE_FILE_CACHE="$PWD/.vuecache"
            export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
@@ -88,7 +88,7 @@ index 6f57b14f0..5e6a6f0ac 100644
  
  # libav
 diff --git Makefile.ffmpeg Makefile.ffmpeg
-index 635b64282..13703ba5b 100644
+index d0cb5356f..4b30a5cdc 100644
 --- Makefile.ffmpeg
 +++ Makefile.ffmpeg
 @@ -36,12 +36,13 @@ EXTLIBS        =
@@ -180,8 +180,8 @@ index 635b64282..13703ba5b 100644
 +
 +ifeq (yes,$(CONFIG_QSV))
 +
-+# libvpl was introduced in ffmpeg6
-+ifeq ($(CONFIG_FFMPEG_VER),5)
++# libvpl was introduced in ffmpeg6; libmfx where configure settled on it
++ifeq ($(CONFIG_QSV_LIBMFX),yes)
 +EXTLIBS  += libmfx
 +else
 +EXTLIBS  += libvpl
@@ -227,7 +227,7 @@ index 635b64282..13703ba5b 100644
  		$(foreach encoder,$(ENCODERS),--enable-encoder=$(encoder)) \
  		$(foreach demuxer,$(DEMUXERS),--enable-demuxer=$(demuxer)) \
 diff --git configure configure
-index 38cc76c9b..83cb5f3c6 100755
+index 38cc76c9b..16911fd9f 100755
 --- configure
 +++ configure
 @@ -57,8 +57,10 @@ OPTIONS=(
@@ -268,7 +268,7 @@ index 38cc76c9b..83cb5f3c6 100755
      gzip)
        eval "$(toupper ${opt}CMD)=\"$val\""
        ;;
-@@ -782,6 +797,34 @@ if enabled_or_auto vaapi; then
+@@ -782,6 +797,36 @@ if enabled_or_auto vaapi; then
    fi
  fi
  
@@ -276,16 +276,18 @@ index 38cc76c9b..83cb5f3c6 100755
 +# qsv
 +#
 +if enabled_or_auto qsv; then
-+  if [ "${CONFIG_FFMPEG_VER:-8}" = "5" ]; then
-+    qsv_pkg="libmfx"; qsv_ver=">=1.28"
-+  else
-+    qsv_pkg="vpl"; qsv_ver=">=2.0"
-+  fi
-+  if check_pkg $qsv_pkg "$qsv_ver"; then
++  # oneVPL from ffmpeg 6; the legacy MediaSDK (libmfx) for ffmpeg 5, and wherever
++  # oneVPL is missing: ffmpeg 6 to 8 still build with --enable-libmfx, and it is
++  # what drives QSV on the Gen6 to Gen11 GPUs
++  if [ "${CONFIG_FFMPEG_VER:-8}" != "5" ] && check_pkg vpl ">=2.0"; then
 +    enable qsv
 +    enable hwaccels
++  elif check_pkg libmfx ">=1.28"; then
++    enable qsv
++    enable qsv_libmfx
++    enable hwaccels
 +  elif enabled qsv; then
-+    die "Intel Quick Sync Video: $qsv_pkg not found (required for ffmpeg ${CONFIG_FFMPEG_VER:-8})"
++    die "Intel Quick Sync Video: neither vpl >= 2.0 nor libmfx >= 1.28 found"
 +  fi
 +fi
 +
@@ -303,7 +305,7 @@ index 38cc76c9b..83cb5f3c6 100755
  #
  # Inotify
  #
-@@ -904,6 +947,7 @@ fi
+@@ -904,6 +949,7 @@ fi
  
  # Write config
  write_config
@@ -649,10 +651,10 @@ index 3f62e5b0d..80d65eb0e 100644
  #endif
      {
 diff --git src/dvr/dvr_rec.c src/dvr/dvr_rec.c
-index 458954961..5c4b4163c 100644
+index 9597fc0aa..d2679a5d3 100644
 --- src/dvr/dvr_rec.c
 +++ src/dvr/dvr_rec.c
-@@ -1499,7 +1499,7 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
+@@ -1501,7 +1501,7 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
  
        htsmsg_add_u32(e, "width",      ssc->es_width);
        htsmsg_add_u32(e, "height",     ssc->es_height);
@@ -701,10 +703,10 @@ index 592a6933d..b7a0e749b 100644
    char es_lang[4];           /* ISO 639 2B 3-letter language code */
    uint8_t es_audio_type;     /* Audio type */
 diff --git src/htsp_server.c src/htsp_server.c
-index 2837efd3b..fefd5e596 100644
+index 4efa3fdcf..a95b664b9 100644
 --- src/htsp_server.c
 +++ src/htsp_server.c
-@@ -4199,7 +4199,7 @@ htsp_stream_deliver(htsp_subscription_t *hs, th_pkt_t *pkt)
+@@ -4222,7 +4222,7 @@ htsp_stream_deliver(htsp_subscription_t *hs, th_pkt_t *pkt)
      htsmsg_add_s64(m, "dts", dts);
    }
  
@@ -713,7 +715,7 @@ index 2837efd3b..fefd5e596 100644
    htsmsg_add_u32(m, "duration", dur);
  
    /**
-@@ -4323,7 +4323,7 @@ htsp_subscription_start(htsp_subscription_t *hs, const streaming_start_t *ss)
+@@ -4346,7 +4346,7 @@ htsp_subscription_start(htsp_subscription_t *hs, const streaming_start_t *ss)
        if(ssc->es_height)
          htsmsg_add_u32(c, "height", ssc->es_height);
        if(ssc->es_frame_duration)
@@ -3167,10 +3169,10 @@ index c65301666..34062d0ba 100644
  
      htsmsg_add_msg(list, NULL, sub);
 diff --git src/timeshift.c src/timeshift.c
-index be5655318..10009262e 100644
+index 7ce8873b6..231837e21 100644
 --- src/timeshift.c
 +++ src/timeshift.c
-@@ -51,7 +51,7 @@ timeshift_packet_log0
+@@ -63,7 +63,7 @@ timeshift_packet_log0
    th_pkt_t *pkt = sm->sm_data;
    tvhtrace(LS_TIMESHIFT,
             "ts %d pkt %s - stream %d type %c pts %10"PRId64
@@ -7403,10 +7405,10 @@ index 2e1dff444..9687e5574 100644
      return -1;
  }
 diff --git src/transcoding/codec/profile_audio_class.c src/transcoding/codec/profile_audio_class.c
-index 8896d26ed..cf599848d 100644
+index 8896d26ed..a66d121b9 100644
 --- src/transcoding/codec/profile_audio_class.c
 +++ src/transcoding/codec/profile_audio_class.c
-@@ -24,6 +24,17 @@
+@@ -24,6 +24,16 @@
  
  /* TVHCodec ================================================================= */
  
@@ -7414,9 +7416,8 @@ index 8896d26ed..cf599848d 100644
 +tvh_codec_audio_get_asetpts( void *o, const char *lang )
 +{
 +    static const struct strtab tab[] = {
-+        { N_("auto"),       0 },
++        { N_("disabled"),   0 },
 +        { N_("enabled"),    1 },
-+        { N_("disabled"),   2 },
 +    };
 +    return strtab2htsmsg(tab, 1, lang);
 +}
@@ -7424,7 +7425,7 @@ index 8896d26ed..cf599848d 100644
  static htsmsg_t *
  tvh_codec_audio_get_list_sample_fmts(TVHAudioCodec *self)
  {
-@@ -360,6 +371,18 @@ const codec_profile_class_t codec_profile_audio_class = {
+@@ -360,6 +370,18 @@ const codec_profile_class_t codec_profile_audio_class = {
                  .list     = codec_profile_audio_class_channel_layout_list,
                  .def.s64  = 0,
              },
@@ -7432,7 +7433,7 @@ index 8896d26ed..cf599848d 100644
 +                .type     = PT_INT,
 +                .id       = "asetpts",
 +                .name     = N_("Normalizes PTS"),
-+                .desc     = N_("Normalizes PTS on the audio link (sample rate / time base) by counting samples. [asetpts=N/SR/TB]"),
++                .desc     = N_("Normalizes PTS on the audio link (sample rate / time base) by counting samples. [asetpts=N/SR/TB] \n Use only as a last resort, because might generate audio/video desynchronization."),
 +                .group    = 4,
 +                .opts     = PO_ADVANCED,
 +                .get_opts = codec_profile_class_get_opts,
@@ -7613,7 +7614,7 @@ index 69c167896..99432f62e 100644
  error_open_display:
      va_close_display_drm(va_dpy);
 diff --git src/transcoding/transcode/audio.c src/transcoding/transcode/audio.c
-index 6c6119877..5077d9ddd 100644
+index 6c6119877..7982b1488 100644
 --- src/transcoding/transcode/audio.c
 +++ src/transcoding/transcode/audio.c
 @@ -19,6 +19,7 @@
@@ -7624,30 +7625,10 @@ index 6c6119877..5077d9ddd 100644
  
  
  static enum AVSampleFormat
-@@ -80,6 +81,166 @@ _audio_context_sample_rate(TVHContext *self, AVDictionary **opts)
+@@ -80,6 +81,120 @@ _audio_context_sample_rate(TVHContext *self, AVDictionary **opts)
  
  
  #if LIBAVCODEC_VERSION_MAJOR > 59
-+static int
-+_audio_encoder_frame_size(TVHContext *self)
-+{
-+    const char *name;
-+    if (!self->oavctx->codec ||
-+        (self->oavctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE))
-+        return 0;
-+    if (self->oavctx->frame_size > 0)
-+        return self->oavctx->frame_size;
-+    /* OPEN_FILTERS runs before avcodec_open2(); use known fixed frame sizes. */
-+    name = self->oavctx->codec->name;
-+    if (!name)
-+        return 0;
-+    if (!strcmp(name, "aac") || !strcmp(name, "libfdk_aac"))
-+        return 1024;
-+    if (!strcmp(name, "mp2"))
-+        return 1152;
-+    return 0;
-+}
-+
 +static int
 +_audio_ch_layout_differs(TVHContext *self)
 +{
@@ -7661,41 +7642,15 @@ index 6c6119877..5077d9ddd 100644
 +}
 +
 +static int
-+_audio_needs_reframe_asetpts(TVHContext *self)
-+{
-+    int out_fs = _audio_encoder_frame_size(self);
-+    int in_fs  = self->iavctx->frame_size;
-+    if (out_fs <= 0)
-+        return 0;
-+    if (in_fs <= 0)
-+        return 1;
-+    return in_fs != out_fs;
-+}
-+
-+static int
-+_audio_needs_timebase_asetpts(TVHContext *self)
-+{
-+    AVRational flt_tb;
-+
-+    flt_tb = av_make_q(1, self->iavctx->sample_rate);
-+    return av_cmp_q(self->iavctx->time_base, flt_tb) != 0;
-+}
-+
-+static int
 +_audio_requires_asetpts(TVHContext *self)
 +{
 +    TVHAudioCodecProfile *ap = (TVHAudioCodecProfile *)self->profile;
 +
-+    if (ap->asetpts == 2)          /* force off */
-+        return 0;
-+    if (ap->asetpts == 1)          /* force on */
++    if (ap->asetpts == 1)
++        /* ap->asetpts == enabled */
 +        return 1;
-+    /* ap->asetpts == 0  →  "auto" */
-+    return _audio_needs_reframe_asetpts(self)
-+        || (self->iavctx->sample_rate != self->oavctx->sample_rate)
-+        || (self->iavctx->sample_fmt != self->oavctx->sample_fmt)
-+        || _audio_ch_layout_differs(self)
-+        || _audio_needs_timebase_asetpts(self);
++    /* ap->asetpts == disabled */
++    return 0;
 +}
 +
 +/**
@@ -7791,7 +7746,7 @@ index 6c6119877..5077d9ddd 100644
  static void
  _audio_context_channel_layout(TVHContext *self, AVDictionary **opts, AVChannelLayout *dst)
  {
-@@ -254,6 +415,25 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
+@@ -254,6 +369,25 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
  static int
  tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
  {
@@ -7817,7 +7772,7 @@ index 6c6119877..5077d9ddd 100644
      char source_args[128];
      char filters[16];
      char layout[32];
-@@ -261,11 +441,7 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+@@ -261,11 +395,7 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
  
      // source args
      memset(source_args, 0, sizeof(source_args));
@@ -7829,7 +7784,7 @@ index 6c6119877..5077d9ddd 100644
      if (str_snprintf(source_args, sizeof(source_args),
              "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
              self->iavctx->time_base.num,
-@@ -287,25 +463,6 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+@@ -287,25 +417,6 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
          return -1;
      }
  
@@ -7855,7 +7810,7 @@ index 6c6119877..5077d9ddd 100644
      int ret = tvh_context_open_filters(self,
          "abuffer", source_args,                           // source
          filters,                                          // filters
-@@ -317,26 +474,50 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+@@ -317,26 +428,50 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
          "sample_rates", &self->oavctx->sample_rate,       // sink option: sample_rate
          sizeof(self->oavctx->sample_rate),
          NULL);                                            // _IMPORTANT!_
@@ -7915,7 +7870,7 @@ index 6c6119877..5077d9ddd 100644
          default:
              break;
      }
-@@ -349,15 +530,35 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -349,15 +484,35 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
  {
      int64_t prev_pts = self->pts;
      int64_t new_pts = avpkt->pts - self->duration;
@@ -7957,7 +7912,7 @@ index 6c6119877..5077d9ddd 100644
      self->duration += avpkt->duration;
      return 0;
  }
-@@ -366,10 +567,80 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -366,10 +521,80 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_encode(TVHContext *self, AVFrame *avframe)
  {
@@ -8042,7 +7997,7 @@ index 6c6119877..5077d9ddd 100644
      return 0;
  }
  
-@@ -384,7 +655,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
+@@ -384,7 +609,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  {
@@ -8063,7 +8018,7 @@ index 6c6119877..5077d9ddd 100644
  #if LIBAVCODEC_VERSION_MAJOR > 59
      pkt->a.pkt_channels = self->oavctx->ch_layout.nb_channels;
  #else
-@@ -394,7 +677,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -394,7 +631,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
      return 0;
  }
  
@@ -8072,10 +8027,10 @@ index 6c6119877..5077d9ddd 100644
      .media_type = AVMEDIA_TYPE_AUDIO,
      .open       = tvh_audio_context_open,
 diff --git src/transcoding/transcode/context.c src/transcoding/transcode/context.c
-index ef1ea10b6..2ac9950cb 100644
+index ef1ea10b6..9973757d0 100644
 --- src/transcoding/transcode/context.c
 +++ src/transcoding/transcode/context.c
-@@ -19,6 +19,13 @@
+@@ -19,12 +19,24 @@
  
  
  #include "internals.h"
@@ -8089,7 +8044,19 @@ index ef1ea10b6..2ac9950cb 100644
  
  #include <libavutil/opt.h>
  
-@@ -194,23 +201,153 @@ _context_encode(TVHContext *self, AVFrame *avframe)
+ 
+ #define TVH_BUFFERSRC_FLAGS AV_BUFFERSRC_FLAG_PUSH | AV_BUFFERSRC_FLAG_KEEP_REF
+-#define TVH_BUFFERSINK_FLAGS AV_BUFFERSINK_FLAG_NO_REQUEST
++/* Not AV_BUFFERSINK_FLAG_NO_REQUEST: that flag returns only what is already
++ * queued at the sink and never asks the graph to produce more, so the drain
++ * loop in tvh_context_encode() stops on EAGAIN while frames are still held
++ * inside the chain -- a doubling filter such as yadif in field mode leaves one
++ * per input behind, and they accumulate. */
++#define TVH_BUFFERSINK_FLAGS 0
+ 
+ 
+ /* TVHContextType =========================================================== */
+@@ -194,23 +206,153 @@ _context_encode(TVHContext *self, AVFrame *avframe)
  static int
  _context_meta(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  {
@@ -8254,7 +8221,7 @@ index ef1ea10b6..2ac9950cb 100644
  
  static int
  _context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
-@@ -259,51 +396,204 @@ tvh_context_setup(TVHContext *self, const AVCodec *iavcodec, const AVCodec *oavc
+@@ -259,51 +401,204 @@ tvh_context_setup(TVHContext *self, const AVCodec *iavcodec, const AVCodec *oavc
  
  
  // open
@@ -8476,7 +8443,7 @@ index ef1ea10b6..2ac9950cb 100644
      }
      return ret;
  }
-@@ -319,7 +609,30 @@ tvh_context_pack(TVHContext *self, AVPacket *avpkt)
+@@ -319,7 +614,30 @@ tvh_context_pack(TVHContext *self, AVPacket *avpkt)
      if (self->helper && self->helper->pack) {
          pkt = self->helper->pack(self, avpkt);
      } else {
@@ -8508,7 +8475,7 @@ index ef1ea10b6..2ac9950cb 100644
      }
      if (!pkt) {
          tvh_context_log(self, LOG_ERR, "failed to create packet");
-@@ -372,6 +685,9 @@ tvh_context_receive_packet(TVHContext *self)
+@@ -372,6 +690,9 @@ tvh_context_receive_packet(TVHContext *self)
      return (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) ? 0 : ret;
  }
  
@@ -8518,7 +8485,7 @@ index ef1ea10b6..2ac9950cb 100644
  
  static int
  tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
-@@ -390,6 +706,29 @@ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
+@@ -390,6 +711,29 @@ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
      }
      if ((ret = (ret == AVERROR_EOF) ? 0 : ret)) {
          av_frame_unref(avframe);
@@ -8548,7 +8515,7 @@ index ef1ea10b6..2ac9950cb 100644
      }
      return ret;
  }
-@@ -421,8 +760,10 @@ tvh_context_encode(TVHContext *self, AVFrame *avframe)
+@@ -421,8 +765,10 @@ tvh_context_encode(TVHContext *self, AVFrame *avframe)
  {
      int ret = 0;
  
@@ -8561,7 +8528,7 @@ index ef1ea10b6..2ac9950cb 100644
      }
      if (!ret && !(ret = tvh_context_push_frame(self, avframe))) {
          while ((ret = tvh_context_pull_frame(self, self->oavframe)) != AVERROR(EAGAIN)) {
-@@ -477,7 +818,7 @@ tvh_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -477,7 +823,7 @@ tvh_context_decode(TVHContext *self, AVPacket *avpkt)
      int ret = 0;
  
      if (!avcodec_is_open(self->iavctx)) {
@@ -8570,7 +8537,7 @@ index ef1ea10b6..2ac9950cb 100644
      }
      if (!ret && !(ret = _context_decode(self, avpkt))) {
          ret = tvh_context_decode_packet(self, avpkt);
-@@ -525,6 +866,19 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value)
+@@ -525,6 +871,19 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value)
  }
  
  
@@ -8590,7 +8557,7 @@ index ef1ea10b6..2ac9950cb 100644
  void
  tvh_context_close(TVHContext *self, int flush)
  {
-@@ -536,7 +890,374 @@ tvh_context_close(TVHContext *self, int flush)
+@@ -536,7 +895,376 @@ tvh_context_close(TVHContext *self, int flush)
      }
  }
  
@@ -8737,7 +8704,9 @@ index ef1ea10b6..2ac9950cb 100644
 +        // Basic audio properties
 +        par->format      = self->iavctx->sample_fmt;
 +        par->sample_rate = self->iavctx->sample_rate;
-+        par->time_base   = self->iavctx->time_base;
++        // dynamic time_base assignment is not working with AC3 (1/48000) to AAC (1/90000) transcoding
++        // With the explicit Tvheadend 90kHz timebase:
++        par->time_base   = (AVRational){ 1, 90000 };
 +
 +        // Copy channel layout (Crucial for FFmpeg 7/8)
 +        ret = av_channel_layout_copy(&par->ch_layout, &self->iavctx->ch_layout);
@@ -8965,7 +8934,7 @@ index ef1ea10b6..2ac9950cb 100644
  int
  tvh_context_open_filters(TVHContext *self,
                           const char *source_name, const char *source_args,
-@@ -691,13 +1412,41 @@ tvh_context_deliver(TVHContext *self, th_pkt_t *pkt)
+@@ -691,13 +1419,41 @@ tvh_context_deliver(TVHContext *self, th_pkt_t *pkt)
  }
  
  
@@ -9008,7 +8977,7 @@ index ef1ea10b6..2ac9950cb 100644
  
      if ((size = pktbuf_len(pkt->pkt_payload)) && pktbuf_ptr(pkt->pkt_payload)) {
          if (size >= TVH_INPUT_BUFFER_MAX_SIZE) {
-@@ -709,26 +1458,92 @@ tvh_context_handle(TVHContext *self, th_pkt_t *pkt)
+@@ -709,26 +1465,92 @@ tvh_context_handle(TVHContext *self, th_pkt_t *pkt)
              ret = AVERROR(ENOMEM);
          }
          else {
@@ -9119,7 +9088,7 @@ index ef1ea10b6..2ac9950cb 100644
              }
          }
      }
-@@ -765,6 +1580,7 @@ tvh_context_destroy(TVHContext *self)
+@@ -765,6 +1587,7 @@ tvh_context_destroy(TVHContext *self)
  {
      if (self) {
          TVHPKT_CLEAR(self->src_pkt);
@@ -9127,7 +9096,7 @@ index ef1ea10b6..2ac9950cb 100644
          if (self->avfltgraph) {
              avfilter_graph_free(&self->avfltgraph); // frees filter contexts
              self->oavfltctx = NULL;
-@@ -778,22 +1594,33 @@ tvh_context_destroy(TVHContext *self)
+@@ -778,22 +1601,33 @@ tvh_context_destroy(TVHContext *self)
              pktbuf_ref_dec(self->input_gh);
              self->input_gh = NULL;
          }
