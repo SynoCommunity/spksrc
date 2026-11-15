@@ -98,10 +98,9 @@ COMPILE_ARGS += product-images
 # https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
 PATCHES_LEVEL = 1
 
-# Filter out any -jN since java's configure will autodetect number of CPU's
-# Use make JOBS=N to set number of CPU's in this package
+# The JDK runs its own parallel make, with the job count configure derives from the
+# CPUs and memory: keep spksrc's -jN, and its NCPUS (then 1), out of it.
 DISABLE_PARALLEL_MAKE = 1
-COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
