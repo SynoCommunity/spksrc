@@ -1,0 +1,28 @@
+[
+  {
+    "step_title": "Shared folder",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Homeward keeps backups of its configuration in this shared folder and can sync into it. The share is created at installation when it does not exist yet.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared folder",
+            "defaultValue": "homeward",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": "Homeward runs as the internal user <b>sc-homeward</b>. To back up photos or sync Drive folders into other shared folders, give this user read/write permission in Control Panel › Shared Folder. See the <a target=\"_blank\" href=\"https://github.com/sebiweise/homeward/blob/master/docs/user-guide.md\">user guide</a>."
+      }
+    ]
+  }
+]
