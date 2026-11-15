@@ -3,6 +3,7 @@ JAVA_REPO_NAME = jdk21u
 JAVA_NAME = jdk
 JAVA_RELEASE = 1
 JAVA_VERSION = 21.0.13.0.3
+JAVA_MAJOR = $(firstword $(subst ., ,$(JAVA_VERSION)))
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -30,6 +31,8 @@ BUILD_DEPENDS += cross/libXt
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
 DEPENDS += cross/fontconfig
+# a font for AWT text: DSM has none, and fontconfig finds it through etc/fonts/conf.d
+DEPENDS += cross/dejavu
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
@@ -95,28 +98,32 @@ COMPILE_ARGS += product-images
 # https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
 PATCHES_LEVEL = 1
 
-# Filter out any -jN since java's configure will autodetect number of CPU's
-# Use make JOBS=N to set number of CPU's in this package
+# The JDK runs its own parallel make, with the job count configure derives from the
+# CPUs and memory: keep spksrc's -jN, and its NCPUS (then 1), out of it.
 DISABLE_PARALLEL_MAKE = 1
-COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
 # The PLIST names the install directory openjdk-@JAVA_VERSION@.
 PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
 
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # force cross compilation
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+endif
 
 # ABI profile for ARM builds:
 #   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
-else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
+endif
+
+# No --with-abi-profile=arm-vfp-hflt: it adds -mthumb, and the 3.2 kernels resume a Thumb-2
+# VFP instruction trapped on a subnormal 2 bytes short (Armada 370, VFPv3-D16), so the VM
+# crashed at start. java-17 builds without it, ARM mode and hard float, and runs there.
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
 endif
 
@@ -134,7 +141,16 @@ java-21-openjdk_install:
 	@cp -rpf $(JDK_IMAGE_DIR)/* $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@$(MSG) "- Link binaries into bin folder"
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@$(MSG) "- Version links: jvm/openjdk-$(JAVA_MAJOR) as a stable JAVA_HOME, and java$(JAVA_MAJOR), javac$(JAVA_MAJOR), jar$(JAVA_MAJOR)"
+	@cd $(STAGING_INSTALL_PREFIX)/jvm && ln -sfn openjdk-$(JAVA_VERSION) openjdk-$(JAVA_MAJOR)
+	@cd $(STAGING_INSTALL_PREFIX)/bin && for c in java javac jar; do ln -sf ../jvm/openjdk-$(JAVA_MAJOR)/bin/$${c} $${c}$(JAVA_MAJOR); done
 	@$(MSG) "- Add license files"
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@$(MSG) "- Point fontconfig at the bundled DejaVu fonts"
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d
+	@printf '%s\n' '<?xml version="1.0"?>' '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">' '<fontconfig>' \
+	  '  <dir>$(INSTALL_PREFIX)/share/dejavu/fonts</dir>' \
+	  '  <include ignore_missing="yes">$(INSTALL_PREFIX)/share/dejavu/fontconfig</include>' \
+	  '</fontconfig>' > $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d/60-dejavu.conf
