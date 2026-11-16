@@ -1,0 +1,11 @@
+[
+  {
+    "step_title": "Boot-up task",
+    "items": [
+      {
+        "desc": "The \"zerotier-one\" boot-up task is removed together with the package. The ZeroTier identity and networks stay on the NAS, so a reinstall keeps the same node ID."
+      }
+    ],
+    "deactivate_v2": "{\n  var step = arguments[0], wizard = arguments[1], action = arguments[2];\n  if (action !== 'next' || step.ztDone) { return true; }\n  step.ztDone = true;\n  var call = { api: 'SYNO.Core.EventScheduler', method: 'delete', version: 1,\n    params: { task_name: \"zerotier-one\" }, callback: function () {}, scope: step };\n  if (window.SYNO && SYNO.API && SYNO.API.Request) { SYNO.API.Request(call); } else { (step.owner || wizard).sendWebAPI(call); }\n  return true;\n}"
+  }
+]

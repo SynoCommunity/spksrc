@@ -1,0 +1,68 @@
+#!/bin/sh
+# zerotier-one — supervisor, runs as the package user (no root). It is the
+# spksrc SERVICE_COMMAND: keeps zerotier-one running, restarts it when it exits
+# (backoff 1 s .. 60 s, reset after 5 minutes of stable running) and when it
+# stops answering on its local API for three checks in a row.
+
+DAEMON="/var/packages/zerotier-one/target/bin/zerotier-one"
+HOME_DIR="/var/packages/zerotier-one/var"
+LOG_FILE="${HOME_DIR}/zerotier-one-supervise.log"
+CHECK_EVERY=4
+MAX_MISSES=3
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "${LOG_FILE}"
+    if [ "$(wc -l < "${LOG_FILE}")" -gt 1000 ]; then
+        tail -n 600 "${LOG_FILE}" > "${LOG_FILE}.tmp" && mv -f "${LOG_FILE}.tmp" "${LOG_FILE}"
+    fi
+}
+
+child=""
+stop_child() {
+    if [ -n "${child}" ] && kill -0 "${child}" 2>/dev/null; then
+        kill "${child}" 2>/dev/null
+        i=0
+        while [ $i -lt 20 ] && kill -0 "${child}" 2>/dev/null; do sleep 0.5; i=$((i + 1)); done
+        kill -9 "${child}" 2>/dev/null
+    fi
+}
+trap 'stop_child; log "supervisor stopped"; exit 0' TERM INT
+
+log "supervisor started (pid $$)"
+backoff=1
+while :; do
+    "${DAEMON}" -U "${HOME_DIR}" &
+    child=$!
+    started=$(date +%s)
+    ticks=0
+    misses=0
+    while kill -0 "${child}" 2>/dev/null; do
+        sleep 15 &
+        wait $!
+        ticks=$((ticks + 1))
+        if [ $((ticks % CHECK_EVERY)) -eq 0 ]; then
+            # /status alone is not enough: on DSM's 4.4 kernel a network leave
+            # can wedge zerotier-one's network lock while /status still answers,
+            # so the network list (and with it the data path) is checked too.
+            if timeout 10 "${DAEMON}" -q "-D${HOME_DIR}" info >/dev/null 2>&1 &&
+                timeout 10 "${DAEMON}" -q "-D${HOME_DIR}" listnetworks >/dev/null 2>&1; then
+                misses=0
+            else
+                misses=$((misses + 1))
+                log "zerotier-one did not answer (${misses}/${MAX_MISSES})"
+                if [ ${misses} -ge ${MAX_MISSES} ]; then
+                    log "zerotier-one is not responding, restarting it"
+                    stop_child
+                fi
+            fi
+        fi
+    done
+    wait "${child}" 2>/dev/null
+    code=$?
+    if [ $(( $(date +%s) - started )) -gt 300 ]; then backoff=1; fi
+    log "zerotier-one exited (code ${code}), restarting in ${backoff} s"
+    sleep "${backoff}" &
+    wait $!
+    backoff=$((backoff * 2))
+    [ ${backoff} -gt 60 ] && backoff=60
+done
