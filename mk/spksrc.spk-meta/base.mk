@@ -94,12 +94,16 @@ $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 #    (e.g. python314>=3.14.5-4) is left untouched;
 #  - a bare entry (e.g. "ffmpeg8" from the consumer Makefile) is replaced
 #    by the pinned one;
-#  - SPK_DEPENDS is rebuilt unquoted so the INFO quoting stays well-formed.
+#  - SPK_DEPENDS is rebuilt unquoted so the INFO quoting stays well-formed;
+#  - the pin names the meta's SPK_NAME, the package DSM knows, not its directory:
+#    spk/ffmpeg4 is the "ffmpeg" package, so "ffmpeg4>=..." named nothing on the
+#    server. A bare entry is dropped under either name.
 # Skipped when the meta is only an indirect dependency (see $(1)_INDIRECT_DEPENDS,
 # e.g. videodriver pulled in through the ffmpeg rpath): the direct meta
 # carries the pin, DSM resolves the chain transitively.
+$(eval $(1)_SPK_DEP_NAME := $(or $($(1)_SPK_NAME),$($(1)_PACKAGE)))
 $(eval $(1)_SPK_DEP_LIST := $(subst :, ,$(subst ",,$(SPK_DEPENDS))))
-$(if $($(1)_INDIRECT_DEPENDS)$(filter $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(space),:,$(strip $($(1)_PACKAGE)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE),$($(1)_SPK_DEP_LIST))))))
+$(if $($(1)_INDIRECT_DEPENDS)$(filter $($(1)_SPK_DEP_NAME)=% $($(1)_SPK_DEP_NAME)<% $($(1)_SPK_DEP_NAME)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(space),:,$(strip $($(1)_SPK_DEP_NAME)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE) $($(1)_SPK_DEP_NAME),$($(1)_SPK_DEP_LIST))))))
 
 # Build list of status cookies to symlink
 $(eval $(1)_STATUS_COOKIES := $(sort $(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))

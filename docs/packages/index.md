@@ -74,6 +74,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Media Server"><td><a href="kiwix/">Kiwix</a></td><td>Media Server</td><td>Offline Wikipedia and content server</td></tr>
     <tr data-category="Media Server"><td><a href="loom/">Loom</a></td><td>Media Server</td><td>Federated and encrypted live streaming</td></tr>
     <tr data-category="Storage"><td><a href="minio/">MinIO</a></td><td>Storage</td><td>S3-compatible object storage</td></tr>
+    <tr data-category="Runtime"><td><a href="java-openjdk/">Java OpenJDK</a></td><td>Runtime</td><td>OpenJDK 17, 21 and 25</td></tr>
     <tr data-category="Runtime"><td><a href="mono/">Mono</a></td><td>Runtime</td><td>.NET runtime</td></tr>
     <tr data-category="CLI"><td><a href="mosh/">mosh</a></td><td>CLI</td><td>Mobile shell for intermittent connectivity</td></tr>
     <tr data-category="Home Automation"><td><a href="mosquitto/">Mosquitto</a></td><td>Home Automation</td><td>MQTT message broker</td></tr>

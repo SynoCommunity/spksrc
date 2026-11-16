@@ -232,6 +232,7 @@ nav:
       - Cloudflared: packages/cloudflared.md
       - DNSCrypt Proxy: packages/dnscrypt-proxy.md
     - Runtime:
+      - Java OpenJDK: packages/java-openjdk.md
       - Mono: packages/mono.md
     - Security:
       - Google Authenticator: packages/google-authenticator.md
