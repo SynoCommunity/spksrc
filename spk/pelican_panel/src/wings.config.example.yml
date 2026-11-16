@@ -1,0 +1,163 @@
+# ===========================================
+# Pelican Wings - Configuration pour Synology
+# ===========================================
+# Ce fichier est un template pour Wings en conteneur Docker sur Synology.
+#
+# IMPORTANT - Docker-in-Docker:
+# Wings tourne dans un conteneur mais crée des conteneurs de jeux via le socket Docker.
+# Les chemins doivent être des chemins HÔTE (Synology) car Docker les monte depuis l'hôte.
+#
+# Les corrections suivantes sont appliquées AUTOMATIQUEMENT au démarrage:
+# - Port API: 8445 → 8080 (le Panel génère 8445, mais le conteneur écoute sur 8080)
+# - Chemins: /var/lib/pelican/* → /var/packages/pelican_panel/var/data/*
+# - mount_passwd: true → false
+# - tmp_directory: /tmp/pelican → chemin hôte
+#
+# Pour configurer Wings:
+# 1. Créez un Node dans le Panel (Admin -> Nodes -> Create New)
+# 2. Copiez la configuration YAML générée
+# 3. Collez-la via http://IP:8080/wings-config
+# 4. Les corrections sont appliquées automatiquement à l'enregistrement
+
+debug: false
+
+# --- System Settings ---
+# IMPORTANT: Ces chemins sont les chemins HÔTE (Synology), pas les chemins conteneur.
+# C'est nécessaire car Wings crée des conteneurs de jeux via le socket Docker monté,
+# et ces conteneurs ont besoin des chemins de l'hôte pour les bind mounts.
+system:
+  # Répertoire racine des données Wings
+  root_directory: /var/packages/pelican_panel/var/data
+
+  # Répertoire des données des serveurs de jeux
+  data: /var/packages/pelican_panel/var/data/servers
+
+  # Répertoire des archives
+  archive_directory: /var/packages/pelican_panel/var/data/archives
+
+  # Répertoire des backups
+  backup_directory: /var/packages/pelican_panel/var/data/backups
+
+  # Répertoire des logs Wings
+  log_directory: /var/packages/pelican_panel/var/data/wings-logs
+
+  # Répertoire temporaire pour les scripts d'installation
+  # IMPORTANT: Doit être un chemin hôte accessible par Docker
+  tmp_directory: /var/packages/pelican_panel/var/data/tmp
+
+  # Utilisateur root dans le conteneur Wings
+  username: root
+
+  # Configuration utilisateur - mount_passwd doit être false sur Synology
+  user:
+    uid: 0
+    gid: 0
+    mount_passwd: false
+
+  # Fuseau horaire
+  timezone: Europe/Paris
+
+  # Limite de taille des fichiers téléchargeables (bytes)
+  # 100MB par défaut
+  max_upload_size: 104857600
+
+# --- API Settings ---
+api:
+  host: 0.0.0.0
+  # Port INTERNE du conteneur Wings
+  # IMPORTANT: Dans le Panel, créez le Node avec le port 8445 (externe)
+  # La correction automatique changera 8445 → 8080 dans ce fichier
+  port: 8080
+
+  # SSL/TLS - Désactivé car géré par reverse proxy DSM
+  ssl:
+    enabled: false
+    # Si vous activez SSL directement sur Wings:
+    # cert: /etc/letsencrypt/live/domain.com/fullchain.pem
+    # key: /etc/letsencrypt/live/domain.com/privkey.pem
+
+  # Timeouts
+  upload_limit: 100
+
+# --- Allowed Origins ---
+# Origines autorisées pour les WebSockets (console serveur)
+# '*' autorise toutes les origines - nécessaire sur Synology car l'IP peut varier
+allowed_origins:
+  - "*"
+
+# --- Panel Connection ---
+# IMPORTANT: Ces valeurs seront remplacées par celles du Panel
+# lors de la configuration via l'interface web.
+# Admin -> Nodes -> [Votre Node] -> Configuration -> Generate Token
+panel:
+  # URL du Panel (avec protocole et port)
+  # Utilisez l'IP ou le FQDN de votre NAS, port 8080
+  url: "http://NAS_IP:8080"
+
+  # Token ID (format: peli_xxxxx)
+  token_id: "CHANGEME_TOKEN_ID"
+
+  # Token secret
+  token: "CHANGEME_TOKEN"
+
+# --- Remote Query ---
+remote_query:
+  # Temps max pour les requêtes vers le Panel
+  timeout: 30
+
+  # Intervalle entre les vérifications d'état
+  boot_servers_per_page: 50
+
+# --- Docker Settings ---
+docker:
+  # Socket Docker (monté dans le conteneur)
+  socket: /var/run/docker.sock
+
+  # Réseau pour les conteneurs de jeux
+  # IMPORTANT: Utiliser une plage IP qui ne chevauche pas les réseaux existants
+  # Plage 172.31.x.x pour éviter les conflits avec pelican_network (172.30.x.x)
+  network:
+    interface: 172.31.0.1
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    name: pelican0
+    ispn: false
+    driver: bridge
+    network_mode: pelican0
+    is_internal: false
+    enable_icc: true
+    network_mtu: 1500
+    interfaces:
+      v4:
+        subnet: 172.31.0.0/16
+        gateway: 172.31.0.1
+
+  # Timeouts conteneurs
+  container_stop_timeout: 10
+
+# --- SFTP Server ---
+sftp:
+  # Port SFTP pour accès aux fichiers des serveurs
+  # Port INTERNE du conteneur (mappé sur 2022 en externe)
+  bind_port: 2022
+
+  # Timeouts
+  read_timeout: 30
+  write_timeout: 30
+
+# --- Allowed Mounts ---
+# Chemins autorisés pour les bind mounts des serveurs de jeux
+# Ces chemins sont les chemins HÔTE (Synology)
+allowed_mounts:
+  - /var/packages/pelican_panel/var/data/servers
+  - /var/packages/pelican_panel/var/data/backups
+  - /var/packages/pelican_panel/var/data/tmp
+
+# --- Throttles ---
+# Limites pour éviter la surcharge
+throttles:
+  # Limite de lignes de log par seconde
+  lines: 2000
+  # Période en millisecondes
+  period: 100
