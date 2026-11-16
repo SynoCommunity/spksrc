@@ -26,6 +26,10 @@ lnk:bin/jstatd
 lnk:bin/keytool
 lnk:bin/rmiregistry
 lnk:bin/serialver
+lnk:bin/java17
+lnk:bin/javac17
+lnk:bin/jar17
+lnk:jvm/openjdk-17
 bin:jvm/openjdk-@JAVA_VERSION@/bin/
 rsc:jvm/openjdk-@JAVA_VERSION@/conf/
 rsc:jvm/openjdk-@JAVA_VERSION@/include/classfile_constants.h
@@ -158,3 +162,4 @@ rsc:jvm/openjdk-@JAVA_VERSION@/release
 rsc:jvm/openjdk-@JAVA_VERSION@/LICENSE
 rsc:jvm/openjdk-@JAVA_VERSION@/ADDITIONAL_LICENSE_INFO
 rsc:jvm/openjdk-@JAVA_VERSION@/ASSEMBLY_EXCEPTION
+rsc:etc/fonts/conf.d/60-dejavu.conf

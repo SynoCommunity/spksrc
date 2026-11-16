@@ -1,0 +1,35 @@
+gcc < 10 finds cmp(Register, ClassState) ambiguous between cmp(Register, unsigned char) and
+the deleted cmp(Register, unsigned): an explicit u1, ClassState's underlying type, picks the
+overload gcc 10 and later choose by themselves. Needed for the gcc 8.5 DSM 7.1 toolchains.
+
+--- a/src/hotspot/cpu/aarch64/macroAssembler_aarch64.cpp
++++ b/src/hotspot/cpu/aarch64/macroAssembler_aarch64.cpp
+@@ -2045,7 +2045,7 @@
+   // Fast path check: class is fully initialized
+   lea(scratch, Address(klass, InstanceKlass::init_state_offset()));
+   ldarb(scratch, scratch);
+-  cmp(scratch, InstanceKlass::fully_initialized);
++  cmp(scratch, (u1)InstanceKlass::fully_initialized);
+   br(Assembler::EQ, *L_fast_path);
+ 
+   // Fast path check: current thread is initializer thread
+--- a/src/hotspot/cpu/aarch64/methodHandles_aarch64.cpp
++++ b/src/hotspot/cpu/aarch64/methodHandles_aarch64.cpp
+@@ -107,7 +107,7 @@
+         // Require compiled LambdaForm class to be fully initialized.
+         __ lea(rscratch2, Address(method_holder, InstanceKlass::init_state_offset()));
+         __ ldarb(rscratch2, rscratch2);
+-        __ cmp(rscratch2, InstanceKlass::fully_initialized);
++        __ cmp(rscratch2, (u1)InstanceKlass::fully_initialized);
+         __ br(Assembler::EQ, L_ok);
+         break;
+ 
+@@ -121,7 +121,7 @@
+         // Class initialization check is too strong here. Just ensure that class initialization has been initiated.
+         __ lea(rscratch2, Address(method_holder, InstanceKlass::init_state_offset()));
+         __ ldarb(rscratch2, rscratch2);
+-        __ cmp(rscratch2, InstanceKlass::being_initialized);
++        __ cmp(rscratch2, (u1)InstanceKlass::being_initialized);
+         __ br(Assembler::GE, L_ok);
+ 
+         // init_state check failed, but it may be an abstract interface method

@@ -3,6 +3,7 @@ JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
 JAVA_RELEASE = 1
 JAVA_VERSION = 17.0.21.0.3
+JAVA_MAJOR = $(firstword $(subst ., ,$(JAVA_VERSION)))
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -22,6 +23,8 @@ BUILD_DEPENDS += cross/libXrender
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
 DEPENDS += cross/fontconfig
+# a font for AWT text: DSM has none, and fontconfig finds it through etc/fonts/conf.d
+DEPENDS += cross/dejavu
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
@@ -93,10 +96,9 @@ PATCHES_LEVEL = 1
 
 ADDITIONAL_CFLAGS = -O2
 
-# Filter out any -jN since java's configure will autodetect number of CPU's
-# Use make JOBS=N to set number of CPU's in this package
+# The JDK runs its own parallel make, with the job count configure derives from the
+# CPUs and memory: keep spksrc's -jN, and its NCPUS (then 1), out of it.
 DISABLE_PARALLEL_MAKE = 1
-COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -122,7 +124,16 @@ java-17-openjdk_pre_compile:
 java-17-openjdk_post_compile:
 	@$(MSG) Link binaries into version independent bin folder
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@$(MSG) "- Version links: jvm/openjdk-$(JAVA_MAJOR) as a stable JAVA_HOME, and java$(JAVA_MAJOR), javac$(JAVA_MAJOR), jar$(JAVA_MAJOR)"
+	@cd $(STAGING_INSTALL_PREFIX)/jvm && ln -sfn openjdk-$(JAVA_VERSION) openjdk-$(JAVA_MAJOR)
+	@cd $(STAGING_INSTALL_PREFIX)/bin && for c in java javac jar; do ln -sf ../jvm/openjdk-$(JAVA_MAJOR)/bin/$${c} $${c}$(JAVA_MAJOR); done
 	@$(MSG) Install license files
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@$(MSG) "- Point fontconfig at the bundled DejaVu fonts"
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d
+	@printf '%s\n' '<?xml version="1.0"?>' '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">' '<fontconfig>' \
+	  '  <dir>$(INSTALL_PREFIX)/share/dejavu/fonts</dir>' \
+	  '  <include ignore_missing="yes">$(INSTALL_PREFIX)/share/dejavu/fontconfig</include>' \
+	  '</fontconfig>' > $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d/60-dejavu.conf

@@ -1,6 +1,6 @@
 SPK_NAME = subliminal
 SPK_VERS = 2.7.1
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/subliminal.png
 
 PYTHON_PACKAGE = python314
@@ -15,13 +15,19 @@ DESCRIPTION = Subliminal searches and downloads the best matching subtitles for 
 DESCRIPTION_FRE = Subliminal recherche et télécharge les sous-titres correspondant le mieux à vos films et séries. Ce paquet fournit l\'outil en ligne de commande subliminal.
 DISPLAY_NAME = Subliminal
 STARTABLE = no
-CHANGELOG = "1. Update to Subliminal 2.7.1, a full rewrite of the upstream project.<br/>2. The package is now a Python 3 command line tool; the former DSM user interface is gone."
+CHANGELOG = "1. Fix the Python virtual environment, which was created with python312 instead of python314."
 
 HOMEPAGE = https://github.com/Diaoul/subliminal
 LICENSE  = MIT
 
 SERVICE_SETUP = src/service-setup.sh
+POST_SERVICE_TARGET = subliminal_extra_install
 
 SPK_COMMANDS = env/bin/subliminal
 
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: subliminal_extra_install
+subliminal_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup

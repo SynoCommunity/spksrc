@@ -3,19 +3,18 @@ JAVA_REPO_NAME = jdk25u
 JAVA_NAME      = jdk
 JAVA_RELEASE   = 1
 JAVA_VERSION   = 25.0.5.0.3
+JAVA_MAJOR   = $(firstword $(subst ., ,$(JAVA_VERSION)))
 PKG_VERS       = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT        = tar.gz
 PKG_DIST_NAME  = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE  = https://github.com/openjdk/jdk25u/archive
 PKG_DIR        = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
-# gcc < 10.0 is not officially supported
-# DSM 7.1 toolchain: WARNING: You are using gcc 8.5.0 which is older than 10.0. This is not a supported configuration.
-REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_DSM = 1.3
-# Java 25 does not support 32 bit architectures
-# if we really want it, we could try the debian patches for 32-bit support
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# configure warns below gcc 10 ("not a supported configuration") but builds with 8.5,
+# the DSM 7.1 toolchains.
+MIN_GCC_VERSION = 8.5
+
+include ../../mk/spksrc.common.mk
 
 # build instructions:
 # https://github.com/openjdk/jdk/blob/master/doc/building.md
@@ -33,11 +32,18 @@ BUILD_DEPENDS += cross/libXt
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
 DEPENDS += cross/fontconfig
+# a font for AWT text: DSM has none, and fontconfig finds it through etc/fonts/conf.d
+DEPENDS += cross/dejavu
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
 DEPENDS += cross/giflib
 DEPENDS += cross/lcms2
+
+# Zero, the 32-bit VM below, calls native code through libffi
+ifneq ($(filter $(ARCH),$(32bit_ARCHS)),)
+DEPENDS += cross/libffi
+endif
 
 HOMEPAGE = https://openjdk.org/projects/jdk/25/
 COMMENT  = OpenJDK 25 is the open-source reference implementation of version 25 of the Java SE Platform as specified by JSR 396 in the Java Community Process.
@@ -96,31 +102,62 @@ COMPILE_ARGS += jdk-image
 # https://udd.debian.org/patches.cgi?src=openjdk-25&version=25.0.3%2B9-2~deb13u1
 PATCHES_LEVEL = 1
 
-# Filter out any -jN since java's configure will autodetect number of CPU's
-# Use make JOBS=N to set number of CPU's in this package
+# The JDK runs its own parallel make, with the job count configure derives from the
+# CPUs and memory: keep spksrc's -jN, and its NCPUS (then 1), out of it.
 DISABLE_PARALLEL_MAKE = 1
-COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
 # The PLIST names the install directory openjdk-@JAVA_VERSION@.
 PLIST_TRANSFORM = sed -e 's%@JAVA_VERSION@%$(JAVA_VERSION)%'
 
+##
+## 32-bit: Zero, the interpreter-only VM, as Debian builds armhf and i386. The x86_32 port
+## is gone since JDK 25 (JEP 503) and ARM32 execution is broken (JDK-8321125).
+##
+ifneq ($(filter $(ARCH),$(32bit_ARCHS)),)
+CONFIGURE_ARGS += --with-jvm-variants=zero
+CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+
+PLIST_TRANSFORM += -e 's%lib/server/%lib/zero/%' -e '/lib\/zero\/classes/d'
+PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/libsleef/d'
+PLIST_TRANSFORM += -e '/jmods\/jdk.internal.vm.ci/d' -e '/jmods\/jdk.graal.compiler/d'
+# no serviceability agent (jhsdb) on Zero
+PLIST_TRANSFORM += -e '/bin\/jhsdb/d' -e '/lib\/libsaproc/d' -e '/jmods\/jdk.hotspot.agent/d'
+
+# No --with-abi-profile on ARMv7: its arm-vfp-hflt adds -mthumb, and the 3.2 kernels resume a
+# Thumb-2 VFP instruction trapped on a subnormal 2 bytes short (Armada 370, VFPv3-D16), which
+# crashes libjvm at its first dlopen. The toolchain's default, ARM mode and hard float, is kept.
+
+ifneq ($(filter $(ARCH),$(i686_ARCHS)),)
+CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
+endif
+endif   # 32-bit
+
+##
+## 64-bit: Server, the HotSpot JIT VM; each arch drops the vector libraries it does not build.
+##
+ifneq ($(filter $(ARCH),$(64bit_ARCHS)),)
+
+# remove targets not created for aarch64
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
-# remove targets not created for aarch64
 PLIST_TRANSFORM += -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/server\/classes/d'
-else
+endif
+
 # remove targets not created for x64
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PLIST_TRANSFORM += -e '/lib\/libsleef/d'
 endif
+endif   # 64-bit
 
 .PHONY: java-25-openjdk_pre_configure
 java-25-openjdk_pre_configure:
 	@$(MSG) "- Make configure script executable"
 	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
 
-JDK_IMAGE_DIR=$(WORK_DIR)/$(PKG_DIR)/build/linux-*-server-release/images/jdk
+# linux-<cpu>-server-release, or linux-<cpu>-zero-release on 32-bit
+JDK_IMAGE_DIR=$(WORK_DIR)/$(PKG_DIR)/build/linux-*-release/images/jdk
 .PHONY: java-25-openjdk_install
 java-25-openjdk_install:
 	@$(MSG) "- Install jdk"
@@ -128,7 +165,16 @@ java-25-openjdk_install:
 	@cp -rpf $(JDK_IMAGE_DIR)/* $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@$(MSG) "- Link binaries into bin folder"
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@$(MSG) "- Version links: jvm/openjdk-$(JAVA_MAJOR) as a stable JAVA_HOME, and java$(JAVA_MAJOR), javac$(JAVA_MAJOR), jar$(JAVA_MAJOR)"
+	@cd $(STAGING_INSTALL_PREFIX)/jvm && ln -sfn openjdk-$(JAVA_VERSION) openjdk-$(JAVA_MAJOR)
+	@cd $(STAGING_INSTALL_PREFIX)/bin && for c in java javac jar; do ln -sf ../jvm/openjdk-$(JAVA_MAJOR)/bin/$${c} $${c}$(JAVA_MAJOR); done
 	@$(MSG) "- Add license files"
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@$(MSG) "- Point fontconfig at the bundled DejaVu fonts"
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d
+	@printf '%s\n' '<?xml version="1.0"?>' '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">' '<fontconfig>' \
+	  '  <dir>$(INSTALL_PREFIX)/share/dejavu/fonts</dir>' \
+	  '  <include ignore_missing="yes">$(INSTALL_PREFIX)/share/dejavu/fontconfig</include>' \
+	  '</fontconfig>' > $(STAGING_INSTALL_PREFIX)/etc/fonts/conf.d/60-dejavu.conf
