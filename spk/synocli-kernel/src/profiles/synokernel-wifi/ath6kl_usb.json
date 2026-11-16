@@ -1,0 +1,5 @@
+{
+  "name": "ath6kl_usb",
+  "description": "Atheros AR6004 adapters",
+  "modules": ["ath6kl_usb"]
+}

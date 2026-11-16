@@ -1,0 +1,6 @@
+{
+  "name": "mwifiex_usb",
+  "description": "Marvell USB8766, USB8797, USB8801 and USB8997 adapters",
+  "comments": "USB8997 on kernels 5.10 and newer, the firmware older kernels ask for is not distributed anymore.",
+  "modules": ["mwifiex_usb"]
+}

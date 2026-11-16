@@ -10,7 +10,7 @@ DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utili
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
 WIZARDS_DIR   = src/wizard/
-CHANGELOG     = "1. Profiles of the rtl8192eu, rtl8188eus, rtl8188fu and rtl8852bu drivers of synokernel-wifi"
+CHANGELOG     = "1. Profiles of the drivers synokernel-wifi adds: rtl8192eu, rtl8188eus, rtl8188fu, rtl8852bu, rt73usb, rt2500usb, rtl8187, ar5523, brcmfmac, mt7663u, mwifiex_usb, ath6kl_usb and rndis_wlan"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.

@@ -1,0 +1,5 @@
+{
+  "name": "rt2500usb",
+  "description": "Ralink RT2570 802.11g adapters: Asus WL-167G v1, Linksys WUSB54G v4 and others",
+  "modules": ["rt2500usb"]
+}
