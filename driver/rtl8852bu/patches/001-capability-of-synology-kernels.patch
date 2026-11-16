@@ -1,0 +1,12 @@
+--- include/rtw_rf.h.orig
++++ include/rtw_rf.h
+@@ -22,6 +22,9 @@
+ /* slot time for 11g */
+ #define SHORT_SLOT_TIME					9
+ #define NON_SHORT_SLOT_TIME				20
++
++/* Synology kernels type CAPABILITY in synobios.h, which linux/usb.h includes */
++#define CAPABILITY RTW_CAPABILITY
+ 
+ typedef enum _CAPABILITY {
+ 	cESS			= 0x0001,

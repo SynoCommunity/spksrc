@@ -1,11 +1,11 @@
 SPK_NAME = synokernel-wifi
 SPK_VERS = 1.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/synokernel-wifi.png
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides drivers of USB WiFi adapters for DSM6 and DSM7, with the wireless stack of the Linux kernel, cfg80211 and mac80211, that DSM7 no longer ships."
-CHANGELOG = "1. Initial release"
+CHANGELOG = "1. Add the rtl8192eu, rtl8188eus and rtl8188fu drivers of the RTL8192EU, RTL8188EU and RTL8188FU adapters, which the rtl8xxxu of DSM kernels lacks<br/>2. Add the rtl8852bu driver of the RTL8832BU and RTL8852BU WiFi 6 adapters, for kernels 5.10"
 
 STARTABLE = no
 WIZARDS_DIR = src/wizard/
@@ -14,9 +14,9 @@ DISPLAY_NAME = SynoKernel WiFi drivers
 HOMEPAGE = https://wireless.docs.kernel.org/
 LICENSE  = GPLv2
 
-# The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
+# The profiles of the WiFi adapters come with synocli-kernel 2.1-13, and the
 # tools to connect with synocli-wifi
-SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi>=1.0-2"
+SPK_DEPENDS = "synocli-kernel>=2.1-13:synocli-wifi>=1.0-2"
 
 REQUIRE_KERNEL ?= 1
 # No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
@@ -30,6 +30,10 @@ DEPENDS += driver/rtl8821cu
 DEPENDS += driver/rtl8821au
 DEPENDS += driver/rtl8812au
 DEPENDS += driver/rtl8814au
+DEPENDS += driver/rtl8192eu
+DEPENDS += driver/rtl8188eus
+DEPENDS += driver/rtl8188fu
+DEPENDS += driver/rtl8852bu
 DEPENDS += driver/rtw88
 DEPENDS += driver/wireless-regdb
 

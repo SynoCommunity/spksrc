@@ -1,0 +1,41 @@
+--- include/osdep_service_linux.h.orig
++++ include/osdep_service_linux.h
+@@ -92,6 +92,38 @@
+ 	#include <net/cfg80211.h>
+ #endif /* CONFIG_IOCTL_CFG80211 */
+ 
++/* Kernels before 4.4: the definitions of linux/ieee80211.h, linux/ip.h,
++ * linux/string.h and linux/etherdevice.h of newer kernels, after the headers, as the element IDs
++ * are enumerated there */
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
++	#include <linux/ip.h>
++	#define WLAN_CATEGORY_RADIO_MEASUREMENT		5
++	#define WLAN_CATEGORY_WNM_UNPROTECTED		11
++	#define WLAN_CATEGORY_VHT			21
++	#define WLAN_EID_HT_OPERATION			61
++	#define WLAN_EID_SECONDARY_CHANNEL_OFFSET	62
++	#define WLAN_EID_BSS_INTOLERANT_CHL_REPORT	73
++	#define WLAN_EID_VHT_CAPABILITY			191
++	#define WLAN_EID_VHT_OPERATION			192
++	#define WLAN_EID_OPMODE_NOTIF			199
++	#ifndef WLAN_OUI_MICROSOFT
++		#define WLAN_OUI_MICROSOFT		0x0050f2
++		#define WLAN_OUI_TYPE_MICROSOFT_WPA	1
++		#define WLAN_OUI_TYPE_MICROSOFT_WMM	2
++		#define WLAN_OUI_TYPE_MICROSOFT_WPS	4
++	#endif
++#endif
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
++	/* strscpy of the driver, its result unused, as strlcpy */
++	#define strscpy strlcpy
++#endif
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0))
++static inline void eth_broadcast_addr(u8 *addr)
++{
++	memset(addr, 0xff, ETH_ALEN);
++}
++#endif
++
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+ 	#include <linux/earlysuspend.h>
