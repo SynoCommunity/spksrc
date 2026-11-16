@@ -1,0 +1,5 @@
+{
+  "name": "rt73usb",
+  "description": "Ralink RT2501USB and RT2571W 802.11g adapters: Linksys WUSB54GC v1, D-Link DWA-110 and others",
+  "modules": ["rt73usb"]
+}

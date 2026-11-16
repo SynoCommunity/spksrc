@@ -1,0 +1,12 @@
+--- include/rtw_rf.h.orig
++++ include/rtw_rf.h
+@@ -75,6 +75,9 @@
+ 	u8	channel_spacing;				//MHz
+ 	u8	modem;
+ };
++
++/* Synology kernels type CAPABILITY in synobios.h, which linux/usb.h includes */
++#define CAPABILITY RTW_CAPABILITY
+ 
+ typedef enum _CAPABILITY{
+ 	cESS			= 0x0001,

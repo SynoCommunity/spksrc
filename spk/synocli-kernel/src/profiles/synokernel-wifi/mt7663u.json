@@ -1,0 +1,6 @@
+{
+  "name": "mt7663u",
+  "description": "MediaTek MT7663U 802.11ac adapters",
+  "comments": "Kernels 5.10 and newer.",
+  "modules": ["mt7663u"]
+}

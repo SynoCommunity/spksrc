@@ -1,0 +1,6 @@
+{
+  "name": "rtl8188eus",
+  "description": "Realtek RTL8188EU and RTL8188EUS adapters: TP-Link TL-WN722N v2/v3, TL-WN725N v2 and other nano adapters",
+  "comments": "Realtek driver, as maintained by aircrack-ng. Kernels 3.2 and newer: the rtl8xxxu of DSM kernels lacks this chip.",
+  "modules": ["8188eu"]
+}

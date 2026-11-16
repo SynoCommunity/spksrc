@@ -1,5 +1,6 @@
 {
   "name": "rtl8xxxu",
-  "description": "Realtek RTL8188EU, RTL8192EU, RTL8723BU and other 802.11n adapters, with the driver of the kernel",
+  "description": "Realtek RTL8192EU, RTL8723BU and other 802.11n adapters, with the driver of the kernel",
+  "comments": "Kernels 4.6 and newer for the RTL8192EU and RTL8723BU, the rtl8xxxu of older kernels has only the RTL8723AU and RTL8192CU: for the RTL8192EU, the rtl8192eu profile. The RTL8188EU and RTL8188FU are in the rtl8xxxu of kernels newer than DSM ones: the rtl8188eus and rtl8188fu profiles.",
   "modules": ["rtl8xxxu"]
 }

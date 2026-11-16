@@ -1,0 +1,5 @@
+{
+  "name": "brcmfmac",
+  "description": "Broadcom BCM43143, BCM43236, BCM43242, BCM43566, BCM43569 and Cypress CYW4373 adapters: Linksys AE2500 and others",
+  "modules": ["brcmfmac"]
+}

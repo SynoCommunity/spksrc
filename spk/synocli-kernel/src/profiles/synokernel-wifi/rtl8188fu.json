@@ -1,0 +1,6 @@
+{
+  "name": "rtl8188fu",
+  "description": "Realtek RTL8188FU adapters",
+  "comments": "Driver of the Linux community for the Realtek chip. Kernels 3.2 and newer: the rtl8xxxu of DSM kernels lacks this chip.",
+  "modules": ["rtl8188fu"]
+}

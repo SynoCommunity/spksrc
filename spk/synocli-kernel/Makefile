@@ -1,6 +1,6 @@
 SPK_NAME = synocli-kernel
 SPK_VERS = 2.1
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
@@ -10,7 +10,7 @@ DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utili
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
 WIZARDS_DIR   = src/wizard/
-CHANGELOG     = "1. Profiles of the USB WiFi adapters of synokernel-wifi<br/>2. synocli-kernelmodule tells to run it with sudo -i, as sudo alone does not find the commands of packages<br/>3. start, stop and restart check root first<br/>4. An installation and upgrade window with the experimental warning and how to load modules"
+CHANGELOG     = "1. Profiles of the drivers synokernel-wifi adds: rtl8192eu, rtl8188eus, rtl8188fu, rtl8852bu, rt73usb, rt2500usb, rtl8187, ar5523, brcmfmac, mt7663u, mwifiex_usb, ath6kl_usb and rndis_wlan"
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.
