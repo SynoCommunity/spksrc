@@ -90,6 +90,48 @@ Fontconfig error: No writable cache directories
 
 The fonts are still found and the text still renders; fontconfig only rescans them each time.
 
+### Using more fonts
+
+Java finds fonts through the bundled fontconfig, which also looks in the usual per-user and local
+directories. Any TrueType or OpenType font placed there is available to Java, for example the fonts
+other packages already ship:
+
+| Package | Fonts | Directory |
+|---------|-------|-----------|
+| ImageMagick | URW base35 (Nimbus Sans, Nimbus Roman, Nimbus Mono PS, C059, ...): metric-compatible with Helvetica, Times, Courier | `/var/packages/imagemagick/target/share/fonts` |
+| Google Fonts | the Google Fonts collection | `/var/packages/google-fonts/target/fonts` |
+
+Pick one of these ways:
+
+- **For one user**, link or copy the fonts into `~/.fonts`:
+
+    ```bash
+    mkdir -p ~/.fonts
+    ln -s /var/packages/imagemagick/target/share/fonts ~/.fonts/urw
+    ```
+
+- **For one user, without moving files**, list the directory in `~/.config/fontconfig/fonts.conf`:
+
+    ```xml
+    <?xml version="1.0"?>
+    <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+    <fontconfig>
+      <dir>/var/packages/imagemagick/target/share/fonts</dir>
+    </fontconfig>
+    ```
+
+- **For every user**, services included (as root):
+
+    ```bash
+    mkdir -p /usr/local/share/fonts
+    ln -s /var/packages/imagemagick/target/share/fonts /usr/local/share/fonts/urw
+    ```
+
+Each JDK package has its own fontconfig, and all three read these same places, so the fonts apply to Java 17,
+21 and 25 at once. Restart the Java application to see them. A font name Java cannot find silently falls back
+to `Dialog` (DejaVu): `new Font("Nimbus Sans", Font.PLAIN, 12).getFamily()` returns `Nimbus Sans` once the
+font is found.
+
 ## Java 25 on 32-bit NAS
 
 The 32-bit x86 port was removed from Java 25 and the 32-bit ARM port no longer runs, so Java 25 uses Zero on
