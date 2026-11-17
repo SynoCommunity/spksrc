@@ -1,0 +1,12 @@
+--- include/rtw_rf.h.orig
++++ include/rtw_rf.h
+@@ -53,6 +53,9 @@
+ u8 rtw_get_op_chs_by_cch_bw(u8 cch, u8 bw, u8 **op_chs, u8 *op_ch_num);
+ 
+ u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group);
++
++/* Synology kernels type CAPABILITY in synobios.h, which linux/usb.h includes */
++#define CAPABILITY RTW_CAPABILITY
+ 
+ typedef enum _CAPABILITY {
+ 	cESS			= 0x0001,

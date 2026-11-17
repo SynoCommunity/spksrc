@@ -1,11 +1,11 @@
 SPK_NAME = synokernel-wifi
 SPK_VERS = 1.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/synokernel-wifi.png
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides drivers of USB WiFi adapters for DSM6 and DSM7, with the wireless stack of the Linux kernel, cfg80211 and mac80211, that DSM7 no longer ships."
-CHANGELOG = "1. Initial release"
+CHANGELOG = "1. Add the rtl8192eu, rtl8188eus and rtl8188fu drivers of the RTL8192EU, RTL8188EU and RTL8188FU adapters, which the rtl8xxxu of DSM kernels lacks<br/>2. Add the rtl8852bu driver of the RTL8832BU and RTL8852BU WiFi 6 adapters, for kernels 5.10<br/>3. Add the kernel drivers rt73usb, rt2500usb, rtl8187, ar5523, brcmfmac, mt7663u, mwifiex_usb, ath6kl_usb and rndis_wlan"
 
 STARTABLE = no
 WIZARDS_DIR = src/wizard/
@@ -14,9 +14,9 @@ DISPLAY_NAME = SynoKernel WiFi drivers
 HOMEPAGE = https://wireless.docs.kernel.org/
 LICENSE  = GPLv2
 
-# The profiles of the WiFi adapters come with synocli-kernel 2.1, and the
+# The profiles of the WiFi adapters come with synocli-kernel 2.1-13, and the
 # tools to connect with synocli-wifi
-SPK_DEPENDS = "synocli-kernel>=2.1:synocli-wifi>=1.0-2"
+SPK_DEPENDS = "synocli-kernel>=2.1-13:synocli-wifi>=1.0-2"
 
 REQUIRE_KERNEL ?= 1
 # No USB WiFi driver of the kernel builds on 2.6.32 (88f6281, qoriq), nor rtl88x2bu
@@ -30,6 +30,10 @@ DEPENDS += driver/rtl8821cu
 DEPENDS += driver/rtl8821au
 DEPENDS += driver/rtl8812au
 DEPENDS += driver/rtl8814au
+DEPENDS += driver/rtl8192eu
+DEPENDS += driver/rtl8188eus
+DEPENDS += driver/rtl8188fu
+DEPENDS += driver/rtl8852bu
 DEPENDS += driver/rtw88
 DEPENDS += driver/wireless-regdb
 
@@ -65,6 +69,12 @@ REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_MEDIATEK=y
 REQUIRE_KERNEL_OPTION += CONFIG_WL_MEDIATEK=y
 REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_REALTEK=y
 REQUIRE_KERNEL_OPTION += CONFIG_RTL_CARDS=m
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_BROADCOM=y
+REQUIRE_KERNEL_OPTION += CONFIG_BRCMFMAC_USB=y
+REQUIRE_KERNEL_OPTION += CONFIG_WLAN_VENDOR_MARVELL=y
+# The cores the USB parts of ath6kl and mwifiex depend on
+REQUIRE_KERNEL_OPTION += CONFIG_ATH6KL=m
+REQUIRE_KERNEL_OPTION += CONFIG_MWIFIEX=m
 
 REQUIRE_KERNEL_MODULE  = CONFIG_CFG80211:net/wireless:cfg80211
 REQUIRE_KERNEL_MODULE += CONFIG_MAC80211:net/mac80211:mac80211
@@ -79,12 +89,20 @@ REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/ralink/rt2x00:rt2
 REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/ralink/rt2x00:rt2x00usb
 REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/ralink/rt2x00:rt2800lib
 REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/ralink/rt2x00:rt2800usb
+REQUIRE_KERNEL_MODULE += CONFIG_RT73USB:drivers/net/wireless/rt2x00:rt73usb
+REQUIRE_KERNEL_MODULE += CONFIG_RT73USB:drivers/net/wireless/ralink/rt2x00:rt73usb
+REQUIRE_KERNEL_MODULE += CONFIG_RT2500USB:drivers/net/wireless/rt2x00:rt2500usb
+REQUIRE_KERNEL_MODULE += CONFIG_RT2500USB:drivers/net/wireless/ralink/rt2x00:rt2500usb
 REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HTC:drivers/net/wireless/ath:ath:CONFIG_LEDS_TRIGGERS
 REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HTC:drivers/net/wireless/ath/ath9k:ath9k_hw:CONFIG_LEDS_TRIGGERS
 REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HTC:drivers/net/wireless/ath/ath9k:ath9k_common:CONFIG_LEDS_TRIGGERS
 REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HTC:drivers/net/wireless/ath/ath9k:ath9k_htc:CONFIG_LEDS_TRIGGERS
 REQUIRE_KERNEL_MODULE += CONFIG_CARL9170:drivers/net/wireless/ath:ath
 REQUIRE_KERNEL_MODULE += CONFIG_CARL9170:drivers/net/wireless/ath/carl9170:carl9170
+REQUIRE_KERNEL_MODULE += CONFIG_AR5523:drivers/net/wireless/ath:ath
+REQUIRE_KERNEL_MODULE += CONFIG_AR5523:drivers/net/wireless/ath/ar5523:ar5523
+REQUIRE_KERNEL_MODULE += CONFIG_ATH6KL_USB:drivers/net/wireless/ath/ath6kl:ath6kl_core
+REQUIRE_KERNEL_MODULE += CONFIG_ATH6KL_USB:drivers/net/wireless/ath/ath6kl:ath6kl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8192CU:drivers/net/wireless/rtlwifi:rtlwifi
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8192CU:drivers/net/wireless/rtlwifi/rtl8192c:rtl8192c-common
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8192CU:drivers/net/wireless/rtlwifi/rtl8192cu:rtl8192cu
@@ -95,6 +113,18 @@ REQUIRE_KERNEL_MODULE += CONFIG_RTL8192CU:drivers/net/wireless/realtek/rtlwifi/r
 REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI_USB:drivers/net/wireless/rtlwifi:rtl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI_USB:drivers/net/wireless/realtek/rtlwifi:rtl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8XXXU:drivers/net/wireless/realtek/rtl8xxxu:rtl8xxxu
+# rtl8187 reads its EEPROM with eeprom_93cx6, which DSM does not ship
+REQUIRE_KERNEL_MODULE += CONFIG_RTL8187:drivers/misc/eeprom:eeprom_93cx6
+REQUIRE_KERNEL_MODULE += CONFIG_RTL8187:drivers/net/wireless/rtl818x/rtl8187:rtl8187
+REQUIRE_KERNEL_MODULE += CONFIG_RTL8187:drivers/net/wireless/realtek/rtl818x/rtl8187:rtl8187
+REQUIRE_KERNEL_MODULE += CONFIG_BRCMFMAC:drivers/net/wireless/brcm80211/brcmutil:brcmutil
+REQUIRE_KERNEL_MODULE += CONFIG_BRCMFMAC:drivers/net/wireless/brcm80211/brcmfmac:brcmfmac
+REQUIRE_KERNEL_MODULE += CONFIG_BRCMFMAC:drivers/net/wireless/broadcom/brcm80211/brcmutil:brcmutil
+REQUIRE_KERNEL_MODULE += CONFIG_BRCMFMAC:drivers/net/wireless/broadcom/brcm80211/brcmfmac:brcmfmac
+REQUIRE_KERNEL_MODULE += CONFIG_MWIFIEX_USB:drivers/net/wireless/mwifiex:mwifiex
+REQUIRE_KERNEL_MODULE += CONFIG_MWIFIEX_USB:drivers/net/wireless/mwifiex:mwifiex_usb
+REQUIRE_KERNEL_MODULE += CONFIG_MWIFIEX_USB:drivers/net/wireless/marvell/mwifiex:mwifiex
+REQUIRE_KERNEL_MODULE += CONFIG_MWIFIEX_USB:drivers/net/wireless/marvell/mwifiex:mwifiex_usb
 REQUIRE_KERNEL_MODULE += CONFIG_MT7601U:drivers/net/wireless/mediatek/mt7601u:mt7601u
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x0U:drivers/net/wireless/mediatek/mt76:mt76
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x0U:drivers/net/wireless/mediatek/mt76:mt76-usb
@@ -108,5 +138,13 @@ REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76:mt76x
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76:mt76x02-usb
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2-common
 REQUIRE_KERNEL_MODULE += CONFIG_MT76x2U:drivers/net/wireless/mediatek/mt76/mt76x2:mt76x2u
+REQUIRE_KERNEL_MODULE += CONFIG_MT7663U:drivers/net/wireless/mediatek/mt76:mt76
+REQUIRE_KERNEL_MODULE += CONFIG_MT7663U:drivers/net/wireless/mediatek/mt76:mt76-usb
+REQUIRE_KERNEL_MODULE += CONFIG_MT7663U:drivers/net/wireless/mediatek/mt76/mt7615:mt7615-common
+REQUIRE_KERNEL_MODULE += CONFIG_MT7663U:drivers/net/wireless/mediatek/mt76/mt7615:mt7663-usb-sdio-common
+REQUIRE_KERNEL_MODULE += CONFIG_MT7663U:drivers/net/wireless/mediatek/mt76/mt7615:mt7663u
+# rndis_wlan, over the usbnet and cdc_ether of DSM, and rndis_host, which DSM lacks
+REQUIRE_KERNEL_MODULE += CONFIG_USB_NET_RNDIS_WLAN:drivers/net/usb:rndis_host
+REQUIRE_KERNEL_MODULE += CONFIG_USB_NET_RNDIS_WLAN:drivers/net/wireless:rndis_wlan
 
 include ../../mk/spksrc.spk.mk
