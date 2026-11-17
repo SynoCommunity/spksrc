@@ -1,0 +1,6 @@
+{
+  "name": "rtl8852bu",
+  "description": "Realtek RTL8832BU and RTL8852BU WiFi 6 adapters",
+  "comments": "Driver of the Linux community for the Realtek chips. Kernels 5.4 and newer, so DSM 7 on kernel 5.10.",
+  "modules": ["8852bu"]
+}

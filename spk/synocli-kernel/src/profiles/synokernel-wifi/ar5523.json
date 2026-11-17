@@ -1,0 +1,5 @@
+{
+  "name": "ar5523",
+  "description": "Atheros AR5523 802.11g adapters: Netgear WG111T, WG111U, D-Link DWL-G132 and others",
+  "modules": ["ar5523"]
+}

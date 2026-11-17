@@ -1,0 +1,9 @@
+--- Makefile.orig
++++ Makefile
+@@ -2354,6 +2354,3 @@
+ 	rm -fr .tmp_versions
+ endif
+ 
+-# For compatibility with kernels prior to 2.6.24.
+-EXTRA_CFLAGS += $(ccflags-y)
+-EXTRA_LDFLAGS += $(ldflags-y)

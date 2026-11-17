@@ -1,0 +1,5 @@
+{
+  "name": "rtl8187",
+  "description": "Realtek RTL8187 and RTL8187B 802.11g adapters: Alfa AWUS036H and others",
+  "modules": ["rtl8187"]
+}

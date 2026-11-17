@@ -1,0 +1,5 @@
+{
+  "name": "rndis_wlan",
+  "description": "Broadcom BCM4320 RNDIS adapters: Linksys WUSB54GSC, WUSB54GSv1/v2, Buffalo WLI-U2-KG125S and others",
+  "modules": ["rndis_wlan"]
+}

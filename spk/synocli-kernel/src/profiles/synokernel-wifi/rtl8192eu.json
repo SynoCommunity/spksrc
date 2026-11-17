@@ -1,0 +1,6 @@
+{
+  "name": "rtl8192eu",
+  "description": "Realtek RTL8192EU adapters",
+  "comments": "Driver of the Linux community for the Realtek chip. Kernels 4.4 and newer. The rtl8xxxu of kernels older than 4.6 lacks this chip: on newer kernels, an alternative to the rtl8xxxu profile, load one or the other.",
+  "modules": ["8192eu"]
+}
