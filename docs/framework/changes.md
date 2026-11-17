@@ -126,6 +126,22 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 17th 2026 — `TC_RUSTC = stable` follows the current stable release (#7791)"
+
+    - **What:** when `TC_RUSTC` is a channel (`stable`, `beta`, `nightly`), the toolchain's
+      rustup step now runs `rustup toolchain install <channel> --force`. A pinned version
+      (`1.97.1` on hi3535 and aarch64-6.2.4, see `spksrc.cross/env-rust.mk`) or an overlay
+      toolchain is left as is. The step no longer runs with `-q`, prints the `rustc` it
+      selected, and `tc_vars.rust.mk` records it as **`TC_RUSTC_RELEASE`** (informational),
+      so the release a build used is in the work dir and in CI's diagnostics.
+    - **Why:** in CI, `RUSTUP_HOME` is `distrib/rustup`, restored from the distrib cache that
+      no build job saves, and the quiet install left the cached release in place: SABnzbd's
+      orjson came out of rustc 1.97.0 while the current stable was 1.100. On Armada 370/XP
+      (VFPv3-D16) that mattered: Rust 1.97/1.98's prebuilt `compiler-builtins` for
+      `armv7-unknown-linux-gnueabihf` uses `d16` in `__aeabi_ul2d`, and `orjson.loads()`
+      died with SIGILL (#7785). Rust 1.100 no longer does.
+    - **PR:** [#7791](https://github.com/SynoCommunity/spksrc/pull/7791)
+
 ??? note "November 14th 2026 — A python spk that ships every wheel installs them without an index (#7770)"
 
     - **What:** `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` becomes **`WHEELS_OFFLINE`**. Set to
