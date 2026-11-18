@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico">
     <title>Stockfish Chess</title>
     <link rel="stylesheet" href="lib/chessboard.min.css">
     <style>
@@ -15,7 +16,7 @@
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { margin-bottom: 15px; color: #4ecca3; text-align: center; font-size: 1.8em; }
         .main-layout { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .board-section { flex: 0 0 auto; }
+        .board-section { flex: 0 1 500px; width: 500px; max-width: 100%; }
         #board-container { max-width: 500px; width: 100%; }
         #board { width: 100%; }
         .info-section { flex: 1; min-width: 220px; max-width: 280px; }
@@ -68,7 +69,9 @@
         .promo-piece:hover { background: #4ecca3; transform: scale(1.1); }
         .promo-piece img { width: 100%; height: 100%; }
         /* FEN Input Modal */
-        .modal input[type="text"] { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #4ecca3; background: #0f0f23; color: #eee; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        .modal input[type="text"], .modal textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #4ecca3; background: #0f0f23; color: #eee; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        .modal textarea { min-height: 140px; resize: vertical; }
+        .modal input[type="file"] { margin: 0 0 8px; color: #aaa; font-size: 12px; }
         .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         /* Turn indicator */
         .turn-indicator { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 8px; }
@@ -114,7 +117,9 @@
                     <button id="hint">Hint</button>
                     <button id="flip">Flip</button>
                     <button id="loadFen" class="secondary">Load FEN</button>
-                    <button id="copyPgn" class="secondary">PGN</button>
+                    <button id="copyPgn" class="secondary">Copy PGN</button>
+                    <button id="loadPgn" class="secondary">Load PGN</button>
+                    <button id="downloadPgn" class="secondary">Download PGN</button>
                 </div>
             </div>
 
@@ -156,6 +161,19 @@
             <div class="modal-buttons">
                 <button id="fenLoad">Load</button>
                 <button id="fenCancel" class="secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PGN Input Modal -->
+    <div class="modal-overlay" id="pgnModal">
+        <div class="modal">
+            <h3>Load Game (PGN)</h3>
+            <input type="file" id="pgnFile" accept=".pgn,application/x-chess-pgn,text/plain">
+            <textarea id="pgnInput" placeholder="Paste or choose a PGN file..."></textarea>
+            <div class="modal-buttons">
+                <button id="pgnLoad">Load</button>
+                <button id="pgnCancel" class="secondary">Cancel</button>
             </div>
         </div>
     </div>
