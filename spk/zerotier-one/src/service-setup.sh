@@ -12,6 +12,11 @@ SERVICE_COMMAND="/bin/sh ${SYNOPKG_PKGDEST}/bin/zerotier-one-supervise"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
+zt_tun_ready ()
+{
+    [ -c /dev/net/tun ] && [ -w /dev/net/tun ]
+}
+
 zt_caps_ready ()
 {
     [ "$(stat -c '%i:%Y:%s' "${ZEROTIER}" 2>/dev/null)" = "$(cat /run/zerotier-one.caps 2>/dev/null)" ]
@@ -31,20 +36,26 @@ service_prestart ()
         echo "The zerotier-one guard fixes it within 30 seconds."
         exit 1
     fi
-    if [ ! -c /dev/net/tun ] || [ ! -w /dev/net/tun ]; then
+    # /bin/getcap is root-only on DSM, so the root guard records in /run the
+    # binary it granted the capability to. After an install or upgrade the
+    # guard loads tun and grants the capability on its next round (every 5
+    # seconds) while Package Center starts the package at once: wait for it
+    # rather than fail. On a first install the wizard has just run the boot-up
+    # task, so give the guard 15 seconds to appear. The guard runs as root, so
+    # its liveness is checked through /proc, not kill -0.
+    if ! zt_tun_ready || ! zt_caps_ready; then
+        echo "waiting for the guard to prepare /dev/net/tun and the network capability of ${ZEROTIER}"
+        i=0
+        while [ $i -lt 60 ]; do
+            zt_tun_ready && zt_caps_ready && break
+            guard_pid=$(cat /run/zerotier-one-guard.pid 2>/dev/null)
+            [ $i -ge 15 ] && { [ -z "${guard_pid}" ] || [ ! -d "/proc/${guard_pid}" ]; } && break
+            sleep 1; i=$((i + 1))
+        done
+    fi
+    if ! zt_tun_ready; then
         echo "ERROR: /dev/net/tun is not ready: is the zerotier-one boot-up task present in Task Scheduler?"
         exit 1
-    fi
-    # /bin/getcap is root-only on DSM, so the root guard records in /run the
-    # binary it granted the capability to; after an install or upgrade the
-    # record no longer matches until the guard has run (within 30 seconds):
-    # wait for it rather than fail the upgrade. The guard runs as root, so
-    # its liveness is checked through /proc, not kill -0.
-    guard_pid=$(cat /run/zerotier-one-guard.pid 2>/dev/null)
-    if ! zt_caps_ready && [ -n "${guard_pid}" ] && [ -d "/proc/${guard_pid}" ]; then
-        echo "waiting for the guard to grant the network capability to ${ZEROTIER}"
-        i=0
-        while [ $i -lt 40 ] && ! zt_caps_ready; do sleep 1; i=$((i + 1)); done
     fi
     if ! zt_caps_ready; then
         echo "ERROR: ZeroTier has no network permission yet. Check that the zerotier-one boot-up task exists in Control Panel > Task Scheduler and run it."
