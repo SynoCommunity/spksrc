@@ -3,9 +3,9 @@ SPK_VERS = 6.1.6
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 11 # unreleased
 SPK_ICON = src/ffmpeg6.png
-CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
-CHANGELOG += "2. Internal build options now follow toolchain capabilities<br/>"
-CHANGELOG += "3. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370<br/>"
+CHANGELOG  = "1. Restore the SYNO-videostation patches <br/>"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities <br/>"
+CHANGELOG += "3. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370"
 
 DEPENDS = cross/ffmpeg6
 VIDEODRV_PACKAGE = synocli-videodriver
