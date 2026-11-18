@@ -126,20 +126,18 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "November 17th 2026 — `TC_RUSTC = stable` follows the current stable release (#7791)"
+??? note "November 17th 2026 — A python spk installs its own compiled wheels, not PyPI's (#7791)"
 
-    - **What:** when `TC_RUSTC` is a channel (`stable`, `beta`, `nightly`), the toolchain's
-      rustup step now runs `rustup toolchain install <channel> --force`. A pinned version
-      (`1.97.1` on hi3535 and aarch64-6.2.4, see `spksrc.cross/env-rust.mk`) or an overlay
-      toolchain is left as is. The step no longer runs with `-q`, prints the `rustc` it
-      selected, and `tc_vars.rust.mk` records it as **`TC_RUSTC_RELEASE`** (informational),
-      so the release a build used is in the work dir and in CI's diagnostics.
-    - **Why:** in CI, `RUSTUP_HOME` is `distrib/rustup`, restored from the distrib cache that
-      no build job saves, and the quiet install left the cached release in place: SABnzbd's
-      orjson came out of rustc 1.97.0 while the current stable was 1.100. On Armada 370/XP
-      (VFPv3-D16) that mattered: Rust 1.97/1.98's prebuilt `compiler-builtins` for
-      `armv7-unknown-linux-gnueabihf` uses `d16` in `__aeabi_ul2d`, and `orjson.loads()`
-      died with SIGILL (#7785). Rust 1.100 no longer does.
+    - **What:** `install_python_wheels` passes, by path, the wheels listed in the package's
+      `requirements-abi3.txt` and `requirements-crossenv.txt`, in the same pip call as
+      `requirements.txt`. pip installs those files, and still resolves their dependencies
+      and the pure-python wheels from the index. `tc_vars.rust.mk` also records the release
+      `TC_RUSTUP_TOOLCHAIN` resolved to as **`TC_RUSTC_RELEASE`** (informational).
+    - **Why:** pip ranks a `manylinux` wheel above a `linux_<arch>` one of the same version,
+      so with the index on, a wheel the package cross-compiled lost to PyPI's whenever PyPI
+      had one for the arch. SABnzbd's orjson came from PyPI, built by Rust 1.97, whose
+      `compiler-builtins` uses `d16` in `__aeabi_ul2d`: `orjson.loads()` died with SIGILL on
+      Armada 370/XP (VFPv3-D16, #7785). Ours, built by Rust 1.100, does not.
     - **PR:** [#7791](https://github.com/SynoCommunity/spksrc/pull/7791)
 
 ??? note "November 14th 2026 — A python spk that ships every wheel installs them without an index (#7770)"
