@@ -81,21 +81,15 @@ pre_rustc_target: rustc_msg
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q --no-modify-path --default-toolchain $(TC_RUSTC) ; \
 	flock -u 5
 
-# A channel (stable, beta, nightly) is updated with --force: rustup otherwise keeps the
-# installed release when a component it carries is missing from the new one. A pinned
-# version or an overlay toolchain is left as is. The release in use is printed.
-_RUSTUP_INSTALL_FORCE = $(if $(filter stable beta nightly,$(TC_RUSTC)),--force)
-
 rustc_target: $(PRE_RUSTC_TARGET)
-	@$(MSG) "rustup toolchain install $(TC_RUSTC) $(_RUSTUP_INSTALL_FORCE)" ; \
+	@$(MSG) "rustup -q toolchain install $(TC_RUSTC)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
 	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
 	pid=$$$$ ; \
 	echo "$${pid}" 1>&5 ; \
-	rustup toolchain install $(TC_RUSTC) $(_RUSTUP_INSTALL_FORCE) ; \
+	rustup -q toolchain install $(TC_RUSTC) ; \
 	$(MSG) "rustup default $(TC_RUSTC)" ; \
 	rustup default $(TC_RUSTC) ; \
-	$(MSG) "rustc $(TC_RUSTC): $$(rustc +$(TC_RUSTC) --version 2>&1)" ; \
 	if [ -n "$(_RUST_BASE_TARGET)" ] ; then \
 	   $(MSG) "Installing STOCK base std $(_RUST_BASE_TARGET) so OVERLAY_RUSTC=0 stays usable without re-invoking this cookie-locked build" ; \
 	   rustup component add rust-std --target $(_RUST_BASE_TARGET) --toolchain $(TC_RUSTC) || { \
