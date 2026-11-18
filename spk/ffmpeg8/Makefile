@@ -1,12 +1,13 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.3
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/ffmpeg8.png
 CHANGELOG  = "1. Update to version 8.1.3<br/>"
 CHANGELOG += "2. Update to jellyfin 8.1.3-1 patchset<br/>"
 CHANGELOG += "3. Rebuilt with nettle 4.0 and the updated video driver libraries<br/>"
-CHANGELOG += "4. Update to jellyfin 8.1.3-2 patchset"
+CHANGELOG += "4. Update to jellyfin 8.1.3-2 patchset<br/>"
+CHANGELOG += "5. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370<br/>"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver

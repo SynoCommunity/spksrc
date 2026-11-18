@@ -150,7 +150,10 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
-CONFIGURE_ARGS += --enable-thumb
+# ARM, not Thumb-2: built as Thumb-2, the native AAC encoder segfaults on an
+# Armada 370 (DS115j, DSM 7.1) in psy_3gpp_analyze_channel(), whatever the
+# optimisation level, LTO or if-conversion; the same source built -marm runs.
+CONFIGURE_ARGS += --disable-thumb
 CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2

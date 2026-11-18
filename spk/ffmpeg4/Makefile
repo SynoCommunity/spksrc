@@ -1,7 +1,7 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.4.8
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 52
+SPK_REV = 53
 SPK_ICON = src/ffmpeg.png
 CHANGELOG  = "1. Update to version 4.4.8<br/>"
 CHANGELOG += "2. Update to jellyfin-ffmpeg v4.4.1-4 patchset<br/>"
@@ -9,7 +9,8 @@ CHANGELOG += "3. Now using new synocli-videodriver package<br/>"
 CHANGELOG += "4. Align package with ffmpeg7/ffmpeg8<br/>"
 CHANGELOG += "5. Enable DSM 5.2 support (x86, PowerPC ppc853x and ARMv5 88f6281)<br/>"
 CHANGELOG += "6. PowerPC ppc853x now built as e500v2 instead of e500<br/>"
-CHANGELOG += "7. Internal build options now follow toolchain capabilities"
+CHANGELOG += "7. Internal build options now follow toolchain capabilities<br/>"
+CHANGELOG += "8. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370<br/>"
 
 DEPENDS = cross/ffmpeg4
 VIDEODRV_PACKAGE = synocli-videodriver

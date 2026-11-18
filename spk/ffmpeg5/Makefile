@@ -1,13 +1,14 @@
 SPK_NAME = ffmpeg5
 SPK_VERS = 5.1.10
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9# unreleased
 SPK_ICON = src/ffmpeg5.png
 CHANGELOG  = "1. Update to version 5.1.10<br/>"
 CHANGELOG += "2. Update to jellyfin-ffmpeg v5.1.4-3 patchset<br/>"
 CHANGELOG += "3. Now using new synocli-videodriver package<br/>"
 CHANGELOG += "4. Align package with ffmpeg7/ffmpeg8<br/>"
-CHANGELOG += "5. Internal build options now follow toolchain capabilities"
+CHANGELOG += "5. Internal build options now follow toolchain capabilities<br/>"
+CHANGELOG += "6. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370<br/>"
 
 DEPENDS = cross/ffmpeg5
 VIDEODRV_PACKAGE = synocli-videodriver
