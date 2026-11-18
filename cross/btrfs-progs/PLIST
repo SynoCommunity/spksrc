@@ -1,0 +1,6 @@
+lnk:lib/libbtrfs.so
+lnk:lib/libbtrfs.so.0
+lib:lib/libbtrfs.so.0.1
+lnk:lib/libbtrfsutil.so
+lnk:lib/libbtrfsutil.so.1
+lib:lib/libbtrfsutil.so.1.2.0
