@@ -1,0 +1,3 @@
+lnk:lib/libbsd.so
+lnk:lib/libbsd.so.0
+lib:lib/libbsd.so.0.12.2
