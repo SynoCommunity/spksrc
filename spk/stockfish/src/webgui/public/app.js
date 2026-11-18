@@ -3,12 +3,14 @@ let game = new Chess();
 let board = null;
 let ws = null;
 let playerColor = 'w';
-let isThinking = false;
 let skillLevel = 10;
 let moveHistory = [];
 let soundEnabled = true;
 let selfPlayMode = false;
 let pendingPromotion = null;
+let searchState = 'idle';
+let pendingSearch = null;
+let lastFocused = null;
 
 // Sound files (bundled locally)
 const sounds = {
@@ -50,16 +52,23 @@ function connectWS() {
     ws = new WebSocket(`${protocol}//${window.location.host}`);
     ws.onopen = () => {
         sendUCI('uci');
-        setTimeout(() => {
-            sendUCI('setoption name Skill Level value ' + skillLevel);
-            sendUCI('isready');
-        }, 100);
     };
     ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'uci') handleUCIResponse(msg.data);
+        try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'uci') handleUCIResponse(msg.data);
+        } catch (e) {
+            console.error('Invalid server message:', e);
+        }
     };
-    ws.onclose = () => setTimeout(connectWS, 2000);
+    ws.onerror = () => {};
+    ws.onclose = () => {
+        ws = null;
+        searchState = 'idle';
+        pendingSearch = null;
+        clearEngineOutput(false);
+        setTimeout(connectWS, 2000);
+    };
 }
 
 function sendUCI(cmd) {
@@ -68,9 +77,87 @@ function sendUCI(cmd) {
     }
 }
 
+function applySkillLevel() {
+    sendUCI('setoption name Skill Level value ' + skillLevel);
+}
+
+function beginSearch(type) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    if (searchState !== 'idle') {
+        pendingSearch = type;
+        if (searchState !== 'stopping') {
+            searchState = 'stopping';
+            sendUCI('stop');
+        }
+        return;
+    }
+    searchState = type;
+    document.getElementById('bestmove').textContent = '';
+    document.getElementById('thinking').textContent = type === 'engine' ? 'Thinking...' : 'Analyzing...';
+    applySkillLevel();
+    sendUCI('position fen ' + game.fen());
+    sendUCI(type === 'engine' ? 'go movetime 1500' : 'go movetime 2000');
+}
+
+function stopEngineSearch() {
+    pendingSearch = null;
+    if (searchState === 'engine' || searchState === 'hint') {
+        searchState = 'stopping';
+        sendUCI('stop');
+    }
+}
+
+function clearEngineOutput(resetEval) {
+    document.getElementById('bestmove').textContent = '';
+    document.getElementById('thinking').textContent = '';
+    if (resetEval) document.getElementById('eval').textContent = '0.0';
+}
+
+function openModal(id) {
+    lastFocused = document.activeElement;
+    const modal = document.getElementById(id);
+    modal.classList.add('active');
+    const field = modal.querySelector('input:not([type="file"]), textarea, button');
+    if (field) setTimeout(() => field.focus(), 0);
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+        lastFocused = null;
+    }
+}
+
+function handleBestMove(uciMove) {
+    const type = searchState;
+    searchState = 'idle';
+    document.getElementById('thinking').textContent = '';
+
+    if (type === 'engine' && uciMove !== '(none)') {
+        makeEngineMove(uciMove);
+    } else if (type === 'hint' && uciMove !== '(none)') {
+        document.getElementById('bestmove').textContent = 'Best: ' + uciMove;
+        if (isEngineTurn()) setTimeout(engineMove, 300);
+    }
+
+    const next = pendingSearch;
+    pendingSearch = null;
+    if (next) beginSearch(next);
+}
+
 function handleUCIResponse(data) {
     data.split('\n').forEach(line => {
-        if (line.startsWith('info') && line.includes('score cp')) {
+        if (line === 'uciok') {
+            searchState = 'idle';
+            pendingSearch = null;
+            applySkillLevel();
+            sendUCI('isready');
+            if (!game.game_over()) setTimeout(engineMove, 100);
+            return;
+        }
+        const searching = searchState === 'engine' || searchState === 'hint';
+        if (line.startsWith('info') && line.includes('score cp') && searching) {
             const match = line.match(/score cp (-?\d+)/);
             if (match) {
                 let cp = parseInt(match[1]) / 100;
@@ -78,7 +165,7 @@ function handleUCIResponse(data) {
                 document.getElementById('eval').textContent = (cp >= 0 ? '+' : '') + cp.toFixed(1);
             }
         }
-        if (line.startsWith('info') && line.includes('score mate')) {
+        if (line.startsWith('info') && line.includes('score mate') && searching) {
             const match = line.match(/score mate (-?\d+)/);
             if (match) {
                 let mate = parseInt(match[1]);
@@ -88,17 +175,12 @@ function handleUCIResponse(data) {
         }
         if (line.startsWith('bestmove')) {
             const match = line.match(/bestmove\s+(\S+)/);
-            if (match) {
-                document.getElementById('bestmove').textContent = 'Best: ' + match[1];
-                if (isThinking) makeEngineMove(match[1]);
-            }
-            document.getElementById('thinking').textContent = '';
+            if (match) handleBestMove(match[1]);
         }
     });
 }
 
 function makeEngineMove(uciMove) {
-    isThinking = false;
     const from = uciMove.substring(0, 2);
     const to = uciMove.substring(2, 4);
     const promotion = uciMove.length > 4 ? uciMove[4] : null;
@@ -148,6 +230,7 @@ function onDrop(source, target) {
         playSound('illegal');
         return 'snapback';
     }
+    clearEngineOutput(false);
     moveHistory.push(move.san);
     playSoundForMove(move);
     updateDisplay();
@@ -161,47 +244,54 @@ function onDrop(source, target) {
 function onSnapEnd() { board.position(game.fen()); }
 
 function showPromotionDialog(color) {
-    const modal = document.getElementById('promoModal');
     const piecesDiv = document.getElementById('promoPieces');
     const prefix = color === 'w' ? 'w' : 'b';
     piecesDiv.innerHTML = ['q','r','b','n'].map(p => `
         <div class="promo-piece" data-piece="${p}">
-            <img src="img/pieces/${colorPrefix}${p.toUpperCase()}.png" alt="${p}">
+            <img src="img/pieces/${prefix}${p.toUpperCase()}.png" alt="${p}">
         </div>
     `).join('');
-    modal.classList.add('active');
+    openModal('promoModal');
     piecesDiv.querySelectorAll('.promo-piece').forEach(el => {
         el.onclick = () => completePromotion(el.dataset.piece);
     });
 }
 
 function completePromotion(piece) {
-    document.getElementById('promoModal').classList.remove('active');
+    closeModal('promoModal');
     if (pendingPromotion) {
         const move = game.move({ from: pendingPromotion.source, to: pendingPromotion.target, promotion: piece });
         if (move) {
+            clearEngineOutput(false);
             moveHistory.push(move.san);
             board.position(game.fen());
             playSound('promote');
+            if (game.in_check() && !game.game_over()) {
+                setTimeout(() => playSound('check'), 100);
+            }
             updateDisplay();
-            if (!game.game_over()) setTimeout(engineMove, 300);
+            if (game.game_over()) playSound('gameEnd');
+            else setTimeout(engineMove, 300);
         }
         pendingPromotion = null;
     }
 }
 
+function isEngineTurn() {
+    return selfPlayMode ||
+        (playerColor === 'w' && game.turn() === 'b') ||
+        (playerColor === 'b' && game.turn() === 'w');
+}
+
 function engineMove() {
-    if (game.game_over() || isThinking) return;
-    isThinking = true;
-    document.getElementById('thinking').textContent = 'Thinking...';
-    sendUCI('position fen ' + game.fen());
-    sendUCI('go movetime 1500');
+    if (game.game_over() || !isEngineTurn()) return;
+    if (searchState === 'idle') beginSearch('engine');
+    else if (searchState === 'stopping' && !pendingSearch) pendingSearch = 'engine';
 }
 
 // Stop self-play mode and sync UI
 function stopSelfPlay() {
     selfPlayMode = false;
-    isThinking = false;
     const cb = document.getElementById('selfPlay');
     if (cb) cb.checked = false;
     document.getElementById('playerColor').disabled = false;
@@ -269,17 +359,22 @@ function updateStatus() {
     if (status && !game.in_check()) document.getElementById('bestmove').textContent = '';
 }
 
-function newGame() {
-    isThinking = false; // Cancel any pending engine move
-    game = new Chess();
-    moveHistory = [];
-    board.position('start');
-    document.getElementById('eval').textContent = '0.0';
-    document.getElementById('bestmove').textContent = '';
-    document.getElementById('thinking').textContent = '';
+function activateGame(nextGame) {
+    stopEngineSearch();
+    pendingPromotion = null;
+    ['promoModal', 'fenModal', 'pgnModal'].forEach(id =>
+        document.getElementById(id).classList.remove('active'));
+    lastFocused = null;
+    game = nextGame;
+    moveHistory = game.history();
+    board.position(game.fen());
+    clearEngineOutput(true);
     updateDisplay();
-    if (selfPlayMode) setTimeout(engineMove, 500);
-    else if (playerColor === 'b') setTimeout(engineMove, 500);
+    setTimeout(engineMove, 500);
+}
+
+function newGame() {
+    activateGame(new Chess());
 }
 
 function loadFEN(fen) {
@@ -289,19 +384,65 @@ function loadFEN(fen) {
         playSound('illegal');
         return false;
     }
-    isThinking = false; // Cancel any pending engine move
-    game = new Chess(fen);
-    moveHistory = [];
-    board.position(fen);
-    document.getElementById('eval').textContent = '0.0';
-    document.getElementById('bestmove').textContent = '';
-    document.getElementById('thinking').textContent = '';
-    updateDisplay();
-    if (selfPlayMode) setTimeout(engineMove, 500);
-    else if ((playerColor === 'w' && game.turn() === 'b') || (playerColor === 'b' && game.turn() === 'w')) {
-        setTimeout(engineMove, 500);
-    }
+    activateGame(new Chess(fen));
     return true;
+}
+
+function loadPGN(pgn) {
+    const candidate = new Chess();
+    let loaded = false;
+    try {
+        loaded = candidate.load_pgn(pgn);
+    } catch (e) {
+        loaded = false;
+    }
+    if (!loaded || candidate.history().length === 0) {
+        alert('Invalid or empty PGN');
+        playSound('illegal');
+        return false;
+    }
+    activateGame(candidate);
+    return true;
+}
+
+function downloadPGN() {
+    const pgn = game.pgn();
+    if (!pgn.trim()) {
+        showToast('No moves');
+        return;
+    }
+    const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'stockfish-' + new Date().toISOString().slice(0, 10) + '.pgn';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('PGN downloaded!');
+}
+
+function saveSettings() {
+    try {
+        localStorage.setItem('stockfishSettings', JSON.stringify({
+            playerColor: playerColor,
+            skillLevel: skillLevel,
+            soundEnabled: soundEnabled
+        }));
+    } catch (e) {}
+}
+
+function loadSettings() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('stockfishSettings'));
+        if (!saved) return;
+        if (saved.playerColor === 'w' || saved.playerColor === 'b') playerColor = saved.playerColor;
+        if (Number.isInteger(saved.skillLevel) && saved.skillLevel >= 1 && saved.skillLevel <= 20) {
+            skillLevel = saved.skillLevel;
+        }
+        if (typeof saved.soundEnabled === 'boolean') soundEnabled = saved.soundEnabled;
+    } catch (e) {}
 }
 
 function showToast(msg) {
@@ -335,6 +476,12 @@ function copyFEN() {
 
 // Initialize
 $(document).ready(() => {
+    loadSettings();
+    document.getElementById('playerColor').value = playerColor;
+    document.getElementById('difficulty').value = skillLevel;
+    document.getElementById('diffVal').textContent = skillLevel;
+    document.getElementById('soundEnabled').checked = soundEnabled;
+
     board = Chessboard('board', {
         draggable: true,
         position: 'start',
@@ -343,71 +490,107 @@ $(document).ready(() => {
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
     });
+    board.orientation(playerColor === 'b' ? 'black' : 'white');
     connectWS();
     updateDisplay();
 
     // Controls
     document.getElementById('newGame').onclick = newGame;
     document.getElementById('undo').onclick = () => {
-        game.undo(); game.undo();
-        moveHistory = moveHistory.slice(0, -2);
+        if (game.history().length === 0) return;
+        stopEngineSearch();
+        pendingPromotion = null;
+        closeModal('promoModal');
+        game.undo();
+        if (game.history().length > 0) game.undo();
+        moveHistory = game.history();
         board.position(game.fen());
+        clearEngineOutput(true);
         updateDisplay();
     };
     document.getElementById('hint').onclick = () => {
-        document.getElementById('thinking').textContent = 'Analyzing...';
-        sendUCI('position fen ' + game.fen());
-        sendUCI('go movetime 2000');
+        if (!game.game_over()) beginSearch('hint');
     };
     document.getElementById('flip').onclick = () => board.flip();
     document.getElementById('copyPgn').onclick = copyPGN;
+    document.getElementById('downloadPgn').onclick = downloadPGN;
     document.getElementById('fen').onclick = copyFEN;
 
     // FEN modal
     document.getElementById('loadFen').onclick = () => {
         document.getElementById('fenInput').value = game.fen();
-        document.getElementById('fenModal').classList.add('active');
+        openModal('fenModal');
     };
     document.getElementById('fenLoad').onclick = () => {
         if (loadFEN(document.getElementById('fenInput').value.trim()))
-            document.getElementById('fenModal').classList.remove('active');
+            closeModal('fenModal');
     };
-    document.getElementById('fenCancel').onclick = () => document.getElementById('fenModal').classList.remove('active');
+    document.getElementById('fenCancel').onclick = () => closeModal('fenModal');
+
+    // PGN modal
+    document.getElementById('loadPgn').onclick = () => {
+        document.getElementById('pgnInput').value = '';
+        document.getElementById('pgnFile').value = '';
+        openModal('pgnModal');
+    };
+    document.getElementById('pgnLoad').onclick = () => {
+        if (loadPGN(document.getElementById('pgnInput').value.trim()))
+            closeModal('pgnModal');
+    };
+    document.getElementById('pgnCancel').onclick = () => closeModal('pgnModal');
+    document.getElementById('pgnFile').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { document.getElementById('pgnInput').value = reader.result; };
+        reader.onerror = () => showToast('Unable to read PGN file');
+        reader.readAsText(file);
+    };
 
     // Close modals on overlay click
     document.querySelectorAll('.modal-overlay').forEach(o => {
-        o.onclick = (e) => { if (e.target === o) { o.classList.remove('active'); pendingPromotion = null; } };
+        o.onclick = (e) => { if (e.target === o) { closeModal(o.id); pendingPromotion = null; } };
     });
 
     // Settings
     document.getElementById('playerColor').onchange = (e) => {
         playerColor = e.target.value;
+        saveSettings();
         newGame();
-        if (playerColor === 'b') board.flip();
+        board.orientation(playerColor === 'b' ? 'black' : 'white');
     };
     document.getElementById('difficulty').oninput = (e) => {
         skillLevel = parseInt(e.target.value);
         document.getElementById('diffVal').textContent = skillLevel;
-        sendUCI('setoption name Skill Level value ' + skillLevel);
+        saveSettings();
+        if (searchState === 'idle') applySkillLevel();
     };
     document.getElementById('soundEnabled').onchange = (e) => {
         soundEnabled = e.target.checked;
+        saveSettings();
         if (soundEnabled) playSound('move');
     };
     document.getElementById('selfPlay').onchange = (e) => {
         selfPlayMode = e.target.checked;
         document.getElementById('playerColor').disabled = selfPlayMode;
-        if (!game.game_over() && !isThinking) {
-            const isEngineTurn = selfPlayMode || (playerColor === "w" && game.turn() === "b") || (playerColor === "b" && game.turn() === "w");
-            if (isEngineTurn) engineMove();
-        }
+        if (!selfPlayMode && searchState === 'engine') stopEngineSearch();
+        if (!game.game_over() && isEngineTurn()) engineMove();
     };
 
     $(window).resize(() => board.resize());
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT') return;
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+            pendingPromotion = null;
+            return;
+        }
+        const tag = e.target.tagName;
+        if (document.querySelector('.modal-overlay.active') ||
+            e.ctrlKey || e.metaKey || e.altKey ||
+            tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+            e.target.isContentEditable) return;
         if (e.key === 'n') newGame();
         else if (e.key === 'u') document.getElementById('undo').click();
         else if (e.key === 'h') document.getElementById('hint').click();
