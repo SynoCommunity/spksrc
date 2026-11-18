@@ -1,0 +1,24 @@
+--- vendored/libfuse/Makefile.orig
++++ vendored/libfuse/Makefile
+@@ -66,7 +66,7 @@
+ DATAROOTDIR   ?= $(PREFIX)/share
+ DATADIR       ?= $(DATAROOTDIR)
+ BINDIR        ?= $(EXEC_PREFIX)/bin
+-SBINDIR       ?= /sbin
++SBINDIR       ?= $(EXEC_PREFIX)/sbin
+ MANDIR        ?= $(DATAROOTDIR)/man
+ MAN1DIR       ?= $(MANDIR)/man1
+ 
+@@ -168,10 +168,10 @@
+ 	$(STRIP) --strip-all $(BUILDDIR)/mount.mergerfs
+ 	$(STRIP) --strip-all $(BUILDDIR)/mergerfs-fusermount
+ 
+-install-utils: mergerfs-fusermount mount.mergerfs strip
++install-utils: mergerfs-fusermount mount.mergerfs
+ 	$(INSTALL) -D $(BUILDDIR)/mergerfs-fusermount "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 	$(INSTALL) -D $(BUILDDIR)/mount.mergerfs "$(INSTALLSBINDIR)/mount.mergerfs"
+-	$(CHOWN) root:root "$(INSTALLBINDIR)/mergerfs-fusermount"
++	#$(CHOWN) root:root "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 	$(CHMOD) u+s "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 
+ install: $(INSTALLUTILS)
