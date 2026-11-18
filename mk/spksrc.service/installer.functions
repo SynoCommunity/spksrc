@@ -116,6 +116,17 @@ install_python_wheels ()
     cachedir=${SYNOPKG_PKGVAR}/pip-cache
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
     requirements=${wheelhouse}/requirements.txt
+    # The wheels built for the package (requirements-abi3.txt, requirements-crossenv.txt), passed
+    # by path: pip otherwise prefers an index's manylinux wheel of the same version to ours
+    wheels=""
+    for built in ${wheelhouse}/requirements-abi3.txt ${wheelhouse}/requirements-crossenv.txt; do
+        [ -s ${built} ] || continue
+        for req in $(grep -v -E '^[[:space:]]*(#|$)' ${built}); do
+            name=$(echo ${req%%==*} | tr 'A-Z.-' 'a-z__')
+            wheel=$(ls ${wheelhouse} | awk -F- -v n="${name}" -v v="${req#*==}" 'tolower($1) == n && $2 == v && /\.whl$/' | head -1)
+            [ -n "${wheel}" ] && wheels="${wheels} ${wheelhouse}/${wheel}"
+        done
+    done
 
     # Install the wheels
     echo "Install packages from wheels"
@@ -127,6 +138,7 @@ install_python_wheels ()
                    --force-reinstall \
                    --cache-dir ${cachedir} \
                    --find-links ${wheelhouse} \
+                   ${wheels} \
                    --requirement ${requirements} \
        || echo "ERROR: Python package installation failed" 1>&2
     fi
