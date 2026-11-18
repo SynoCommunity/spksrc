@@ -49,7 +49,7 @@ else
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+CONFIGURE_ARGS += --extra-version=$(call read_makefile_var,$(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile,SPK_REV)
 
 # libavformat/fifo.c holds the tree's only 64-bit atomic. Without C11 <stdatomic.h>
 # (gcc < 4.9) ffmpeg maps it onto __sync_*_8, which 32-bit PowerPC has no instruction for

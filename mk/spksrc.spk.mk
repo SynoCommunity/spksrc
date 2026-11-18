@@ -94,6 +94,11 @@ OS_MIN_VER = $(TC_OS_MIN_VER)
 endif
 endif
 
+# make keeps the blanks between a value and a comment after it, SPK_REV = 9 # unreleased
+# reading "9 ": out of the package's file name and its INFO version.
+SPK_VERS := $(strip $(SPK_VERS))
+SPK_REV := $(strip $(SPK_REV))
+
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
 
 #####

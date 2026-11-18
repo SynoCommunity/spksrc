@@ -10,7 +10,9 @@
 #
 # The value of VAR as the file assigns it (VAR = value, VAR := value, VAR ?= value), as
 # raw text: a reference inside it is not expanded. Empty when the file or the line is absent.
-read_makefile_var = $(shell sed -n 's/^$(2)[[:space:]]*[:?]*=[[:space:]]*//p' $(1) 2>/dev/null)
+# A comment after the value is left out, and so are the blanks before it, as make itself
+# leaves the comment out of the value: SPK_REV = 9 # unreleased reads 9.
+read_makefile_var = $(shell sed -n '/^$(2)[[:space:]]*[:?]*=/{s/^[^=]*=[[:space:]]*//;s/#.*//;s/[[:space:]]*$$//;p;}' $(1) 2>/dev/null)
 
 # Macro: locate a toolchain tool
 #

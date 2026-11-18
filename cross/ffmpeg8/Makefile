@@ -55,7 +55,7 @@ CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+CONFIGURE_ARGS += --extra-version=$(call read_makefile_var,$(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile,SPK_REV)
 
 # Enable the Synology VideoStation compatibility code added by the
 # SYNO-* patch series (hls_seek_time, smooth streaming, srt tags, ...)

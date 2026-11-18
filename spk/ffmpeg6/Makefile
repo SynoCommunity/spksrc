@@ -1,7 +1,7 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.1.6
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 11# unreleased
+SPK_REV = 11 # unreleased
 SPK_ICON = src/ffmpeg6.png
 CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
 CHANGELOG += "2. Internal build options now follow toolchain capabilities<br/>"
