@@ -39,6 +39,9 @@ CRATE_VERSION_LIBZSYS = 1.1.25
 CARGO_INSTALL_ARGS += --locked
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CRATE_VERSION_JOBSERVER = 0.1.34
+# lcms2-sys 4.2.0 is edition 2024 (rustc 1.85+), past the rustc 1.82 of PPC;
+# 4.1.0 is the last 2021-edition release (4.0.x are all yanked)
+CRATE_VERSION_LCMS2SYS = 4.1.0
 endif
 
 include ../../mk/spksrc.cross-rust.mk
@@ -60,4 +63,5 @@ pngquant_post_extract:
 	@cd $(WORK_DIR)/$(PKG_DIR) && CARGO_HOME=$(CARGO_HOME) cargo update libz-sys --precise $(CRATE_VERSION_LIBZSYS)
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 	@cd $(WORK_DIR)/$(PKG_DIR) && CARGO_HOME=$(CARGO_HOME) cargo update jobserver --precise $(CRATE_VERSION_JOBSERVER)
+	@cd $(WORK_DIR)/$(PKG_DIR) && CARGO_HOME=$(CARGO_HOME) cargo update lcms2-sys --precise $(CRATE_VERSION_LCMS2SYS)
 endif
