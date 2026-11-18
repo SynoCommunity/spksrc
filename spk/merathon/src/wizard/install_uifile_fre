@@ -1,0 +1,71 @@
+[
+    {
+        "step_title": "Configuration de Merathon",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Dossier partagé qui contient vos dépôts Git (son nom, pas son chemin). Il est créé s'il n'existe pas, et l'utilisateur Merathon reçoit automatiquement les droits de lecture et d'écriture dessus.",
+                "subitems": [
+                    {
+                        "key": "wizard_repos_share",
+                        "desc": "Nom du dossier partagé",
+                        "defaultValue": "git",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[A-Za-z0-9_-]+$/",
+                                "errorText": "Lettres, chiffres, - et _ seulement"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "desc": "Jeton d'accès (16 caractères ou plus). Il vous sera demandé à chaque connexion à Merathon depuis un navigateur (une session dure 12 heures, et se termine au redémarrage du paquet) : conservez-le dans un gestionnaire de mots de passe. Qui le connaît peut lire et modifier les dépôts ci-dessus : utilisez HTTPS (proxy inverse de DSM). Tous les utilisateurs connectés partagent la même identité Git (nom et e-mail des commits) et les mêmes clés SSH.",
+                "subitems": [
+                    {
+                        "key": "wizard_token",
+                        "desc": "Jeton d'accès",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^.{16,}$/",
+                                "errorText": "16 caractères ou plus"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Adresse de Merathon, ouverte par son icône du menu DSM (facultatif). Renseignez-la si vous joignez Merathon par le proxy inverse de DSM, par exemple https://merathon.monnas.myds.me. Laissez vide pour ouvrir directement http://<NAS>:8765/, ce qui ne fonctionne pas quand DSM est utilisé en HTTPS avec un nom myds.me ou synology.me. Modifiable ensuite (MERATHON_PUBLIC_URL dans config.env).",
+                "subitems": [
+                    {
+                        "key": "wizard_public_url",
+                        "desc": "Adresse de Merathon",
+                        "emptyText": "https://merathon.monnas.myds.me",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^https?:\\/\\/[A-Za-z0-9._~:\\/?#@!$&()*+,;=%-]+$/",
+                                "errorText": "Une adresse qui commence par http:// ou https://"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "multiselect",
+                "desc": "Le terminal intégré exécute des commandes sur le NAS, sous l'utilisateur Merathon.",
+                "subitems": [
+                    {
+                        "key": "wizard_terminal",
+                        "desc": "Activer le terminal intégré",
+                        "defaultValue": false
+                    }
+                ]
+            }
+        ]
+    }
+]

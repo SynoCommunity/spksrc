@@ -1,0 +1,5 @@
+body { margin: 0; font-family: system-ui, sans-serif; background: #14151c; color: #e6e6ea; }
+main { max-width: 34rem; margin: 12vh auto 0; padding: 0 1.5rem; text-align: center; }
+h1 { font-size: 1.3rem; margin: 0.8rem 0; }
+a { color: #f0566e; word-break: break-all; }
+.muted { color: #9a9cab; font-size: 0.9rem; line-height: 1.5; }

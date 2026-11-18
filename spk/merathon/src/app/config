@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.merathon": {
+            "type": "url",
+            "icon": "images/merathon-{0}.png",
+            "title": "Merathon",
+            "desc": "Merathon - Git Repository Manager",
+            "url": "/webman/3rdparty/merathon/index.html",
+            "allUsers": true,
+            "grantPrivilege": "all",
+            "advanceGrantPrivilege": true
+        }
+    }
+}
