@@ -5,7 +5,8 @@ SPK_REV = 11 # unreleased
 SPK_ICON = src/ffmpeg6.png
 CHANGELOG  = "1. Restore the SYNO-videostation patches <br/>"
 CHANGELOG += "2. Internal build options now follow toolchain capabilities <br/>"
-CHANGELOG += "3. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370"
+CHANGELOG += "3. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370 <br/>"
+CHANGELOG += "4. Build fdk-aac, lame, twolame, opencore-amr, zvbi, gnutls and OpenSSL with optimization: they were built without"
 
 DEPENDS = cross/ffmpeg6
 VIDEODRV_PACKAGE = synocli-videodriver

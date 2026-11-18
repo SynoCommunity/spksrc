@@ -24,6 +24,11 @@ CONFIGURE_ARGS += no-tests
 # avoid multilib postfix (like lib64 for 64-bit archs):
 CONFIGURE_ARGS += --libdir=lib
 
+# Configure takes CFLAGS from the environment in place of its own flags, -O3
+# among them, and spksrc always sets it: without a level of its own, the
+# library is built -O0.
+ADDITIONAL_CFLAGS = -O3
+
 include ../../mk/spksrc.cross-cc.mk
 
 # Use CA certificates provided by DSM
