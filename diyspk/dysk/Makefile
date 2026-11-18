@@ -1,11 +1,16 @@
 SPK_NAME = dysk
-SPK_VERS = 3.6.1
 SPK_REV = 1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-MIN_RUSTC_VERSION = 1.75
+include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/dysk
+
+# SPK_VERS has to follow whichever variant the virtual lands on
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+SPK_VERS = 3.8.2
+else
+SPK_VERS = 3.6.1
+endif
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A linux utility to get information on filesystems, like df but better.

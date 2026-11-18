@@ -54,7 +54,7 @@ CHANGELOG += "9. Update mergerfs to v2.42.0 (v2.40.2 on older toolchains, includ
 CHANGELOG += "10. Update fuse3 to v3.18.3 (v3.16.2 on older toolchains). <br/>"
 CHANGELOG += "11. Add compsize for inspecting Btrfs compression. <br/>"
 CHANGELOG += "12. Add duperemove 0.14.1 for deduplicating Btrfs files. <br/>"
-CHANGELOG += "13. Add dysk. <br/>"
+CHANGELOG += "13. Add dysk 3.8.2 (3.6.1 on older Rust toolchains). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
