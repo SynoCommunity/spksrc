@@ -9,7 +9,7 @@ CHANGELOG += "3. Now using new synocli-videodriver package <br/>"
 CHANGELOG += "4. Align package with ffmpeg7/ffmpeg8 <br/>"
 CHANGELOG += "5. Internal build options now follow toolchain capabilities <br/>"
 CHANGELOG += "6. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370 <br/>"
-CHANGELOG += "7. Build fdk-aac, lame, twolame, opencore-amr, zvbi, gnutls and OpenSSL with optimization: they were built without"
+CHANGELOG += "7. Build fdk-aac, lame, twolame, opencore-amr and zvbi with optimization: they were built without"
 
 DEPENDS = cross/ffmpeg5
 VIDEODRV_PACKAGE = synocli-videodriver

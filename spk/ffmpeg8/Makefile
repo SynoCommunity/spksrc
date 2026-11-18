@@ -8,7 +8,7 @@ CHANGELOG += "2. Update to jellyfin 8.1.3-1 patchset <br/>"
 CHANGELOG += "3. Rebuilt with nettle 4.0 and the updated video driver libraries <br/>"
 CHANGELOG += "4. Update to jellyfin 8.1.3-2 patchset <br/>"
 CHANGELOG += "5. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370 <br/>"
-CHANGELOG += "6. Build fdk-aac, lame, twolame, opencore-amr, zvbi, gnutls and OpenSSL with optimization: they were built without"
+CHANGELOG += "6. Build fdk-aac, lame, twolame, opencore-amr and zvbi with optimization: they were built without"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
