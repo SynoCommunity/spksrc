@@ -1,5 +1,5 @@
 PKG_NAME = tt-rss
-PKG_GIT_HASH = 5cbcc14224e52861512242c39aeeb961a82dadac
+PKG_GIT_HASH = 926394faab63f58dbb446db9b69c68efb1cef204
 PKG_VERS = $(shell echo $(PKG_GIT_HASH) | cut -c1-8)
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git

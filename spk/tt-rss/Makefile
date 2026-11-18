@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20260327
-SPK_REV = 21
+SPK_VERS = 20261118
+SPK_REV = 22
 SPK_ICON = src/tt-rss.png
 
 DEPENDS = cross/tt-rss
@@ -15,7 +15,7 @@ MAINTAINER = moneytoo
 DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
 DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et Atom open source conçu pour vous permettre de lire des nouvelles de n\'importe quel endroit, tout en se sentant aussi proche d\'une application de bureau que possible.
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. Update to latest git commit. <br/>2. Switch from MariaDB to PostgreSQL database (required since April 2025). <br/>3. Require DSM 7.2+ (PHP 8.4)."
+CHANGELOG = "Update to 2026-11-18 git snapshot (926394fa)."
 
 HOMEPAGE = https://tt-rss.org/
 LICENSE = GPL
