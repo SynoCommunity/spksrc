@@ -1,9 +1,9 @@
 SPK_NAME = ombi
-SPK_VERS = 4.53.4
-SPK_REV = 7
+SPK_VERS = 4.53.10
+SPK_REV = 8
 SPK_ICON = src/ombi.png
 
-# Arch exclusions for dotnet 6.0
+# Dotnet core architecture exclusions
 DOTNET_CORE_ARCHS = 1
 
 DEPENDS = cross/ombi cross/libe_sqlite3
@@ -13,7 +13,7 @@ MAINTAINER = hgy59
 DISPLAY_NAME = Ombi
 HOMEPAGE = https://ombi.io/
 DESCRIPTION = Ombi is a self-hosted web application that automatically gives your shared Plex or Emby users the ability to request content by themselves! Ombi can be linked to multiple TV Show and Movie DVR tools to create a seamless end-to-end experience for your users.
-CHANGELOG = "Update Ombi to v4.53.4."
+CHANGELOG = "Update Ombi to v4.53.10."
 LICENSE  = GPLv2
 
 SERVICE_USER = auto
