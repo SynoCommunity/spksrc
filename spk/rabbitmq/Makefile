@@ -1,16 +1,16 @@
 SPK_NAME = rabbitmq
-SPK_VERS = 4.2.8
-SPK_REV = 14
+SPK_VERS = 4.4.1
+SPK_REV = 15
 SPK_ICON = src/rabbitmq.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/rabbitmq
-SPK_DEPENDS = "erlang>=26.2:erlang<28.0"
+SPK_DEPENDS = "erlang>=27.0:erlang<30.0"
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. From T-Mobile to Runtastic, RabbitMQ is used worldwide at small startups and large enterprises. RabbitMQ is lightweight and easy to deploy on premises and in the cloud. It supports multiple messaging protocols. RabbitMQ can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements.
 DISPLAY_NAME = RabbitMQ
-CHANGELOG = "1. Update to v4.2.8. <br/>2. Intermediate upgrade step for RabbitMQ 4.4.0."
+CHANGELOG = "Update to v4.4.1."
 
 HOMEPAGE = https://www.rabbitmq.com
 LICENSE = MPL 2.0
