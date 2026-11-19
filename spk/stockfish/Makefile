@@ -1,16 +1,19 @@
 SPK_NAME = stockfish
-SPK_VERS = 16
-SPK_REV = 4
+SPK_VERS = 19
+SPK_REV = 5
 SPK_ICON = src/stockfish.png
 
 DEPENDS = cross/stockfish
 BUILD_DEPENDS = native/nodejs-22
-SPK_DEPENDS = "Node.js_v18"
+SPK_DEPENDS = "Node.js_v22"
+
+# Node.js_v22 (Synology package) declares os_min_ver="7.2-60085"
+REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = mayweed
 DISPLAY_NAME = Stockfish
 DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
-CHANGELOG = "Update to v16. Replace legacy PHP web GUI with modern Node.js-based interface using server-side engine."
+CHANGELOG = "Update to v19 (requires DSM 7.2)."
 HOMEPAGE = https://stockfishchess.org/
 LICENSE = GPLv3
 

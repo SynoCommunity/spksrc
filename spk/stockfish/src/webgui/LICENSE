@@ -24,8 +24,8 @@ chessboard.js v1.0.0
 MIT License - Copyright (c) 2019 Chris Oakman
 https://github.com/oakmac/chessboardjs
 
-chess.js
---------
+chess.js (bundled minified build)
+--------------------------------
 BSD 2-Clause License - Copyright (c) 2023 Jeff Hlywa
 https://github.com/jhlywa/chess.js
 
@@ -45,5 +45,12 @@ Public Domain - From chessboard.js project
 
 Sound effects
 -------------
-Inspired by Lichess (AGPL-3.0)
-https://github.com/lichess-org/lila
+CC0 1.0 (public domain), no attribution required.
+Source: https://sfxmint.com/sounds/chess
+- move: Piece Placement 06
+- capture: Capture 02
+- castle: Castling 03
+- check: Clock Press 04
+- promote: Sliding Piece 07
+- game end: Pieces Into Box 08
+- illegal: Weighted Piece 10

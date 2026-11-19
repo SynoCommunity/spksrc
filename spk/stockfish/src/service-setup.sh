@@ -1,7 +1,7 @@
 # Stockfish service setup
 
 WEBGUI_HOME="${SYNOPKG_PKGDEST}/share/webgui"
-NODE_BIN="/var/packages/Node.js_v18/target/usr/local/bin/node"
+NODE_BIN="/var/packages/Node.js_v22/target/usr/local/bin/node"
 
 # Service configuration
 SERVICE_COMMAND="${NODE_BIN} server.js"

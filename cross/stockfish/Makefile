@@ -1,6 +1,6 @@
 PKG_NAME = Stockfish
 PKG_SHORT_NAME = sf
-PKG_VERS = 16
+PKG_VERS = 19
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_SHORT_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/official-stockfish/$(PKG_NAME)/archive
@@ -14,8 +14,8 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-# src/Makefile compiles with -std=c++17, which gcc takes from 7.
-MIN_GCC_VERSION = 7
+# Stockfish 19 requires GCC 9.3 or newer.
+MIN_GCC_VERSION = 9.3
 
 include ../../mk/spksrc.common.mk
 
