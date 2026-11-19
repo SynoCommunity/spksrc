@@ -39,44 +39,12 @@ rabbitmq_log ()
     fi
 }
 
-rabbitmq_old_start ()
-{
-    if "${RABBITMQ_OLD_SSS}" status >/dev/null 2>&1; then
-        RABBITMQ_OLD_STARTED=1
-        return 0
-    fi
-
-    "${RABBITMQ_OLD_SSS}" start >/dev/null 2>&1 || return 1
-    RABBITMQ_OLD_STARTED=1
-}
-
 rabbitmq_old_stop ()
 {
     if [ "${RABBITMQ_OLD_STARTED}" = "1" ]; then
         "${RABBITMQ_OLD_SSS}" stop >/dev/null 2>&1 || true
         RABBITMQ_OLD_STARTED=0
     fi
-}
-
-rabbitmq_old_wait ()
-{
-    waited=0
-    while [ "${waited}" -lt "${RABBITMQ_START_TIMEOUT}" ]; do
-        if HOME="${SYNOPKG_PKGVAR}" "${RABBITMQ_OLD_CTL}" \
-            --timeout 10 await_startup >/dev/null 2>&1; then
-            return 0
-        fi
-        sleep 2
-        waited=$((waited + 2))
-    done
-    return 1
-}
-
-rabbitmq_old_eval ()
-{
-    HOME="${SYNOPKG_PKGVAR}" "${RABBITMQ_OLD_CTL}" \
-        --timeout "${RABBITMQ_CHECK_TIMEOUT}" eval "$1" 2>/dev/null |
-        tr -d '[:space:]'
 }
 
 validate_preupgrade ()
@@ -107,22 +75,40 @@ validate_preupgrade ()
         exit 1
     fi
 
-    if ! rabbitmq_old_start; then
-        echo "Unable to start the installed RabbitMQ 4.2.x service for the upgrade check."
-        exit 1
+    if "${RABBITMQ_OLD_SSS}" status >/dev/null 2>&1; then
+        RABBITMQ_OLD_STARTED=1
+    else
+        "${RABBITMQ_OLD_SSS}" start >/dev/null 2>&1 || {
+            echo "Unable to start the installed RabbitMQ 4.2.x service for the upgrade check."
+            exit 1
+        }
+        RABBITMQ_OLD_STARTED=1
     fi
 
-    if ! rabbitmq_old_wait; then
+    waited=0
+    old_ready=0
+    while [ "${waited}" -lt "${RABBITMQ_START_TIMEOUT}" ]; do
+        if HOME="${SYNOPKG_PKGVAR}" "${RABBITMQ_OLD_CTL}" \
+            --timeout 10 await_startup >/dev/null 2>&1; then
+            old_ready=1
+            break
+        fi
+        sleep 2
+        waited=$((waited + 2))
+    done
+    if [ "${old_ready}" != "1" ]; then
         rabbitmq_old_stop
         echo "RabbitMQ did not become ready for the upgrade check."
         exit 1
     fi
 
-    all_stable="$(rabbitmq_old_eval 'map_size(rabbit_feature_flags:list(disabled, stable)) =:= 0.')"
-    khepri="$(rabbitmq_old_eval 'rabbit_khepri:is_enabled().')"
+    checks="$(HOME="${SYNOPKG_PKGVAR}" "${RABBITMQ_OLD_CTL}" \
+        --timeout "${RABBITMQ_CHECK_TIMEOUT}" eval \
+        '{map_size(rabbit_feature_flags:list(disabled, stable)) =:= 0, rabbit_khepri:is_enabled()}.' \
+        2>/dev/null | tr -d '[:space:]')"
     rabbitmq_old_stop
 
-    if [ "${all_stable}" != "true" ] || [ "${khepri}" != "true" ]; then
+    if [ "${checks}" != "{true,true}" ]; then
         echo "RabbitMQ 4.4 requires all stable feature flags and the Khepri metadata store."
         echo "Before upgrading, run:"
         echo "  sudo /var/packages/rabbitmq/target/bin/rabbitmqctl enable_feature_flag all"
