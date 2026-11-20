@@ -4,7 +4,7 @@ SPK_GIT_HASH = 15068a97
 SPK_GIT_DATE = 20261115
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 52
+SPK_REV = 53
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -38,6 +38,8 @@ CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP time
 CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 CHANGELOG += "5. Intel Quick Sync Video (QSV) with MediaSDK or oneVPL, on DSM 6 too<br/>"
 CHANGELOG += "6. Fix the FFmpeg 4 dependency on the archs that use it (toolchains older than gcc 4.9: ARMv5, hi3535, ...): the package is ffmpeg, not ffmpeg4 \(\#7719\)<br/>"
+CHANGELOG += "7. Shared channel cache: fixes from a code review of TVH-\#2249, including a cache recording surviving a lost signal, timeshift on audio-only services, budgets shared evenly between the caches, the newest part of a cache kept in RAM in front of the disk, and settings followed as they change<br/>"
+CHANGELOG += "8. Web interface: state of the shared channel caches on the Home page, in a Status > Caches tab and beside Status > Subscriptions<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/
