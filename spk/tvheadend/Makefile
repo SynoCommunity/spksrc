@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 15068a97
-SPK_GIT_DATE = 20261115
+SPK_GIT_HASH = 06e7cd76
+SPK_GIT_DATE = 20261128
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 52
+SPK_REV = 53
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -32,12 +32,14 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG  = "1. Update to latest git version 15068a97 of November 15th 2026<br/>"
+CHANGELOG  = "1. Update to latest git version 06e7cd76 of November 28th 2026<br/>"
 CHANGELOG += "2. Experimental migration to ffmpeg 8.1 with hardware transcoding \(TVH-\#2117\)<br/>"
 CHANGELOG += "3. Experimental shared channel cache: record from cache, HTSP timeshift and keep tuned channels \(TVH-\#2249\)<br/>"
 CHANGELOG += "4. Add tv_postremove_cleanup.sh post-remove command to delete comskip and scene marker files<br/>"
 CHANGELOG += "5. Intel Quick Sync Video (QSV) with MediaSDK or oneVPL, on DSM 6 too<br/>"
 CHANGELOG += "6. Fix the FFmpeg 4 dependency on the archs that use it (toolchains older than gcc 4.9: ARMv5, hi3535, ...): the package is ffmpeg, not ffmpeg4 \(\#7719\)<br/>"
+CHANGELOG += "7. Shared channel cache: fixes from a code review of TVH-\#2249, including a cache recording surviving a lost signal, timeshift on audio-only services, budgets shared fairly between the caches -- what a slow channel's cache does not need going to the others --, the newest part of a cache kept in RAM in front of the disk, and settings followed as they change<br/>"
+CHANGELOG += "8. Web interface: state of the shared channel caches on the Home page, in a Status > Caches tab and beside Status > Subscriptions, drawn by use or by cache<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/

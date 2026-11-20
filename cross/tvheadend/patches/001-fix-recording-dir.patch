@@ -1,7 +1,7 @@
 # This ensures that the default recording directory is not placed in package system directories, independent of the DSM version
 --- src/dvr/dvr_config.c.orig	2024-06-15 07:32:43.000000000 +0000
 +++ src/dvr/dvr_config.c	2024-06-17 00:44:57.198422104 +0000
-@@ -289,7 +289,7 @@ dvr_config_storage_check(dvr_config_t *c
+@@ -321,7 +321,7 @@
      return;
  
    /* Try to figure out a good place to put them videos */
