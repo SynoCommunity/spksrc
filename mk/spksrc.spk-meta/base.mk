@@ -46,14 +46,14 @@ $(eval $(1)_SPK_MAKEFILE           := $(realpath $($(1)_PACKAGE_WORK_DIR)/..)/Ma
 # from its directory: spk/ffmpeg4 installs as "ffmpeg", and a prefix that names no
 # existing directory makes $(realpath) empty -- which every path below is guarded on,
 # so the meta would share its status cookies while its libraries stayed unreachable.
-$(eval $(1)_SPK_NAME               := $(shell sed -n 's/^SPK_NAME[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
+$(eval $(1)_SPK_NAME               := $(call read_makefile_var,$($(1)_SPK_MAKEFILE),SPK_NAME))
 $(eval $(1)_INSTALL_PREFIX         := /var/packages/$(or $($(1)_SPK_NAME),$($(1)_PACKAGE))/target)
 $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
 
 # Nothing staged is always a bug, never a state to carry on from: the caller only reaches
 # here once the meta has been built. Say so, rather than silently drop every -I and -L.
 $(if $($(1)_STAGING_INSTALL_PREFIX),,$(error meta $($(1)_PACKAGE) staged nothing at $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
-$(eval $(1)_VERSION                := $(shell sed -n 's/^SPK_VERS[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE))-$(shell sed -n 's/^SPK_REV[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
+$(eval $(1)_VERSION                := $(call read_makefile_var,$($(1)_SPK_MAKEFILE),SPK_VERS)-$(call read_makefile_var,$($(1)_SPK_MAKEFILE),SPK_REV))
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
 

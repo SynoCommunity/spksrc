@@ -15,6 +15,11 @@ PRE_CONFIGURE_TARGET = fdk-aac_configure
 
 GNU_CONFIGURE = 1
 
+# configure falls back on its own -O2 only when CFLAGS is unset, and spksrc
+# always sets it: without a level of its own, the library is built -O0.
+ADDITIONAL_CFLAGS = -O2
+ADDITIONAL_CXXFLAGS = -O2
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: fdk-aac_configure

@@ -1,10 +1,12 @@
 SPK_NAME = ffmpeg7
 SPK_VERS = 7.1.5
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 11
+SPK_REV = 12 # unreleased
 SPK_ICON = src/ffmpeg7.png
-CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
-CHANGELOG += "2. Internal build options now follow toolchain capabilities"
+CHANGELOG  = "1. Restore the SYNO-videostation patches <br/>"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities <br/>"
+CHANGELOG += "3. ARMv7: build in ARM mode instead of Thumb-2, which crashed the native AAC encoder on Armada 370 <br/>"
+CHANGELOG += "4. Build fdk-aac, lame, twolame, opencore-amr and zvbi with optimization: they were built without"
 
 DEPENDS = cross/ffmpeg7
 VIDEODRV_PACKAGE = synocli-videodriver

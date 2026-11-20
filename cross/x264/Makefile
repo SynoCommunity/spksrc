@@ -2,8 +2,10 @@ PKG_NAME = x264
 PKG_VERS = 20250608-stable
 PKG_EXT = tar.gz
 PKG_GIT_HASH = 0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee
-PKG_DIST_NAME = $(PKG_NAME)-master.$(PKG_EXT)
-PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/$(PKG_GIT_HASH)
+# The GitHub mirror of code.videolan.org, byte-identical archive: code.videolan.org
+# answers CI runners with an Anubis page instead of the archive
+PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/mirror/x264/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 

@@ -49,7 +49,7 @@ else
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+CONFIGURE_ARGS += --extra-version=$(call read_makefile_var,$(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile,SPK_REV)
 
 # libavformat/fifo.c holds the tree's only 64-bit atomic. Without C11 <stdatomic.h>
 # (gcc < 4.9) ffmpeg maps it onto __sync_*_8, which 32-bit PowerPC has no instruction for
@@ -156,7 +156,10 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
-CONFIGURE_ARGS += --enable-thumb
+# ARM, not Thumb-2: with this toolchain and these flags, a Thumb-2 build of
+# ffmpeg 8.1.3 segfaults in the native AAC encoder (psy_3gpp_analyze_channel())
+# on an Armada 370 (DS115j, DSM 7.1), and the same source built -marm runs.
+CONFIGURE_ARGS += --disable-thumb
 CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2

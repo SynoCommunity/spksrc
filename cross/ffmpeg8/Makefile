@@ -55,7 +55,7 @@ CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+CONFIGURE_ARGS += --extra-version=$(call read_makefile_var,$(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile,SPK_REV)
 
 # Enable the Synology VideoStation compatibility code added by the
 # SYNO-* patch series (hls_seek_time, smooth streaming, srt tags, ...)
@@ -150,7 +150,10 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
-CONFIGURE_ARGS += --enable-thumb
+# ARM, not Thumb-2: built as Thumb-2, the native AAC encoder segfaults on an
+# Armada 370 (DS115j, DSM 7.1) in psy_3gpp_analyze_channel(), whatever the
+# optimisation level, LTO or if-conversion; the same source built -marm runs.
+CONFIGURE_ARGS += --disable-thumb
 CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2

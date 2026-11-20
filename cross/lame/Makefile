@@ -13,6 +13,10 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
+# configure falls back on its own -O2 only when CFLAGS is unset, and spksrc
+# always sets it: without a level of its own, the library is built -O0.
+ADDITIONAL_CFLAGS = -O2
+
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
