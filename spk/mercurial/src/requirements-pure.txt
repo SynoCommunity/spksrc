@@ -1,1 +1,4 @@
-docutils==0.22.4
+# Generated using the requirements script on November 20, 2026
+# Command: generate_requirements.sh "mercurial==7.2.4" 314
+
+#pip==26.2.2                    ==> python314
