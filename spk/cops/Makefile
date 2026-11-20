@@ -8,7 +8,7 @@ DEPENDS  = cross/cops
 override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
-SPK_DEPENDS = WebStation:PHP8.4:Apache2.4
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4"
 # os_min_ver of Synology PHP8.4
 TC_OS_MIN_VER = 7.2-60096
 # SRM is not supported due lacking webstation, php and apache packages
