@@ -1,5 +1,5 @@
 PKG_NAME = garage
-PKG_VERS = 2.3.0
+PKG_VERS = 2.5.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://git.deuxfleurs.fr/Deuxfleurs/garage/archive
@@ -15,5 +15,8 @@ COMMENT  = Garage is an S3-compatible distributed object storage service designe
 LICENSE  = AGPLv3.0
 
 RUST_SRC_DIR = $(WORK_DIR)/garage/src/garage
+
+# Report the Garage release version instead of a git describe of the spksrc worktree.
+ENV += GIT_VERSION=$(PKG_VERS)
 
 include ../../mk/spksrc.cross-rust.mk
