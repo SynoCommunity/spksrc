@@ -6,8 +6,6 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/garage
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
 MAINTAINER = fgma
 DESCRIPTION = Garage is an S3-compatible distributed object storage service designed for self-hosting at a small-to-medium scale.
 DISPLAY_NAME = Garage

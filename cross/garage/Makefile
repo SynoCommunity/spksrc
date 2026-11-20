@@ -9,6 +9,7 @@ PKG_DIR = $(PKG_NAME)
 DEPENDS =
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS_REASON = Garage 2.5.0 dependencies require Rust edition 2024; the old ARMv5/PowerPC Rust toolchain is too old
 
 HOMEPAGE = https://garagehq.deuxfleurs.fr/
 COMMENT  = Garage is an S3-compatible distributed object storage service designed for self-hosting at a small-to-medium scale.
