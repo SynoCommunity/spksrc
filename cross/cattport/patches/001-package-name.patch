@@ -1,0 +1,27 @@
+# use the lowercase package name of the SynoCommunity build
+# 
+# the upstream spk is named "Cattport", the SynoCommunity package is "cattport"
+# and the name is part of the paths under /var/packages and /webman/3rdparty
+# 
+--- src/package/lib/cattport_core.py.orig	2026-11-02 02:26:52.000000000 +0000
++++ src/package/lib/cattport_core.py	2026-11-03 17:58:01.000000000 +0000
+@@ -18,7 +18,7 @@
+ import urllib.request
+ from html.parser import HTMLParser
+ 
+-PACKAGE = "Cattport"
++PACKAGE = "cattport"
+ NAMESPACE = "labs.morcatt.cattport"
+ TILE_PREFIX = NAMESPACE + ".tile."
+ SCHEMA = 1
+--- src/package/ui/cattport.js.orig	2026-11-02 02:26:52.000000000 +0000
++++ src/package/ui/cattport.js	2026-11-03 17:58:01.000000000 +0000
+@@ -3,7 +3,7 @@
+ 
+ (function () {
+   const NS = labs.morcatt.cattport;
+-  const PACKAGE = "Cattport";
++  const PACKAGE = "cattport";
+   const INSTANCE = "labs.morcatt.cattport.Instance";
+   const TILES = "labs.morcatt.cattport.tile.";
+   const BASE = "/webman/3rdparty/" + PACKAGE + "/";
