@@ -126,6 +126,20 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 17th 2026 — A python spk installs its own compiled wheels, not PyPI's (#7791)"
+
+    - **What:** `install_python_wheels` passes, by path, the wheels listed in the package's
+      `requirements-abi3.txt` and `requirements-crossenv.txt`, in the same pip call as
+      `requirements.txt`. pip installs those files, and still resolves their dependencies
+      and the pure-python wheels from the index. `tc_vars.rust.mk` also records the release
+      `TC_RUSTUP_TOOLCHAIN` resolved to as **`TC_RUSTC_RELEASE`** (informational).
+    - **Why:** pip ranks a `manylinux` wheel above a `linux_<arch>` one of the same version,
+      so with the index on, a wheel the package cross-compiled lost to PyPI's whenever PyPI
+      had one for the arch. SABnzbd's orjson came from PyPI, built by Rust 1.97, whose
+      `compiler-builtins` uses `d16` in `__aeabi_ul2d`: `orjson.loads()` died with SIGILL on
+      Armada 370/XP (VFPv3-D16, #7785). Ours, built by Rust 1.100, does not.
+    - **PR:** [#7791](https://github.com/SynoCommunity/spksrc/pull/7791)
+
 ??? note "November 14th 2026 — A python spk that ships every wheel installs them without an index (#7770)"
 
     - **What:** `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` becomes **`WHEELS_OFFLINE`**. Set to

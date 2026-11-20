@@ -353,7 +353,9 @@ endif
 	echo TC_ENV += CARGO_TERM_PROGRESS_WHEN=\"never\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC) ; \
-	echo TC_RUSTUP_TOOLCHAIN := $(TC_RUSTUP_TOOLCHAIN)
+	echo TC_RUSTUP_TOOLCHAIN := $(TC_RUSTUP_TOOLCHAIN) ; \
+	echo "# The release TC_RUSTUP_TOOLCHAIN resolved to when this file was written (informational)" ; \
+	echo TC_RUSTC_RELEASE := $$($(CARGO_HOME)/bin/rustc +$(TC_RUSTUP_TOOLCHAIN) --version 2>/dev/null | cut -d' ' -f2)
 
 # The build/host split autoconf actually uses. With --host=<triple> the *bare* CC, CFLAGS
 # and LDFLAGS below are the host's -- autoconf's host being the machine the output runs on,
