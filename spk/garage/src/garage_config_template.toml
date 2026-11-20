@@ -14,6 +14,10 @@ rpc_secret = "@RPC_SECRET@"
 s3_region = "garage"
 api_bind_addr = "[::]:3900"
 root_domain = ".s3.garage.localhost"
+# Recommended by Garage 2.5.0 for generating publicly accessible S3 URLs.
+# If unset, Garage falls back to root_domain.
+# public_endpoint = "https://s3.example.com"
+# public_endpoint_path_style = false
 
 [s3_web]
 bind_addr = "[::]:3902"
