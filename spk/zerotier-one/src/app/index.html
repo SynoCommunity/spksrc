@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZeroTier</title>
+<link rel="stylesheet" href="app.css?v=1.16.2-1">
+</head>
+<body>
+<main class="zt" aria-live="polite">
+  <header class="zt-head">
+    <img class="zt-logo" src="images/icon_64.png" alt="" width="40" height="40">
+    <div class="zt-title">
+      <h1>ZeroTier</h1>
+      <p class="zt-sub" data-t="subtitle"></p>
+    </div>
+    <span class="zt-pill" id="node-state">…</span>
+  </header>
+
+  <section class="zt-node" id="node" hidden>
+    <dl>
+      <div><dt data-t="nodeId"></dt><dd class="mono" id="node-id"></dd></div>
+      <div><dt data-t="version"></dt><dd class="mono" id="node-version"></dd></div>
+      <div><dt data-t="networks"></dt><dd class="mono" id="node-count"></dd></div>
+    </dl>
+  </section>
+
+  <section class="zt-card">
+    <h2 data-t="joinTitle"></h2>
+    <form id="join" class="zt-join" autocomplete="off" novalidate>
+      <label for="join-id" data-t="networkId"></label>
+      <input id="join-id" class="mono" inputmode="text" maxlength="16" spellcheck="false" placeholder="0123456789abcdef">
+      <button type="submit" class="zt-btn zt-primary" data-t="join"></button>
+    </form>
+    <p class="zt-hint" data-t="joinHint"></p>
+  </section>
+
+  <section class="zt-card">
+    <h2 data-t="networksTitle"></h2>
+    <div id="networks"><p class="zt-muted" data-t="loading"></p></div>
+  </section>
+
+  <p class="zt-msg" id="message" role="status"></p>
+  <footer class="zt-foot">zerotier-one · <a href="https://github.com/MTSistemi/SpkForge" target="_blank" rel="noopener">SpkForge</a></footer>
+</main>
+<script src="app.js?v=1.16.2-1"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "ZtSynoNet.js": {
+        "SynoCommunity.ZeroTierOne.Instance": {
+            "type": "app",
+            "version": "1.16.2-1",
+            "title": "app:app_name",
+            "desc": "app:description",
+            "icon": "images/icon_{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "allUsers": false,
+            "appWindow": "SynoCommunity.ZeroTierOne.MainWindow",
+            "depend": ["SynoCommunity.ZeroTierOne.MainWindow"]
+        },
+        "SynoCommunity.ZeroTierOne.MainWindow": {
+            "type": "lib",
+            "version": "1.16.2-1",
+            "title": "app:app_name",
+            "icon": "images/icon_{0}.png",
+            "texts": "texts",
+            "depend": []
+        }
+    }
+}

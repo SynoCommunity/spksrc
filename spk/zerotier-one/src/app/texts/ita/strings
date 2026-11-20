@@ -1,0 +1,3 @@
+[app]
+app_name = "ZeroTier"
+description = "Collegamento del NAS alle reti ZeroTier"

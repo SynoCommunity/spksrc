@@ -1,0 +1,3 @@
+[app]
+app_name = "ZeroTier"
+description = "Join this NAS to your ZeroTier networks"
