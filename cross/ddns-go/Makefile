@@ -1,11 +1,12 @@
 PKG_NAME = ddns-go
-PKG_VERS = 6.17.1
-WEB_VERSION = $(PKG_VERS)
+PKG_VERS = 6.17.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jeessy2/ddns-go/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+BUILD_DATE = $(shell date -u -d @$(or $(SOURCE_DATE_EPOCH),$(shell date +%s)) +%Y-%m-%dT%H:%M:%SZ)
 
 HOMEPAGE = https://github.com/jeessy2/ddns-go
 COMMENT  = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service.
@@ -18,7 +19,7 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: ddns-go_compile_target
 ddns-go_compile_target:
-	@$(RUN) $(MAKE) VERSION=v$(PKG_VERS) BUILD_TIME="$$(date -u +'%Y-%m-%dT%H:%M:%SZ')" build
+	@$(RUN) $(MAKE) VERSION=v$(PKG_VERS) BUILD_TIME="$(BUILD_DATE)" build
 
 .PHONY: ddns-go_install
 ddns-go_install:
