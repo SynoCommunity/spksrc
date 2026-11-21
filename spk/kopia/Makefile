@@ -1,6 +1,6 @@
 SPK_NAME = kopia
 SPK_VERS = 0.23.1
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/kopia.png
 
 DEPENDS = cross/kopia
