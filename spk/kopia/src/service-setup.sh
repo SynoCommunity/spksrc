@@ -15,12 +15,15 @@ service_prestart () {
     if [ ! -f "${SYNOPKG_PKGVAR}/default.crt" ];then
         SERVICE_COMMAND+=" --tls-generate-cert"
     fi
-    SERVICE_COMMAND+=" --server-username=${wizard_username} --server-password=${wizard_password}"
+    # Pass the credentials by environment, not argv: arguments are visible to every local account via ps.
+    export KOPIA_SERVER_USERNAME="${wizard_username}"
+    export KOPIA_SERVER_PASSWORD="${wizard_password}"
 }
 
 service_postinst () {
     if [ ! -f "${SYNOPKG_PKGVAR}/pwd" ]; then
         echo "${wizard_password}" > "${SYNOPKG_PKGVAR}/pwd"
         echo "${wizard_username}" > "${SYNOPKG_PKGVAR}/usr"
+        chmod 600 "${SYNOPKG_PKGVAR}/pwd" "${SYNOPKG_PKGVAR}/usr"
     fi
 }
