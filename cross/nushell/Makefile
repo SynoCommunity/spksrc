@@ -1,9 +1,5 @@
 PKG_NAME = nushell
-# Do not go past 0.112.2 yet: nushell 0.113.0 pulls in the fff-search crate,
-# whose AVX2 path is gated on any(x86_64, x86) but imports std::arch::x86_64,
-# so it does not compile on 32-bit x86 (evansport). fff-search 0.9.7 narrows
-# the gate to x86_64 and fixes it, but is only published as a prerelease.
-PKG_VERS = 0.112.2
+PKG_VERS = 0.117.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/nushell/nushell/archive
@@ -27,6 +23,9 @@ COMMENT  = A new type of shell.
 LICENSE  = MIT
 
 CARGO_BUILD_ARGS = --locked
+
+# nushell 0.117.0 sets rust-version = 1.97.1
+MIN_RUSTC_VERSION = 1.97.1
 
 NUSHELL_PLUGINS = inc polars gstat formats query
 
