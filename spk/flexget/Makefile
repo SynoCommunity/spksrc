@@ -48,15 +48,6 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [brotli] -std=gnu99 -Wno-attributes
 endif
 
-# [greenlet]
-# version >= 3.1: gcc >= 8   (DSM7.1+) Mandatory require full c++20 support (designated initializers)
-# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Python 3.12 support only, NOT compatible with Python 3.14
-# For GCC < 8, greenlet is skipped entirely. SQLAlchemy (the consumer of greenlet)
-# works without it in sync mode, so no functionality is lost.
-ifeq ($(call version_ge, $(TC_GCC), 8.0),1)
-WHEELS += greenlet==3.3.2
-endif
-
 # [cryptography]
 # cryptography 50 builds through maturin and needs the versioned Python include path
 DEPENDS += cross/openssl3
