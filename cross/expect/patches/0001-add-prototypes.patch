@@ -1,0 +1,114 @@
+From c5e79881646e792f4f686ff4de5de14b1d1a18d2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Aug 2022 18:25:23 -0700
+Subject: [PATCH] Add prototype to function definitions
+
+Compilers like clang has started erroring out on implicit-function-declaration
+therefore arrange the relevant include files where needed.
+
+---
+ exp_chan.c     | 5 +++--
+ exp_clib.c     | 4 +++-
+ exp_main_sub.c | 5 +++++
+ pty_termios.c  | 4 ++++
+ 4 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/exp_chan.c b/exp_chan.c
+index 79f486c..50375d3 100644
+--- a/exp_chan.c
++++ b/exp_chan.c
+@@ -35,6 +35,7 @@
+ #include "exp_prog.h"
+ #include "exp_command.h"
+ #include "exp_log.h"
++#include "exp_event.h" /* exp_background_channelhandler */
+ #include "tcldbg.h" /* Dbg_StdinMode */
+ 
+ extern int		expSetBlockModeProc _ANSI_ARGS_((int fd, int mode));
+@@ -631,7 +632,7 @@ expWaitOnOne() {
+ }
+ 
+ void
+-exp_background_channelhandlers_run_all()
++exp_background_channelhandlers_run_all(void)
+ {
+     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+     ExpState *esPtr;
+@@ -760,7 +761,7 @@ expCreateChannel(interp,fdin,fdout,pid)
+ }
+ 
+ void
+-expChannelInit() {
++expChannelInit(void) {
+     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+ 
+     tsdPtr->channelCount = 0;
+diff --git a/exp_clib.c b/exp_clib.c
+index b21fb5d..8f31fc3 100644
+--- a/exp_clib.c
++++ b/exp_clib.c
+@@ -9,13 +9,14 @@ would appreciate credit if this program or parts of it are used.
+ 
+ #include "expect_cf.h"
+ #include <stdio.h>
++#include <unistd.h>
+ #include <setjmp.h>
+ #ifdef HAVE_INTTYPES_H
+ #  include <inttypes.h>
+ #endif
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+-
++#include <sys/wait.h>
+ #ifdef TIME_WITH_SYS_TIME
+ # include <sys/time.h>
+ # include <time.h>
+@@ -1738,6 +1739,7 @@ int exp_getptyslave();
+ #define sysreturn(x)	return(errno = x, -1)
+ 
+ void exp_init_pty();
++void exp_init_tty();
+ 
+ /*
+    The following functions are linked from the Tcl library.  They
+diff --git a/exp_main_sub.c b/exp_main_sub.c
+index bf6c4be..f53b89e 100644
+--- a/exp_main_sub.c
++++ b/exp_main_sub.c
+@@ -61,6 +61,11 @@ int exp_cmdlinecmds = FALSE;
+ int exp_interactive =  FALSE;
+ int exp_buffer_command_input = FALSE;/* read in entire cmdfile at once */
+ int exp_fgets();
++int exp_tty_cooked_echo(
++    Tcl_Interp *interp,
++    exp_tty *tty_old,
++    int *was_raw,
++    int *was_echo);
+ 
+ Tcl_Interp *exp_interp;	/* for use by signal handlers who can't figure out */
+ 			/* the interpreter directly */
+diff --git a/pty_termios.c b/pty_termios.c
+index c605b23..80ed5e7 100644
+--- a/pty_termios.c
++++ b/pty_termios.c
+@@ -7,6 +7,7 @@ would appreciate credit if you use this file or parts of it.
+ 
+ */
+ 
++#include <pty.h> /* openpty */
+ #include <stdio.h>
+ #include <signal.h>
+ 
+@@ -15,6 +16,9 @@ would appreciate credit if you use this file or parts of it.
+ #endif
+ 
+ #include "expect_cf.h"
++#include "tclInt.h"
++
++extern char * expErrnoMsg    _ANSI_ARGS_((int));
+ 
+ /*
+    The following functions are linked from the Tcl library.  They
+-- 
+2.37.2
+

@@ -1,6 +1,6 @@
 SPK_NAME = expect
 SPK_VERS = 5.45.4
-SPK_REV = 1
+SPK_REV = 2
 
 DEPENDS = cross/expect
 
