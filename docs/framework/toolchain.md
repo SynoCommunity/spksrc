@@ -409,7 +409,7 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 | Component | Versions | Toolchains | Used by builds |
 |-----------|----------|------------|----------------|
 | rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
-| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link of the five archs above (`RUST_LINK_VIA_BINUTILS`) |
+| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link where it is newer than the vendor ld (`RUST_LINK_VIA_BINUTILS`) |
 | gcc | 8.5 | the same 68 | not yet: installed only |
 
 ### Where the overlay code lives
@@ -508,7 +508,7 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 | `OVERLAY_GCC` | `0` | gcc 8.5 beside the vendor gcc, with the binutils overlay it drives. Off for the tree; `native/rustc-1.98`, a rust built with gcc 8.5, turns it on for itself. |
 | `OVERLAY_RUSTC` | `1` | Custom from-source rustc + Synology triple. `0` falls back to stock `rustup` — diagnostic only: the archs that ship an overlay do so precisely because the stock std does not fit them. |
 | `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off. |
-| `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. |
+| `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists, or a binutils overlay newer than the vendor ld | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. A link passes no vendor `-mcpu` flag to `as`, so it is safe beside the vendor gcc. |
 | `OVERLAY_GCC_VERSION` | newest the arch ships | Which gcc build to select, matching the consumer dir name; empty where the arch ships none. |
 | `OVERLAY_RUSTC_VERSION` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
 | `OVERLAY_BINUTILS_VERSION` | newest the arch ships | Idem. |

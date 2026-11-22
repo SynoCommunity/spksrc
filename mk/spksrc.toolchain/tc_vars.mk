@@ -451,7 +451,7 @@ tc_vars:
 # and _OVERLAY_<c>_ON -- so the file, included at parse, records without changing a
 # decision; stage0.mk compares TC_OVERLAY_<c>_ON with what a run resolves, and stops a run
 # that differs. Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on
-# wherever a rust overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim
+# wherever a binutils overlay exists, is TC_RUST_LINK_VIA_BINUTILS, its shim
 # TC_OVERLAY_RUSTC_LINKER (the -Clink-arg=-B of the Rust link flags).
 tc_overlay_vars:
 	@echo TC_OVERLAY_BINUTILS_ON := $(if $(_OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \

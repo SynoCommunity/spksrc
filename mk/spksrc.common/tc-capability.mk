@@ -8,6 +8,7 @@
 #   MIN_KERNEL_VERSION = 3.10   needs a 3.10 or newer kernel
 #   MIN_GCC_VERSION    = 8      needs gcc 8 or newer
 #   MIN_BINUTILS_VERSION = 2.20 needs binutils 2.20 or newer (as/ld)
+#   MIN_RUSTC_BINUTILS_VERSION = 2.30  needs that ld for the Rust link
 #   MIN_RUSTC_VERSION  = 1.85   needs rustc 1.85 or newer
 #   REQUIRE_64BIT      = 1      needs a 64-bit target
 #
@@ -112,6 +113,18 @@ ifneq ($(strip $(MIN_BINUTILS_VERSION)),)
 ifneq ($(strip $(TC_BINUTILS)),)
 ifeq ($(call version_ge,$(TC_BINUTILS),$(MIN_BINUTILS_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),binutils $(TC_BINUTILS) < $(MIN_BINUTILS_VERSION))
+endif
+endif
+endif
+
+# The ld of the Rust link alone: the binutils overlay's under RUST_LINK_VIA_BINUTILS,
+# else the one C links with (TC_BINUTILS).
+TC_RUSTC_BINUTILS := $(if $(and $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(strip $(_OVERLAY_BINUTILS_DIR))),$(OVERLAY_BINUTILS_VERSION),$(TC_BINUTILS))
+
+ifneq ($(strip $(MIN_RUSTC_BINUTILS_VERSION)),)
+ifneq ($(strip $(TC_RUSTC_BINUTILS)),)
+ifeq ($(call version_ge,$(TC_RUSTC_BINUTILS),$(MIN_RUSTC_BINUTILS_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(call comma_append,$(TC_CAPABILITY_UNSUPPORTED),rust link binutils $(TC_RUSTC_BINUTILS) < $(MIN_RUSTC_BINUTILS_VERSION))
 endif
 endif
 endif

@@ -154,7 +154,7 @@ overlay_binutils_version = $(or $(strip $(_OVERLAY_BINUTILS_PKG_VERS)),$(strip $
 # FWRD_ARGS, which spksrc.common.mk builds from FWRD_VARS. Deliberately absent from
 # FWRD_ARGS_SPK: which compiler a package builds with belongs to that package and its own
 # work dir, so an spk built as another's meta decides for itself rather than inheriting its
-# caller's choice. Not RUST_LINK_VIA_BINUTILS: it derives from _OVERLAY_RUSTC_DIR, which the
+# caller's choice. Not RUST_LINK_VIA_BINUTILS: it derives from the overlay dirs, which the
 # child reads itself.
 FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC OVERLAY_BINUTILS_ASKED
 
