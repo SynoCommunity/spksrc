@@ -173,8 +173,9 @@ $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAIN
 endif
 
 ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
-get_github_maintainer_url = $(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo "")
-get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' )
+# A value containing whitespace is a display name, not a GitHub login.
+get_github_maintainer_url = $(if $(findstring $(space),$(1)),,$(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo ""))
+get_github_maintainer_name = $(if $(findstring $(space),$(1)),$(1),$(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' ))
 else
 get_github_maintainer_url = "https://github.com/SynoCommunity"
 get_github_maintainer_name = $(MAINTAINER)
