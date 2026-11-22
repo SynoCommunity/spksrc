@@ -165,11 +165,11 @@ export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/py
 # crossenv stubs platform.libc_ver() as ("", ""), which some builds read as musl
 # (curl_cffi); DSM is glibc on every arch, so the stub reports TC_GLIBC.
 define crossenv_libc_glibc
-@set -o pipefail; { \
-$(MSG) "platform.libc_ver(): glibc $(TC_GLIBC), not crossenv's empty stub" ; \
-sed -i '/^def libc_ver/,/return/ s/return ("", "")/return ("glibc", "$(TC_GLIBC)")/' $(CROSSENV_PATH)/lib/platform-patch.py ; \
-grep -q 'return ("glibc", "$(TC_GLIBC)")' $(CROSSENV_PATH)/lib/platform-patch.py ; \
-} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+    @set -o pipefail; { \
+    $(MSG) "platform.libc_ver(): glibc $(TC_GLIBC), not crossenv's empty stub" ; \
+    sed -i '/^def libc_ver/,/return/ s/return ("", "")/return ("glibc", "$(TC_GLIBC)")/' $(CROSSENV_PATH)/lib/platform-patch.py ; \
+    grep -q 'return ("glibc", "$(TC_GLIBC)")' $(CROSSENV_PATH)/lib/platform-patch.py ; \
+    } > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 endef
 
 build_crossenv_target: SHELL:=/bin/bash
