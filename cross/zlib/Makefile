@@ -1,5 +1,5 @@
 PKG_NAME = zlib
-PKG_VERS = 1.3.2
+PKG_VERS = 1.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 # Primary: GitHub release CDN (most reliable, byte-identical to upstream).
@@ -16,8 +16,12 @@ LICENSE  = zlib-license
 
 ADDITIONAL_CFLAGS = -Os -fPIC
 
-# create pkgconfig file in lib/pkgconfig (instead of share/pkgconfig)
-CONFIGURE_ARGS += -DINSTALL_PKGCONFIG_DIR=$(INSTALL_PREFIX)/lib/pkgconfig
-CONFIGURE_ARGS += -DZLIB_BUILD_EXAMPLES=OFF
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_lt, $(TC_GCC), 5),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+
+CONFIGURE_ARGS += -DZLIB_BUILD_TESTING=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
