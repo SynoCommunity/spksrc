@@ -140,7 +140,7 @@ If you only read one thing, read this. The details are in the dated log below.
       safe under a matched gcc, while a link passes the vendor gcc's `-mcpu` flags to no
       assembler. DSM 7.1 and later are unchanged: their overlay, where one exists, is the
       vendor's own 2.30.
-    - **PR:** [#XXXX](https://github.com/SynoCommunity/spksrc/pull/XXXX)
+    - **PR:** [#7818](https://github.com/SynoCommunity/spksrc/pull/7818)
 
 ??? note "November 17th 2026 — A python spk installs its own compiled wheels, not PyPI's (#7791)"
 
