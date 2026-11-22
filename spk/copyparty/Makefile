@@ -1,5 +1,5 @@
 SPK_NAME = copyparty
-SPK_VERS = 1.20.26
+SPK_VERS = 1.20.27
 SPK_REV = 2
 SPK_ICON = src/copyparty.png
 
@@ -11,7 +11,7 @@ WHEELS_OFFLINE = 1
 MAINTAINER = SynoCommunity
 DESCRIPTION = Portable file server with resumable uploads, file sharing, and WebDAV.
 DISPLAY_NAME = copyparty
-CHANGELOG = "Update copyparty to v1.20.26."
+CHANGELOG = "Update copyparty to v1.20.27."
 HOMEPAGE = https://github.com/9001/copyparty
 LICENSE = MIT
 
