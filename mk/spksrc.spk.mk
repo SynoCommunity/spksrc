@@ -172,14 +172,15 @@ ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
 endif
 
+MAINTAINER_NAME = $(strip $(MAINTAINER))
+
 ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
 # A value containing whitespace is a display name, not a GitHub login.
-# Strip it first so accidental trailing spaces do not change the decision.
-get_github_maintainer_url = $(if $(findstring $(space),$(strip $(1))),,$(shell wget --quiet --spider https://github.com/$(strip $(1)) && echo "https://github.com/$(strip $(1))" || echo ""))
-get_github_maintainer_name = $(if $(findstring $(space),$(strip $(1))),$(strip $(1)),$(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(strip $(1)) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(strip $(1))|g' ))
+get_github_maintainer_url = $(if $(findstring $(space),$(1)),,$(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo ""))
+get_github_maintainer_name = $(if $(findstring $(space),$(1)),$(1),$(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' ))
 else
 get_github_maintainer_url = "https://github.com/SynoCommunity"
-get_github_maintainer_name = $(MAINTAINER)
+get_github_maintainer_name = $(MAINTAINER_NAME)
 endif
 
 $(WORK_DIR)/INFO: SHELL:=/bin/sh
@@ -207,9 +208,9 @@ $(WORK_DIR)/INFO:
 	    /bin/echo -n "$(DESCRIPTION_$(call upper,$(LANGUAGE)))"  | sed -e 's/"/\\\\\\"/g' && \
 	    /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
-	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
+	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER_NAME))\" >> $@
 ifeq ($(strip $(MAINTAINER_URL)),)
-	@echo maintainer_url=\"$(call get_github_maintainer_url,$(MAINTAINER))\" >> $@
+	@echo maintainer_url=\"$(call get_github_maintainer_url,$(MAINTAINER_NAME))\" >> $@
 else
 	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
 endif
