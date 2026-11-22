@@ -1,5 +1,5 @@
 PKG_NAME = loom
-PKG_VERS = 0.2.4
+PKG_VERS = 0.4.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ebenderooock/loom/releases/download/v$(PKG_VERS)
@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Pinned upstream release commit so buildinfo.Commit is accurate without hitting
 # the (rate-limited) GitHub API at build time. Bump together with PKG_VERS.
-PKG_COMMIT = db8e0ab
+PKG_COMMIT = 792fb39
 
 HOMEPAGE = https://loom.deroock.co.za
 COMMENT  = Loom is a unified, self-hosted media automation server (a Radarr/Sonarr/Prowlarr/Overseerr replacement).
@@ -30,9 +30,11 @@ GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 GO_BUILD_ARGS = -trimpath -tags "embed no_builtin_torrent"
 
+BUILD_DATE = $(shell date -u -d @$(or $(SOURCE_DATE_EPOCH),$(shell date +%s)) +%Y-%m-%dT%H:%M:%SZ)
+
 GO_LDFLAGS  = -s -w
 GO_LDFLAGS += -X github.com/ebenderooock/loom/internal/buildinfo.Version=$(PKG_VERS)
 GO_LDFLAGS += -X github.com/ebenderooock/loom/internal/buildinfo.Commit=$(PKG_COMMIT)
-GO_LDFLAGS += -X github.com/ebenderooock/loom/internal/buildinfo.Date=$(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+GO_LDFLAGS += -X github.com/ebenderooock/loom/internal/buildinfo.Date=$(BUILD_DATE)
 
 include ../../mk/spksrc.cross-go.mk

@@ -1,6 +1,6 @@
 SPK_NAME = loom
-SPK_VERS = 0.2.4
-SPK_REV = 2
+SPK_VERS = 0.4.5
+SPK_REV = 3
 SPK_ICON = src/loom.png
 
 DEPENDS = cross/loom
@@ -12,7 +12,7 @@ DISPLAY_NAME = Loom
 
 DESCRIPTION = Loom is a unified, self-hosted media automation server. It searches indexers, drives your download clients, imports and organizes movies and TV, and ships a built-in web UI and request portal — a single-binary replacement for the Radarr/Sonarr/Prowlarr/Overseerr stack.
 
-CHANGELOG = "Update package to v0.2.4."
+CHANGELOG = "Update Loom to v0.4.5."
 
 STARTABLE = yes
 SERVICE_USER = auto
