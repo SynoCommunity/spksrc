@@ -117,9 +117,9 @@ endif
 endif
 endif
 
-# The ld of the Rust link alone: the binutils overlay's under RUST_LINK_VIA_BINUTILS,
+# The ld of the Rust link alone: the binutils overlay's under RUSTC_LINK_VIA_BINUTILS_OVERLAY,
 # else the one C links with (TC_BINUTILS).
-TC_RUSTC_BINUTILS := $(if $(and $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(strip $(_OVERLAY_BINUTILS_DIR))),$(OVERLAY_BINUTILS_VERSION),$(TC_BINUTILS))
+TC_RUSTC_BINUTILS := $(if $(and $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),$(strip $(_OVERLAY_BINUTILS_DIR))),$(OVERLAY_BINUTILS_VERSION),$(TC_BINUTILS))
 
 ifneq ($(strip $(MIN_RUSTC_BINUTILS_VERSION)),)
 ifneq ($(strip $(TC_RUSTC_BINUTILS)),)

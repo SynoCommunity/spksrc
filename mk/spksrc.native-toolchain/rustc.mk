@@ -34,13 +34,13 @@ RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
 # own triple. Derived, not declared -- no other spelling was ever reached.
 RUST_POSTFIX_ALIASES  := $(RUST_TARGET_JSON_BASE) $(RUST_TARGET)
 
-# RUST_LINK_VIA_BINUTILS: build the from-source std with a modern binutils 2.30 ld (the same
+# RUSTC_LINK_VIA_BINUTILS_OVERLAY: build the from-source std with a modern binutils 2.30 ld (the same
 # ld the consumer's package link uses), narrow to the Rust link -- C stays on vendor gcc+ld.
 # ppc853x needs it: its 2008 ld 2.18 leaves std's TLS TPREL16 relocs dynamic and glibc-2.8
-# mis-applies them. ON for every custom-rustc arch; RUST_LINK_VIA_BINUTILS=0 on the command
+# mis-applies them. ON for every custom-rustc arch; RUSTC_LINK_VIA_BINUTILS_OVERLAY=0 on the command
 # line opts out. The binutils is the front-end's TOOLCHAIN_BINUTILS_*.
-RUST_LINK_VIA_BINUTILS := 1
-ifeq ($(RUST_LINK_VIA_BINUTILS),1)
+RUSTC_LINK_VIA_BINUTILS_OVERLAY := 1
+ifeq ($(RUSTC_LINK_VIA_BINUTILS_OVERLAY),1)
 # Build-time: link the target through the co-built ld (so std's own dynamic objects use
 # the modern ld). A gcc -B wrapper, since gcc < 4.8 has no -fuse-ld.
 RUST_BINUTILS_SHIM = $(WORK_DIR)/binutils-shim
@@ -109,7 +109,7 @@ RUST_AR       ?= $(RUST_TOOL_BIN)ar
 RUST_RANLIB   ?= $(RUST_TOOL_BIN)ranlib
 # The link driver: the co-built binutils wrapper when the Rust link is routed through the
 # overlay ld, otherwise plain gcc (which calls its own binutils ld).
-RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils-cc,$(RUST_CC))
+RUST_LINKER   ?= $(if $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),$(WORK_DIR)/binutils-cc,$(RUST_CC))
 
 # The overlay directories this component's consumers carry: all-<vers> builds for them
 # (spksrc.native-toolchain.mk).
@@ -216,10 +216,10 @@ RUSTC_STAGE2_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage2_done
 
 # PRE_CONFIGURE: extract the gcc toolchain (tc-install, generic) and create the
 # <alias>-<tool> symlinks rustc invokes the target tools by (triple name). When
-# RUST_LINK_VIA_BINUTILS, also co-build the modern binutils and its build wrapper first.
+# RUSTC_LINK_VIA_BINUTILS_OVERLAY, also co-build the modern binutils and its build wrapper first.
 PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
-rustc_prepare: tc-install rustc_gcc_overlay $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
+rustc_prepare: tc-install rustc_gcc_overlay $(if $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
 	@cd $(TC_EXTRACT_DIR)/bin ; \
 	for gnutool in $$(ls -1) ; do \
@@ -258,7 +258,7 @@ rustc_binutils_cobuild:
 	@$(call rustc_status,binutils-cobuild)
 	@$(MSG) "*********************************************************************"
 	@$(MSG) "*** Co-building binutils $(TOOLCHAIN_BINUTILS_VERSION) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
-	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
+	@$(MSG) "*** Auto-built here per-arch (RUSTC_LINK_VIA_BINUTILS_OVERLAY); NOT a DEPENDS"
 	@$(MSG) "*** PATH: $(TOOLCHAIN_BINUTILS_WORK)"
 	@$(MSG) "*********************************************************************"
 	$(TOOLCHAIN_BINUTILS_MAKE)

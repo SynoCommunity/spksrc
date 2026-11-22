@@ -185,7 +185,7 @@ TC_OVERLAY_GCC_PATH := <spksrc>/overlay/syno-qoriq-6.2.4_gcc-8.5/work/install/us
 TC_OVERLAY_RUSTC_ON := TRUE
 TC_OVERLAY_RUSTC := 1.82.0
 TC_OVERLAY_RUSTC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_RUST_LINK_VIA_BINUTILS := TRUE
+TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY := TRUE
 TC_OVERLAY_RUSTC_LINKER := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
@@ -409,7 +409,7 @@ An overlay is a toolchain component installed **beside** a base toolchain instea
 | Component | Versions | Toolchains | Used by builds |
 |-----------|----------|------------|----------------|
 | rust | 1.82 (vendor gcc), 1.82 and 1.98 (gcc 8.5) | `x86-5.2`, `ppc853x-5.2`, `88f6281-5.2`, `88f6281-6.2.4`, `qoriq-6.2.4` | the vendor-gcc build, see [Custom From-Source Rust Toolchains](#custom-from-source-rust-toolchains) |
-| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link where it is newer than the vendor ld (`RUST_LINK_VIA_BINUTILS`) |
+| binutils | 2.30 | 68 toolchains of DSM 5.2 to 7.1 | for the Rust link where it is newer than the vendor ld (`RUSTC_LINK_VIA_BINUTILS_OVERLAY`) |
 | gcc | 8.5 | the same 68 | not yet: installed only |
 
 ### Where the overlay code lives
@@ -508,7 +508,7 @@ Every overlay decision is resolved in `mk/spksrc.common/overlay.mk` (the *decide
 | `OVERLAY_GCC` | `0` | gcc 8.5 beside the vendor gcc, with the binutils overlay it drives. Off for the tree; `native/rustc-1.98`, a rust built with gcc 8.5, turns it on for itself. |
 | `OVERLAY_RUSTC` | `1` | Custom from-source rustc + Synology triple. `0` falls back to stock `rustup` — diagnostic only: the archs that ship an overlay do so precisely because the stock std does not fit them. |
 | `OVERLAY_BINUTILS` | `0` | **Global**: overlay `as`/`ld` for *every* compile. Only safe under a matched modern gcc, hence off. |
-| `RUST_LINK_VIA_BINUTILS` | `1` where a rust overlay exists, or a binutils overlay newer than the vendor ld | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. A link passes no vendor `-mcpu` flag to `as`, so it is safe beside the vendor gcc. |
+| `RUSTC_LINK_VIA_BINUTILS_OVERLAY` | `1` where a rust overlay exists, or a binutils overlay newer than the vendor ld | **Narrow**: only the Rust link takes the overlay `ld`; C keeps the vendor `as`/`ld`. A link passes no vendor `-mcpu` flag to `as`, so it is safe beside the vendor gcc. |
 | `OVERLAY_GCC_VERSION` | newest the arch ships | Which gcc build to select, matching the consumer dir name; empty where the arch ships none. |
 | `OVERLAY_RUSTC_VERSION` | newest the arch ships | Which rust build to select, among those made with the selected gcc -- the vendor-gcc ones while `OVERLAY_GCC` is off. |
 | `OVERLAY_BINUTILS_VERSION` | newest the arch ships | Idem. |
@@ -533,7 +533,7 @@ TC_OVERLAY_BINUTILS := 2.30       # its version, beside TC_BINUTILS, the one the
 TC_OVERLAY_RUSTC_ON := TRUE
 TC_OVERLAY_RUSTC := 1.82.0
 TC_OVERLAY_RUSTC_DIR := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_RUST_LINK_VIA_BINUTILS := TRUE # the narrow use: the Rust link only, through the shim below
+TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY := TRUE # the narrow use: the Rust link only, through the shim below
 TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
@@ -545,7 +545,7 @@ TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 
 A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc, and ships it as an overlay (see [Toolchain Overlays](#toolchain-overlays)).
 
-An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC_ON := TRUE` in its `tc_vars.overlay.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUST_LINK_VIA_BINUTILS`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
+An arch opts in simply by having a rust overlay (`_OVERLAY_RUSTC_DIR`, `TC_OVERLAY_RUSTC_ON := TRUE` in its `tc_vars.overlay.mk`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through the binutils 2.30 overlay (`RUSTC_LINK_VIA_BINUTILS_OVERLAY`). The rust builds made with the gcc 8.5 overlay are installed beside the vendor one, and not selected.
 
 ### Building Rust
 
@@ -557,7 +557,7 @@ make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 make -C native/rustc-1.98 all-6.2.4        # built with the gcc 8.5 overlay (OVERLAY_GCC)
 ```
 
-You do **not** build binutils separately: the Rust build makes `native/binutils-2.30` for the same `(arch, DSM)` automatically, profile-guided and archived, as gcc does (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).
+You do **not** build binutils separately: the Rust build makes `native/binutils-2.30` for the same `(arch, DSM)` automatically, profile-guided and archived, as gcc does (the `rustc_binutils_cobuild` step, gated on `RUSTC_LINK_VIA_BINUTILS_OVERLAY`). It is intentionally not a `DEPENDS` -- a `DEPENDS` cannot carry the per-arch parametrization -- so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so. Publish the result as in [Building and publishing an overlay](#building-and-publishing-an-overlay).
 
 ## Troubleshooting
 

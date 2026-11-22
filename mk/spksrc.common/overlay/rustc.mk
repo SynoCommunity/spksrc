@@ -59,7 +59,7 @@ _OVERLAY_RUSTC_DIR := $(if $(call is_true,$(OVERLAY_GCC)),\
 # NARROW: only the Rust link takes the overlay ld; C keeps the vendor's. On with a rust
 # overlay, or where the binutils overlay is newer than the vendor ld -- overlays exist only
 # up to the vendor's version, so a different one is newer. Lazy: TC_BINUTILS_VENDOR comes later.
-RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(_OVERLAY_RUSTC_DIR)),1,$(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(filter-out $(or $(TC_BINUTILS_VENDOR),$(TC_BINUTILS)),$(OVERLAY_BINUTILS_VERSION)),1)))
+RUSTC_LINK_VIA_BINUTILS_OVERLAY ?= $(if $(strip $(_OVERLAY_RUSTC_DIR)),1,$(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(filter-out $(or $(TC_BINUTILS_VENDOR),$(TC_BINUTILS)),$(OVERLAY_BINUTILS_VERSION)),1)))
 
 # Lazy (=), like the other components' ACTIVE.
 _OVERLAY_RUSTC_ON = $(if $(strip $(_OVERLAY_RUSTC_DIR)),$(if $(call is_true,$(OVERLAY_RUSTC)),1))

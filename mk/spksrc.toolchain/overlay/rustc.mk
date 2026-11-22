@@ -66,13 +66,13 @@ RUSTFLAGS += $(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic)
 
 endif # custom-rust arch (_OVERLAY_RUSTC_DIR)
 
-# RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on
+# RUSTC_LINK_VIA_BINUTILS_OVERLAY routes ONLY the Rust package link through the overlay ld (C stays on
 # vendor gcc+ld), on every arch that ships a binutils overlay, rustup-stock or custom rust;
 # defaulted in spksrc.common/overlay/rustc.mk. gcc picks its ld from -B (gcc < 4.8 has no
 # -fuse-ld), and that reaches the link driver through the same channel as -latomic -- so there
 # is no wrapper script to write, and nothing for _all to build. The linker itself stays the
 # plain cross gcc (tc_vars' default).
-ifeq ($(RUST_LINK_VIA_BINUTILS),1)
+ifeq ($(RUSTC_LINK_VIA_BINUTILS_OVERLAY),1)
 ifneq ($(strip $(_OVERLAY_BINUTILS_DIR)),)
 RUSTFLAGS += -Clink-arg=-B$(OVERLAY_BINUTILS_SHIM)
 endif

@@ -128,7 +128,7 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ??? note "November 22nd 2026 — The Rust link takes the binutils overlay wherever one exists"
 
-    - **What:** `RUST_LINK_VIA_BINUTILS` now defaults to `1` on every arch that ships a
+    - **What:** `RUST_LINK_VIA_BINUTILS`, renamed **`RUSTC_LINK_VIA_BINUTILS_OVERLAY`**, now defaults to `1` on every arch that ships a
       binutils overlay, not only the five with a rust overlay: the Rust link of x64, armv7,
       evansport, aarch64, hi3535, ... on DSM 5.2 to 7.0 goes through the overlay's ld 2.30,
       while C keeps the vendor gcc and ld. A new floor, **`MIN_RUSTC_BINUTILS_VERSION`**,
