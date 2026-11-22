@@ -2,6 +2,8 @@ SPK_NAME = tcl
 SPK_VERS = 9.1.0
 SPK_MAIN_VERS=$(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 10
+
+MIN_GCC_VERSION = 4.9
 SPK_ICON = src/tcl.png
 
 DEPENDS = cross/tcl

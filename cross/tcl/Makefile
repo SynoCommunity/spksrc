@@ -6,6 +6,8 @@ PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://prdownloads.sourceforge.net/tcl
 PKG_DIR = $(PKG_NAME)$(PKG_VERS)/unix
 
+MIN_GCC_VERSION = 4.9
+
 DEPENDS = cross/zlib
 
 HOMEPAGE = https://www.tcl.tk/
@@ -24,6 +26,11 @@ endif
 # Tcl 9's zipfs build requires a native Tcl 9 tclsh, unavailable while
 # cross-compiling. The package installs the Tcl library separately anyway.
 CONFIGURE_ARGS += --disable-zipfs
+
+# GCC < 5 misparses attributes on enum constants in tclCompile.h.
+ifeq ($(call version_lt,$(TC_GCC),5.0),1)
+ADDITIONAL_CPPFLAGS += -DALLOW_DEPRECATED_OPCODES
+endif
 
 POST_INSTALL_TARGET = tcl_post_install
 
