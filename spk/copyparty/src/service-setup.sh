@@ -1,7 +1,7 @@
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-PYTHON_DIR="/var/packages/python314/target/bin"
+PYTHON_DIR="/var/packages/@@PYTHON_PACKAGE@@/target/bin"
 
 # Optional (soft) ffmpeg: use the newest installed SynoCommunity ffmpeg package, if any.
 # Deliberately not a SPK_DEPENDS: file serving works without it, but thumbnails,
