@@ -1,10 +1,9 @@
 SPK_NAME = copyparty
-SPK_VERS = 1.20.18
-SPK_REV = 1
+SPK_VERS = 1.20.26
+SPK_REV = 2
 SPK_ICON = src/copyparty.png
 
 PYTHON_PACKAGE = python314
-SPK_DEPENDS = "ffmpeg8"
 
 WHEELS = src/requirements-pure.txt src/requirements-crossenv.txt
 WHEELS_OFFLINE = 1
@@ -12,7 +11,7 @@ WHEELS_OFFLINE = 1
 MAINTAINER = SynoCommunity
 DESCRIPTION = Portable file server with resumable uploads, file sharing, and WebDAV.
 DISPLAY_NAME = copyparty
-CHANGELOG = "1. Initial copyparty package v1.20.18."
+CHANGELOG = "Update copyparty to v1.20.26."
 HOMEPAGE = https://github.com/9001/copyparty
 LICENSE = MIT
 
@@ -30,6 +29,9 @@ WIZARDS_DIR = src/wizard
 SERVICE_WIZARD_SHARENAME = wizard_media_share
 
 POST_STRIP_TARGET = copyparty_extra_install
+
+# [Pillow]
+DEPENDS += python/pillow
 
 include ../../mk/spksrc.spk-meta.mk
 

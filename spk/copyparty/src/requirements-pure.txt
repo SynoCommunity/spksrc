@@ -1,3 +1,7 @@
-copyparty==1.20.18
+# Generated using the requirements script on November 22, 2026
+# Command: generate_requirements.sh "copyparty[audiotags,thumbnails]==1.20.26" 314
+
+copyparty==1.20.26
 Jinja2==3.1.6
 mutagen==1.48.1
+#pip==26.2.2                    ==> python314
