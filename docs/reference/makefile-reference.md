@@ -43,6 +43,12 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `HELPURL` | SPK | No | Help/documentation URL |
 | `SUPPORTURL` | SPK | No | Support URL |
 
+A `MAINTAINER` value containing whitespace is treated as a display name and is not
+resolved as a GitHub login. Single-word values are looked up only when they are valid
+GitHub logins: letters, digits, and hyphens, without leading, trailing, or doubled
+hyphens. The name lookup uses `GITHUB_TOKEN` when available, and a failed lookup
+is reported and falls back to the login. Set `DISABLE_GITHUB_MAINTAINER = 1` to skip lookups entirely.
+
 ## Dependency Variables
 
 | Variable | Description | Example |
