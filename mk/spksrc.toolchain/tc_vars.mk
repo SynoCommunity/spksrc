@@ -459,7 +459,7 @@ tc_overlay_vars:
 	echo TC_OVERLAY_BINUTILS_DIR := $(firstword $(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
 	echo TC_OVERLAY_BINUTILS_SHIM := $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_SHIM)) ; \
-	echo TC_OVERLAY_BINUTILS_RUSTC_ON := $(if $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),TRUE,FALSE) ; \
+	echo TC_OVERLAY_BINUTILS_RUSTC_ON := $(if $(and $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),$(strip $(_OVERLAY_BINUTILS_DIR))),TRUE,FALSE) ; \
 	echo TC_OVERLAY_GCC_ON := $(if $(_OVERLAY_GCC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_GCC := $(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_GCC_DIR := $(firstword $(_OVERLAY_GCC_DIR)) ; \
