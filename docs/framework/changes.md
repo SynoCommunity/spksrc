@@ -126,6 +126,19 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 23rd 2026 — crossenv reports glibc from platform.libc_ver() (#7817)"
+
+    - **What:** when a crossenv is created, its `platform-patch.py` stub of
+      `platform.libc_ver()` returns `("glibc", TC_GLIBC)` instead of crossenv's `("", "")`
+      (the `crossenv_libc_glibc` recipe of `spksrc.python-crossenv.mk`). The creation fails
+      if the stub is not found or the version is empty. `build-python` is not touched.
+    - **Why:** a build that picks its libc from `libc_ver()` took musl: curl_cffi linked
+      the musl libcurl-impersonate on x86_64 and aarch64, and found none on armv7 and i686.
+      DSM is glibc on every arch.
+    - **Existing work dirs:** a crossenv created before keeps the empty stub; `make clean`
+      the package (or its python's crossenv) to recreate it. CI always starts clean.
+    - **PR:** [#7817](https://github.com/SynoCommunity/spksrc/pull/7817)
+
 ??? note "November 22nd 2026 — The Rust link takes the binutils overlay wherever one exists"
 
     - **What:** `RUST_LINK_VIA_BINUTILS`, renamed **`RUSTC_LINK_VIA_BINUTILS_OVERLAY`**, now defaults to `1` on every arch that ships a

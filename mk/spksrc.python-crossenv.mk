@@ -168,7 +168,7 @@ define crossenv_libc_glibc
     @set -o pipefail; { \
     $(MSG) "platform.libc_ver(): glibc $(TC_GLIBC), not crossenv's empty stub" ; \
     sed -i '/^def libc_ver/,/return/ s/return ("", "")/return ("glibc", "$(TC_GLIBC)")/' $(CROSSENV_PATH)/lib/platform-patch.py ; \
-    grep -q 'return ("glibc", "$(TC_GLIBC)")' $(CROSSENV_PATH)/lib/platform-patch.py ; \
+    grep -q 'return ("glibc", "[0-9][0-9.]*")' $(CROSSENV_PATH)/lib/platform-patch.py ; \
     } > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 endef
 
