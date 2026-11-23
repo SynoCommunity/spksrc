@@ -450,23 +450,23 @@ tc_vars:
 # _PATH only when ON. The tree computes none of these names -- its own are _OVERLAY_<c>_DIR
 # and _OVERLAY_<c>_ON -- so the file, included at parse, records without changing a
 # decision; stage0.mk compares TC_OVERLAY_<c>_ON with what a run resolves, and stops a run
-# that differs. Binutils is ON only as the GLOBAL overlay; the narrow rust-link use, on
-# where the binutils overlay is newer, is TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY, its shim
-# TC_OVERLAY_RUSTC_LINKER (the -Clink-arg=-B of the Rust link flags).
+# that differs. Binutils is ON only as the GLOBAL overlay; its narrow rust-link use, on where
+# the binutils overlay is newer, is TC_OVERLAY_BINUTILS_RUSTC_ON. TC_OVERLAY_BINUTILS_SHIM is
+# the shim dir both uses pass to gcc's -B.
 tc_overlay_vars:
 	@echo TC_OVERLAY_BINUTILS_ON := $(if $(_OVERLAY_BINUTILS_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_BINUTILS := $(call read_makefile_var,$(firstword $(_OVERLAY_BINUTILS_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_BINUTILS_DIR := $(firstword $(_OVERLAY_BINUTILS_DIR)) ; \
 	echo TC_OVERLAY_BINUTILS_PATH := $(TC_OVERLAY_BINUTILS_PATH) ; \
+	echo TC_OVERLAY_BINUTILS_SHIM := $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_SHIM)) ; \
+	echo TC_OVERLAY_BINUTILS_RUSTC_ON := $(if $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),TRUE,FALSE) ; \
 	echo TC_OVERLAY_GCC_ON := $(if $(_OVERLAY_GCC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_GCC := $(call read_makefile_var,$(firstword $(_OVERLAY_GCC_DIR))/Makefile,PKG_VERS) ; \
 	echo TC_OVERLAY_GCC_DIR := $(firstword $(_OVERLAY_GCC_DIR)) ; \
 	echo TC_OVERLAY_GCC_PATH := $(TC_OVERLAY_GCC_PATH) ; \
 	echo TC_OVERLAY_RUSTC_ON := $(if $(_OVERLAY_RUSTC_ON),TRUE,FALSE) ; \
 	echo TC_OVERLAY_RUSTC := $(call read_makefile_var,$(firstword $(_OVERLAY_RUSTC_DIR))/Makefile,PKG_VERS) ; \
-	echo TC_OVERLAY_RUSTC_DIR := $(firstword $(_OVERLAY_RUSTC_DIR)) ; \
-	echo TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY := $(if $(filter 1,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY)),TRUE,FALSE) ; \
-	echo TC_OVERLAY_RUSTC_LINKER := $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_SHIM))
+	echo TC_OVERLAY_RUSTC_DIR := $(firstword $(_OVERLAY_RUSTC_DIR))
 
 #####
 

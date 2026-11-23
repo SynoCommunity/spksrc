@@ -178,6 +178,8 @@ TC_OVERLAY_BINUTILS_ON := FALSE
 TC_OVERLAY_BINUTILS := 2.30
 TC_OVERLAY_BINUTILS_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30
 TC_OVERLAY_BINUTILS_PATH := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/install/usr/local/bin/
+TC_OVERLAY_BINUTILS_SHIM := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim
+TC_OVERLAY_BINUTILS_RUSTC_ON := TRUE
 TC_OVERLAY_GCC_ON := FALSE
 TC_OVERLAY_GCC := 8.5.0
 TC_OVERLAY_GCC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_gcc-8.5
@@ -185,8 +187,6 @@ TC_OVERLAY_GCC_PATH := <spksrc>/overlay/syno-qoriq-6.2.4_gcc-8.5/work/install/us
 TC_OVERLAY_RUSTC_ON := TRUE
 TC_OVERLAY_RUSTC := 1.82.0
 TC_OVERLAY_RUSTC_DIR := <spksrc>/overlay/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY := TRUE
-TC_OVERLAY_RUSTC_LINKER := <spksrc>/overlay/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
 ### tc_vars.autotools.mk
@@ -530,11 +530,11 @@ Each generated `tc_vars.overlay.mk` records what the build actually resolved to,
 ```makefile
 TC_OVERLAY_BINUTILS_ON := FALSE   # the global overlay: the C build keeps the vendor as/ld
 TC_OVERLAY_BINUTILS := 2.30       # its version, beside TC_BINUTILS, the one the build takes
+TC_OVERLAY_BINUTILS_SHIM := …/syno-qoriq-6.2.4_binutils-2.30/work/shim  # the -B dir of both uses
+TC_OVERLAY_BINUTILS_RUSTC_ON := TRUE  # the narrow use: the Rust link only, through that shim
 TC_OVERLAY_RUSTC_ON := TRUE
 TC_OVERLAY_RUSTC := 1.82.0
 TC_OVERLAY_RUSTC_DIR := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
-TC_RUSTC_LINK_VIA_BINUTILS_OVERLAY := TRUE # the narrow use: the Rust link only, through the shim below
-TC_OVERLAY_RUSTC_LINKER := …/syno-qoriq-6.2.4_binutils-2.30/work/shim
 ```
 
 `TC_OVERLAY_<c>_ON` says whether the build uses an overlay; `TC_OVERLAY_<c>`, `_DIR` and `_PATH` (its version, consumer dir and bin dir) are filled wherever the arch ships it, used or not, and `$(call tc,…)` takes a `_PATH` only when `_ON` is `TRUE`. The tree computes none of these names -- it keeps its own in `_OVERLAY_<c>_DIR` and `OVERLAY_<c>_ON` -- so the file, included at parse, never shadows a decision. Its flags are fixed with the overlays it records, though: a run whose switches resolve otherwise -- `OVERLAY_BINUTILS=1` on a work dir built without it -- stops with *tc_vars.mk was generated with the BINUTILS overlay OFF and this run has it ON: run make clean first*. The rule is the same for a work dir a `check` or an `overlay` report created: the optional dependencies resolved there depend on the overlays too.
