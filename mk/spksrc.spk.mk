@@ -183,9 +183,9 @@ is_github_login = $(if $(and $(strip $(1)),$(if $(word 2,$(1)),,1),$(if $(call _
 ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
 # GITHUB_TOKEN, where CI passes it, lifts the 60 requests/hour of an anonymous client. A
 # failed lookup is reported, instead of silently publishing the login as the name.
-_github_user = curl -fsS -H 'Accept: application/vnd.github+json' $(if $(GITHUB_TOKEN),-H 'Authorization: Bearer $(GITHUB_TOKEN)') https://api.github.com/users/$(1) 2>/dev/null
-get_github_maintainer_url = $(if $(call is_github_login,$(1)),$(shell $(call _github_user,$(1)) | jq -r '.html_url // empty'))
-get_github_maintainer_name = $(if $(call is_github_login,$(1)),$(or $(shell $(call _github_user,$(1)) | jq -r '.name // .login'),$(warning GitHub lookup of MAINTAINER $(1) failed: the login is used)$(1)),$(1))
+_maintainer_github_user = curl -fsS -H 'Accept: application/vnd.github+json' $(if $(GITHUB_TOKEN),-H 'Authorization: Bearer $(GITHUB_TOKEN)') https://api.github.com/users/$(1) 2>/dev/null
+get_github_maintainer_url = $(if $(call is_github_login,$(1)),https://github.com/$(1))
+get_github_maintainer_name = $(if $(call is_github_login,$(1)),$(or $(shell $(call _maintainer_github_user,$(1)) | jq -r '.name // .login'),$(warning GitHub lookup of MAINTAINER $(1) failed: the login is used)$(1)),$(1))
 else
 get_github_maintainer_url = "https://github.com/SynoCommunity"
 get_github_maintainer_name = $(MAINTAINER_NAME)
