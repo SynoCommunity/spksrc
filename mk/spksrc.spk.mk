@@ -174,10 +174,18 @@ endif
 
 MAINTAINER_NAME = $(strip $(MAINTAINER))
 
+# A GitHub login: one word of a-z, 0-9 and hyphens, no leading, trailing or doubled
+# hyphen (the 39-character cap is not checked). Pure make, no fork.
+_maintainer_login_chars := a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 -
+_maintainer_drop_chars = $(if $(2),$(call _maintainer_drop_chars,$(subst $(firstword $(2)),,$(1)),$(wordlist 2,$(words $(2)),$(2))),$(1))
+is_github_login = $(if $(and $(strip $(1)),$(if $(word 2,$(1)),,1),$(if $(call _maintainer_drop_chars,$(call lower,$(1)),$(_maintainer_login_chars)),,1),$(if $(findstring --,$(1)),,1),$(if $(filter -% %-,$(1)),,1)),1)
+
 ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
-# A value containing whitespace is a display name, not a GitHub login.
-get_github_maintainer_url = $(if $(findstring $(space),$(1)),,$(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo ""))
-get_github_maintainer_name = $(if $(findstring $(space),$(1)),$(1),$(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' ))
+# GITHUB_TOKEN, where CI passes it, lifts the 60 requests/hour of an anonymous client. A
+# failed lookup is reported, instead of silently publishing the login as the name.
+_github_user = curl -fsS -H 'Accept: application/vnd.github+json' $(if $(GITHUB_TOKEN),-H 'Authorization: Bearer $(GITHUB_TOKEN)') https://api.github.com/users/$(1) 2>/dev/null
+get_github_maintainer_url = $(if $(call is_github_login,$(1)),$(shell $(call _github_user,$(1)) | jq -r '.html_url // empty'))
+get_github_maintainer_name = $(if $(call is_github_login,$(1)),$(or $(shell $(call _github_user,$(1)) | jq -r '.name // .login'),$(warning GitHub lookup of MAINTAINER $(1) failed: the login is used)$(1)),$(1))
 else
 get_github_maintainer_url = "https://github.com/SynoCommunity"
 get_github_maintainer_name = $(MAINTAINER_NAME)
