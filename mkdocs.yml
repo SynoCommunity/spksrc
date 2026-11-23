@@ -217,6 +217,7 @@ nav:
       - Flexget: packages/flexget.md
       - Radarr/Sonarr: packages/radarr-sonarr.md
     - Media Server:
+      - DS Video HEVC Passthrough: packages/dsvideo-passthrough.md
       - Immich: packages/immich.md
       - Jellyfin: packages/jellyfin.md
       - Kiwix: packages/kiwix.md
