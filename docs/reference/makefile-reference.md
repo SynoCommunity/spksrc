@@ -240,6 +240,7 @@ The architecture **groups** (`x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARC
 |----------|-------------|
 | `MIN_GCC_VERSION` | Refuse archs whose toolchain gcc is below this (capability floor) |
 | `MIN_BINUTILS_VERSION` | Refuse archs whose toolchain binutils is below this (capability floor) |
+| `MIN_RUSTC_BINUTILS_VERSION` | Refuse archs whose Rust link `ld` is below this (capability floor) |
 | `MIN_GLIBC_VERSION` | Refuse archs whose toolchain glibc is below this (runtime floor) |
 | `MIN_KERNEL_VERSION` | Refuse archs whose toolchain kernel is below this (runtime floor) |
 | `MIN_RUSTC_VERSION` | Refuse archs whose toolchain rustc is below this (capability floor) |

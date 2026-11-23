@@ -10,8 +10,9 @@
 #                           baked into tc_vars. Only safe under a MATCHED modern gcc: a modern
 #                           binutils rejects vendor flags a stock gcc emits (arm-marvell's
 #                           -mcpu=marvell-f). Off by default.
-#   RUST_LINK_VIA_BINUTILS  NARROW -- only the Rust link, C keeps the vendor as/ld. For archs
-#                           whose stock ld breaks Rust but whose gcc emits standard flags.
+#   RUSTC_LINK_VIA_BINUTILS_OVERLAY
+#                           NARROW -- only the Rust link, C keeps the vendor as/ld. On by
+#                           default where this overlay is newer; a link takes no -mcpu.
 #                           ppc853x REQUIRES it: its 2008 ld 2.18 mishandles Rust's TLS/PIE.
 #
 # PRODUCED by native/binutils-<ver>, CONSUMED here by downloading the published .txz through

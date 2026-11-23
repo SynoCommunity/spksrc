@@ -126,6 +126,22 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 22nd 2026 — The Rust link takes the binutils overlay wherever one exists"
+
+    - **What:** `RUST_LINK_VIA_BINUTILS`, renamed **`RUSTC_LINK_VIA_BINUTILS_OVERLAY`**, now defaults to `1` on every arch that ships a
+      binutils overlay, not only the five with a rust overlay: the Rust link of x64, armv7,
+      evansport, aarch64, hi3535, ... on DSM 5.2 to 7.0 goes through the overlay's ld 2.30,
+      while C keeps the vendor gcc and ld. A new floor, **`MIN_RUSTC_BINUTILS_VERSION`**,
+      measures that ld (`TC_RUSTC_BINUTILS`): the overlay's where the Rust link uses it,
+      `TC_BINUTILS` otherwise.
+    - **Why:** a package whose Rust modules need a newer ld than the vendor's 2.24/2.25 could
+      only declare a `MIN_BINUTILS_VERSION`, which refused the arch for its C as well; the
+      overlay ld 2.30 was already there. The global binutils overlay stays off: it is only
+      safe under a matched gcc, while a link passes the vendor gcc's `-mcpu` flags to no
+      assembler. DSM 7.1 and later are unchanged: their overlay, where one exists, is the
+      vendor's own 2.30.
+    - **PR:** [#7818](https://github.com/SynoCommunity/spksrc/pull/7818)
+
 ??? note "November 17th 2026 — A python spk installs its own compiled wheels, not PyPI's (#7791)"
 
     - **What:** `install_python_wheels` passes, by path, the wheels listed in the package's

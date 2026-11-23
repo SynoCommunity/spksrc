@@ -20,7 +20,7 @@ LICENSE  = Apache-2.0, MIT
 # source pipeline (download/extract/patch) is the framework's, so patches live in
 # ./patches and are applied by the normal patch step.
 #
-# NO manual prerequisite: the Rust link needs a modern binutils (RUST_LINK_VIA_BINUTILS,
+# NO manual prerequisite: the Rust link needs a modern binutils (RUSTC_LINK_VIA_BINUTILS_OVERLAY,
 # default ON), so this build CO-BUILDS native/binutils-$(vers) for the SAME arch on the
 # fly (rustc_binutils_cobuild, a rustc_prepare step). It is deliberately NOT a DEPENDS --
 # a DEPENDS could not carry the per-(arch,DSM) parametrization. So `make arch-<arch>-<vers>`

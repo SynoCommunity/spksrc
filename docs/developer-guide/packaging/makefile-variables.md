@@ -395,6 +395,7 @@ human-readable reason.
 |----------|-------------|
 | `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
 | `MIN_BINUTILS_VERSION` | Needs at least this binutils — the `as` and `ld` the toolchain ships |
+| `MIN_RUSTC_BINUTILS_VERSION` | Needs at least this `ld` for the Rust link — the binutils overlay's where `RUSTC_LINK_VIA_BINUTILS_OVERLAY` is on, else the toolchain's |
 | `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
 | `MIN_KERNEL_VERSION` | Needs at least this kernel — a runtime floor no toolchain can lift |
 | `MIN_RUSTC_VERSION` | Needs at least this rustc (e.g. `1.85`) |
@@ -409,6 +410,9 @@ MIN_RUSTC_VERSION = 1.85
 
 # Needs an ld that knows R_PPC_TLSGD → binutils 2.20 or newer
 MIN_BINUTILS_VERSION = 2.20
+
+# Its Rust modules need a newer ld than the C around them
+MIN_RUSTC_BINUTILS_VERSION = 2.30
 
 # Needs a 64-bit target (e.g. SVT-AV1)
 REQUIRE_64BIT = 1
