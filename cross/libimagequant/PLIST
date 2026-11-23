@@ -1,2 +1,3 @@
 lnk:lib/libimagequant.so
-lib:lib/libimagequant.so.0
+lnk:lib/libimagequant.so.0.4
+lib:lib/libimagequant.so.0.4.1
