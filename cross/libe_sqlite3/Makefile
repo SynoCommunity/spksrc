@@ -58,7 +58,7 @@ endif
 .PHONY: libe_sqlite3_compile
 libe_sqlite3_compile:
 	@$(MSG) "compile libe_sqlite3"
-	@$(RUN) sh -c '$$CC $$CFLAGS $(WORK_DIR)/$(PKG_DIR)/sqlite3.c $(CURDIR)/stubs.c -o $(WORK_DIR)/libe_sqlite3.so'
+	@$(RUN) sh -c '$$CC $$CFLAGS $(WORK_DIR)/$(PKG_DIR)/sqlite3.c $(CURDIR)/src/stubs.c -o $(WORK_DIR)/libe_sqlite3.so'
 
 .PHONY: libe_sqlite3_install
 libe_sqlite3_install:
