@@ -1,6 +1,6 @@
 SPK_NAME = monitoring-plugins
-SPK_VERS = 3.0.2
-SPK_REV = 4
+SPK_VERS = 3.0.3
+SPK_REV = 5
 SPK_ICON = src/monitoring-plugins.png
 
 DEPENDS = cross/monitoring-plugins
@@ -12,7 +12,7 @@ MIN_GCC_VERSION = 4.9
 
 MAINTAINER = Gagi2k
 DESCRIPTION = Standard plugins for Icinga, Naemon, Nagios, Shinken, Sensu, and other monitoring applications.
-CHANGELOG = "1. Update monitoring-plugins to v3.0.2"
+CHANGELOG = "Update monitoring-plugins to v3.0.3."
 STARTABLE = no
 DISPLAY_NAME = Monitoring Plugins
 
