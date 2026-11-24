@@ -7,6 +7,7 @@ DEPENDS = cross/dotnet10-runtime
 
 # libcoreclr requires glibc >= 2.27 (DSM 7.2+)
 MIN_GLIBC_VERSION = 2.27
+REQUIRED_MIN_DSM = 7.2
 
 # Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
