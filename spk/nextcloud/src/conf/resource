@@ -33,7 +33,7 @@
         "display_name": "Nextcloud",
         "icon": "app/images/nextcloud-{0}.png",
         "php": {
-          "backend": 12,
+          "backend": 13,
           "connect_timeout": 120,
           "extensions": [
             "curl",
@@ -43,7 +43,6 @@
             "gmp",
             "iconv",
             "imagick",
-            "imap",
             "intl",
             "ldap",
             "memcached",
