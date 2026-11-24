@@ -12,9 +12,10 @@ MIN_GCC_VERSION = 4.9
 
 MAINTAINER = Gagi2k
 DESCRIPTION = Standard plugins for Icinga, Naemon, Nagios, Shinken, Sensu, and other monitoring applications.
-CHANGELOG = "Update monitoring-plugins to v3.0.3."
+CHANGELOG = "Update monitoring-plugins to v3.0.3 and add a fix command for privileged checks."
 STARTABLE = no
 DISPLAY_NAME = Monitoring Plugins
+WIZARDS_DIR = src/wizard
 
 HOMEPAGE = https://www.monitoring-plugins.org
 LICENSE  = GPLv3
@@ -73,5 +74,14 @@ SPK_COMMANDS += bin/check_wave
 # must be found in /usr/local/bin too:
 SPK_COMMANDS += bin/utils.sh
 SPK_COMMANDS += bin/utils.pm
+SPK_COMMANDS += bin/monitoring-plugins-fix
+
+POST_STRIP_TARGET = monitoring_plugins_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: monitoring_plugins_extra_install
+monitoring_plugins_extra_install:
+	@$(MSG) Install monitoring-plugins fix helper
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 src/bin/monitoring-plugins-fix $(STAGING_DIR)/bin/monitoring-plugins-fix

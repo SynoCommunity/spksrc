@@ -1,0 +1,16 @@
+[
+  {
+    "step_title": "Privileged Monitoring Checks",
+    "items": [
+      {
+        "desc": "The <strong>check_ping</strong>, <strong>check_icmp</strong>, and <strong>check_dhcp</strong> plugins require root privileges. Synology removes setuid bits during package installation."
+      },
+      {
+        "desc": "To enable these checks, run this command in SSH after installation:<br/><br/><code style=\"user-select: all\">monitoring-plugins-fix</code><br/><br/>It will prompt for your DSM administrator password and apply the required permissions."
+      },
+      {
+        "desc": "The other monitoring plugins do not require this step."
+      }
+    ]
+  }
+]
