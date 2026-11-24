@@ -1,0 +1,13 @@
+[
+  {
+    "step_title": "Privileged Monitoring Checks",
+    "items": [
+      {
+        "desc": "Package upgrades also remove setuid bits. If you use <strong>check_ping</strong>, <strong>check_icmp</strong>, or <strong>check_dhcp</strong>, run this command again in SSH after upgrading:<br/><br/><code style=\"user-select: all\">monitoring-plugins-fix</code>"
+      },
+      {
+        "desc": "It will prompt for your DSM administrator password and restore the required permissions."
+      }
+    ]
+  }
+]

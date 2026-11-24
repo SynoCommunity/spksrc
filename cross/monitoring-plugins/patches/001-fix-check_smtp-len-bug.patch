@@ -9,7 +9,7 @@
  #endif
  }
  
-@@ -83,7 +83,7 @@
+@@ -84,5 +84,5 @@
  	return (int)send(socket_descriptor, buf, (size_t)num, 0);
  #else /* ifndef HAVE_SSL */
 -	return send(socket_descriptor, buf, len, 0);

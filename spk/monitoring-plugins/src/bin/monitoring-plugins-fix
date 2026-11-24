@@ -1,0 +1,24 @@
+#!/bin/sh
+
+PKG_NAME="monitoring-plugins"
+PKG_TARGET="/var/packages/${PKG_NAME}/target"
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Requesting DSM administrator privileges..."
+    exec sudo "$0" "$@"
+fi
+
+echo "Enabling privileged monitoring checks..."
+
+for FILE in /bin/ping /bin/ping6 \
+    "${PKG_TARGET}/bin/check_icmp" "${PKG_TARGET}/bin/check_dhcp"; do
+    if [ -e "${FILE}" ]; then
+        chown root:root "${FILE}"
+        chmod 4755 "${FILE}"
+        echo "  ${FILE}"
+    else
+        echo "  WARNING: ${FILE} not found" >&2
+    fi
+done
+
+echo "Done. Privileged ping, ICMP, and DHCP checks are now enabled."
