@@ -1,19 +1,20 @@
 SPK_NAME = dotnet10-runtime
-SPK_VERS = 10.0.10
-SPK_REV = 4
+SPK_VERS = 10.0.15
+SPK_REV = 5
 SPK_ICON = src/dotnet.png
 
 DEPENDS = cross/dotnet10-runtime
 
 # libcoreclr requires glibc >= 2.27 (DSM 7.2+)
 MIN_GLIBC_VERSION = 2.27
+REQUIRED_MIN_DSM = 7.2
 
 # Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = brice-fromentin
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Update to dotnet-runtime v10.0.10."
+CHANGELOG = "Update to dotnet-runtime v10.0.15."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 10 runtime
