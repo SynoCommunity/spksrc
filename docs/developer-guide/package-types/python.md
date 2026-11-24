@@ -307,6 +307,7 @@ resolve the complete set and split it into pure-python and cross-compiled files:
 tools/generate_requirements.sh "rdiff-backup[meta]==2.2.7" 314
 tools/generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
 tools/generate_requirements.sh "-r requirements.txt" 314
+tools/generate_requirements.sh --poetry-lock https://example.invalid/project/poetry.lock 314
 ```
 
 The helper uses `native/python<version>`, builds it if necessary, and writes:
@@ -314,6 +315,10 @@ The helper uses `native/python<version>`, builds it if necessary, and writes:
 - `generated_requirements_all.txt`
 - `generated_requirements_crossenv.txt`
 - `generated_requirements_pure.txt`
+
+For Poetry projects, `--poetry-lock FILE|URL` resolves the exact versions from
+the lock file instead of asking pip for a fresh resolution. The `main` group is
+used by default; pass `--poetry-group GROUP` to select another group.
 
 Packages already provided by the Python meta are written as comments. Use
 `--repo PATH` to point at another spksrc checkout and `--output-dir DIR` to
