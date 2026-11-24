@@ -1,5 +1,5 @@
-# Generated using the requirements script on November 22, 2026
-# Command: generate_requirements.sh "copyparty[audiotags,thumbnails]==1.20.27" 314
+# Generated using the requirements script on November 24, 2026
+# Command: generate_requirements.sh "copyparty[audiotags,thumbnails]==1.20.28" 314
 
 MarkupSafe==3.0.4
 #pillow==13.0.0             ==> python/pillow
