@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
-SPK_VERS = 0.23.3
-SPK_REV = 13
+SPK_VERS = 0.25.1
+SPK_REV = 14
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
@@ -8,8 +8,6 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-# rust edition 2024 required (see rust-version in syncstorage-rs Cargo.toml)
-MIN_RUSTC_VERSION = 1.91
 # ARMv7L (hi3535) excluded: aws-lc-sys (rustls) ARMv8 crypto assembly does not
 # assemble on the ARMv7 (Cortex-A9) toolchain
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
@@ -25,7 +23,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = An implementation of the Mozilla Sync-1.5 Server protocol used by the sync service in Firefox 29 and later. You can use Mozilla Sync Server to exchange browser data \(bookmarks, history, open tabs, passwords, add-ons, and the like\) between \'clients\' in a manner that respects a user\'s security and privacy. The service runs on port 8132.
 DISPLAY_NAME = Mozilla Sync Server
-CHANGELOG = "1. Update Mozilla Sync Server package to v0.23.3."
+CHANGELOG = "Update Mozilla Sync Server package to v0.25.1."
 
 HOMEPAGE = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE = MPL 2.0
@@ -47,6 +45,9 @@ POST_STRIP_TARGET = ffsync_extra_install
 DEPENDS += cross/openssl3
 
 include ../../mk/spksrc.spk-meta.mk
+
+# cryptography 50 cffi bridge needs the versioned Python include directory
+WHEELS_CFLAGS += [cryptography] -I$(PYTHON_STAGING_INSTALL_PREFIX)/include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
