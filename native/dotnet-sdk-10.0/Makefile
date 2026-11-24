@@ -1,6 +1,6 @@
-# Version 10.0.14, SDK 10.0.403
+# Version 10.0.15, SDK 10.0.404
 # https://dotnet.microsoft.com/download/dotnet/10.0
-PKG_VERS = 10.0.403
+PKG_VERS = 10.0.404
 PKG_EXT = tar.gz
 PKG_NAME = dotnet-sdk-10.0
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
