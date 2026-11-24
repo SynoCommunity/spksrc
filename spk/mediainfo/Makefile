@@ -5,9 +5,6 @@ SPK_ICON = src/mediainfo.png
 
 DEPENDS = cross/mediainfo
 
-# GCC >= 5 required for MediaInfo 26.05 (C++11)
-MIN_GCC_VERSION = 5
-
 MAINTAINER = ymartin59
 DESCRIPTION = "MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files."
 DISPLAY_NAME = MediaInfo
