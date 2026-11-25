@@ -1,6 +1,6 @@
 --- ../duply_2.4.1-orig/duply	2022-09-09 12:46:13.000000000 +0000
 +++ duply	2022-10-06 11:19:53.344470242 +0000
-@@ -951,7 +951,7 @@ SOURCE='${DEFAULT_SOURCE}'
+@@ -995,7 +995,7 @@ SOURCE='${DEFAULT_SOURCE}'
  
  # override the python interpreter to execute duplicity, unset by default
  #  e.g. "python3" or "/usr/bin/python3.8"
