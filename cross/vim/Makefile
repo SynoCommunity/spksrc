@@ -1,5 +1,5 @@
 PKG_NAME = vim
-PKG_VERS = 9.2.1125
+PKG_VERS = 9.2.1409
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/vim/vim/archive
