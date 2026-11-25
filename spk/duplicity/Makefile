@@ -1,6 +1,6 @@
 SPK_NAME = duplicity
-SPK_VERS = 3.2.1
-SPK_REV = 14
+SPK_VERS = 3.2.2
+SPK_REV = 15
 SPK_ICON = src/duplicity.png
 
 # The protobuf wheel includes stdatomic.h (upb/port/atomic.h), which gcc ships from 4.9 on.
@@ -16,7 +16,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v3.2.1 and duply to v2.5.6. <br/>2. Migrate to Python 3.14."
+CHANGELOG = "Update duplicity to v3.2.2."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
