@@ -1,6 +1,6 @@
 --- src/Makefile
 +++ src/Makefile
-@@ -391,7 +391,7 @@
+@@ -422,7 +422,7 @@
  REDIS_CHECK_AOF_NAME=redis-check-aof$(PROG_SUFFIX)
  ALL_SOURCES=$(sort $(patsubst %.o,%.c,$(REDIS_SERVER_OBJ) $(REDIS_VEC_SETS_OBJ) $(REDIS_CLI_OBJ) $(REDIS_BENCHMARK_OBJ)))
  

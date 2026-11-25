@@ -1,5 +1,5 @@
 PKG_NAME = redis
-PKG_VERS = 8.10.2
+PKG_VERS = 8.12.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases
@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# needs the gcc 4.7 atomics hdr_histogram probes, and -ffat-lto-objects:
-#   deps/hdr_histogram/hdr_atomic.h:142: #error "Unable to determine atomic
-#   operations for your platform"
-MIN_GCC_VERSION = 4.7
+# 8.12's bundled hdr_histogram needs GCC 4.8; GCC 4.7 x86 builds fail
+# on its SSE intrinsics/builtins.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://redis.io
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
@@ -25,14 +24,12 @@ else
 CONFIGURE_TARGET = nop
 endif
 
-INSTALL_ARGS = install PREFIX=$(STAGING_INSTALL_PREFIX)
-
-# Redis 8.10 builds its bundled modules (redisearch, redisjson,
-# redistimeseries) by default; this package ships the server core
-# only, as all previous versions did.
+# Redis 8.12 builds bundled modules by default. Pass none to both build and
+# install/deploy so this package ships the server core only.
+INSTALL_ARGS = install none PREFIX=$(STAGING_INSTALL_PREFIX)
 COMPILE_ARGS += build none
 
-# use jemalloc for intel archs
+# Use jemalloc on Intel architectures.
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
 ENV += USE_JEMALLOC=yes
 else
