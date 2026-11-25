@@ -46,9 +46,6 @@ DEPENDS += cross/openssl3
 
 include ../../mk/spksrc.spk-meta.mk
 
-# cryptography 50 cffi bridge needs the versioned Python include directory
-WHEELS_CFLAGS += [cryptography] -I$(PYTHON_STAGING_INSTALL_PREFIX)/include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
-
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
 	@$(MSG) Install config file
