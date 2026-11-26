@@ -1,6 +1,6 @@
 SPK_NAME = beszel-hub
-SPK_VERS = 0.21.1
-SPK_REV = 3
+SPK_VERS = 0.21.2
+SPK_REV = 4
 SPK_ICON = src/beszel.png
 
 DEPENDS = cross/beszel-hub
@@ -9,7 +9,7 @@ MAINTAINER = hgy59
 DESCRIPTION = "Simple, lightweight server monitoring. This package provides the Beszel Hub only."
 
 DISPLAY_NAME = Beszel Hub
-CHANGELOG = "Update beszel-hub to v0.21.1."
+CHANGELOG = "Update beszel-hub to v0.21.2 and disable self_update."
 
 HOMEPAGE = https://beszel.dev/
 LICENSE  = MIT
