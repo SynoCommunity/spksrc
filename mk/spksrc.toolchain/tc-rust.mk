@@ -81,6 +81,19 @@ pre_rustc_target: rustc_msg
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q --no-modify-path --default-toolchain $(TC_RUSTC) ; \
 	flock -u 5
 
+# A package picks its rustc from its own gcc (RUST_OLD_GCC_PIN below gcc 5, env-rust.mk), and
+# this toolchain's is installed once, in whichever package's context comes first: where a
+# gcc overlay lifts a vendor gcc older than 5, provision both, each with the target std. The
+# vendor gcc is the one this Makefile declares.
+include ../../mk/spksrc.cross/env-rust.mk
+ifeq ($(_OVERLAY_RUSTC_ON),)
+ifneq ($(and $(strip $(RUST_OLD_GCC_PIN)),$(strip $(_OVERLAY_GCC_DIR))),)
+ifeq ($(call version_lt,$(call read_makefile_var,Makefile,TC_GCC),5),1)
+_RUSTC_ALSO := $(filter-out $(TC_RUSTC),stable $(RUST_OLD_GCC_PIN))
+endif
+endif
+endif
+
 rustc_target: $(PRE_RUSTC_TARGET)
 	@$(MSG) "rustup -q toolchain install $(TC_RUSTC)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
@@ -110,6 +123,10 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	else \
 	   $(MSG) "Target $(RUST_TARGET) unavailable via rustup — will be handled by toolchain deps" ; \
 	fi ; \
+	for v in $(_RUSTC_ALSO) ; do \
+	   $(MSG) "Also provisioning rust $$v with $(RUST_TARGET) std, for packages on the other side of the gcc overlay" ; \
+	   rustup -q toolchain install $$v && rustup component add rust-std --target $(RUST_TARGET) --toolchain $$v || exit 1 ; \
+	done ; \
 	flock -u 5
 
 # The base rustup install only; the binutils linker wrapper is the rust overlay's own
