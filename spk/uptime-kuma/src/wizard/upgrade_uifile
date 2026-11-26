@@ -2,9 +2,12 @@
   {
     "step_title": "Uptime Kuma Upgrade",
     "items": [
-      {
-        "desc": "Your monitoring data will be preserved during the upgrade.<br><br><b>Recommended:</b> Back up <code>/var/packages/uptime-kuma/var/</code> before proceeding using Hyper Backup or manual copy.<br><br>The service will restart automatically when complete."
-      }
+            {
+                "desc": "Your monitoring data will be preserved during the upgrade.<br><br><b>Recommended:</b> Back up <code>/var/packages/uptime-kuma/var/</code> before proceeding using Hyper Backup or manual copy.<br><br>The service will restart automatically when complete."
+            },
+            {
+                "desc": "<b>TCP Port monitor change:</b> Uptime Kuma 2.5.8 removed TLS/STARTTLS support for TCP Port monitors. Existing TLS-enabled TCP monitors will become plain TCP monitors. Review affected monitors after upgrading."
+            }
     ]
   }
 ]
