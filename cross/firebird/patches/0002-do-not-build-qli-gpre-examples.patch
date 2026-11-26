@@ -1,0 +1,21 @@
+--- builds/posix/Makefile.in.1	2023-08-18 21:59:51.408045740 +0200
++++ builds/posix/Makefile.in	2023-08-18 22:03:41.578508436 +0200
+@@ -348,9 +348,7 @@ cross2:
+ 	$(MAKE) engine
+ 	$(MAKE) fbintl
+ 	$(MAKE) utilities
+-	$(MAKE) $(GPRE)
+ 	$(MAKE) plugins
+-	$(MAKE) -f Makefile.plugins_examples
+ 	$(MAKE) cross_rest
+ 
+ 
+@@ -660,7 +658,7 @@ GBAK_FILES := $(subst Native,$(TARGET),$
+ 
+ rest:	qli message_file tzdata
+ 
+-cross_rest:	qli gbak_files
++cross_rest:	gbak_files
+ 	$(MAKE) $(BUILD_FILE)
+ 
+ qli:		$(QLI)

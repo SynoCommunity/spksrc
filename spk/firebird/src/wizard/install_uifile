@@ -1,0 +1,21 @@
+[
+  {
+    "step_title": "Configuration of FirebirdSQL server",
+    "items": [
+      {
+        "type": "password",
+        "desc": "SYSDBA user (the Firebird administrator account)",
+        "subitems": [
+          {
+            "key": "wizard_sysdba_password",
+            "desc": "Password",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
+
