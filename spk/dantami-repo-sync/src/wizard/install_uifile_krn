@@ -1,0 +1,45 @@
+[
+  {
+    "step_title": "앱 관리자 계정 만들기",
+    "items": [
+      {
+        "desc": "DSM 계정과 별도로 사용할 앱 관리자 계정이에요. 이미 앱 계정이 있으면 기존 계정을 유지하며 아래 입력으로 변경하지 않아요."
+      },
+      {
+        "type": "textfield",
+        "subitems": [
+          {
+            "key": "app_admin_user",
+            "desc": "관리자 아이디",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[a-zA-Z0-9][a-zA-Z0-9_.-]{2,39}$/",
+                "errorText": "영문/숫자/._- 3~40자를 입력하세요"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "password",
+        "subitems": [
+          {
+            "key": "app_admin_password",
+            "desc": "비밀번호 · 12~72바이트",
+            "validator": {
+              "allowBlank": false
+            }
+          },
+          {
+            "key": "app_admin_confirm",
+            "desc": "비밀번호 확인",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
