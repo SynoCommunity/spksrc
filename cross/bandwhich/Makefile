@@ -8,9 +8,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Reloc 95 is R_PPC_TLSGD, which ld learned in binutils 2.20; ppc853x-5.2 is still on
-# 2.18.50 and answers "unknown relocation type 95". The linker is short, not the arch.
-MIN_BINUTILS_VERSION = 2.20
+# The Rust link needs R_PPC_TLSGD (reloc 95), which ld learned in binutils 2.20; the
+# binutils overlay brings it where the vendor ld is older (ppc853x-5.2: 2.18.50).
+MIN_RUSTC_BINUTILS_VERSION = 2.20
+# Requires 'epoll_create1' and 'pipe2'
+MIN_GLIBC_VERSION = 2.9
 
 HOMEPAGE = https://github.com/imsnif/bandwhich#readme
 COMMENT  = CLI utility for displaying current network utilization by process, connection and remote IP/hostname.
