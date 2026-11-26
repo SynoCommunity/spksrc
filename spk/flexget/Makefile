@@ -44,10 +44,19 @@ MIN_RUSTC_VERSION = 1.88
 # The Rust wheels need the binutils 2.30 overlay for the Rust link.
 MIN_RUSTC_BINUTILS_VERSION = 2.30
 
-# curl-cffi's prebuilt libcurl-impersonate is linked by the C side, where the
-# Rust-link overlay does not apply.
+# curl-cffi's prebuilt libcurl-impersonate is linked by the C side. Where the
+# vendor binutils is older than the 2.30 shim used for the Rust link, route
+# that C link through the same shim instead of rejecting the arch.
 ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)),)
+ifneq ($(strip $(_OVERLAY_BINUTILS_DIR)),)
+ifeq ($(call version_lt,$(TC_BINUTILS_VENDOR),2.30),1)
+WHEELS_LDFLAGS += [curl_cffi] -B$(_OVERLAY_BINUTILS_DIR)/work/shim
+else
 MIN_BINUTILS_VERSION = 2.30
+endif
+else
+MIN_BINUTILS_VERSION = 2.30
+endif
 endif
 
 # [brotli]
