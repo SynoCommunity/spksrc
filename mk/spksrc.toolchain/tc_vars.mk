@@ -58,6 +58,8 @@ COOKIE_PREFIX =
 # that overlay is ON.
 TC_PATH                   = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
 TC_OVERLAY_BINUTILS_PATH  = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_BIN)/)
+# The vendor gcc drivers carrying -B to the binutils shim (spksrc.toolchain/overlay/binutils.mk)
+TC_OVERLAY_BINUTILS_GCC_PATH = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(OVERLAY_BINUTILS_GCC_DIR)/)
 TC_OVERLAY_GCC_PATH       = $(if $(strip $(_OVERLAY_GCC_DIR)),$(firstword $(_OVERLAY_GCC_DIR))/work/install/usr/local/bin/)
 # The suffix the gcc-family drivers carry in THIS build, empty unless the gcc overlay is ON:
 # the overlay names its drivers for its directory's version (<target>-gcc-8.5, g++-8.5),

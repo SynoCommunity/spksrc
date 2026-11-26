@@ -132,6 +132,30 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "November 26th 2026 — The binutils overlay on by default, beside the vendor gcc too"
+
+    - **What:** `OVERLAY_BINUTILS` now defaults to `1`. With the gcc overlay on, the default,
+      nothing changes: it already turned binutils 2.30 on. Beside the vendor gcc
+      (`OVERLAY_GCC=0`), every compile now takes binutils 2.30 too. Kernel modules and
+      drivers keep the vendor `as`/`ld` (they force both switches off), and so does 88f6281
+      under its vendor gcc 4.6.4, which passes the assembler `-mcpu=marvell-f`: a modern
+      `as` rejects it (`OVERLAY_BINUTILS_SKIPPED` says so; an explicit `OVERLAY_BINUTILS=1`
+      is honoured).
+    - **Vendor gcc drivers:** `-B` in `CFLAGS`/`LDFLAGS` alone mixes the two binutils: a link
+      that drops `LDFLAGS` (bzip2's `libbz2.so`, curl-cffi's static `libcurl-impersonate`)
+      fell back to the vendor ld, which cannot read the `R_X86_64_REX_GOTPCRELX` the 2.30
+      `as` emits ("unrecognized relocation (0x2a)"). The toolchain now writes
+      `overlay/<tc>_binutils-<v>/work/vendor-gcc/<prefix>{gcc,g++,c++,cpp,gfortran}`, which
+      exec the vendor driver with `-B<shim>`, and `$(call tc,gcc)` returns them while
+      binutils is on and the gcc overlay off -- as gcc 8.5 has the overlay `as`/`ld`
+      linked in its own `libexec`. `COMPILER_PATH` would not do: the host gcc reads it too.
+    - **Checked:** the assembler options of the 59 vendor gccs of DSM 5.2 to 7.0 against
+      `as` 2.30 (only `-mcpu=marvell-f` fails); zlib, bzip2, libebml and openssl3 under the
+      vendor gcc on x64, armv7, hi3535 and qoriq 6.2.4; bzip2 and openssl3 run on a DS918+
+      and a DS115j.
+    - **`make setup`** now writes `OVERLAY_BINUTILS ?= 1`; a `local.mk` from an earlier
+      setup keeps its `?= 0` until edited.
+
 ??? note "November 26th 2026 — The gcc 8.5 overlay on by default, DSM 5.2 to 7.1 (#7391)"
 
     - **What:** the gcc 8.5 overlay, installed beside the vendor gcc of 68 toolchains since

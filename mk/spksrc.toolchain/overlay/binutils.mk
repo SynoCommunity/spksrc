@@ -27,6 +27,11 @@ OVERLAY_BINUTILS_BIN  = $(_OVERLAY_BINUTILS_DIR)/work/install/usr/local/bin
 # carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim).
 # Absolute, so the -B path baked into tc_vars is stable across checkouts.
 OVERLAY_BINUTILS_SHIM = $(_OVERLAY_BINUTILS_DIR)/work/shim
+# Beside the vendor gcc, -B in the flags is not enough: a link that drops LDFLAGS lets gcc
+# fall back to the vendor ld, which cannot read what the overlay as emitted (x86_64
+# R_X86_64_REX_GOTPCRELX). These drivers carry -B themselves, as the gcc overlay's
+# libexec as/ld links do; the tc macro returns them while binutils is ON and gcc OFF.
+OVERLAY_BINUTILS_GCC_DIR = $(_OVERLAY_BINUTILS_DIR)/work/vendor-gcc
 # GLOBAL redirect, folded into CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS by tc_vars. Empty unless the
 # global overlay is active -- a -B into a shim that never gets built would silently leave
 # every compile on the vendor as/ld.
@@ -54,10 +59,18 @@ endif
 .PHONY: overlay-binutils-install
 overlay-binutils-install:
 	@$(if $(_OVERLAY_BINUTILS_ON),MAKEFLAGS= $(MAKE) --no-print-directory -C $(firstword $(_OVERLAY_BINUTILS_DIR)),:)
+ifneq ($(strip $(_OVERLAY_BINUTILS_DIR)),)
+	@mkdir -p $(OVERLAY_BINUTILS_GCC_DIR) ; \
+	for t in $(_tc_gcc_tools) ; do \
+	  v=$(TC_PATH)$(TC_PREFIX)$$t ; w=$(OVERLAY_BINUTILS_GCC_DIR)/$(TC_PREFIX)$$t ; \
+	  [ -x "$$v" ] || continue ; \
+	  printf '#!/bin/sh\nexec "%s" -B"%s" "$$@"\n' "$$v" "$(OVERLAY_BINUTILS_SHIM)" > $$w.tmp && chmod 755 $$w.tmp && mv -f $$w.tmp $$w ; \
+	done
+endif
 
 # Report a degraded or risky state. Conditions AND wording both come from
 # spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):
 # the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-binutils-warn
 overlay-binutils-warn:
-	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING UNMATCHED)
+	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING SKIPPED)

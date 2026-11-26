@@ -22,7 +22,7 @@
 #                                     carried to every sub-make: 0 is refused beside gcc
 #
 #   degraded  OVERLAY_BINUTILS_MISSING      wanted, arch ships none
-#             OVERLAY_BINUTILS_UNMATCHED    active beside the vendor gcc
+#             OVERLAY_BINUTILS_SKIPPED      on, but kept off beside this vendor gcc
 #             OVERLAY_GCC_NO_BINUTILS       wanted, but no binutils overlay to drive
 #             OVERLAY_RUSTC_GCC_FALLBACK    the vendor-gcc rust taken for the gcc overlay
 #             OVERLAY_<c>_VERSION_MISSING   ships one, but not that version
@@ -78,10 +78,11 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # ---- REQUESTED (switches) ----------------------------------------------------------
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,
 #                        these archs ship an overlay because the stock std does not fit.
-# OVERLAY_BINUTILS       GLOBAL: overlay as/ld for EVERY compile. Needs a matched modern
-#                        gcc, hence off by default -- OVERLAY_GCC is what matches it, and
-#                        turns it on (_OVERLAY_BINUTILS_ON); asking 0 alongside an active
-#                        gcc overlay stops the build (OVERLAY_BINUTILS_REFUSED).
+# OVERLAY_BINUTILS       GLOBAL: overlay as/ld for EVERY compile. On by default, beside the
+#                        vendor gcc too, which reaches it through its driver wrappers --
+#                        except where that gcc emits what a modern as rejects
+#                        (_OVERLAY_BINUTILS_VENDOR_GCC_EXCLUDED). The gcc overlay turns it on
+#                        anyway (_OVERLAY_BINUTILS_ON); asking 0 beside it stops the build.
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix. On
 #                        by default; inert where the arch ships none.
 #
@@ -89,7 +90,7 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # immediate (:=) and read OVERLAY_GCC, so a `?=` after them would leave them seeing an
 # unset switch while everything later sees the default.
 OVERLAY_RUSTC    ?= 1
-OVERLAY_BINUTILS ?= 0
+OVERLAY_BINUTILS ?= 1
 # On by default, tree-wide. A package that selects a meta on TC_GCC must agree with the meta
 # spk-meta-source builds, and FWRD_ARGS_SPK does not carry the switch: only a shared
 # default makes both decide the same way. Inert wherever the arch ships no gcc overlay.
