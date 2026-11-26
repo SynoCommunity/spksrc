@@ -1,0 +1,36 @@
+
+matrix-synapse==1.74.0
+
+# [bcrypt] and [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+bcrypt==4.0.1
+cryptography==38.0.4
+# Requirement for cryptography
+cffi==1.15.1
+
+ijson==3.1.4
+
+MarkupSafe==2.1.1
+msgpack==1.0.4
+
+# [Pillow]
+# Require --global-options arguments
+#  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
+Pillow==9.3.0
+
+pydantic==1.10.2
+
+# [PyNaCl]
+# Depends: cross/libsodium
+# Require environment variables
+#  SODIUM_INSTALL=system
+PyNaCl==1.5.0
+
+# [PyYAML]
+# Depends: libyaml
+PyYAML==6.0
+
+simplejson==3.18.0
+zope.interface==5.5.2
