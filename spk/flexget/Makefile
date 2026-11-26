@@ -35,8 +35,8 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 
 include ../../mk/spksrc.common.mk
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-UNSUPPORTED_ARCHS_REASON = missing libcurl-impersonate support for these architectures
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS_REASON = no compatible libcurl-impersonate prebuild (PPC lacks one; hi3535 is soft-float)
 
 # pydantic-core 2.50.5 requires rustc 1.88
 MIN_RUSTC_VERSION = 1.88
@@ -47,7 +47,7 @@ MIN_RUSTC_BINUTILS_VERSION = 2.30
 # curl-cffi's prebuilt libcurl-impersonate is linked by the C side. Where the
 # vendor binutils is older than the 2.30 shim used for the Rust link, route
 # that C link through the same shim instead of rejecting the arch.
-ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)),)
+ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv7_ARCHS) $(i686_ARCHS)),)
 ifneq ($(strip $(_OVERLAY_BINUTILS_DIR)),)
 ifeq ($(call version_lt,$(TC_BINUTILS_VENDOR),2.30),1)
 WHEELS_LDFLAGS += [curl_cffi] -B$(_OVERLAY_BINUTILS_DIR)/work/shim
@@ -77,7 +77,7 @@ ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
 CURL_CFFI_TARGET_MACHINE = x86_64
 else ifneq ($(findstring $(ARCH),$(i686_ARCHS)),)
 CURL_CFFI_TARGET_MACHINE = i686
-else ifneq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),)
+else ifneq ($(findstring $(ARCH),$(ARMv7_ARCHS)),)
 CURL_CFFI_TARGET_MACHINE = armv7l
 else ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),)
 CURL_CFFI_TARGET_MACHINE = aarch64
