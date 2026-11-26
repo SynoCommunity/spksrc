@@ -1,5 +1,5 @@
 PKG_NAME = diesel
-PKG_VERS = 2.3.9
+PKG_VERS = 2.3.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
@@ -14,7 +14,7 @@ MIN_GCC_VERSION = 4.6
 
 # a transitive crate needs edition 2024, which cargo parses from 1.85:
 #   feature `edition2024` is required ... not stabilized in this version of Cargo
-MIN_RUSTC_VERSION = 1.85
+MIN_RUSTC_VERSION = 1.86
 
 HOMEPAGE = https://diesel.rs/
 COMMENT  = A safe, extensible ORM and Query Builder for Rust.

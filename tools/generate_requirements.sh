@@ -12,10 +12,13 @@ usage() {
 create requirements files for the given package and python version.
 
 usage: $(basename "$0") [--repo PATH] [--output-dir DIR] package[==version] [310|311|312|313|314]
+       $(basename "$0") [--repo PATH] [--output-dir DIR] --poetry-lock FILE|URL [--poetry-group GROUP] [310|311|312|313|314]
 
   package        pip requirement(s), or "-r requirements.txt"
   --repo PATH    spksrc repository root (default: auto-detect from current directory)
   --output-dir   directory for generated_requirements_*.txt (default: current directory)
+  --poetry-lock  use exact packages from a poetry.lock file or URL
+  --poetry-group poetry.lock dependency group (default: main)
 EOF
 }
 
@@ -26,6 +29,9 @@ die() {
 
 _repo=${SPKSRC:-}
 _output_dir=.
+_poetry_lock=
+_poetry_group=main
+_poetry_group_set=
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -43,6 +49,17 @@ while [ "$#" -gt 0 ]; do
             _output_dir=$2
             shift 2
             ;;
+        --poetry-lock)
+            [ "$#" -ge 2 ] || die "--poetry-lock requires a file or URL"
+            _poetry_lock=$2
+            shift 2
+            ;;
+        --poetry-group)
+            [ "$#" -ge 2 ] || die "--poetry-group requires a group name"
+            _poetry_group=$2
+            _poetry_group_set=1
+            shift 2
+            ;;
         --)
             shift
             break
@@ -53,7 +70,14 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-if [ "$#" -eq 3 ] && [ "$1" = "-r" ]; then
+if [ -z "$_poetry_lock" ] && [ -n "$_poetry_group_set" ]; then
+    die "--poetry-group requires --poetry-lock"
+fi
+
+if [ -n "$_poetry_lock" ]; then
+    [ "$#" -eq 1 ] || { usage >&2; exit 1; }
+    _python_version=$1
+elif [ "$#" -eq 3 ] && [ "$1" = "-r" ]; then
     _package="-r $2"
     _pip_args=(-r "$2")
     _python_version=$3
@@ -64,6 +88,14 @@ elif [ "$#" -eq 2 ]; then
 else
     usage >&2
     exit 1
+fi
+
+if [ -n "$_poetry_lock" ]; then
+    _command="--poetry-lock \"$_poetry_lock\""
+    [ "$_poetry_group" = main ] || _command+=" --poetry-group \"$_poetry_group\""
+    _command+=" $_python_version"
+else
+    _command="\"$_package\" $_python_version"
 fi
 
 case "$_python_version" in
@@ -114,17 +146,56 @@ echo "python = $_python3"
 _venv=$(mktemp -d "${TMPDIR:-/tmp}/generate-requirements.XXXXXX")
 _meta=$(mktemp "${TMPDIR:-/tmp}/generate-requirements-meta.XXXXXX")
 _python_provided=$(mktemp "${TMPDIR:-/tmp}/generate-requirements-python.XXXXXX")
+_poetry_lock_file=
+_poetry_requirements=
 
 cleanup() {
     rm -rf "$_venv" "$_meta" "$_python_provided"
+    [ -z "$_poetry_lock_file" ] || rm -f "$_poetry_lock_file"
+    [ -z "$_poetry_requirements" ] || rm -f "$_poetry_requirements"
 }
 trap cleanup EXIT
+
+if [ -n "$_poetry_lock" ]; then
+    case "$_poetry_lock" in
+        http://*|https://*)
+            _poetry_lock_file=$(mktemp "${TMPDIR:-/tmp}/generate-requirements-lock.XXXXXX")
+            echo "download poetry.lock [$_poetry_lock]"
+            curl -fL --connect-timeout 30 --retry 2 -o "$_poetry_lock_file" "$_poetry_lock"
+            ;;
+        *)
+            _poetry_lock_file=$(realpath "$_poetry_lock") || die "cannot resolve poetry.lock [$_poetry_lock]"
+            [ -f "$_poetry_lock_file" ] || die "poetry.lock not found [$_poetry_lock]"
+            ;;
+    esac
+
+    _poetry_requirements=$(mktemp "${TMPDIR:-/tmp}/generate-requirements-lock-req.XXXXXX")
+    _toml_python="$_python3"
+    "$_toml_python" -c 'import tomllib' >/dev/null 2>&1 || _toml_python=python3
+    "$_toml_python" -c 'import tomllib' >/dev/null 2>&1 || die "Python 3.11+ is required to read poetry.lock"
+    "$_toml_python" - "$_poetry_lock_file" "$_poetry_group" > "$_poetry_requirements" <<'PY'
+import sys
+import tomllib
+
+lock = tomllib.load(open(sys.argv[1], "rb"))
+group = sys.argv[2]
+for package in lock["package"]:
+    if group in package.get("groups", []):
+        print(f"{package['name']}=={package['version']}")
+PY
+    [ -s "$_poetry_requirements" ] || die "no packages found in poetry.lock group [$_poetry_group]"
+fi
 
 echo "create virtual env [$_venv]"
 "$_python3" -m venv "$_venv"
 
-echo "install package [$_package]"
-PIP_DISABLE_PIP_VERSION_CHECK=1 "$_venv/bin/python" -m pip install --no-input "${_pip_args[@]}"
+if [ -n "$_poetry_requirements" ]; then
+    echo "install packages from poetry.lock group [$_poetry_group]"
+    PIP_DISABLE_PIP_VERSION_CHECK=1 "$_venv/bin/python" -m pip install --no-input -r "$_poetry_requirements"
+else
+    echo "install package [$_package]"
+    PIP_DISABLE_PIP_VERSION_CHECK=1 "$_venv/bin/python" -m pip install --no-input "${_pip_args[@]}"
+fi
 
 _all="$_output_dir/generated_requirements_all.txt"
 _crossenv="$_output_dir/generated_requirements_crossenv.txt"
@@ -179,7 +250,7 @@ write_header() {
     local file=$1
     {
         printf '# Generated using the requirements script on %s\n' "$(LC_ALL=C date '+%B %-d, %Y')"
-        printf '# Command: %s "%s" %s\n\n' "$(basename "$0")" "$_package" "$_python_version"
+        printf '# Command: %s %s\n\n' "$(basename "$0")" "$_command"
     } > "$file"
 }
 

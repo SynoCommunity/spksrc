@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.23.3
+PKG_VERS = 0.25.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -14,7 +14,7 @@ DEPENDS += cross/mariadb-connector-c
 ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 
 # rust edition 2024 required (see rust-version in Cargo.toml)
-MIN_RUSTC_VERSION = 1.91
+MIN_RUSTC_VERSION = 1.98.1
 
 HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
@@ -23,7 +23,7 @@ LICENSE  = MPL 2.0
 # arguments to install the main server program
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/syncserver
 CARGO_BUILD_ARGS += --no-default-features
-CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
+CARGO_BUILD_ARGS += --features=mysql
 CARGO_BUILD_ARGS += --locked
 
 # we support MariaDB 10 only

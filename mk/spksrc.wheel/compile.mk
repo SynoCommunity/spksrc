@@ -26,7 +26,7 @@ endif
 ##
 
 # Define where is located the crossenv
-CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv-default))
 
 ##
 
@@ -62,6 +62,7 @@ endif
 wheel_compile_target: SHELL:=/bin/bash
 wheel_compile_target: pre_wheel_compile_target
 ifneq ($(WHEEL_TYPE),pure)
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk 2>/dev/null),$(eval $(e)))
 	@[ "$(WHEEL_TYPE)" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs) ; \
 	localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \
@@ -78,9 +79,9 @@ ifneq ($(WHEEL_TYPE),pure)
 	REQUIREMENT=$(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) \
 	   WHEEL_NAME=$(WHEEL_NAME) \
 	   WHEEL_VERSION=$(WHEEL_VERSION) \
-	   ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
-	   ADDITIONAL_CPPFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
-	   ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
+	   ADDITIONAL_CFLAGS="-I$(PYTHON_STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+	   ADDITIONAL_CPPFLAGS="-I$(PYTHON_STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
+	   ADDITIONAL_CXXFLAGS="-I$(PYTHON_STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
 	   ADDITIONAL_LDFLAGS="$${localLDFLAGS[@]}" \
 	   ABI3="$${abi3}" \
 	   PIP_GLOBAL_OPTION="$${global_options}" \
