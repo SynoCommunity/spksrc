@@ -1,6 +1,6 @@
 SPK_NAME = flexget
-SPK_VERS = 3.19.22
-SPK_REV = 18
+SPK_VERS = 3.22.13
+SPK_REV = 19
 SPK_ICON = src/flexget.png
 
 PYTHON_PACKAGE = python314
@@ -11,7 +11,7 @@ SPK_DEPENDS = "python314>=3.14.5-4"
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "1. Update FlexGet to v3.19.22. <br/>2. Refresh Python dependencies."
+CHANGELOG = "1. Update FlexGet to v3.22.13. <br/>2. Refresh Python dependencies."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/
@@ -35,6 +35,12 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 
 include ../../mk/spksrc.common.mk
 
+# pydantic-core 2.50.5 requires rustc 1.88
+MIN_RUSTC_VERSION = 1.88
+
+# The Rust wheels need the binutils 2.30 overlay for the Rust link.
+MIN_RUSTC_BINUTILS_VERSION = 2.30
+
 # [brotli]
 # GCC < 5.0 (DSM 6.2.4) does not support the 'model' attribute directive
 # and requires -std=c99 for C99-style for-loop declarations
@@ -42,14 +48,13 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [brotli] -std=gnu99 -Wno-attributes
 endif
 
-# [greenlet]
-# version >= 3.1: gcc >= 8   (DSM7.1+) Mandatory require full c++20 support (designated initializers)
-# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Python 3.12 support only, NOT compatible with Python 3.14
-# For GCC < 8, greenlet is skipped entirely. SQLAlchemy (the consumer of greenlet)
-# works without it in sync mode, so no functionality is lost.
-ifeq ($(call version_ge, $(TC_GCC), 8.0),1)
-WHEELS += greenlet==3.3.2
-endif
+# [cryptography]
+# cryptography 50 builds through maturin and needs the versioned Python include path
+DEPENDS += cross/openssl3
+WHEELS_CFLAGS += [cryptography] -I$(PYTHON_PACKAGE_WORK_DIR)/install/var/packages/$(PYTHON_PACKAGE)/target/include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
+
+# [curl-cffi]
+DEPENDS += python/curl-cffi
 
 # [Pendulum]
 DEPENDS += python/pendulum
@@ -61,16 +66,6 @@ endif
 
 # [PyYAML]
 DEPENDS += cross/libyaml
-
-# [rpds-py]
-# Version = 0.24 requires rustc >= 1.82 (qoriq)
-# Version = 0.25 requires rustc >= 1.85
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
-WHEELS += rpds_py==0.24.0
-else
-WHEELS += rpds_py==0.30.0
-endif
 
 include ../../mk/spksrc.spk-meta.mk
 

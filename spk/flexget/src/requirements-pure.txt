@@ -1,79 +1,83 @@
-# Generated using the requirements script on May 26, 2026
-# Command: ./generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
+# Generated using the requirements script on November 21, 2026
+# Command: generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]==3.22.13" 314
 
 aniso8601==10.0.1
-annotated_doc==0.0.4
-anyio==4.13.0
-apscheduler==3.11.2
+annotated-doc==0.0.7
+annotated-types==0.8.0
+anyio==4.15.1
+APScheduler==3.11.3
 attrs==26.1.0
 babelfish==0.6.1
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 blinker==1.9.0
-#certifi==2026.5.20                     ==> python314
+#certifi==2026.10.23            ==> python314
 cheroot==11.1.2
 CherryPy==18.10.0
-click==8.4.1
-deluge_client==1.10.2
-feedparser==6.0.12
-flask==3.1.3
-flask_compress==1.24
-flask_cors==6.0.2
-Flask_Login==0.6.3
-flask_restx==1.3.2
-flexget==3.19.22
-guessit==3.8.0
+click==8.5.1
+deluge-client==1.10.2
+feedparser-sgmllib==2.1.0
+feedparser==6.0.14
+Flask-Compress==1.26
+flask-cors==6.0.5
+Flask-Login==0.6.3
+flask-restx==1.3.2
+Flask==3.1.3
+flexget==3.22.13
+guessit==4.2.1
 h11==0.16.0
-h2==4.3.0
-hpack==4.1.0
+h2==4.4.1
+hpack==4.2.0
 html5lib==1.1
 httpcore==1.0.9
 httpx==0.28.1
 hyperframe==6.1.0
-idna==3.16
+idna==3.20
 importlib_resources==7.1.0
 itsdangerous==2.2.0
-jaraco_collections==5.2.1
-jaraco_context==6.1.2
-jaraco_functools==4.5.0
-jaraco_text==4.2.0
-jinja2==3.1.6
+jaraco.collections==5.2.1
+jaraco.context==6.1.2
+jaraco.functools==4.6.0
+jaraco.text==4.3.0
+Jinja2==3.1.6
+jsonschema-specifications==2025.9.1
 jsonschema==4.26.0
-jsonschema_specifications==2025.9.1
 loguru==0.7.3
-markdown_it_py==4.2.0
+markdown-it-py==4.3.0
 mdurl==0.1.2
-more_itertools==11.1.0
-packaging==26.2
-#pip==25.3                              ==> python314
-plumbum==1.10.0
+more-itertools==11.2.1
+#packaging==26.3                ==> python314
+#pip==26.2.2                    ==> python314
+plumbum==2.0.2
 portend==3.2.1
-pygments==2.20.0
+pycparser==3.12
+pydantic==2.14.4
+Pygments==2.21.0
 pynzb==0.1.0
-pyparsing==3.3.2
-pyrss2gen==1.1
-python_dateutil==2.9.0.post0
-python_telegram_bot==22.7
-qbittorrent_api==2025.11.1
-rebulk==3.2.0
+pyparsing==3.3.3
+PyRSS2Gen==1.1
+python-dateutil==2.9.0.post0
+python-telegram-bot==22.8
+qbittorrent-api==2026.10.1
+rebulk==6.0.2
 referencing==0.37.0
 requests==2.34.2
 rich==15.0.0
 rpyc==6.0.2
-#setuptools==82.0.1                     ==> python314
-sgmllib3k==1.0.0
+#setuptools==84.2.1             ==> python314
 shellingham==1.5.4
-#six==1.17.0                            ==> python314
+#six==1.17.0                    ==> python314
 socksio==1.0.0
-soupsieve==2.8.4
-tempora==5.9.0
-transmission_rpc==7.0.11
-typer==0.26.0
-typer_slim==0.24.0
-typing_extensions==4.15.0
-tzdata==2026.2
-tzlocal==5.3.1
-urllib3==2.7.0
-webencodings==0.5.1
-werkzeug==3.1.8
-zc_lockfile==4.0
+soupsieve==4.1.3
+tempora==5.13.0
+transmission-rpc==7.0.12
+typer-slim==0.24.0
+typer==0.29.2
+typing-inspection==0.4.5
+typing_extensions==4.16.0
+tzdata==2026.6
+tzlocal==5.4.5
+urllib3==2.8.0
+webencodings==0.6.1
+Werkzeug==3.1.9
+zc.lockfile==4.1
 zxcvbn==4.5.0

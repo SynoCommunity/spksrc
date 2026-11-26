@@ -1,12 +1,15 @@
-# Generated using the requirements script on May 26, 2026
-# Command: ./generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
+# Generated using the requirements script on November 21, 2026
+# Command: generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]==3.22.13" 314
 
-brotli==1.2.0
-charset_normalizer==3.4.7
-#greenlet==3.5.1                    ==> supported version depends on gcc version
-markupsafe==3.0.3
-#pendulum==3.2.0                    ==> python/pendulum
+brotli==1.2.1
+cffi==2.1.1
+charset-normalizer==3.5.2
+cryptography==50.0.2
+#curl_cffi==0.17.0                  ==> python/curl-cffi
+MarkupSafe==3.0.4
+#pendulum==3.3.0                    ==> python/pendulum
 psutil==7.2.2
-pyyaml==6.0.3
-#rpds_py==0.30.0                    ==> supported version depends on rust version
-sqlalchemy==2.0.50
+pydantic_core==2.50.5
+PyYAML==6.0.4
+rpds-py==2026.9.1
+SQLAlchemy==2.0.58                  # 2.1 requires Cython >= 3.1; crossenv keeps 3.0.12
