@@ -28,6 +28,44 @@ block
   review --> merge
 ```
 
+## Working with an AI Assistant
+
+If you use an AI coding assistant, **start by pointing it at
+[`AGENTS.md`](https://github.com/SynoCommunity/spksrc/blob/master/AGENTS.md)** in the
+repository root. It is the short form of everything on this site that an assistant needs
+before touching a package: directory conventions, the build steps and their cookies,
+capability floors, architecture groups, the digests format, versioning rules, and the
+mistakes that are easy to make here and hard to spot.
+
+Some assistants read a root `AGENTS.md` on their own. If yours does not, say so explicitly
+in your first message:
+
+```text
+Read AGENTS.md at the repository root before making any change, and follow it.
+Task: update cross/<package> to <version>.
+```
+
+A few things worth stating in that first message, because they are project policy rather
+than something a model can infer:
+
+- **Which architecture to test on.** `make arch-x64-7.1` is the usual default; name the
+  legacy arch instead if that is where the problem is.
+- **That it must not push.** Every push starts a CI run. Have it show you the diff and the
+  commit message first — see [Pull Requests](pull-requests.md).
+- **Which package or directory is in scope**, so it does not widen the change.
+
+`AGENTS.md` deliberately stays short and points here for detail; this documentation tree is
+the primary reference, and `.github/copilot-instructions.md` carries longer build-system
+notes for GitHub Copilot. If you find the framework has moved on and `AGENTS.md` has not,
+updating it is a welcome contribution in its own right.
+
+!!! warning "Verify before you trust"
+    An assistant is confident about architecture lists, compiler versions and glibc
+    thresholds that it has not checked. Those are all *measurable* in this repository — the
+    toolchains are in tree, and `toolchain/syno-<arch>-<dsm>/Makefile` declares `TC_GCC`,
+    `TC_GLIBC` and `TC_KERNEL`. Ask for the evidence, and review the diff yourself before
+    it is committed.
+
 ## Step 1: Fork and Clone
 
 ### Fork the Repository

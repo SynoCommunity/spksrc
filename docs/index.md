@@ -30,6 +30,12 @@ Welcome to the documentation for **SynoCommunity**, home of [spksrc](https://git
 
     Architecture tables, Makefile variables, and API documentation.
 
+-   :material-robot-outline: **[Using an AI Agent](contributing/development-process.md#working-with-an-ai-assistant)**
+
+    ---
+
+    Start your assistant on `AGENTS.md`, and what to tell it before it touches a package.
+
 </div>
 
 ## What is spksrc?
