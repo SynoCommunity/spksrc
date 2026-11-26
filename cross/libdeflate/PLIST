@@ -1,0 +1,3 @@
+lnk:lib/libdeflate.so
+lnk:lib/libdeflate.so.0
+lib:lib/libdeflate.so.0.1.22

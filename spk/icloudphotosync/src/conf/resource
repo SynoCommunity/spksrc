@@ -1,0 +1,12 @@
+{
+    "data-share": {
+        "shares": [
+            {
+                "name": "iCloudPhotos",
+                "permission": {
+                    "rw": ["iCloudPhotoSync"]
+                }
+            }
+        ]
+    }
+}
