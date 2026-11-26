@@ -1,0 +1,54 @@
+#!/bin/sh
+# USB Sync service control, runs as the package user on DSM 7.
+# spksrc provides SYNOPKG_PKGDEST and SYNOPKG_PKGVAR.
+PKG="usbsync"
+DEST="${SYNOPKG_PKGDEST:-/var/packages/usbsync/target}"
+VAR="${SYNOPKG_PKGVAR:-/var/packages/usbsync/var}"
+BIN="$DEST/bin/usbsync"
+PID="$VAR/usbsync.pid"
+LOG="$VAR/usbsync.log"
+
+is_running() {
+    [ -f "$PID" ] && kill -0 "$(cat "$PID")" 2>/dev/null
+}
+
+case "$1" in
+    start)
+        is_running && exit 0
+        mkdir -p "$VAR"
+        if [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt 1048576 ]; then
+            tail -c 262144 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+        fi
+        PORT=8765
+        [ -f "$VAR/usbsync.env" ] && . "$VAR/usbsync.env"
+        export SYNOPKG_PKGVAR="$VAR" SYNOPKG_PKGNAME="$PKG"
+        export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/syno/bin:$PATH"
+        nohup "$BIN" -data "$VAR" -listen ":$PORT" >> "$LOG" 2>&1 &
+        echo $! > "$PID"
+        sleep 1
+        is_running || { echo "USB Sync failed to start, see $LOG"; exit 1; }
+        exit 0
+        ;;
+    stop)
+        if is_running; then
+            P="$(cat "$PID")"
+            kill "$P"
+            i=0
+            while kill -0 "$P" 2>/dev/null && [ $i -lt 20 ]; do sleep 1; i=$((i+1)); done
+            kill -9 "$P" 2>/dev/null
+        fi
+        rm -f "$PID"
+        exit 0
+        ;;
+    status)
+        is_running && exit 0
+        exit 3
+        ;;
+    log)
+        echo "$LOG"
+        exit 0
+        ;;
+    *)
+        exit 1
+        ;;
+esac
