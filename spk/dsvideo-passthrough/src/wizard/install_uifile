@@ -1,0 +1,31 @@
+[
+  {
+    "step_title": "Proxy settings",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "DS Video connects to this port instead of the DSM port. Video Station is reached via the URL below (normally this NAS itself). After install, set the DS Video server address to this NAS on the listen port.",
+        "subitems": [
+          {
+            "key": "wizard_listen_port",
+            "desc": "Listen port",
+            "defaultValue": "5080",
+            "validator": {
+              "allowBlank": false,
+              "regex": { "expr": "/^[1-9][0-9]{1,4}$/", "errorText": "Enter a port number" }
+            }
+          },
+          {
+            "key": "wizard_upstream",
+            "desc": "Video Station URL",
+            "defaultValue": "http://127.0.0.1:5000",
+            "validator": {
+              "allowBlank": false,
+              "regex": { "expr": "/^http:\\/\\/[A-Za-z0-9.:\\[\\]-]+\\/?$/", "errorText": "e.g. http://127.0.0.1:5000" }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

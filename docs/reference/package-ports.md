@@ -54,6 +54,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Downloads"><td>5053</td><td>Couchpotato (custom)</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>5055</td><td>Seerr</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>5075</td><td>NZBHydra</td><td>Downloads</td><td>Web interface</td></tr>
+    <tr data-category="Media Server"><td>5080</td><td>DS Video HEVC Passthrough</td><td>Media Server</td><td>DS Video proxy</td></tr>
     <tr data-category="Utilities"><td>5244</td><td>OpenList</td><td>Utilities</td><td>Web interface</td></tr>
     <tr data-category="Communication"><td>5280</td><td>ejabberd</td><td>Communication</td><td>HTTP admin</td></tr>
     <tr data-category="Development"><td>5433</td><td>PostgreSQL</td><td>Development</td><td>Database</td></tr>

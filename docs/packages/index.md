@@ -59,6 +59,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Media"><td><a href="comskip/">Comskip</a></td><td>Media</td><td>Commercial detector for recorded TV</td></tr>
     <tr data-category="Downloads"><td><a href="deluge/">Deluge</a></td><td>Downloads</td><td>Feature-rich BitTorrent client</td></tr>
     <tr data-category="Network"><td><a href="dnscrypt-proxy/">dnscrypt-proxy</a></td><td>Network</td><td>DNS encryption proxy</td></tr>
+    <tr data-category="Media Server"><td><a href="dsvideo-passthrough/">DS Video HEVC Passthrough</a></td><td>Media Server</td><td>HEVC raw passthrough proxy for DS Video</td></tr>
     <tr data-category="Backup"><td><a href="duplicity/">Duplicity</a></td><td>Backup</td><td>Encrypted bandwidth-efficient backup</td></tr>
     <tr data-category="Media"><td><a href="ffmpeg/">FFmpeg</a></td><td>Media</td><td>Complete multimedia framework</td></tr>
     <tr data-category="Web Apps"><td><a href="file-browser/">File Browser</a></td><td>Web Apps</td><td>Web file browser</td></tr>
