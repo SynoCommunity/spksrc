@@ -44,7 +44,6 @@ else
 	@$(if $(_OVERLAY_BINUTILS_ON),$(if $(call is_true,$(OVERLAY_BINUTILS)),,$(_ovl_line) "note: ON for the gcc overlay (it drives as/ld)" ;))
 	@$(if $(OVERLAY_BINUTILS_MISSING),$(_ovl_line) "note: requested but the arch ships none" ;)
 	@$(if $(OVERLAY_BINUTILS_VERSION_MISSING),$(_ovl_line) "note: binutils $(OVERLAY_BINUTILS_VERSION) is not shipped here" ;)
-	@$(if $(OVERLAY_BINUTILS_SKIPPED),$(_ovl_line) "note: kept off beside this vendor gcc (-mcpu=marvell-f)" ;)
 	$(call _overlay_report_component,GCC,gcc)
 	@$(if $(OVERLAY_GCC_VERSION_MISSING),$(_ovl_line) "note: gcc $(OVERLAY_GCC_VERSION) is not shipped here" ;)
 	@$(if $(OVERLAY_GCC_NO_BINUTILS),$(_ovl_line) "note: asked without a binutils overlay to drive: vendor gcc kept" ;)

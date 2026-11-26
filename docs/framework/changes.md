@@ -137,10 +137,8 @@ If you only read one thing, read this. The details are in the dated log below.
     - **What:** `OVERLAY_BINUTILS` now defaults to `1`. With the gcc overlay on, the default,
       nothing changes: it already turned binutils 2.30 on. Beside the vendor gcc
       (`OVERLAY_GCC=0`), every compile now takes binutils 2.30 too. Kernel modules and
-      drivers keep the vendor `as`/`ld` (they force both switches off), and so does 88f6281
-      under its vendor gcc 4.6.4, which passes the assembler `-mcpu=marvell-f`: a modern
-      `as` rejects it (`OVERLAY_BINUTILS_SKIPPED` says so; an explicit `OVERLAY_BINUTILS=1`
-      is honoured).
+      drivers keep the vendor `as`/`ld`: they force both switches off, and kbuild calls
+      `$(CROSS_COMPILE)as`/`ld` of the vendor toolchain directly.
     - **Vendor gcc drivers:** `-B` in `CFLAGS`/`LDFLAGS` alone mixes the two binutils: a link
       that drops `LDFLAGS` (bzip2's `libbz2.so`, curl-cffi's static `libcurl-impersonate`)
       fell back to the vendor ld, which cannot read the `R_X86_64_REX_GOTPCRELX` the 2.30
@@ -149,10 +147,15 @@ If you only read one thing, read this. The details are in the dated log below.
       exec the vendor driver with `-B<shim>`, and `$(call tc,gcc)` returns them while
       binutils is on and the gcc overlay off -- as gcc 8.5 has the overlay `as`/`ld`
       linked in its own `libexec`. `COMPILER_PATH` would not do: the host gcc reads it too.
+    - **88f6281:** its gcc 4.6.4 defaults to `-mcpu=marvell-f` and writes `.cpu marvell-f`
+      into every `.s`, which `as` 2.30 rejects (a specs file cannot reach that directive).
+      Its drivers ask for `-march=armv5te -mtune=marvell-f` unless the caller picks a cpu
+      or arch: the `.text` of 33 zlib, bzip2, lz4 and lame objects is byte-identical to
+      the vendor default.
     - **Checked:** the assembler options of the 59 vendor gccs of DSM 5.2 to 7.0 against
-      `as` 2.30 (only `-mcpu=marvell-f` fails); zlib, bzip2, libebml and openssl3 under the
-      vendor gcc on x64, armv7, hi3535 and qoriq 6.2.4; bzip2 and openssl3 run on a DS918+
-      and a DS115j.
+      `as` 2.30; zlib, bzip2, libebml, openssl3 and fd under the vendor gcc on the 20 CI
+      archs of DSM 5.2 to 7.1 (refusals only from package floors); bzip2, openssl3 and fd
+      run on a DS918+, a DS115j and a DS212j.
     - **`make setup`** now writes `OVERLAY_BINUTILS ?= 1`; a `local.mk` from an earlier
       setup keeps its `?= 0` until edited.
 

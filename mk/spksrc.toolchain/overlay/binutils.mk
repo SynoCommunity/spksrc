@@ -7,9 +7,8 @@
 #
 # Two scopes draw on the same download:
 #   OVERLAY_BINUTILS        GLOBAL -- as/ld (and ar, nm, strip, ...) for every compilation,
-#                           baked into tc_vars. Only safe under a MATCHED modern gcc: a modern
-#                           binutils rejects vendor flags a stock gcc emits (arm-marvell's
-#                           -mcpu=marvell-f). Off by default.
+#                           baked into tc_vars. On by default; beside the vendor gcc, through
+#                           the drivers below (marvell-f rewritten to armv5te).
 #   RUSTC_LINK_VIA_BINUTILS_OVERLAY
 #                           NARROW -- only the Rust link, C keeps the vendor as/ld. On by
 #                           default where this overlay is newer; a link takes no -mcpu.
@@ -31,6 +30,9 @@ OVERLAY_BINUTILS_SHIM = $(_OVERLAY_BINUTILS_DIR)/work/shim
 # fall back to the vendor ld, which cannot read what the overlay as emitted (x86_64
 # R_X86_64_REX_GOTPCRELX). These drivers carry -B themselves, as the gcc overlay's
 # libexec as/ld links do; the tc macro returns them while binutils is ON and gcc OFF.
+# A gcc configured --with-cpu=marvell-f (88f6281) writes `.cpu marvell-f`, unknown to a modern
+# as: its drivers ask for -march=armv5te -mtune=marvell-f, the same code, unless the caller
+# picks a cpu or arch itself.
 OVERLAY_BINUTILS_GCC_DIR = $(_OVERLAY_BINUTILS_DIR)/work/vendor-gcc
 # GLOBAL redirect, folded into CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS by tc_vars. Empty unless the
 # global overlay is active -- a -B into a shim that never gets built would silently leave
@@ -64,7 +66,10 @@ ifneq ($(strip $(_OVERLAY_BINUTILS_DIR)),)
 	for t in $(_tc_gcc_tools) ; do \
 	  v=$(TC_PATH)$(TC_PREFIX)$$t ; w=$(OVERLAY_BINUTILS_GCC_DIR)/$(TC_PREFIX)$$t ; \
 	  [ -x "$$v" ] || continue ; \
-	  printf '#!/bin/sh\nexec "%s" -B"%s" "$$@"\n' "$$v" "$(OVERLAY_BINUTILS_SHIM)" > $$w.tmp && chmod 755 $$w.tmp && mv -f $$w.tmp $$w ; \
+	  x= ; $$v -v 2>&1 | grep -q -- '--with-cpu=marvell-f' && x='-march=armv5te -mtune=marvell-f' ; \
+	  { printf '#!/bin/sh\n' ; \
+	    [ -n "$$x" ] && printf 'case " $$* " in *" -mcpu="*|*" -march="*) x= ;; *) x="%s" ;; esac\n' "$$x" ; \
+	    printf 'exec "%s" -B"%s" $${x} "$$@"\n' "$$v" "$(OVERLAY_BINUTILS_SHIM)" ; } > $$w.tmp && chmod 755 $$w.tmp && mv -f $$w.tmp $$w ; \
 	done
 endif
 
@@ -73,4 +78,4 @@ endif
 # the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-binutils-warn
 overlay-binutils-warn:
-	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING SKIPPED)
+	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING)

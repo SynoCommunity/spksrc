@@ -22,7 +22,6 @@
 #                                     carried to every sub-make: 0 is refused beside gcc
 #
 #   degraded  OVERLAY_BINUTILS_MISSING      wanted, arch ships none
-#             OVERLAY_BINUTILS_SKIPPED      on, but kept off beside this vendor gcc
 #             OVERLAY_GCC_NO_BINUTILS       wanted, but no binutils overlay to drive
 #             OVERLAY_RUSTC_GCC_FALLBACK    the vendor-gcc rust taken for the gcc overlay
 #             OVERLAY_<c>_VERSION_MISSING   ships one, but not that version
@@ -79,9 +78,8 @@ _OVERLAY_TC := syno$(or $(TC_ARCH_SUFFIX),$(ARCH_SUFFIX))
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,
 #                        these archs ship an overlay because the stock std does not fit.
 # OVERLAY_BINUTILS       GLOBAL: overlay as/ld for EVERY compile. On by default, beside the
-#                        vendor gcc too, which reaches it through its driver wrappers --
-#                        except where that gcc emits what a modern as rejects
-#                        (_OVERLAY_BINUTILS_VENDOR_GCC_EXCLUDED). The gcc overlay turns it on
+#                        vendor gcc too, which reaches it through its driver wrappers
+#                        (spksrc.toolchain/overlay/binutils.mk). The gcc overlay turns it on
 #                        anyway (_OVERLAY_BINUTILS_ON); asking 0 beside it stops the build.
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix. On
 #                        by default; inert where the arch ships none.

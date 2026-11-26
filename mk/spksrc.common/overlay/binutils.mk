@@ -24,14 +24,7 @@ endif
 # assemble what it emits. A package therefore activates OVERLAY_GCC alone; an explicit
 # OVERLAY_BINUTILS=0 beside it is refused (spksrc.common/overlay.mk). No cycle:
 # _OVERLAY_GCC_ON tests availability, not this.
-#
-# Beside the vendor gcc, the default skips the toolchains whose gcc passes the assembler what
-# binutils 2.30 rejects: 88f6281's -mcpu=marvell-f. Decided here, where the toolchain is known,
-# not in the switch's default, which the first make settles before any arch and forwards. An
-# explicit OVERLAY_BINUTILS=1 is still honoured.
-_OVERLAY_BINUTILS_VENDOR_GCC_EXCLUDED = syno-88f6281-%
-_OVERLAY_BINUTILS_VENDOR_OK = $(if $(call is_true,$(OVERLAY_BINUTILS_ASKED)),1,$(if $(filter $(_OVERLAY_BINUTILS_VENDOR_GCC_EXCLUDED),$(_OVERLAY_TC)),,1))
-_OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(_OVERLAY_GCC_ON),1,$(if $(call is_true,$(OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_VENDOR_OK))))
+_OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(call is_true,$(OVERLAY_BINUTILS))$(_OVERLAY_GCC_ON),1))
 
 # OVERLAY_BINUTILS asked off while the gcc overlay is active: the request cannot be obeyed,
 # and building anyway would let the caller believe it was. Stops at parse time, in the
@@ -45,7 +38,5 @@ OVERLAY_BINUTILS_REFUSED = $(if $(_OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED
 # and must not announce a missing binutils on every build of a 7.2 arch.
 _OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS_ASKED))$(call is_true,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY))$(if $(strip $(_OVERLAY_GCC_DIR)),$(call is_true,$(OVERLAY_GCC))),1)
 
-# Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or on but
-# skipped beside a vendor gcc that emits what it rejects.
+# Degraded state (spksrc.common/overlay.mk): wanted where the arch ships none.
 OVERLAY_BINUTILS_MISSING   = $(if $(_OVERLAY_BINUTILS_ANY),,$(_OVERLAY_BINUTILS_WANTED))
-OVERLAY_BINUTILS_SKIPPED   = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(_OVERLAY_BINUTILS_ON),,$(if $(call is_true,$(OVERLAY_BINUTILS)),1)))

@@ -7,7 +7,7 @@
 # Macro: the banner of a component's first degraded state
 #
 #   overlay-binutils-warn:
-#   	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING SKIPPED)
+#   	@$(call overlay_warn,BINUTILS,VERSION_MISSING MISSING)
 #
 # The first <STATE> of the list, in order, whose OVERLAY_<C>_<STATE> is 1, as the text of
 # OVERLAY_WARN_<C>_<STATE>; nothing when none is. The order is the priority: one banner
@@ -39,14 +39,6 @@ $(MSG) "*********************************************************************" ;
 $(MSG) "*** No rust $(OVERLAY_RUSTC_VERSION) overlay built with gcc $(OVERLAY_GCC_VERSION) for [$(_OVERLAY_TC)]" ; \
 $(MSG) "*** Using $(patsubst $(_OVERLAY_TC)_%,%,$(notdir $(_OVERLAY_RUSTC_VENDOR))) instead" ; \
 $(MSG) "*** The rust std is built against the vendor gcc, the C around it is not" ; \
-$(MSG) "*********************************************************************"
-endef
-
-define OVERLAY_WARN_BINUTILS_SKIPPED
-$(MSG) "*********************************************************************" ; \
-$(MSG) "*** binutils $(OVERLAY_BINUTILS_VERSION) is not used beside the vendor gcc $(TC_GCC_VENDOR):" ; \
-$(MSG) "*** it passes the assembler -mcpu=marvell-f, which a modern as rejects." ; \
-$(MSG) "*** Set OVERLAY_GCC=1 to build with gcc $(OVERLAY_GCC_VERSION) and its binutils." ; \
 $(MSG) "*********************************************************************"
 endef
 
