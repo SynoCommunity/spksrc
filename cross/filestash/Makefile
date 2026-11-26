@@ -1,7 +1,7 @@
 PKG_NAME = filestash
 # No upstream tags; pinned to master commit below (commit date as version)
-PKG_VERS = 20260910
-PKG_GIT_HASH = 8a85e85bf2afa4007b62a53cbe2b57e4c3bb1551
+PKG_VERS = 20261126
+PKG_GIT_HASH = d3bdbde5b9f385b52cf447daba0cc4c13e8e391f
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mickael-kerjean/filestash/archive
@@ -10,7 +10,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
 BUILD_DEPENDS = native/go
 
-# Go 1.26 has no 32-bit PowerPC target (covered by env-go.mk);
+# Go 1.27 has no 32-bit PowerPC target (covered by env-go.mk);
 # ARMv5 (88f6281, kernel 2.6) is below Go's minimum kernel needs
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
@@ -23,7 +23,7 @@ LICENSE  = AGPL-3.0
 # so the package must be selected via GO_SRC_DIR instead (builds ".").
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/cmd
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/dist/filestash
-GO_BUILD_ARGS = -tags "fts5" -o $(WORK_DIR)/$(PKG_DIR)/dist/filestash
+GO_BUILD_ARGS = -tags "fts5" -trimpath -ldflags="-s -w" -o $(WORK_DIR)/$(PKG_DIR)/dist/filestash
 
 PRE_COMPILE_TARGET = filestash_pre_compile
 

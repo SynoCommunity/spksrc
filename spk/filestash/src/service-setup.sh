@@ -5,10 +5,23 @@
 export FILESTASH_PATH="${SYNOPKG_PKGVAR}/data"
 
 FILESTASH_BIN="${SYNOPKG_PKGDEST}/bin/filestash"
-# Transcoder plugin needs ffmpeg on PATH (set here, not in
-# SERVICE_COMMAND: the launcher splits that value into words, so it must
-# stay a single simple command without shell operators)
-PATH="/var/packages/ffmpeg8/target/bin:${PATH}"
+
+# Optional (soft) ffmpeg: use the newest installed SynoCommunity ffmpeg
+# package, if any. File management works without it; thumbnails,
+# transcoding and ffprobe-based metadata need it.
+FFMPEG_DIR=""
+for _ff_pkg in ffmpeg8 ffmpeg7 ffmpeg6 ffmpeg5 ffmpeg4 ffmpeg; do
+    _ff_bin="/var/packages/${_ff_pkg}/target/bin"
+    if [ -x "${_ff_bin}/ffmpeg" ] && [ -x "${_ff_bin}/ffprobe" ]; then
+        FFMPEG_DIR="${_ff_bin}"
+        break
+    fi
+done
+unset _ff_pkg _ff_bin
+
+if [ -n "${FFMPEG_DIR}" ]; then
+    PATH="${FFMPEG_DIR}:${PATH}"
+fi
 
 SERVICE_COMMAND="${FILESTASH_BIN}"
 SVC_CWD="${SYNOPKG_PKGVAR}"

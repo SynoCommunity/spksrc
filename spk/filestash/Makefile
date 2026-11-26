@@ -1,15 +1,14 @@
 SPK_NAME = filestash
-SPK_VERS = 20260910
+SPK_VERS = 20261126
 SPK_REV = 1
 SPK_ICON = src/filestash.png
 
 DEPENDS = cross/filestash
-SPK_DEPENDS = "ffmpeg8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Filestash is a web file manager that connects to SFTP, S3, WebDAV, local disk and cloud storage through a single interface.
 DISPLAY_NAME = Filestash
-CHANGELOG = "Initial package. Filestash snapshot 20260910."
+CHANGELOG = "Initial package. Filestash snapshot 20261126."
 
 HOMEPAGE = https://filestash.app
 LICENSE = AGPL-3.0
