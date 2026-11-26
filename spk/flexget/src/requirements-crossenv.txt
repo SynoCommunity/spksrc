@@ -5,7 +5,7 @@ brotli==1.2.1
 cffi==2.1.1
 charset-normalizer==3.5.2
 cryptography==50.0.2
-curl_cffi==0.17.0
+#curl_cffi==0.17.0                  ==> python/curl-cffi
 MarkupSafe==3.0.4
 #pendulum==3.3.0                    ==> python/pendulum
 psutil==7.2.2
