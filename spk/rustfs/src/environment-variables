@@ -1,0 +1,12 @@
+# Additional RustFS settings, one KEY=value per line, read at every start.
+# Values set here override the package defaults.
+#
+# The package already ships safe defaults for a single-HDD NAS
+# (RUSTFS_DRIVE_TIMEOUT_PROFILE=high_latency and related timeouts) so that
+# RustFS does not answer 503 / SlowDown under sustained backup load. Override
+# them here if your hardware differs. See the upstream documentation at
+# https://docs.rustfs.com (operations / drive-timeout-tuning).
+#
+# Examples:
+#RUSTFS_SERVER_DOMAINS=s3.example.org
+#RUSTFS_REGION=us-east-1
