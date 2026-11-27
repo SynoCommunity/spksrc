@@ -5,7 +5,10 @@ SPK_ICON = src/powershell.png
 
 DEPENDS = cross/powershell
 
-# PowerShell 7.7 bundles .NET 11, whose libcoreclr requires glibc >= 2.27 (DSM 7.2+)
+# Framework-dependent PowerShell 7.7 runs on the shared .NET 11 runtime
+SPK_DEPENDS = "dotnet11-runtime>=11.0.0"
+
+# .NET 11 libcoreclr requires glibc >= 2.27 (DSM 7.2+)
 MIN_GLIBC_VERSION = 2.27
 
 # Arch exclusions for dotnet
@@ -23,6 +26,6 @@ LICENSE  = MIT
 
 include ../../mk/spksrc.common.mk
 
-SPK_COMMANDS = share/powershell/pwsh
+SPK_COMMANDS = bin/pwsh
 
 include ../../mk/spksrc.spk.mk

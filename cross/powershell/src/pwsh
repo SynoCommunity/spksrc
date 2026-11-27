@@ -1,0 +1,6 @@
+#!/bin/sh
+# Start PowerShell on the shared .NET 11 runtime from the dotnet11-runtime package.
+DOTNET_ROOT=/var/packages/dotnet11-runtime/target/share/dotnet
+export DOTNET_ROOT
+PSHOME_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")/share/powershell"
+exec "${DOTNET_ROOT}/dotnet" "${PSHOME_DIR}/pwsh.dll" "$@"

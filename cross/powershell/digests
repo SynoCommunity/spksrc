@@ -1,9 +1,3 @@
-powershell-7.7.0-linux-x64.tar.gz SHA1 b26dc5ad56d02da222485af031545e3f812d1fe4
-powershell-7.7.0-linux-x64.tar.gz SHA256 c89d9c682d2c403dfe726f3df948e359675235a5bd6fab535776de69729ca0cb
-powershell-7.7.0-linux-x64.tar.gz MD5 7e007fd83aaa5a922d68219195f28d6e
-powershell-7.7.0-linux-arm32.tar.gz SHA1 c563f5a81fb5820a54b3ebc101cf7836f7c0501f
-powershell-7.7.0-linux-arm32.tar.gz SHA256 d05e2bbc7b165e4db1b7194f92ccb6951e09847d4013f9cc464ead1c8804a10a
-powershell-7.7.0-linux-arm32.tar.gz MD5 d98ccbe1a93ce5f910972a656b3d3f84
-powershell-7.7.0-linux-arm64.tar.gz SHA1 dbddfa5773e1558b9c56755c39b6b9987ca3485a
-powershell-7.7.0-linux-arm64.tar.gz SHA256 e59c89776eaa59790d44b3edd14277435225ab08b6e7603763101b89de83d935
-powershell-7.7.0-linux-arm64.tar.gz MD5 e46727c785b7448a0ed4b22749bebf8c
+powershell-7.7.0-linux-x64-fxdependent.tar.gz SHA1 5ffba9a7a3ba665535dee1f3a21cce0d1f0b34dc
+powershell-7.7.0-linux-x64-fxdependent.tar.gz SHA256 57573b61f79a497e314221bcf62d6d131d04256548ed88e01f671996f1882449
+powershell-7.7.0-linux-x64-fxdependent.tar.gz MD5 4dd36dcfdb67ea802c981db0c6acfc6f
