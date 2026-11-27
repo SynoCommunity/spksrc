@@ -1,0 +1,71 @@
+[
+    {
+        "step_title": "Merathon setup",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Shared folder that holds your Git repositories (its name, not its path). It is created if it does not exist, and the Merathon user is given read/write permission on it automatically.",
+                "subitems": [
+                    {
+                        "key": "wizard_repos_share",
+                        "desc": "Shared folder name",
+                        "defaultValue": "git",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[A-Za-z0-9_-]+$/",
+                                "errorText": "Letters, digits, - and _ only"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "desc": "Access token (16 characters or more). You will be asked for it every time you sign in to Merathon from a browser (a session lasts 12 hours, and ends when the package restarts): keep it in a password manager. Anyone who knows it can read and change the repositories above, so use HTTPS (DSM reverse proxy). Everyone who signs in shares the same Git identity (name and e-mail of commits) and the same SSH keys.",
+                "subitems": [
+                    {
+                        "key": "wizard_token",
+                        "desc": "Access token",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^.{16,}$/",
+                                "errorText": "16 characters or more"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Address of Merathon, opened by its icon in the DSM menu (optional). Fill it in when you reach Merathon through the DSM reverse proxy, for example https://merathon.mynas.myds.me. Leave it empty to open http://<NAS>:8765/ directly, which does not work when DSM is used over HTTPS with a myds.me or synology.me name. You can change it later (MERATHON_PUBLIC_URL in config.env).",
+                "subitems": [
+                    {
+                        "key": "wizard_public_url",
+                        "desc": "Address of Merathon",
+                        "emptyText": "https://merathon.mynas.myds.me",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^https?:\\/\\/[A-Za-z0-9._~:\\/?#@!$&()*+,;=%-]+$/",
+                                "errorText": "An address starting with http:// or https://"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "multiselect",
+                "desc": "The integrated terminal runs commands on the NAS as the Merathon user.",
+                "subitems": [
+                    {
+                        "key": "wizard_terminal",
+                        "desc": "Enable the integrated terminal",
+                        "defaultValue": false
+                    }
+                ]
+            }
+        ]
+    }
+]
