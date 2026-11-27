@@ -1,6 +1,6 @@
 SPK_NAME = ejabberd
-SPK_VERS = 25.10
-SPK_REV = 4
+SPK_VERS = 26.09
+SPK_REV = 5
 SPK_ICON = src/ejabberd.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ DESCRIPTION = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQ
 ADMIN_URL = /admin/
 ADMIN_PORT = 5280
 DISPLAY_NAME = ejabberd
-CHANGELOG = "1. Update ejabberd to v25.10."
+CHANGELOG = "1. Update ejabberd to v26.09."
 
 HOMEPAGE = https://www.ejabberd.im
 LICENSE  = GPLv2
@@ -21,8 +21,8 @@ WIZARDS_DIR = src/wizard
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-# custom start-stop-status script is required, 
-# as SERVICE_COMMAND is not a single command
+# Custom start/stop is required for the ejabberdctl start/started and
+# stop/stopped handshakes; generic stop only terminates the stored PID.
 SSS_SCRIPT = src/service-start-stop.sh
 
 FWPORTS = src/ejabberd.sc

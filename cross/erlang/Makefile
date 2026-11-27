@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 27.3.4.19
+PKG_VERS = 28.5.0.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -14,7 +14,7 @@ COMMENT  = Erlang is a programming language used to build massively scalable sof
 LICENSE  = Apache 2.0
 
 NATIVE_ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
-ENV = PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
+ENV += PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
 
 INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
 
@@ -29,17 +29,26 @@ CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.common.mk
 
-# OTP 27 JIT (asmjit) requires GCC 9+; GCC 8.5 and older crash while
+# OTP 27+ JIT (asmjit) requires GCC 9+; GCC 8.5 and older crash while
 # compiling asmjit/core/virtmem.cpp
 ifeq ($(call version_lt, $(TC_GCC), 9),1)
 CONFIGURE_ARGS += --disable-jit
 endif
 
-# OTP 27 requires 64-bit time_t by default. 32-bit DSM toolchains only
+# OTP 27+ requires 64-bit time_t by default. 32-bit DSM toolchains only
 # provide 32-bit time_t, so allow the upstream-supported opt-out.
 ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),)
 CONFIGURE_ARGS += --disable-year2038
 endif
+
+# qoriq's 32-bit target needs libatomic for the 64-bit __atomic_* builtins.
+# Keep it before the objects but retain it despite --as-needed; otherwise the
+# linker drops it before libei references the symbols. Re-enable --as-needed
+# for the libraries that follow.
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+ADDITIONAL_LDFLAGS += -Wl,--no-as-needed -latomic -Wl,--as-needed
+endif
+
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 
