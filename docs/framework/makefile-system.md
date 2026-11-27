@@ -281,6 +281,7 @@ spksrc.toolchain.mk
 spksrc.toolchain/
 ├── overlay/
 │   ├── binutils.mk           # uses the binutils overlay (shim, -B), cleans every overlay
+│   ├── gcc.mk                # uses the gcc overlay (installed at tcvars, its warnings)
 │   └── rustc.mk              # uses the rust overlay (synology triple, rustup toolchain)
 ├── tc-base.mk
 ├── tc-flags.mk

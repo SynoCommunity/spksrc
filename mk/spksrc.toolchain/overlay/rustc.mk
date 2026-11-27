@@ -37,7 +37,12 @@ include ../../mk/spksrc.cross/env-rust.mk
 # reading like a rustup name (<ver>-<target>) grafted with arch/DSM/gcc.
 _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
-_RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
+# The gcc is the one the selected rust was BUILT with, as its directory names it
+# (_gcc-<version>) and spksrc.overlay/rust.mk links it: not TC_GCC, the build's, which reads
+# 8.5.0 under the gcc overlay where the directory says 8.5, and the vendor's when the vendor
+# rust is taken for lack of one built with the overlay.
+_RUST_GCC   = $(lastword $(subst _gcc-, ,$(notdir $(firstword $(_OVERLAY_RUSTC_DIR)))))
+_RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(_RUST_GCC)
 
 # ON = custom from-source build + synology triple; OFF = stock rustup rustc + `unknown`
 # triple, usable only where rustup ships a std (tc-rust.mk reports it). The switch and its

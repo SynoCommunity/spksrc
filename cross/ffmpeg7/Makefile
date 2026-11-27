@@ -26,6 +26,14 @@ CONFIGURE_ARGS += --ar=$(call tc,ar)
 CONFIGURE_ARGS += --nm=$(call tc,nm)
 CONFIGURE_ARGS += --ranlib=$(call tc,ranlib)
 CONFIGURE_ARGS += --strip=$(call tc,strip)
+
+# ffmpeg 7 wants C11 static assertions. static_assert is not a runtime feature, just a
+# macro glibc added to assert.h in 2.16; the keyword comes from the compiler, so define it
+# ourselves on an older libc rather than lose the arch. Via --extra-cflags, not CFLAGS:
+# ffmpeg takes its environment from the generated tc_vars.
+ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
 CONFIGURE_ARGS += --pkg-config=$(call native,pkg-config)
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-pic
@@ -48,8 +56,11 @@ else
   endif
 endif
 
-# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
-# toolchains ship no such header. Was disabled for qoriq by name.
+# New since ffmpeg7: its libavdevice/v4l2.c reaches for the multiplanar API -- v4l2_plane
+# and V4L2_CAP_VIDEO_CAPTURE_MPLANE, which Linux grew in 3.2 -- while configure only
+# checks that linux/videodev2.h exists. The 2.6.32 toolchains ship that header without
+# those symbols, so the indev is enabled and then fails to compile. ffmpeg4-6 do not use
+# them and need no such guard. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
 CONFIGURE_ARGS += --disable-indev=v4l2
 endif
@@ -146,6 +157,13 @@ $(call depend,cross/fdk-aac,--enable-libfdk-aac --enable-nonfree)
 ##
 ## ARCH SPECIFIC
 ##
+
+# gcc 4.6.4 kept ffmpeg7 out entirely; the overlay makes it reachable. --cpu=armv5te is
+# what turns off the armv6/v6t2/neon/vfp paths this core does not have.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=armv5te
+endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm

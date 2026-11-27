@@ -6,8 +6,9 @@ PKG_DIST_SITE = https://github.com/sharkdp/fd/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# tikv-jemalloc-sys fails to build:
-MIN_BINUTILS_VERSION = 2.22
+# Requires 'pipe2'. Also covers tikv-jemalloc-sys, whose C redefines a typedef, which
+# gcc only accepts from 4.6: the one toolchain below it, ppc853x-5.2, has glibc 2.8.
+MIN_GLIBC_VERSION = 2.9
 
 # see: https://github.com/sharkdp/fd/issues/1428
 # fd >= 10.5.0 and rustc >= 1.90 fixed the build with ARMv7L toolchain.

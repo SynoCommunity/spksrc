@@ -31,13 +31,12 @@ _OVERLAY_BINUTILS_ON = $(if $(strip $(_OVERLAY_BINUTILS_DIR)),$(if $(call is_tru
 # first make that knows the arch -- before stage0 touches the toolchain.
 OVERLAY_BINUTILS_REFUSED = $(if $(_OVERLAY_GCC_ON),$(if $(OVERLAY_BINUTILS_ASKED),$(call is_false,$(OVERLAY_BINUTILS_ASKED))))
 
-# All three uses pull the same archive; they differ only in scope. The gcc overlay ships
+# All three uses pull the same archive; they differ only in scope. OVERLAY_BINUTILS counts
+# only when asked: its default is on, and must not announce a missing binutils either. The gcc overlay ships
 # no as/ld of its own, so without this it would silently drive the vendor ones. The gcc one
 # counts only where the arch ships a gcc overlay: elsewhere OVERLAY_GCC=1 asks for nothing,
 # and must not announce a missing binutils on every build of a 7.2 arch.
-_OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS))$(call is_true,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY))$(if $(strip $(_OVERLAY_GCC_DIR)),$(call is_true,$(OVERLAY_GCC))),1)
+_OVERLAY_BINUTILS_WANTED = $(if $(call is_true,$(OVERLAY_BINUTILS_ASKED))$(call is_true,$(RUSTC_LINK_VIA_BINUTILS_OVERLAY))$(if $(strip $(_OVERLAY_GCC_DIR)),$(call is_true,$(OVERLAY_GCC))),1)
 
-# Degraded states (spksrc.common/overlay.mk): wanted where the arch ships none, or active
-# beside the vendor gcc, which it is not matched to.
+# Degraded state (spksrc.common/overlay.mk): wanted where the arch ships none.
 OVERLAY_BINUTILS_MISSING   = $(if $(_OVERLAY_BINUTILS_ANY),,$(_OVERLAY_BINUTILS_WANTED))
-OVERLAY_BINUTILS_UNMATCHED = $(if $(_OVERLAY_BINUTILS_ON),$(if $(_OVERLAY_GCC_ON),,1))

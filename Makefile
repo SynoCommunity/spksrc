@@ -246,7 +246,7 @@ local.mk:
 .PHONY: overlay-defaults
 overlay-defaults: local.mk
 	@grep -q "^OVERLAY_RUSTC" local.mk    || echo "OVERLAY_RUSTC ?= 1" >> local.mk
-	@grep -q "^OVERLAY_BINUTILS" local.mk || echo "OVERLAY_BINUTILS ?= 0" >> local.mk
+	@grep -q "^OVERLAY_BINUTILS" local.mk || echo "OVERLAY_BINUTILS ?= 1" >> local.mk
 	@# migrate an earlier '=' form: it would override an environment prefix
 	@sed -i -e "s/^OVERLAY_RUSTC = /OVERLAY_RUSTC ?= /" -e "s/^OVERLAY_BINUTILS = /OVERLAY_BINUTILS ?= /" local.mk
 

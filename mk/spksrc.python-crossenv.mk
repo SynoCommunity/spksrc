@@ -207,14 +207,16 @@ ifeq ($(CROSSENV_WHEEL),default)
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 endif
 	@set -o pipefail; { \
-	$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py --directory-prefix=$(CROSSENV_PATH)/build ; \
+	$(RUN) wget --no-verbose --timeout=30 --tries=$(or $(DOWNLOAD_TRIES),2) --waitretry=10 --retry-connrefused \
+	     --retry-on-http-error=429,500,502,503,504 -O $(CROSSENV_PATH)/build/get-pip.py \
+	     https://bootstrap.pypa.io/get-pip.py || { echo "ERROR: cannot download get-pip.py" ; exit 1 ; } ; \
 	$(RUN) chmod 755 $(CROSSENV_PATH)/build/get-pip.py ; \
 	. $(CROSSENV_PATH)/bin/activate ; \
 	$(MSG) crossenv-$(CROSSENV_WHEEL)/build default packages: $(CROSSENV_BUILD_PIP), $(CROSSENV_BUILD_SETUPTOOLS), $(CROSSENV_BUILD_WHEEL) ; \
-	$(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_BUILD_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	$(RUN) $$(which build-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) ; \
+	$(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_BUILD_PIP) --no-setuptools --no-wheel --disable-pip-version-check || exit 1 ; \
+	$(RUN) $$(which build-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) || exit 1 ; \
 	$(MSG) crossenv-$(CROSSENV_WHEEL)/cross default packages: $(CROSSENV_CROSS_PIP), $(CROSSENV_CROSS_SETUPTOOLS), $(CROSSENV_CROSS_WHEEL) ; \
-	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check || exit 1 ; \
 	$(RUN) $$(which cross-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 	@$(MSG) $(MAKE) \

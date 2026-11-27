@@ -121,10 +121,76 @@ If you only read one thing, read this. The details are in the dated log below.
   archive and pulled in like any other dependency. That fixes long-standing failures on
   those archs (SPE float, the ppc853x TLS relocations, `AtomicU64`). It also
   generalises: a component shipped **beside** a base toolchain is an *overlay*, switched
-  with **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`** from `local.mk`, and `make help`
+  with **`OVERLAY_GCC`** / **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`**, and `make help`
   shows which are active for your arch.
 
+- **gcc 8.5 on DSM 5.2 to 7.1, on by default.** 68 toolchains get gcc 8.5 and binutils
+  2.30 beside their vendor compiler, so a package whose `MIN_GCC_VERSION` the vendor gcc
+  misses builds there all the same, and `TC_GCC` reports the compiler actually used.
+  **`OVERLAY_GCC=0`** builds on the vendor gcc. See
+  [Building with the gcc overlay](../framework/toolchain.md#building-with-the-gcc-overlay).
+
 ---
+
+??? note "November 26th 2026 — The binutils overlay on by default, beside the vendor gcc too"
+
+    - **What:** `OVERLAY_BINUTILS` now defaults to `1`. With the gcc overlay on, the default,
+      nothing changes: it already turned binutils 2.30 on. Beside the vendor gcc
+      (`OVERLAY_GCC=0`), every compile now takes binutils 2.30 too. Kernel modules and
+      drivers keep the vendor `as`/`ld`: they force both switches off, and kbuild calls
+      `$(CROSS_COMPILE)as`/`ld` of the vendor toolchain directly.
+    - **Vendor gcc drivers:** `-B` in `CFLAGS`/`LDFLAGS` alone mixes the two binutils: a link
+      that drops `LDFLAGS` (bzip2's `libbz2.so`, curl-cffi's static `libcurl-impersonate`)
+      fell back to the vendor ld, which cannot read the `R_X86_64_REX_GOTPCRELX` the 2.30
+      `as` emits ("unrecognized relocation (0x2a)"). The toolchain now writes
+      `overlay/<tc>_binutils-<v>/work/vendor-gcc/<prefix>{gcc,g++,c++,cpp,gfortran}`, which
+      exec the vendor driver with `-B<shim>`, and `$(call tc,gcc)` returns them while
+      binutils is on and the gcc overlay off -- as gcc 8.5 has the overlay `as`/`ld`
+      linked in its own `libexec`. `COMPILER_PATH` would not do: the host gcc reads it too.
+    - **88f6281:** its gcc 4.6.4 defaults to `-mcpu=marvell-f` and writes `.cpu marvell-f`
+      into every `.s`, which `as` 2.30 rejects (a specs file cannot reach that directive).
+      Its drivers ask for `-march=armv5te -mtune=marvell-f` unless the caller picks a cpu
+      or arch: the `.text` of 33 zlib, bzip2, lz4 and lame objects is byte-identical to
+      the vendor default.
+    - **Checked:** the assembler options of the 59 vendor gccs of DSM 5.2 to 7.0 against
+      `as` 2.30; zlib, bzip2, libebml, openssl3 and fd under the vendor gcc on the 20 CI
+      archs of DSM 5.2 to 7.1 (refusals only from package floors); bzip2, openssl3 and fd
+      run on a DS918+, a DS115j and a DS212j.
+    - **`make setup`** now writes `OVERLAY_BINUTILS ?= 1`; a `local.mk` from an earlier
+      setup keeps its `?= 0` until edited.
+
+??? note "November 26th 2026 — The gcc 8.5 overlay on by default, DSM 5.2 to 7.1 (#7391)"
+
+    - **What:** the gcc 8.5 overlay, installed beside the vendor gcc of 68 toolchains since
+      #7701 and produced by #7707, is now used by packages, together with binutils 2.30,
+      whose `as`/`ld` it needs. A package then builds with `<target>-gcc-8.5`, and `TC_GCC`
+      reports `8.5.0`, so `MIN_GCC_VERSION` floors and `version_ge` selections follow the
+      compiler actually used; `TC_GCC_VENDOR` keeps the toolchain's own.
+    - **On by default** (`OVERLAY_GCC ?= 1`), tree-wide, so a package and the meta packages
+      it builds agree without the switch crossing the spk boundary. Inert where an arch
+      ships no overlay; kernel modules and drivers keep the vendor gcc. `OVERLAY_GCC=0`
+      returns to the vendor compiler; an explicit `OVERLAY_BINUTILS=0` beside an active
+      gcc overlay stops the build, since gcc 8.5 cannot drive the vendor `as`.
+    - **The effective compiler, wherever the toolchain is asked.** The overlay's runtimes
+      are searched first, with `-L` and `--rpath-link`, which `ld` uses for a shared
+      library's own `DT_NEEDED`; the toolchain's include directory moves to `-idirafter`,
+      so it no longer shadows gcc 8.5's headers; `TC_HAS_LIBATOMIC` probes the compiler
+      that will run. `tc_vars.overlay.mk` records the drivers' suffix, `TC_GCC_SUFFIX`.
+    - **What a package carries:** the overlay's `libstdc++.so` and `libgcc_s.so`, newer
+      than DSM's, wherever a shipped binary needs them (`TC_LIBS_OVERLAY`).
+    - **Rust follows the gcc:** the rust built with gcc 8.5 is taken by default, and the
+      rustup toolchain is named after the gcc the selected rust was built with. On an arch
+      with no rust overlay and a vendor gcc older than 5 (`hi3535`, the ARMv8 archs of DSM
+      6.2.4), the toolchain provisions stable rust for the overlay side and 1.97.1 for the
+      vendor side. The Rust link takes the same binutils 2.30
+      (`RUSTC_LINK_VIA_BINUTILS_OVERLAY`, #7818).
+    - **Overlay consumers** build no plist (`INSTALL_PLIST_SKIP`), and log and answer
+      `make help` in `overlay/` as in `toolchain/`.
+    - **Packages:** ffmpeg 6 builds without LTO on PowerPC, where gcc 8.5 crashes in it;
+      ffmpeg 7 and 8 define `static_assert` below glibc 2.16 and build for armv5te on
+      ARMv5; the dvb plugin of gst-plugins-bad needs the headers of a 3.10 kernel.
+    - See [Building with the gcc overlay](toolchain.md#building-with-the-gcc-overlay).
+    - Pull request: [#7391](https://github.com/SynoCommunity/spksrc/pull/7391)
 
 ??? note "November 23rd 2026 — crossenv reports glibc from platform.libc_ver() (#7817)"
 
