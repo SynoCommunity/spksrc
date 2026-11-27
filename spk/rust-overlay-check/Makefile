@@ -20,6 +20,7 @@ include ../../mk/spksrc.common.mk
 # against stock rustup, which every other CI job already exercises for free.
 ifeq ($(strip $(_OVERLAY_RUSTC_DIR)),)
 UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+UNSUPPORTED_ARCHS_REASON = no rust overlay on this arch: nothing to check
 endif
 
 SPK_COMMANDS = bin/pngquant bin/rg
