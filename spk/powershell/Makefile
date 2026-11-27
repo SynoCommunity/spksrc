@@ -5,8 +5,11 @@ SPK_ICON = src/powershell.png
 
 DEPENDS = cross/powershell
 
-# Framework-dependent PowerShell 7.7 runs on the shared .NET 11 runtime
-SPK_DEPENDS = "dotnet11-runtime>=11.0.0"
+# Framework-dependent PowerShell 7.7 runs on the shared .NET 11 runtime.
+# pwsh.runtimeconfig.json requires Microsoft.NETCore.App 11.0.0 and rolls forward to
+# any newer 11.0.x. When an update raises that version, add it as a minimum,
+# e.g. "dotnet11-runtime>=11.0.2"; never pin an exact runtime version.
+SPK_DEPENDS = "dotnet11-runtime"
 
 # .NET 11 libcoreclr requires glibc >= 2.27 (DSM 7.2+)
 MIN_GLIBC_VERSION = 2.27
