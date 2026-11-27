@@ -1,0 +1,19 @@
+[{
+    "step_title": "Your Cattport apps",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Removing Cattport takes its tiles out of DSM. Your services aren't touched. What should happen to your list of apps?",
+        "subitems": [{
+            "key": "wizard_keep_data",
+            "desc": "Keep it, so it comes back if I reinstall",
+            "defaultValue": true
+          }, {
+            "key": "wizard_delete_data",
+            "desc": "Delete it",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }
+]
