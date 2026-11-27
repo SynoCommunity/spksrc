@@ -40,6 +40,15 @@ endif
 ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),)
 CONFIGURE_ARGS += --disable-year2038
 endif
+
+# qoriq's 32-bit target needs libatomic for the 64-bit __atomic_* builtins.
+# Keep it before the objects but retain it despite --as-needed; otherwise the
+# linker drops it before libei references the symbols. Re-enable --as-needed
+# for the libraries that follow.
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+ADDITIONAL_LDFLAGS += -Wl,--no-as-needed -latomic -Wl,--as-needed
+endif
+
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 
