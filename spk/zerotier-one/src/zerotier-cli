@@ -1,0 +1,4 @@
+#!/bin/sh
+# zerotier-cli for this package's daemon: zerotier-one acts as the CLI with -q,
+# and -D points it at the package's data directory.
+exec /var/packages/zerotier-one/target/bin/zerotier-one -q -D/var/packages/zerotier-one/var "$@"
