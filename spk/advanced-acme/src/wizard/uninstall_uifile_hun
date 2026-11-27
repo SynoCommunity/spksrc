@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Az Advanced ACME eltávolítása",
+    "items": [
+      {
+        "desc": "A DSM-be telepített tanúsítványok megmaradnak, de többé nem újulnak meg. Ha törli az adatokat, az Advanced ACME által létrehozott „advanced-acme” DSM-felhasználó is eltávolításra kerül."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Az Advanced ACME mentett hozzáférési és tanúsítványadatainak törlése (DSM-fiók, DNS-kulcsok, ACME-fiókok)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]

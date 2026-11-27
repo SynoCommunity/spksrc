@@ -1,0 +1,20 @@
+[
+  {
+    "step_title": "Uninstall Advanced ACME",
+    "items": [
+      {
+        "desc": "The certificates installed in DSM stay in place but will no longer be renewed. If you delete the data, the DSM user “advanced-acme” created by Advanced ACME is removed as well."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Delete the stored access data and certificate data of Advanced ACME (DSM account, DNS keys, ACME accounts)",
+            "defaultValue": true
+          }
+        ]
+      }
+    ]
+  }
+]
