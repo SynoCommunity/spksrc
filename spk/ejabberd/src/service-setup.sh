@@ -3,7 +3,7 @@
 # which isn't deployed yet. Use the installed location for ejabberdctl.
 EJABBERD_CTL="/var/packages/ejabberd/target/bin/ejabberdctl"
 # HOME to place the erlang cookie into
-export HOME=${SYNOPKG_PKGVAR}
+export HOME="${SYNOPKG_PKGVAR}"
 
 # Old locations where data may exist from previous versions.
 # On DSM 7, target/var is in @appstore while var is in @appdata.
@@ -90,15 +90,15 @@ service_restore ()
 
 service_preinst ()
 {
-    if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "UPGRADE" ]; then
         if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
             # provide a copy of the new config files 
             # copy to TMP_DIR that will be restored into var, to 
             # prevent final overwriting by previous versions of *.new files
             for config_file in ejabberdctl.cfg ejabberd.yml inetrc; do
-                if [ -f ${SYNOPKG_PKGINST_TEMP_DIR}/var/${config_file} ]; then
+                if [ -f "${SYNOPKG_PKGINST_TEMP_DIR}/var/${config_file}" ]; then
                     echo "install new config file as: ${config_file}.new"
-                    $CP ${SYNOPKG_PKGINST_TEMP_DIR}/var/${config_file} ${TMP_DIR}/${config_file}.new
+                    $CP "${SYNOPKG_PKGINST_TEMP_DIR}/var/${config_file}" "${TMP_DIR}/${config_file}.new"
                 fi
             done
         fi
@@ -107,13 +107,13 @@ service_preinst ()
 
 service_postinst ()
 {
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Add custom hostname to hosts list (below localhost) if not localhost
         if [ "${wizard_ejabberd_hostname}" != "localhost" ]; then
-            sed -e "/^  - localhost$/a\\  - ${wizard_ejabberd_hostname}" -i ${SYNOPKG_PKGVAR}/ejabberd.yml
+            sed -e "/^  - localhost$/a\\  - ${wizard_ejabberd_hostname}" -i "${SYNOPKG_PKGVAR}/ejabberd.yml"
         fi
         # Patch ejabberd.yml with admin user from install wizard
-        sed -e "s#@@adminuser@@#${wizard_ejabberd_admin_username}@${wizard_ejabberd_hostname}#g" -i ${SYNOPKG_PKGVAR}/ejabberd.yml
+        sed -e "s#@@adminuser@@#${wizard_ejabberd_admin_username}@${wizard_ejabberd_hostname}#g" -i "${SYNOPKG_PKGVAR}/ejabberd.yml"
 
         ${EJABBERD_CTL} start
         ${EJABBERD_CTL} started

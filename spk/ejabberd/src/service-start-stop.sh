@@ -4,12 +4,12 @@
 DNAME="${SYNOPKG_PKGNAME}"
 
 # Source package specific variable and functions
-SVC_SETUP=$(dirname $0)/service-setup
+SVC_SETUP="$(dirname "$0")/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
-EJABBERD_PID_PATH=${PID_FILE}
+EJABBERD_PID_PATH="${PID_FILE}"
 export EJABBERD_PID_PATH
 
 
@@ -21,35 +21,27 @@ start_daemon ()
 
 stop_daemon ()
 {
+    # Use ejabberdctl for the graceful stop handshake; generic stop only
+    # terminates the stored PID and bypasses ejabberd's node shutdown.
     ${EJABBERD_CTL} stop
-    wait_for_status 1 20 || kill -9 $(cat "${PID_FILE}")
-    rm -f ${PID_FILE} 
-    ${EJABBERD_CTL} stopped
+    if ! ${EJABBERD_CTL} stopped; then
+        [ -f "${PID_FILE}" ] && kill -9 "$(cat "${PID_FILE}")"
+        ${EJABBERD_CTL} stopped || true
+    fi
+    rm -f "${PID_FILE}"
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 $(cat "${PID_FILE}") > /dev/null 2>&1; then
+    if [ -f "${PID_FILE}" ] && kill -0 "$(cat "${PID_FILE}")" > /dev/null 2>&1; then
         return
     fi
-    rm -f "${PID_FILE}" > /dev/null
-    return 1
-}
-
-wait_for_status ()
-{
-    counter=$2
-    while [ ${counter} -gt 0 ]; do
-        daemon_status
-        [ $? -eq $1 ] && return
-        counter=$((counter-1))
-        sleep 1
-    done
+    rm -f "${PID_FILE}"
     return 1
 }
 
 
-case $1 in
+case "$1" in
     start)
         if daemon_status; then
             echo "${DNAME} is already running"
@@ -80,9 +72,9 @@ case $1 in
         fi
         ;;
     log)
-        if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
+        if [ -n "${LOG_FILE}" ] && [ -r "${LOG_FILE}" ]; then
             # Shorten long logs to last 100 lines
-            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            TEMP_LOG_FILE="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_temp.log"
             # Clear any previous log
             echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
             tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"

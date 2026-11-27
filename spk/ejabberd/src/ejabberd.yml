@@ -167,6 +167,7 @@ shaper_rules:
 
 modules:
   mod_adhoc: {}
+  mod_adhoc_api: {}
   mod_admin_extra: {}
   mod_announce:
     access: announce
@@ -181,7 +182,7 @@ modules:
   mod_fail2ban: {}
   mod_http_api: {}
   mod_http_upload:
-    put_url: https://@HOST@:5443/upload
+    put_url: https://@HOST_URL_ENCODE@:5443/upload
     custom_headers:
       "Access-Control-Allow-Origin": "https://@HOST@"
       "Access-Control-Allow-Methods": "GET,HEAD,PUT,OPTIONS"
@@ -235,6 +236,7 @@ modules:
     ip_access: trusted_network
   mod_roster:
     versioning: true
+  mod_s2s_bidi: {}
   mod_s2s_dialback: {}
   mod_shared_roster: {}
   mod_stream_mgmt:
