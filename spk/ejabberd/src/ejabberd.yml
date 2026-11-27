@@ -19,10 +19,11 @@ hosts:
 
 loglevel: info
 
-## If you already have certificates, list them here
-# certfiles:
-#  - /etc/letsencrypt/live/domain.tld/fullchain.pem
-#  - /etc/letsencrypt/live/domain.tld/privkey.pem
+## A self-signed certificate is generated on install.
+## Replace certfiles and ca_file with trusted paths as needed.
+ca_file: /etc/ssl/certs/ca-certificates.crt
+certfiles:
+  - "@@certfile@@"
 
 listen:
   -

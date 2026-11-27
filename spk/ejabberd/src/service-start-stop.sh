@@ -19,25 +19,56 @@ start_daemon ()
     ${EJABBERD_CTL} started
 }
 
+stop_process ()
+{
+    [ -f "${PID_FILE}" ] || return 0
+    pid="$(cat "${PID_FILE}" 2>/dev/null)"
+    [ -n "${pid}" ] || {
+        rm -f "${PID_FILE}"
+        return 0
+    }
+
+    if kill -0 "${pid}" > /dev/null 2>&1; then
+        kill -TERM "${pid}" > /dev/null 2>&1 || true
+        counter="${SVC_WAIT_TIMEOUT:-20}"
+        while [ "${counter}" -gt 0 ] && kill -0 "${pid}" > /dev/null 2>&1; do
+            sleep 1
+            counter=$((counter - 1))
+        done
+        kill -0 "${pid}" > /dev/null 2>&1 && kill -9 "${pid}" > /dev/null 2>&1 || true
+    fi
+    rm -f "${PID_FILE}"
+}
+
 stop_daemon ()
 {
     # Use ejabberdctl for the graceful stop handshake; generic stop only
     # terminates the stored PID and bypasses ejabberd's node shutdown.
-    ${EJABBERD_CTL} stop
-    if ! ${EJABBERD_CTL} stopped; then
-        [ -f "${PID_FILE}" ] && kill -9 "$(cat "${PID_FILE}")"
-        ${EJABBERD_CTL} stopped || true
+    # If the node is already down (stale PID or crashed node), do not run the
+    # RPC handshake or wait for its full timeout; clean up the process instead.
+    if ! ${EJABBERD_CTL} stop > /dev/null 2>&1; then
+        echo "ejabberd node is not reachable; stopping any remaining process."
+        stop_process
+        return 0
+    fi
+
+    if ! ${EJABBERD_CTL} stopped > /dev/null 2>&1; then
+        stop_process
+        ${EJABBERD_CTL} stopped > /dev/null 2>&1 || true
     fi
     rm -f "${PID_FILE}"
 }
 
 daemon_status ()
 {
-    if [ -f "${PID_FILE}" ] && kill -0 "$(cat "${PID_FILE}")" > /dev/null 2>&1; then
-        return
+    [ -f "${PID_FILE}" ] || return 1
+    pid="$(cat "${PID_FILE}" 2>/dev/null)"
+    if [ -z "${pid}" ] || ! kill -0 "${pid}" > /dev/null 2>&1; then
+        rm -f "${PID_FILE}"
+        return 1
     fi
-    rm -f "${PID_FILE}"
-    return 1
+    # A live PID is not enough after a crashed node: verify the node answers.
+    ${EJABBERD_CTL} ping > /dev/null 2>&1
 }
 
 
@@ -47,6 +78,7 @@ case "$1" in
             echo "${DNAME} is already running"
             exit 0
         else
+            stop_process
             echo "Starting ${DNAME} ..."
             start_daemon
             exit $?
@@ -59,6 +91,7 @@ case "$1" in
             exit $?
         else
             echo "${DNAME} is not running"
+            stop_process
             exit 0
         fi
         ;;
