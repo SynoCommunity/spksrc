@@ -1,5 +1,5 @@
 SPK_NAME = romarr
-SPK_VERS = 1.15.0
+SPK_VERS = 1.16.0
 SPK_REV = 1
 SPK_ICON = src/romarr.png
 
@@ -14,7 +14,7 @@ SPK_DEPENDS = "python312"
 MAINTAINER = BlizzHacker
 DESCRIPTION = ROMarr is the *arr for games. Request a title and ROMarr searches your indexers through Prowlarr, hands the best release to qBittorrent, SABnzbd or NZBGet, verifies what arrived against No-Intro and Redump, and files it into RomM, Gaseous, Retrom or a plain folder tree for ES-DE, Batocera, EmuDeck and RetroArch. ROMarr includes no games or BIOS files.
 DISPLAY_NAME = ROMarr
-CHANGELOG = "1. Initial package, ROMarr 1.15.0."
+CHANGELOG = "1. Update ROMarr to 1.16.0."
 
 HOMEPAGE = https://romarr.app
 LICENSE  = MIT
