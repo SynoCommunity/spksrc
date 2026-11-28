@@ -1,0 +1,43 @@
+[
+  {
+    "step_title": "ROMarr game library",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Shared folder where ROMarr files finished games, one sub-folder per platform. It is created if it does not exist, and the ROMarr service user is given read/write access to it.",
+        "subitems": [
+          {
+            "key": "wizard_games_share",
+            "desc": "Shared folder",
+            "defaultValue": "games",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Enter the name of a shared folder, not a path. Sub-folders are not supported."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": ""
+      },
+      {
+        "desc": "ROMarr runs as the internal service user <b>'sc-romarr'</b>. It must also be able to read your download client's completed folder: in <b>Control Panel &gt; Shared Folder</b>, edit that share, open <b>Permissions</b>, choose <b>System internal user</b> and give <b>sc-romarr</b> Read/Write. See <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a>."
+      },
+      {
+        "desc": ""
+      },
+      {
+        "desc": "There is no default password. Open ROMarr on port 6868 right after installing; the first visit sets it."
+      },
+      {
+        "desc": ""
+      },
+      {
+        "desc": "This package imports .zip and loose files. .7z and .rar archives, which most disc platforms use, need ROMarr's Docker image: install it with Container Manager instead if your model has it."
+      }
+    ]
+  }
+]
