@@ -10,12 +10,17 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Package base: master 15068a978 (Nov 15th 2026).  100 is the diff
-88b1293e6..dbffe9fb3 -- uknunknown's dev_transcoding_2026 head.  He rebases
-now, but on his own schedule: 88b1293e6 is one commit behind this base, and
-that commit touches only src/parsers/message.c, which this patch does not,
-so the diff applies to the tarball unchanged (earlier heads needed one: f4a501933 as 8dad33a74, d68b98abb on
-547f8bfae, 601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c).  Regenerate
+Package base: master 06e7cd76b (Nov 28th 2026).  100 is uknunknown's
+dev_transcoding_2026 head, 73ef0453a (one commit on 98b6f0c49), rebased onto this
+base as 47dc0a174 -- a local branch, rb-2117-06e7cd76b; nothing is pushed to his.
+His branch now sits on a master recent enough to carry 0c42643d0 and the rpm
+CI build moved into support/ci-rpm-build.sh, and resolves both himself, so the
+rebase is clean: his commit's change is the same, file by file, as on his
+branch.  It carries what was our patch 104.
+Earlier heads needed more: d0cb51f50 as 8b210bfb7 on 083bf459a, its codec.c
+conflicts taking master's side and his --ffmpeg=7 for Fedora 37-43 carried
+into support/ci-rpm-build.sh; dbffe9fb3 as de447370a on 083bf459a and as 248e3bf99 on 2ad574993, f4a501933 as 8dad33a74, d68b98abb on 547f8bfae,
+601ba8246 on 13cd6820b, 400658886 on 5ce3ff63c.  Regenerate
 whenever his head moves, and note that he force-pushes -- a plain
 `git fetch` is then rejected as non-fast-forward, so fetch with +refs or -f.
 
@@ -59,6 +64,11 @@ generated from its own commit on a local branch over his:
        config_migrate_v26 to rewrite the stored zeros, and drops the two aac
        profiles the native encoder cannot open.  Full analysis in the patch
        header; offered to uknunknown for #2117, drop it once it is upstream.
+
+  104  (gone) gave the encoded stream the frame duration of its encoder, so
+       that field-rate deinterlacing was announced at the rate it had;
+       uknunknown took it into d0cb51f50 (now 73ef0453a), so it arrives
+       with 100.
 
 (the numbers below are the older, now dropped, set)
 

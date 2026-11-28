@@ -1,26 +1,26 @@
 diff --git .github/workflows/build-ci.yml .github/workflows/build-ci.yml
-index bbffd2221..8f65b348d 100644
+index 425984f3f..8eea6c82e 100644
 --- .github/workflows/build-ci.yml
 +++ .github/workflows/build-ci.yml
-@@ -352,7 +352,7 @@ jobs:
-           export STATICLIB_CACHE="$PWD/.staticlib"
-           export VUE_FILE_CACHE="$PWD/.vuecache"
-           export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
--          ./configure --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libfdkaac_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE && make -C rpm build -j$(nproc) || (echo "PARALLEL BUILD FAILED, DOING SINGLE THREADED BUILD" && make -C rpm build)
-+          ./configure ${{ contains(fromJson('["37", "38", "39", "40", "41", "42", "43"]'), matrix.releasever) && '--ffmpeg=7 ' || '' }} --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libfdkaac_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE && make -C rpm build -j$(nproc) || (echo "PARALLEL BUILD FAILED, DOING SINGLE THREADED BUILD" && make -C rpm build)
+@@ -378,7 +378,7 @@ jobs:
+           restore-keys: |
+             staticlib-fedora-${{ matrix.releasever }}-${{ matrix.runner }}-
+       - name: build
+-        run: support/ci-rpm-build.sh ${{ matrix.releasever }}
++        run: support/ci-rpm-build.sh ${{ matrix.releasever }} ${{ matrix.releasever }} ${{ contains(fromJson('["37", "38", "39", "40", "41", "42", "43"]'), matrix.releasever) && '--ffmpeg=7' || '' }}
        - name: copy-result
          run: cp rpm/RPMS/*/tvheadend*.rpm .
        - uses: actions/upload-artifact@v4
 diff --git .github/workflows/build-cloudsmith.yml .github/workflows/build-cloudsmith.yml
-index fd25ba7a4..b43338d1c 100644
+index 7f53fecf5..8af7d1be6 100644
 --- .github/workflows/build-cloudsmith.yml
 +++ .github/workflows/build-cloudsmith.yml
-@@ -368,7 +368,7 @@ jobs:
-           export STATICLIB_CACHE="$PWD/.staticlib"
-           export VUE_FILE_CACHE="$PWD/.vuecache"
-           export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
--          ./configure --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libfdkaac_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE && make -C rpm build -j$(nproc) || (echo "PARALLEL BUILD FAILED, DOING SINGLE THREADED BUILD" && make -C rpm build)
-+          ./configure ${{ contains(fromJson('["37", "38", "39", "40", "41", "42", "43"]'), matrix.releasever) && '--ffmpeg=7 ' || '' }} --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libfdkaac_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE && make -C rpm build -j$(nproc) || (echo "PARALLEL BUILD FAILED, DOING SINGLE THREADED BUILD" && make -C rpm build)
+@@ -377,7 +377,7 @@ jobs:
+           restore-keys: |
+             staticlib-fedora-${{ matrix.releasever }}-${{ matrix.runner }}-
+       - name: build
+-        run: support/ci-rpm-build.sh ${{ matrix.releasever }}
++        run: support/ci-rpm-build.sh ${{ matrix.releasever }} ${{ matrix.releasever }} ${{ contains(fromJson('["37", "38", "39", "40", "41", "42", "43"]'), matrix.releasever) && '--ffmpeg=7' || '' }}
        - name: copy-result
          run: cp rpm/RPMS/*/tvheadend*.rpm .
        - uses: actions/upload-artifact@v4
@@ -614,10 +614,10 @@ index 9e56dd4c4..35dd4160a 100644
      }
  ]
 diff --git src/api/api_service.c src/api/api_service.c
-index d74ba410e..48d1a93ce 100644
+index 7fc03d765..220308bea 100644
 --- src/api/api_service.c
 +++ src/api/api_service.c
-@@ -87,7 +87,7 @@ api_service_streams_get_one ( elementary_stream_t *es, int use_filter )
+@@ -89,7 +89,7 @@ api_service_streams_get_one ( elementary_stream_t *es, int use_filter )
    } else if (SCT_ISVIDEO(es->es_type)) {
      htsmsg_add_u32(e, "width",          es->es_width);
      htsmsg_add_u32(e, "height",         es->es_height);
@@ -627,10 +627,10 @@ index d74ba410e..48d1a93ce 100644
      htsmsg_add_u32(e, "aspect_den",     es->es_aspect_den);
    } else if (es->es_type == SCT_CA) {
 diff --git src/config.c src/config.c
-index 3f62e5b0d..80d65eb0e 100644
+index 04d7c28a8..0668f7795 100644
 --- src/config.c
 +++ src/config.c
-@@ -2281,6 +2281,10 @@ const idclass_t config_class = {
+@@ -2311,6 +2311,10 @@ const idclass_t config_class = {
           .name   = N_("Miscellaneous Settings"),
           .number = 8,
        },
@@ -641,7 +641,7 @@ index 3f62e5b0d..80d65eb0e 100644
        {}
    },
    .ic_properties = (const property_t[]){
-@@ -2907,7 +2911,7 @@ const idclass_t config_class = {
+@@ -2937,7 +2941,7 @@ const idclass_t config_class = {
                     "NOTE: After save, Tvheadend restart is required!"),
        .off    = offsetof(config_t, enable_vainfo),
        .opts   = PO_EXPERT,
@@ -664,7 +664,7 @@ index 9597fc0aa..d2679a5d3 100644
        htsmsg_add_u32(e, "aspect_den", ssc->es_aspect_den);
      } else {
 diff --git src/esstream.h src/esstream.h
-index 592a6933d..b7a0e749b 100644
+index 82f23d13b..4df824d09 100644
 --- src/esstream.h
 +++ src/esstream.h
 @@ -22,6 +22,9 @@
@@ -703,10 +703,10 @@ index 592a6933d..b7a0e749b 100644
    char es_lang[4];           /* ISO 639 2B 3-letter language code */
    uint8_t es_audio_type;     /* Audio type */
 diff --git src/htsp_server.c src/htsp_server.c
-index 4efa3fdcf..a95b664b9 100644
+index 29e8bc6ab..c395aa6fe 100644
 --- src/htsp_server.c
 +++ src/htsp_server.c
-@@ -4222,7 +4222,7 @@ htsp_stream_deliver(htsp_subscription_t *hs, th_pkt_t *pkt)
+@@ -4242,7 +4242,7 @@ htsp_stream_deliver(htsp_subscription_t *hs, th_pkt_t *pkt)
      htsmsg_add_s64(m, "dts", dts);
    }
  
@@ -715,7 +715,7 @@ index 4efa3fdcf..a95b664b9 100644
    htsmsg_add_u32(m, "duration", dur);
  
    /**
-@@ -4346,7 +4346,7 @@ htsp_subscription_start(htsp_subscription_t *hs, const streaming_start_t *ss)
+@@ -4370,7 +4370,7 @@ htsp_subscription_start(htsp_subscription_t *hs, const streaming_start_t *ss)
        if(ssc->es_height)
          htsmsg_add_u32(c, "height", ssc->es_height);
        if(ssc->es_frame_duration)
@@ -3156,10 +3156,10 @@ index 7d2277c71..3689f1de3 100644
    default:
      return 0;
 diff --git src/service.c src/service.c
-index c65301666..34062d0ba 100644
+index 25cf68255..32c054afd 100644
 --- src/service.c
 +++ src/service.c
-@@ -1664,7 +1664,7 @@ void service_save ( service_t *t, htsmsg_t *m )
+@@ -1667,7 +1667,7 @@ void service_save ( service_t *t, htsmsg_t *m )
        if(st->es_height)
  	      htsmsg_add_u32(sub, "height", st->es_height);
        if(st->es_frame_duration)
@@ -3198,7 +3198,7 @@ index a16e2a311..b1f2174fe 100644
  const enum AVPixelFormat *
  tvh_codec_profile_video_get_pix_fmts(TVHCodecProfile *self);
 diff --git src/transcoding/codec/codec.c src/transcoding/codec/codec.c
-index 6e5d1e3e7..cc3e2b0c6 100644
+index 2706df733..7367a67dc 100644
 --- src/transcoding/codec/codec.c
 +++ src/transcoding/codec/codec.c
 @@ -69,6 +69,11 @@ extern TVHCodec tvh_codec_vaapi_vp8;
@@ -3224,7 +3224,7 @@ index 6e5d1e3e7..cc3e2b0c6 100644
  
  /* AVCodec ================================================================== */
  
-@@ -115,11 +124,31 @@ codec_get_title(const AVCodec *self)
+@@ -115,27 +124,29 @@ codec_get_title(const AVCodec *self)
  
  /* TVHCodec ================================================================= */
  
@@ -3232,58 +3232,61 @@ index 6e5d1e3e7..cc3e2b0c6 100644
 +   ch_layouts) are deprecated since lavc 61.13 (ffmpeg 7.1) in favor of
 +   avcodec_get_supported_config(), which keeps the same semantics: the list
 +   uses the same config-specific terminator and NULL means "all supported". */
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-+static const void *
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+ static const void *
+-tvh_codec_supported_config(const AVCodec *codec, enum AVCodecConfig config)
 +tvh_codec_get_supported_config(const AVCodec *codec, enum AVCodecConfig config)
-+{
-+    const void *configs = NULL;
-+
+ {
+     const void *configs = NULL;
+ 
+-    if (avcodec_get_supported_config(NULL, codec, config, 0, &configs, NULL)) {
 +    if (avcodec_get_supported_config(NULL, codec, config, 0, &configs, NULL) < 0)
-+        return NULL;
-+    return configs;
-+}
-+#endif
-+
+         return NULL;
+-    }
+     return configs;
+ }
+ #endif
+ 
+-
  static void
  tvh_codec_video_init(TVHVideoCodec *self, const AVCodec *codec)
  {
      if (!self->pix_fmts) {
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-+        self->pix_fmts = tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_PIX_FORMAT);
-+#else
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+         self->pix_fmts =
+-            tvh_codec_supported_config(codec, AV_CODEC_CONFIG_PIX_FORMAT);
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_PIX_FORMAT);
+ #else
          self->pix_fmts = codec->pix_fmts;
-+#endif
-     }
- }
- 
-@@ -131,15 +160,25 @@ tvh_codec_audio_init(TVHAudioCodec *self, const AVCodec *codec)
-     };
- 
+ #endif
+@@ -152,7 +163,7 @@ tvh_codec_audio_init(TVHAudioCodec *self, const AVCodec *codec)
      if (!self->sample_fmts) {
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-+        self->sample_fmts = tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_FORMAT);
-+#else
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+         self->sample_fmts =
+-            tvh_codec_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_FORMAT);
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_FORMAT);
+ #else
          self->sample_fmts = codec->sample_fmts;
-+#endif
-     }
+ #endif
+@@ -160,7 +171,7 @@ tvh_codec_audio_init(TVHAudioCodec *self, const AVCodec *codec)
      if (!self->sample_rates) {
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-+        self->sample_rates = tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_RATE);
-+#else
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+         self->sample_rates =
+-            tvh_codec_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_RATE);
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_RATE);
+ #else
          self->sample_rates = codec->supported_samplerates;
-+#endif
-         if (!self->sample_rates)
-             self->sample_rates = default_sample_rates;
-     }
+ #endif
+@@ -170,7 +181,7 @@ tvh_codec_audio_init(TVHAudioCodec *self, const AVCodec *codec)
      if (!self->channel_layouts) {
--#if LIBAVCODEC_VERSION_MAJOR > 59
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-+        self->channel_layouts = tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_CHANNEL_LAYOUT);
-+#elif LIBAVCODEC_VERSION_MAJOR > 59
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+         self->channel_layouts =
+-            tvh_codec_supported_config(codec, AV_CODEC_CONFIG_CHANNEL_LAYOUT);
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_CHANNEL_LAYOUT);
+ #elif LIBAVCODEC_VERSION_MAJOR > 59
          self->channel_layouts = codec->ch_layouts;
  #else
-         self->channel_layouts = codec->channel_layouts;
-@@ -320,6 +359,11 @@ tvh_codecs_register()
+@@ -352,6 +363,11 @@ tvh_codecs_register()
      }
  #endif
  
@@ -3295,7 +3298,7 @@ index 6e5d1e3e7..cc3e2b0c6 100644
  #if ENABLE_NVENC
      tvh_codec_register(&tvh_codec_nvenc_h264);
      tvh_codec_register(&tvh_codec_nvenc_hevc);
-@@ -328,6 +372,10 @@ tvh_codecs_register()
+@@ -360,6 +376,10 @@ tvh_codecs_register()
  #if ENABLE_OMX
      tvh_codec_register(&tvh_codec_omx_h264);
  #endif
@@ -11392,7 +11395,7 @@ index 2bf58b002..c88942db8 100644
     sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value) */
  int
 diff --git src/transcoding/transcode/stream.c src/transcoding/transcode/stream.c
-index 35f69004c..86dc2ad7d 100644
+index 35f69004c..794919320 100644
 --- src/transcoding/transcode/stream.c
 +++ src/transcoding/transcode/stream.c
 @@ -63,18 +63,19 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
@@ -11506,7 +11509,7 @@ index 35f69004c..86dc2ad7d 100644
      if (!icodec && !(icodec = avcodec_find_decoder(icodec_id))) {
          tvh_stream_log(self, LOG_ERR, "failed to find decoder for '%s'",
                         streaming_component_type2txt(ssc->es_type));
-@@ -141,10 +170,62 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
+@@ -141,10 +170,70 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
                                               icodec, ocodec, ssc->ssc_gh))) {
          return -1;
      }
@@ -11561,6 +11564,14 @@ index 35f69004c..86dc2ad7d 100644
 +        av_reduce(&fr.num, &fr.den, fr.num, fr.den, INT_MAX);
 +        self->context->iavctx->framerate = fr;
 +    }
++    /* The component handed downstream describes the encoded stream, whose
++     * frame duration is the encoder's: a field-rate deinterlacer halves it.
++     * Left at the source's, the muxers write it into the container (the
++     * Matroska DefaultDuration, the libav muxer's time base) and a 50 fps
++     * stream is announced at 25.  Cleared, it is taken by globalheaders from
++     * the first encoded packet, whose duration tvh_context_pack() sets. */
++    if (SCT_ISVIDEO(ssc->es_type))
++        ssc->es_frame_duration = 0;
 +    // setup parser
 +    tvh_context_setup_parser(self->context);
 +    if (!self->context->out_pkt)
@@ -12746,6 +12757,35 @@ index 4f390aafe..cd26f7449 100644
              playlist:  false,
              mimetype:  'video/x-matroska; codecs="avc1.42E01E, mp4a.40.2"'
          }
+diff --git support/ci-rpm-build.sh support/ci-rpm-build.sh
+index 50b32db67..4b5cd82c3 100755
+--- support/ci-rpm-build.sh
++++ support/ci-rpm-build.sh
+@@ -9,12 +9,14 @@
+ # Usage: support/ci-rpm-build.sh <releasever>
+ #   <releasever>  release as used in the container tag and the RPM Fusion
+ #                 package name: "44", "rawhide", "9", ...
++#   [extra_configure]  optional extra flags passed to ./configure (e.g. "--ffmpeg=7")
+ 
+ set -e
+ 
+ releasever="$1"
++extra_configure="$2"
+ if [ -z "$releasever" ]; then
+-    echo "Usage: $0 <releasever>" >&2
++    echo "Usage: $0 <releasever> [extra_configure]" >&2
+     exit 2
+ fi
+ 
+@@ -50,7 +52,7 @@ export VUE_FILE_CACHE="$PWD/.vuecache"
+ # also forwarded by rpm/Makefile into the %configure run inside rpmbuild
+ export TVH_EXTRA_CONFIGURE="--enable-vue_cache --disable-vue_build"
+ 
+-./configure --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE
++./configure $extra_configure --disable-dvbscan --disable-libfdkaac_static --disable-ffmpeg_static --disable-hdhomerun_static --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static --enable-libfdkaac --enable-hdhomerun_client --enable-libsystemd_daemon --python=/usr/bin/python3 $TVH_EXTRA_CONFIGURE
+ 
+ make -C rpm build -j"$(nproc)" || {
+     echo "PARALLEL BUILD FAILED, DOING SINGLE THREADED BUILD"
 diff --git support/patches/ffmpeg.vaapi.diff support/patches/ffmpeg.vaapi.diff
 new file mode 100644
 index 000000000..695ad6c8d

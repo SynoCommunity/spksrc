@@ -1,6 +1,6 @@
 --- support/getmuxlist.orig	2022-11-10 17:31:18.000000000 +0000
 +++ support/getmuxlist	2022-11-18 02:29:56.510420567 +0000
-@@ -28,6 +28,9 @@ if [ -d "${DIR}/.git" ]; then
+@@ -27,6 +27,9 @@
  elif [ ! -d "${DIR}" ]; then
    git clone -b "${BRANCH}" "${URL}" "${DIR}" > /dev/null 2>&1 || exit 1
  fi

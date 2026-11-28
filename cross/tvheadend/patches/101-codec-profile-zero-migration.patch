@@ -19,17 +19,27 @@ created from it keeps -99 and is saved with it.  The stored zeros are the work
 of earlier versions, where the field defaulted to 0 and idnode_save() wrote it
 out -- the upgrade path, which is the one every existing user is on.
 
-config_migrate_v26 rewrites a stored "profile": 0 to -99 across codec/*.  A
+config_migrate_v27 rewrites a stored "profile": 0 to -99 across codec/*.  A
 one-shot migration rather than a test in the load path, so a user who does
 select profile 0 afterwards is obeyed; the rewrite is lossless by construction,
 since under the previous "profile > 0" code a stored 0 was never emitted.
 Migrations run from config_init() ahead of codec_init(), so the codec subsystem
 reads the rewritten files.
 
-Verified on the NAS this package targets: the log shows the v25 to v26 step,
+Verified on the NAS this package targets, when it was still v26: the log shows
+the v25 to v26 step,
 all 13 profiles moved from 0 to -99, no profile= option reaches the encoders
 and the aac stream opens, while a profile set explicitly does reach h264_qsv
 and is accepted.
+
+It was v26 until master's f87eb28d5 took that number, for the local language
+codes (qaa..qtz) in stream filter rules; it is v27 now, after master's.  An
+installation of an earlier package is at 26 already, having run this
+migration as v26: it runs this one again as v27, which rewrites only a
+profile set to 0 since -- Baseline, for nvenc and v4l2m2m, neither on a
+Synology -- and it does not run master's v26, which matters only for a stream
+filter rule on "qaa".  Neither is worth a test of its own; the numbers have
+to follow master's.
 
 Two things this patch used to carry are now in uknunknown's branch, so they
 come with patch 100 instead: gating the aac Main and LTP profiles on
@@ -39,12 +49,12 @@ encode), and the tidy-up of tvh_codec_profile_base_open().
 
 --- src/config.c.orig
 +++ src/config.c
-@@ -1514,6 +1514,38 @@ config_migrate_v25 ( void )
-   }
+@@ -1543,6 +1543,38 @@ config_migrate_v26 ( void )
+   htsmsg_destroy(c);
  }
  
 +/*
-+ * v25 -> v26 : codec profile "profile": 0 used to mean "unset"
++ * v26 -> v27 : codec profile "profile": 0 used to mean "unset"
 + *
 + * Every codec profile config written before the AV_PROFILE_UNKNOWN default
 + * carries "profile": 0 -- not a choice, just the zeroed field.  The encoder
@@ -58,7 +68,7 @@ encode), and the tidy-up of tvh_codec_profile_base_open().
 + * -99 is spelled out because this file builds without libavcodec.
 + */
 +static void
-+config_migrate_v26 ( void )
++config_migrate_v27 ( void )
 +{
 +  htsmsg_t *c, *e;
 +  htsmsg_field_t *f;
@@ -78,13 +88,13 @@ encode), and the tidy-up of tvh_codec_profile_base_open().
  /*
   * Perform backup
   */
-@@ -1640,7 +1672,8 @@ static const config_migrate_t config_migrate_table[] = {
-   config_migrate_v22,
+@@ -1670,7 +1702,8 @@ static const config_migrate_t config_migrate_table[] = {
    config_migrate_v23,
    config_migrate_v24,
--  config_migrate_v25
-+  config_migrate_v25,
-+  config_migrate_v26
+   config_migrate_v25,
+-  config_migrate_v26
++  config_migrate_v26,
++  config_migrate_v27
  };
  
  /*
